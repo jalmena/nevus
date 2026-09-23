@@ -10,7 +10,7 @@ neVus is a self-hosted application for keeping a longitudinal photographic recor
 
 Your dermatologist has hundreds of patients and approximately seven minutes. Your mole does not care. When the question "has this changed since last time?" comes up, neVus exists so that the answer is a dated series of measured photographs rather than "I think it was a little smaller".
 
-> **Status: Phase 0, discovery.** There is nothing to install yet. This repository holds the audits, research and decisions that come before the first line of application code. The [roadmap](#roadmap) says what comes next.
+> **Status: Phase 1, foundation.** There is nothing to install yet: the repository holds the discovery documents, the settled identity and the first application scaffold (backend, interface shell, container image and CI). The [roadmap](#roadmap) says what comes next.
 
 ## What neVus is
 
