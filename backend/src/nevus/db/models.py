@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import JSON, Boolean, ForeignKey, Index, Integer, String, Uuid
+from sqlalchemy import JSON, BigInteger, Boolean, ForeignKey, Index, Integer, String, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from nevus.db.base import Base
@@ -123,3 +123,54 @@ class Setting(Base):
     value: Mapped[dict[str, Any] | list[Any] | str | int | bool | None] = mapped_column(JSON)
     encrypted: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     updated_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow, onupdate=utcnow)
+
+
+IMAGE_ROLES = ("overview", "close_up", "with_reference", "other")
+IMAGE_MODALITIES = ("camera", "dermatoscope")
+RENDITION_KINDS = ("full", "preview", "thumb")
+
+
+class Image(Base):
+    """A stored photograph: the scrubbed original (by content hash) and what little metadata survives."""
+
+    __tablename__ = "images"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    person_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("persons.id", ondelete="CASCADE"), nullable=False)
+    role: Mapped[str] = mapped_column(String(16), nullable=False, default="close_up")
+    modality: Mapped[str] = mapped_column(String(16), nullable=False, default="camera")
+    sha256: Mapped[str] = mapped_column(String(64), nullable=False)
+    bytes: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    mime: Mapped[str] = mapped_column(String(64), nullable=False)
+    width: Mapped[int] = mapped_column(Integer, nullable=False)
+    height: Mapped[int] = mapped_column(Integer, nullable=False)
+    orientation: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    source_format: Mapped[str] = mapped_column(String(16), nullable=False)
+    re_encoded: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    captured_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    captured_tz: Mapped[str | None] = mapped_column(String(64))
+    created_by: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"))
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
+    deleted_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+
+    renditions: Mapped[list[Rendition]] = relationship(back_populates="image", cascade="all, delete-orphan")
+
+    __table_args__ = (Index("ix_images_person_id", "person_id"), Index("ix_images_sha256", "sha256"))
+
+
+class Rendition(Base):
+    __tablename__ = "renditions"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    image_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("images.id", ondelete="CASCADE"), nullable=False)
+    kind: Mapped[str] = mapped_column(String(16), nullable=False)
+    sha256: Mapped[str] = mapped_column(String(64), nullable=False)
+    bytes: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    mime: Mapped[str] = mapped_column(String(64), nullable=False)
+    width: Mapped[int] = mapped_column(Integer, nullable=False)
+    height: Mapped[int] = mapped_column(Integer, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
+
+    image: Mapped[Image] = relationship(back_populates="renditions")
+
+    __table_args__ = (Index("ix_renditions_image_id_kind", "image_id", "kind", unique=True),)
