@@ -4,9 +4,59 @@
     "tagline": "Porque «creo que era más pequeño» no es un dato.",
     "intendedUse": "neVus es una ayuda personal de documentación y medición. No diagnostica, no criba ni evalúa el riesgo de ninguna enfermedad."
   },
-  "shell": {
-    "language": "Idioma",
-    "comingSoon": "El mapa corporal, tus marcas y sus observaciones llegan con la primera versión."
+  "common": { "working": "Un momento…", "cancel": "Cancelar", "close": "Cerrar", "back": "Volver" },
+  "shell": { "language": "Idioma", "navigation": "Principal", "persons": "Personas" },
+  "languages": { "en": "Inglés", "es": "Español" },
+  "auth": {
+    "username": "Usuario",
+    "password": "Contraseña",
+    "repeatPassword": "Repite la contraseña",
+    "passwordHint": "Al menos {{count}} caracteres. Una frase funciona bien.",
+    "passwordTooShort": "La contraseña necesita al menos {{count}} caracteres.",
+    "passwordsDiffer": "Las dos contraseñas no coinciden.",
+    "claimTitle": "Reclamar esta instancia",
+    "claimIntro": "Todavía nadie tiene cuenta. La primera cuenta será la administradora y creará las demás; no hay registro abierto.",
+    "claimAction": "Crear la cuenta administradora",
+    "loginTitle": "Iniciar sesión",
+    "loginAction": "Entrar"
   },
-  "languages": { "en": "Inglés", "es": "Español" }
+  "persons": {
+    "title": "Personas",
+    "name": "Nombre",
+    "add": "Añadir una persona",
+    "create": "Crear",
+    "emptyTitle": "Todavía no hay personas",
+    "emptyText": "Una persona es alguien de cuyas marcas en la piel llevas registro: tú o alguien a tu cargo.",
+    "role": { "owner": "Propietario", "manager": "Gestor", "viewer": "Lector" }
+  },
+  "images": {
+    "addPhoto": "Añadir una foto",
+    "role": "Tipo",
+    "roles": {
+      "close_up": "Primer plano",
+      "with_reference": "Con tarjeta de referencia",
+      "overview": "Vista general",
+      "other": "Otra"
+    },
+    "takePhoto": "Hacer una foto",
+    "chooseFile": "Elegir un archivo",
+    "uploading": "Subiendo…",
+    "uploaded": "Guardada. Se han eliminado del archivo la ubicación y los identificadores del dispositivo.",
+    "privacyNote": "La foto se queda en este servidor. Antes de guardarla se elimina todo lo que incrustó la cámara, salvo la fecha de captura y la orientación.",
+    "emptyTitle": "Todavía no hay fotos",
+    "emptyTextEdit": "Haz la primera foto de una marca o elige una de la galería.",
+    "emptyTextView": "Nadie ha añadido fotos de esta persona todavía.",
+    "open": "Abrir la foto",
+    "alt": "{{role}}, {{date}}",
+    "noDate": "Sin fecha de captura",
+    "delete": "Mover a la papelera"
+  },
+  "settings": {
+    "title": "Ajustes",
+    "theme": "Tema",
+    "themes": { "system": "Como el dispositivo", "light": "Claro", "dark": "Oscuro" },
+    "showUncertainty": "Mostrar la incertidumbre de las medidas (±)",
+    "roles": { "admin": "administración", "member": "miembro" },
+    "signOut": "Cerrar sesión"
+  }
 }

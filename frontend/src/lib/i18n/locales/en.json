@@ -4,9 +4,59 @@
     "tagline": "Because 'I think it was smaller' is not data.",
     "intendedUse": "neVus is a personal documentation and measurement aid. It does not diagnose, screen for, or assess the risk of any disease."
   },
-  "shell": {
-    "language": "Language",
-    "comingSoon": "The body map, your marks and their observations arrive with the first release."
+  "common": { "working": "Working…", "cancel": "Cancel", "close": "Close", "back": "Back" },
+  "shell": { "language": "Language", "navigation": "Main", "persons": "Persons" },
+  "languages": { "en": "English", "es": "Spanish" },
+  "auth": {
+    "username": "Username",
+    "password": "Password",
+    "repeatPassword": "Repeat the password",
+    "passwordHint": "At least {{count}} characters. A sentence works well.",
+    "passwordTooShort": "The password needs at least {{count}} characters.",
+    "passwordsDiffer": "The two passwords are not the same.",
+    "claimTitle": "Claim this instance",
+    "claimIntro": "Nobody has an account yet. The first account becomes the administrator and creates the others; there is no open registration.",
+    "claimAction": "Create the administrator",
+    "loginTitle": "Sign in",
+    "loginAction": "Sign in"
   },
-  "languages": { "en": "English", "es": "Spanish" }
+  "persons": {
+    "title": "Persons",
+    "name": "Name",
+    "add": "Add a person",
+    "create": "Create",
+    "emptyTitle": "No persons yet",
+    "emptyText": "A person is somebody whose skin marks you keep a record of: you, or someone you look after.",
+    "role": { "owner": "Owner", "manager": "Manager", "viewer": "Viewer" }
+  },
+  "images": {
+    "addPhoto": "Add a photo",
+    "role": "Kind",
+    "roles": {
+      "close_up": "Close-up",
+      "with_reference": "With reference card",
+      "overview": "Overview",
+      "other": "Other"
+    },
+    "takePhoto": "Take a photo",
+    "chooseFile": "Choose a file",
+    "uploading": "Uploading…",
+    "uploaded": "Saved. Location data and device identifiers were removed from the file.",
+    "privacyNote": "The photo stays on this server. Everything the camera embedded except the capture time and orientation is removed before it is stored.",
+    "emptyTitle": "No photos yet",
+    "emptyTextEdit": "Take the first photo of a mark, or choose one from the gallery.",
+    "emptyTextView": "Nobody has added photos for this person yet.",
+    "open": "Open the photo",
+    "alt": "{{role}}, {{date}}",
+    "noDate": "No capture date",
+    "delete": "Move to trash"
+  },
+  "settings": {
+    "title": "Settings",
+    "theme": "Theme",
+    "themes": { "system": "Follow the device", "light": "Light", "dark": "Dark" },
+    "showUncertainty": "Show measurement uncertainty (±)",
+    "roles": { "admin": "administrator", "member": "member" },
+    "signOut": "Sign out"
+  }
 }

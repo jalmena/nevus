@@ -6,7 +6,9 @@ import "@/design-system/tokens/tokens.css";
 import "@/design-system/base.css";
 import { App } from "@/app/App";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
+});
 const root = document.getElementById("root");
 if (!root) {
   throw new Error("Root element missing");

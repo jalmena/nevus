@@ -1,32 +1,36 @@
-import { useTranslation } from "react-i18next";
-import { supportedLanguages, type Language } from "@/lib/i18n";
-import styles from "./App.module.css";
+import { BrowserRouter, Route, Routes } from "react-router";
+import { ClaimPage } from "@/features/auth/ClaimPage";
+import { LoginPage } from "@/features/auth/LoginPage";
+import { RequireAuth } from "@/features/auth/RequireAuth";
+import { HomePage } from "@/features/persons/HomePage";
+import { PersonPage } from "@/features/persons/PersonPage";
+import { SettingsPage } from "@/features/settings/SettingsPage";
+import { Shell } from "./Shell";
+
+export function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/claim" element={<ClaimPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route
+        element={
+          <RequireAuth>
+            <Shell />
+          </RequireAuth>
+        }
+      >
+        <Route index element={<HomePage />} />
+        <Route path="persons/:personId" element={<PersonPage />} />
+        <Route path="settings" element={<SettingsPage />} />
+      </Route>
+    </Routes>
+  );
+}
 
 export function App() {
-  const { t, i18n } = useTranslation();
   return (
-    <div className={styles.page}>
-      <header className={styles.brand}>
-        <img src="/brand/wordmark-dark.svg" alt={t("app.name")} width={288} height={135} />
-        <p className={styles.tagline}>{t("app.tagline")}</p>
-      </header>
-      <main className={styles.main}>
-        <p>{t("shell.comingSoon")}</p>
-        <p className="text-secondary">{t("app.intendedUse")}</p>
-        <label className={styles.language}>
-          <span>{t("shell.language")}</span>
-          <select
-            value={i18n.resolvedLanguage ?? "en"}
-            onChange={(event) => void i18n.changeLanguage(event.target.value as Language)}
-          >
-            {supportedLanguages.map((code) => (
-              <option key={code} value={code}>
-                {t(`languages.${code}`)}
-              </option>
-            ))}
-          </select>
-        </label>
-      </main>
-    </div>
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
   );
 }
