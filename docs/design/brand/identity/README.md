@@ -4,9 +4,9 @@ Settled on 2026-09-23 after five rounds (history in [`../README.md`](../README.m
 
 ## The mark
 
-A divider, the measuring compass, holding the mark between its points. The legs are the V of the name, the hinge at the vertex is a disc with a hole of exactly half its diameter in the inverse colour, and the mark between the points is the only accent. Symmetric to the pixel, one stroke weight, round caps.
+A divider, the measuring compass, holding the mark between its points. The legs are the V of the name, the hinge at the vertex is a disc with a hole of exactly half its diameter in the inverse colour, and the mark between the points is the only accent. The drawing is the one approved in round 5 (stroke 18 on the 256 grid, tips of radius 11, hinge of radius 18), with the hole (radius 9) as the only addition; a pixel comparison against the round-5 file shows no other difference. Symmetric to the pixel.
 
-![Mark, light and dark](boards/board-mark.png)
+![Round 5, final and dark](boards/board-mark.png)
 
 At 16, 24, 32 and 48 px (real size and enlarged):
 
@@ -16,7 +16,7 @@ Files: [`svg/mark.svg`](svg/mark.svg) (light container), [`svg/mark-dark.svg`](s
 
 ## The wordmark
 
-`neVus` set in **B612 Bold**, with the mark standing in for the V: the letter box of the mark (from the tips to the bottom of the hinge) is mapped to the cap height, the mark sits 0.03 em into its neighbours like a kerned V, and the whole word is optically centred so the mark's axis is the exact centre of the ink box (189.7 px of ink on the left against 182.1 px on the right before centring; equal after).
+`neVus` set in **B612 Bold**, with the mark standing in for the V, unchanged: the letter box of the mark (from the tips to the bottom of the hinge) is mapped to the cap height, the mark sits 0.03 em into its neighbours like a kerned V, and the whole word is optically centred so the mark's axis is the exact centre of the ink box (191.0 px of ink on the left against 183.4 px on the right before centring; equal after).
 
 ![Wordmark, light](boards/board-wordmark.png)
 
@@ -51,7 +51,7 @@ Source: [`svg/store-card.svg`](svg/store-card.svg).
 
 ## Usage rules
 
-- Clear space around the mark and the wordmark: one hinge-disc diameter on every side, never less.
+- Clear space around the mark and the wordmark: two hinge-disc diameters on every side, never less.
 - Minimum sizes: mark 16 px; wordmark 120 px wide (below that, use the mark alone).
 - The accent colour appears only on the mark between the points and on interface actions; never recolour the letters.
 - Light artwork on the light paper, dark artwork on the dark paper; do not place the light mark on photographs or coloured surfaces (use the container version).

@@ -5,7 +5,7 @@
   "cap_height_px": 100.0,
   "x_height_px": 73.33333333333333,
   "em_px": 133.33333333333334,
-  "width_px": 379.46997929606624,
+  "width_px": 382.0044742729306,
   "tracking_em": 0.0,
   "adjustments_em_thousandths": {},
   "advances_px": [
@@ -17,8 +17,8 @@
   ],
   "centring": {
     "char": "V",
-    "left_ink_to_centre_px": 189.73498964803312,
-    "centre_to_right_ink_px": 182.13498964803313
+    "left_ink_to_centre_px": 191.0022371364653,
+    "centre_to_right_ink_px": 183.40223713646532
   },
   "shifts_px": [
     0.0,
@@ -27,7 +27,7 @@
     3.799999999999997,
     7.599999999999994
   ],
-  "view_w": 427.46997929606624,
+  "view_w": 430.0044742729306,
   "view_h": 199.70666666666668,
   "pad": 24,
   "baseline_y_px": 142.37333333333333
