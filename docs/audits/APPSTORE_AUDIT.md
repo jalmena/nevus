@@ -2,6 +2,9 @@
 
 Date: 2026-09-23. Scope: the maintainer's CasaOS/ZimaOS app store repository, which today distributes a single application (Tabernacle) and must become the personal store that also distributes neVus without breaking the existing Tabernacle installation. Method: inspection of the local clone and of the published `gh-pages` branch, plus the conventions documented in [CasaOS / ZimaOS third-party app store conventions](../research/CASAOS_STORE_CONVENTIONS.md).
 
+
+> **Update, 2026-09-23.** The maintainer renamed the repository to `jalmena/jalmena-appstore` after this audit was written. Verified the same day: the old `raw.githubusercontent.com` feed URLs and the old jsDelivr base URL still answer HTTP 200 with the same `Content-Length` and no redirect, and `github.com` redirects with 301, so subscribed CasaOS and ZimaOS clients are unaffected. Step 2 below is therefore done; Step 1 must additionally update the `base-url` in both workflows and `scripts/build.sh`, and the README, to the new name, while documenting that the old URLs remain valid. The display name chosen by the maintainer is "jalmena store"; neVus goes under the `Others` category.
+
 ## 1. Current structure
 
 Tracked files:
