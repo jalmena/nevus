@@ -1,0 +1,12 @@
+{
+  "app": {
+    "name": "neVus",
+    "tagline": "Porque «creo que era más pequeño» no es un dato.",
+    "intendedUse": "neVus es una ayuda personal de documentación y medición. No diagnostica, no criba ni evalúa el riesgo de ninguna enfermedad."
+  },
+  "shell": {
+    "language": "Idioma",
+    "comingSoon": "El mapa corporal, tus marcas y sus observaciones llegan con la primera versión."
+  },
+  "languages": { "en": "Inglés", "es": "Español" }
+}

@@ -1,0 +1,12 @@
+{
+  "app": {
+    "name": "neVus",
+    "tagline": "Because 'I think it was smaller' is not data.",
+    "intendedUse": "neVus is a personal documentation and measurement aid. It does not diagnose, screen for, or assess the risk of any disease."
+  },
+  "shell": {
+    "language": "Language",
+    "comingSoon": "The body map, your marks and their observations arrive with the first release."
+  },
+  "languages": { "en": "English", "es": "Spanish" }
+}

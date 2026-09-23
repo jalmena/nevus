@@ -1,0 +1,129 @@
+/* neVus design tokens. The only file where colours are written as values; everything else uses tokens.
+   Source of truth: docs/design/DESIGN_BRIEF.md and docs/design/brand/identity/README.md. */
+
+@font-face {
+  font-family: Epilogue;
+  src: url("/fonts/Epilogue-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: light dark;
+
+  /* colour: light theme */
+  --color-paper: #f6f1ea;
+  --color-surface: #fffcf7;
+  --color-surface-2: #efe8de;
+  --color-border: #d9d1c5;
+  --color-ink: #2b2a28;
+  --color-ink-2: #5e5a54;
+  --color-ink-3: #8b857c;
+  --color-accent: #1f6f6b;
+  --color-accent-2: #ddedea;
+  --color-info: #3e6d9c;
+  --color-attention: #b9791b;
+  --color-danger: #a8402f;
+  --color-success: #4e7d3a;
+  --color-photo-frame: #e9e3da;
+  --color-marker: #2b2a28;
+  --color-marker-selected: #1f6f6b;
+  --color-chart-1: #1f6f6b;
+  --color-chart-2: #8a6d3b;
+  --color-chart-3: #3e6d9c;
+  --color-chart-4: #6b5b95;
+
+  /* the brand block is always dark, whatever the theme */
+  --color-brand-paper: #17161a;
+  --color-brand-ink: #ede8e0;
+  --color-brand-accent: #5fb3ae;
+
+  /* type */
+  --font-ui: Epilogue, system-ui, -apple-system, "Segoe UI", roboto, sans-serif;
+  --font-weight-secondary: 400;
+  --font-weight-body: 500;
+  --font-weight-emphasis: 600;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --text-3xl: 2.25rem;
+  --leading-text: 1.5;
+  --leading-heading: 1.2;
+
+  /* space, shape, elevation, motion */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --radius-control: 6px;
+  --radius-card: 12px;
+  --radius-pill: 999px;
+  --shadow-1: 0 1px 2px rgb(43 42 40 / 8%), 0 2px 8px rgb(43 42 40 / 6%);
+  --shadow-2: 0 6px 24px rgb(43 42 40 / 14%);
+  --motion-fast: 120ms;
+  --motion-medium: 200ms;
+  --motion-slow: 320ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --touch-target: 44px;
+  --focus-ring: 0 0 0 2px var(--color-paper), 0 0 0 4px var(--color-accent);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-paper: #17161a;
+    --color-surface: #1f1e23;
+    --color-surface-2: #2a292f;
+    --color-border: #3a393f;
+    --color-ink: #ede8e0;
+    --color-ink-2: #b9b3aa;
+    --color-ink-3: #8a857d;
+    --color-accent: #5fb3ae;
+    --color-accent-2: #1b3735;
+    --color-info: #8db4de;
+    --color-attention: #e3b25f;
+    --color-danger: #e07a67;
+    --color-success: #8fbf7a;
+    --color-photo-frame: #2e2d33;
+    --color-marker: #ede8e0;
+    --color-marker-selected: #5fb3ae;
+    --shadow-1: 0 1px 2px rgb(0 0 0 / 40%), 0 2px 8px rgb(0 0 0 / 30%);
+    --shadow-2: 0 6px 24px rgb(0 0 0 / 50%);
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-paper: #17161a;
+  --color-surface: #1f1e23;
+  --color-surface-2: #2a292f;
+  --color-border: #3a393f;
+  --color-ink: #ede8e0;
+  --color-ink-2: #b9b3aa;
+  --color-ink-3: #8a857d;
+  --color-accent: #5fb3ae;
+  --color-accent-2: #1b3735;
+  --color-info: #8db4de;
+  --color-attention: #e3b25f;
+  --color-danger: #e07a67;
+  --color-success: #8fbf7a;
+  --color-photo-frame: #2e2d33;
+  --color-marker: #ede8e0;
+  --color-marker-selected: #5fb3ae;
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 40%), 0 2px 8px rgb(0 0 0 / 30%);
+  --shadow-2: 0 6px 24px rgb(0 0 0 / 50%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 0ms;
+    --motion-medium: 0ms;
+    --motion-slow: 0ms;
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "extends": "stylelint-config-standard",
+  "rules": {
+    "color-no-hex": [
+      true,
+      {
+        "message": "Colours live in design-system/tokens/tokens.css; use a token."
+      }
+    ],
+    "selector-class-pattern": null,
+    "custom-property-pattern": null,
+    "value-keyword-case": [
+      "lower",
+      {
+        "ignoreProperties": ["/^--font/", "font-family"]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["src/design-system/tokens/tokens.css"],
+      "rules": {
+        "color-no-hex": null
+      }
+    }
+  ]
+}
