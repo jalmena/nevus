@@ -159,7 +159,7 @@ Each requirement has an identifier, a target release and, where useful, acceptan
 | --- | --- | --- |
 | FR-DAT-01 | Trash for lesions, observations and images with automatic purge after 30 days, including blob files; restore from trash | 0.1.0 |
 | FR-DAT-02 | Complete export per person or instance: images, metadata as JSON, measurements as CSV, packaged and encrypted with a passphrase (`age` format) | 0.1.0 |
-| FR-DAT-03 | Backup command producing an encrypted, consistent snapshot (database plus blobs); nightly schedule inside the container writing under the data directory; retention 30 daily and 12 monthly; restore command; both tested in CI | 0.1.0 |
+| FR-DAT-03 | Backup command producing an encrypted, consistent snapshot: in SQLite mode the database plus the image store; in PostgreSQL mode the image store and a manifest only, the database backup being the operator's responsibility (the command says so and the deployment guide shows an example); nightly schedule inside the container writing under the data directory; retention 30 daily and 12 monthly; restore command; both tested in CI | 0.1.0 |
 | FR-DAT-04 | Profile purge: hard delete of a person and all their data after re-authentication; audit log keeps identifiers only | 0.1.0 |
 | FR-DAT-05 | Storage quota per person (soft) and low-disk guard | 0.1.0 |
 
@@ -218,7 +218,7 @@ Each requirement has an identifier, a target release and, where useful, acceptan
 | 1.0.0 | TOTP; scheduled backup verification; accessibility and threat-model reviews; privacy blur; performance pass |
 | 1.x | New-lesion detection across sessions, descriptive morphology and colour descriptors, Web Push (flagged), accelerated inference variant, more languages |
 
-## 9. Assumptions to confirm with the PO
+## 9. Confirmed by the PO (2026-09-23)
 
-1. The uncertainty display switch affects the application only; PDF reports always show ± and the "no detectable change" label (engineering interpretation of answer 28).
-2. In PostgreSQL mode the operator runs the database; neVus's backup command dumps it with the PostgreSQL client tools shipped in the image, and the restore command expects the same.
+1. The uncertainty display switch affects the application only; PDF reports always show ± and the "no detectable change" label.
+2. In PostgreSQL mode the operator runs and backs up the database; neVus backs up and restores the image store and a manifest only, and its documentation says so.

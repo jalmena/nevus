@@ -79,7 +79,7 @@ Answers that depart from the proposed default are marked **(departs from default
 27. **Measurement mode.** *Default:* semi-automatic with mandatory manual override.
     **Answer:** Semi-automatic (tap, proposed outline or diameter) with manual correction always available; nothing is saved without confirmation.
 28. **Uncertainty display.** *Default:* always show ±; never present sub-uncertainty differences as change.
-    **Answer (departs from default):** Uncertainty display is **enabled by default and can be switched off in the settings page**. Engineering interpretation, to confirm: the switch affects in-app display only; PDF reports always show ± and the "no detectable change" classification.
+    **Answer (departs from default):** Uncertainty display is **enabled by default and can be switched off in the settings page**. Confirmed by the PO later the same day: the switch affects in-app display only; PDF reports always show ± and the "no detectable change" classification.
 
 ## 8. Reminders (P1)
 
@@ -124,7 +124,7 @@ Answers that depart from the proposed default are marked **(departs from default
 43. **Access path and internal CA trust.** *Why:* decides whether live camera, PWA installation and offline mode work on day one.
     **Answer:** The PO's phones already trust the internal certificate authority used by the reverse proxy, so HTTPS is valid on mobile from day one; live camera, PWA installation and the offline capture queue are available in v1.
 44. **Database.** *Default:* SQLite in a single container.
-    **Answer (departs from default):** SQLite in a single container by default, **with a configurable external PostgreSQL option**. Both dialects are supported and exercised in CI; the backup procedure for the PostgreSQL option is documented separately.
+    **Answer (departs from default):** SQLite in a single container by default, **with a configurable external PostgreSQL option**. Both dialects are supported and exercised in CI. Confirmed later the same day: in PostgreSQL mode the database backup is the operator's responsibility; neVus backs up the image store and a manifest only.
 45. **Backups.** *Default:* nightly, encrypted, 30 daily / 12 monthly.
     **Answer:** Nightly encrypted snapshot (`age`, passphrase) under the app's data directory, picked up by the operator's existing backup job; retention 30 daily and 12 monthly; command-line restore tested in CI.
 46. **Architectures.** *Default:* amd64 first, arm64 when cheap.
@@ -153,7 +153,9 @@ Answers that depart from the proposed default are marked **(departs from default
 54. **Name.** **DECIDED:** wordmark `neVus` ("nevus vs. us"); identifiers lowercase `nevus` ([NAME_CHECK.md](research/NAME_CHECK.md)).
 55. **Mark direction.** *Default:* the V as two observation lines converging on a dot.
     **Answer (departs from default):** Explore the three directions (converging V, time rings opening into a V, typographic V accent) as SVG sketches in the design brief before deciding.
+    **Second round (same day):** none of the three sketches accepted; three new directions requested. The colours are approved.
 56. **Type character.** *Default:* quiet humanist sans, self-hosted.
     **Answer:** A quiet humanist sans-serif with its own character, libre licence, self-hosted, tabular figures for measurements.
+    **Revised (same day):** for the wordmark, a typeface whose letterforms are as symmetric as possible (geometric); several wordmarks in candidate typefaces to be offered. The interface typeface follows the wordmark's choice where legibility allows.
 57. **Tagline.** *Default:* "Evidence, not memory." for the product.
     **Answer (departs from default):** The product tagline is **"Because 'I think it was smaller' is not data."** The other candidate lines may be used in README copy.

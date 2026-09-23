@@ -99,7 +99,7 @@ Identifiers are UUIDv7 everywhere (sortable; the PWA can mint them offline and t
 
 ### 4.4 Database strategy
 
-SQLAlchemy 2.0 with portable column types (`Uuid`, `JSON`, `DateTime(timezone=True)`, `LargeBinary`) and no dialect-specific SQL outside `db/dialects.py`. Alembic migrations run in batch mode for SQLite; every migration runs against both engines in CI, plus an upgrade of fixture databases from each released schema. SQLite runs with WAL, `synchronous=NORMAL`, `busy_timeout=5000`, foreign keys on; PostgreSQL uses `psycopg` with a small pool. Hot JSON keys that need indexes (for example the latest diameter) are exposed as ordinary columns rather than JSON path indexes, so both engines behave the same. The backup command uses SQLite's online backup API or `pg_dump` (client tools are in the image) and packages the result with the blob manifest.
+SQLAlchemy 2.0 with portable column types (`Uuid`, `JSON`, `DateTime(timezone=True)`, `LargeBinary`) and no dialect-specific SQL outside `db/dialects.py`. Alembic migrations run in batch mode for SQLite; every migration runs against both engines in CI, plus an upgrade of fixture databases from each released schema. SQLite runs with WAL, `synchronous=NORMAL`, `busy_timeout=5000`, foreign keys on; PostgreSQL uses `psycopg` with a small pool. Hot JSON keys that need indexes (for example the latest diameter) are exposed as ordinary columns rather than JSON path indexes, so both engines behave the same. In SQLite mode the backup command snapshots the database with the online backup API and archives the blob tree; in PostgreSQL mode it archives the blob tree and a manifest, and the database dump is the operator's responsibility, documented with an example.
 
 ### 4.5 Image storage
 

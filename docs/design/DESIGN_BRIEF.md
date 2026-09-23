@@ -48,7 +48,7 @@ Contrast: every text/background pair meets WCAG 2.2 AA (4.5:1 body, 3:1 large te
 
 ## 4. Typography
 
-- Family: a quiet humanist sans-serif with tabular figures under a libre licence, self-hosted as WOFF2. Working choice: **Source Sans 3** (SIL Open Font License 1.1); alternative if the Product Owner prefers more character: Instrument Sans (OFL). No font is loaded from third parties at runtime; `system-ui` is the fallback stack.
+- Family: the Product Owner asked for letterforms as symmetric as possible, which points at geometric sans-serifs (mirrored n/u, symmetric V, round e, rotationally symmetric s). Candidates are set as outlined wordmarks in [`brand/README.md`](brand/README.md), all under the SIL Open Font License 1.1 and self-hosted as WOFF2; the interface uses the chosen family where legibility allows and a companion text face if needed. No font is loaded from third parties at runtime; `system-ui` is the fallback stack.
 - Weights: 400 (text), 600 (headings, buttons). No 700.
 - Scale (rem, 16 px base): 0.75 / 0.875 / 1 / 1.125 / 1.375 / 1.75 / 2.25. Line heights 1.5 for text, 1.2 for headings.
 - Numbers: `font-variant-numeric: tabular-nums` for measurements, dates and tables so columns align; the ± sign and unit set in secondary ink.
@@ -170,5 +170,5 @@ Following the Tabernacle convention: `icon.svg` as the single source of the mark
 
 ## 13. Decisions pending with the Product Owner
 
-1. Mark direction (A, B or C) after reviewing the sketches.
-2. Typeface confirmation (Source Sans 3 as the working choice).
+1. Mark direction: the first three sketches were declined; a second round is in `brand/README.md`.
+2. Typeface: chosen from the outlined wordmark candidates in `brand/README.md`.
