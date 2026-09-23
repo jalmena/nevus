@@ -1,8 +1,5 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/design/brand/identity/svg/wordmark-transparent-dark.svg">
-    <img src="docs/design/brand/identity/svg/wordmark-transparent.svg" alt="neVus" width="320">
-  </picture>
+  <img src="docs/design/brand/identity/svg/wordmark-dark.svg" alt="neVus" width="360">
 </p>
 
 # neVus

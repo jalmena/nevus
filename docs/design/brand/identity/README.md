@@ -2,33 +2,37 @@
 
 Settled on 2026-09-23 after five rounds (history in [`../README.md`](../README.md)). Everything here is generated from the sources in [`sources/`](sources/); change the parameters, not the drawings.
 
+**The mark and the wordmark are always shown on the dark paper** (`#17161A`, light ink `#EDE8E0`, accent `#5FB3AE`): app icon, favicon, README, store card, report header, login page. The light drawings exist only for light interface surfaces where the mark appears inline (for example a small mark in a light toolbar); they are never used for the brand block.
+
 ## The mark
 
 A divider, the measuring compass, holding the mark between its points. The legs are the V of the name, the hinge at the vertex is a disc with a hole of exactly half its diameter in the inverse colour, and the mark between the points is the only accent. The drawing is the one approved in round 5 (stroke 18 on the 256 grid, tips of radius 11, hinge of radius 18), with the hole (radius 9) as the only addition; a pixel comparison against the round-5 file shows no other difference. Symmetric to the pixel.
 
-![Round 5, final and dark](boards/board-mark.png)
+![The mark on the dark paper, and the light variant](boards/board-mark.png)
 
 At 16, 24, 32 and 48 px (real size and enlarged):
 
 ![Sizes](boards/board-mark-sizes.png)
 
-Files: [`svg/mark.svg`](svg/mark.svg) (light container), [`svg/mark-dark.svg`](svg/mark-dark.svg), [`svg/mark-bare.svg`](svg/mark-bare.svg) and [`svg/mark-bare-dark.svg`](svg/mark-bare-dark.svg) (no container, for lockups and headers); PNG icons in [`icons/`](icons/) at 16, 32, 48, 180, 192 and 512 px.
+Files: [`svg/mark-dark.svg`](svg/mark-dark.svg) (canonical, dark container), [`svg/mark-bare-dark.svg`](svg/mark-bare-dark.svg) (no container, for the wordmark and dark headers), [`svg/mark.svg`](svg/mark.svg) and [`svg/mark-bare.svg`](svg/mark-bare.svg) (light variants for light interface surfaces); PNG icons from the dark mark in [`icons/`](icons/) at 16, 32, 48, 180, 192 and 512 px, plus `icon-512-light.png`.
 
 ## The wordmark
 
 `neVus` set in **B612 Bold**, with the mark standing in for the V, unchanged: the letter box of the mark (from the tips to the bottom of the hinge) is mapped to the cap height, the mark sits 0.03 em into its neighbours like a kerned V, and the whole word is optically centred so the mark's axis is the exact centre of the ink box (191.0 px of ink on the left against 183.4 px on the right before centring; equal after).
 
-![Wordmark, light](boards/board-wordmark.png)
+![Wordmark on the dark paper](boards/board-wordmark-dark.png)
 
-![Wordmark, dark](boards/board-wordmark-dark.png)
+Light variant (light interface surfaces only; the centre line shows the optical centring):
 
-Files: [`svg/wordmark.svg`](svg/wordmark.svg), [`svg/wordmark-dark.svg`](svg/wordmark-dark.svg), [`svg/wordmark-transparent.svg`](svg/wordmark-transparent.svg), [`svg/wordmark-transparent-dark.svg`](svg/wordmark-transparent-dark.svg). Outlines only; no font is needed to render them. Metrics in [`sources/wordmark-metrics.json`](sources/wordmark-metrics.json).
+![Wordmark, light variant](boards/board-wordmark.png)
+
+Files: [`svg/wordmark-dark.svg`](svg/wordmark-dark.svg) (canonical, on the dark paper), [`svg/wordmark-transparent-dark.svg`](svg/wordmark-transparent-dark.svg) (for dark surfaces), [`svg/wordmark.svg`](svg/wordmark.svg) and [`svg/wordmark-transparent.svg`](svg/wordmark-transparent.svg) (light variants). Outlines only; no font is needed to render them. Metrics in [`sources/wordmark-metrics.json`](sources/wordmark-metrics.json).
 
 ## Colour
 
 | Token | Light | Dark | Use |
 | --- | --- | --- | --- |
-| paper | `#F6F1EA` | `#17161A` | background, the hole in the hinge |
+| paper | `#F6F1EA` | `#17161A` | background, the hole in the hinge; the brand block always uses the dark paper |
 | ink | `#2B2A28` | `#EDE8E0` | letters and strokes |
 | accent | `#1F6F6B` | `#5FB3AE` | the mark between the points; primary actions in the interface |
 
@@ -43,7 +47,7 @@ Licence texts: [`licences/OFL-B612.txt`](licences/OFL-B612.txt), [`licences/OFL-
 
 ## Store card
 
-Preview of the 1200 × 630 card built from the same outlines:
+Preview of the 1200 × 630 card built from the same outlines, on the dark paper:
 
 ![Store card preview](boards/store-card-preview.png)
 
@@ -54,6 +58,6 @@ Source: [`svg/store-card.svg`](svg/store-card.svg).
 - Clear space around the mark and the wordmark: two hinge-disc diameters on every side, never less.
 - Minimum sizes: mark 16 px; wordmark 120 px wide (below that, use the mark alone).
 - The accent colour appears only on the mark between the points and on interface actions; never recolour the letters.
-- Light artwork on the light paper, dark artwork on the dark paper; do not place the light mark on photographs or coloured surfaces (use the container version).
+- The brand block (mark and wordmark together, or the wordmark alone) always sits on the dark paper; the light drawings are only for a small inline mark on light interface surfaces. Never place the mark on photographs or coloured surfaces.
 - Do not rotate, skew, add effects, or redraw the V in a typeface: the mark is the V.
 - The tagline is set in Epilogue, never in B612.

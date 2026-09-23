@@ -155,6 +155,7 @@ Answers that depart from the proposed default are marked **(departs from default
     **Answer (departs from default):** Explore the three directions (converging V, time rings opening into a V, typographic V accent) as SVG sketches in the design brief before deciding.
     **Second round (same day):** none of the three sketches accepted; three new directions requested. The colours are approved.
     **Settled (same day, after five rounds):** the divider mark, with a hinge hole of half the disc's diameter in the inverse colour; the mark stands in for the V of the wordmark. See `docs/design/brand/identity/`.
+    **Approved by the PO (same day):** the mark and the wordmark are always shown on the dark background.
 56. **Type character.** *Default:* quiet humanist sans, self-hosted.
     **Answer:** A quiet humanist sans-serif with its own character, libre licence, self-hosted, tabular figures for measurements.
     **Revised (same day):** for the wordmark, a typeface whose letterforms are as symmetric as possible (geometric); several wordmarks in candidate typefaces to be offered. The interface typeface follows the wordmark's choice where legibility allows.
