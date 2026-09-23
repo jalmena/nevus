@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="Mark A: two lines converging on a dot">
+  <rect width="256" height="256" rx="56" fill="#F6F1EA"/>
+  <g stroke="#2B2A28" stroke-width="26" stroke-linecap="round" fill="none">
+    <path d="M60 52 L116 138"/>
+    <path d="M196 52 L140 138"/>
+  </g>
+  <circle cx="128" cy="180" r="24" fill="#1F6F6B"/>
+</svg>

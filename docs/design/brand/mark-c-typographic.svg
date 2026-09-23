@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="Mark C: a typographic V as the only accent">
+  <rect width="256" height="256" rx="56" fill="#F6F1EA"/>
+  <text x="128" y="196" text-anchor="middle" font-family="'Source Sans 3', 'Segoe UI', system-ui, sans-serif" font-size="184" font-weight="600" fill="#1F6F6B">V</text>
+  <circle cx="128" cy="216" r="9" fill="#2B2A28"/>
+</svg>
