@@ -1,0 +1,18 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:best-practices", ":semanticCommits", ":dependencyDashboard"],
+  "baseBranches": ["develop"],
+  "minimumReleaseAge": "3 days",
+  "lockFileMaintenance": { "enabled": true, "schedule": ["before 6am on monday"] },
+  "packageRules": [
+    {
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "automerge": true
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "pinDigests": true
+    }
+  ]
+}

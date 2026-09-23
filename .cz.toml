@@ -1,0 +1,12 @@
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.0.0"
+tag_format = "v$version"
+major_version_zero = true
+update_changelog_on_bump = true
+changelog_incremental = true
+version_files = [
+  "backend/pyproject.toml:^version",
+  "frontend/package.json:\"version\"",
+  "deploy/compose.yaml:^  version:",
+]

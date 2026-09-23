@@ -1,0 +1,157 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, develop, "release/**", "hotfix/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  commits:
+    name: Conventional commits
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v6
+      - name: Check every commit message in the pull request
+        run: uvx --from commitizen cz check --rev-range "origin/${{ github.base_ref }}..HEAD"
+
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: nevus
+          POSTGRES_PASSWORD: nevus
+          POSTGRES_DB: nevus
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U nevus" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+      - run: uv sync --frozen
+      - name: Lint and format
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+      - name: Type check
+        run: uv run mypy
+      - name: Tests on SQLite
+        run: uv run pytest --cov=nevus --cov-report=term-missing
+      - name: Tests on PostgreSQL
+        env:
+          NEVUS_DATABASE_URL: postgresql+psycopg://nevus:nevus@localhost:5432/nevus
+        run: uv run pytest
+      - name: Migrations on SQLite
+        env:
+          NEVUS_DATA_DIR: ${{ runner.temp }}/sqlite
+        run: |
+          uv run alembic upgrade head
+          uv run alembic check
+      - name: Migrations on PostgreSQL
+        env:
+          NEVUS_DATABASE_URL: postgresql+psycopg://nevus:nevus@localhost:5432/nevus
+        run: |
+          uv run alembic upgrade head
+          uv run alembic check
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: frontend/.node-version
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm format:check
+      - run: pnpm test
+      - run: pnpm build
+
+  image:
+    name: Container image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build
+        run: docker build -f deploy/Dockerfile --build-arg VERSION=ci -t nevus:ci .
+      - name: Size budget (550 MB)
+        run: |
+          size=$(docker image inspect nevus:ci --format '{{.Size}}')
+          echo "image size: $((size / 1024 / 1024)) MB"
+          test "$size" -lt $((550 * 1024 * 1024))
+      - name: Start, answer, and run as the right user
+        run: |
+          mkdir -p ci-data
+          docker run -d --name nevus -p 8080:8080 -v "$PWD/ci-data:/data" nevus:ci
+          for i in $(seq 1 60); do curl -fsS http://127.0.0.1:8080/healthz && break || sleep 1; done
+          curl -fsS http://127.0.0.1:8080/healthz | tee /dev/stderr | grep -q '"status":"ok"'
+          # The index must answer 200 without a session: CasaOS accepts only 200 or 401 there.
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/)" = "200"
+          curl -fsS http://127.0.0.1:8080/ | grep -q "neVus"
+          uid=$(docker exec nevus sh -c 'stat -c %u /proc/1')
+          echo "pid 1 runs as uid $uid"; test "$uid" = "1000"
+          docker rm -f nevus
+      - name: Honour PUID and PGID on a root-owned bind mount
+        run: |
+          sudo mkdir -p ci-data-puid && sudo chown root:root ci-data-puid
+          docker run -d --name nevuspuid -e PUID=1500 -e PGID=1500 -p 8081:8080 -v "$PWD/ci-data-puid:/data" nevus:ci
+          for i in $(seq 1 60); do curl -fsS http://127.0.0.1:8081/healthz && break || sleep 1; done
+          curl -fsS http://127.0.0.1:8081/healthz | grep -q '"storage":"ok"'
+          uid=$(docker exec nevuspuid sh -c 'stat -c %u /proc/1')
+          echo "pid 1 runs as uid $uid"; test "$uid" = "1500"
+          docker rm -f nevuspuid
+
+  security:
+    name: Security
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: astral-sh/setup-uv@v6
+      - name: Python dependency audit
+        working-directory: backend
+        run: uv export --frozen --no-dev --no-emit-project --format requirements-txt | uvx pip-audit --strict -r /dev/stdin
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: frontend/.node-version
+      - name: JavaScript dependency audit
+        working-directory: frontend
+        run: pnpm audit --prod --audit-level high
