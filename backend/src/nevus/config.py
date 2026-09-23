@@ -5,10 +5,10 @@ from __future__ import annotations
 import secrets
 from functools import lru_cache
 from pathlib import Path
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import Field, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -19,7 +19,10 @@ class Settings(BaseSettings):
     data_dir: Path = Field(default=Path("data"), description="Holds the database, blobs, backups and secrets")
     database_url: str | None = Field(default=None, description="SQLAlchemy URL; defaults to SQLite inside data_dir")
     static_dir: Path | None = Field(default=None, description="Built frontend; a placeholder is served when missing")
-    allowed_hosts: list[str] = Field(default_factory=list, description="Hostnames answered beyond private addresses")
+    # NoDecode keeps pydantic-settings from parsing the variable as JSON, so a plain "a.example, b.example" works.
+    allowed_hosts: Annotated[list[str], NoDecode] = Field(
+        default_factory=list, description="Hostnames answered beyond private addresses; comma-separated"
+    )
     secret_key_file: Path | None = Field(default=None, description="Server secret file; generated when missing")
     log_level: Literal["debug", "info", "warning", "error"] = "info"
     role: Literal["all", "web", "worker"] = "all"

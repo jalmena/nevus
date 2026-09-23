@@ -34,3 +34,11 @@ def test_secret_key_is_generated_once_with_restrictive_permissions(tmp_path: Pat
     assert first == second
     assert len(first) == 64
     assert oct((tmp_path / "secret.key").stat().st_mode & 0o777) == "0o600"
+
+
+def test_allowed_hosts_read_from_the_environment_as_a_plain_list(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("NEVUS_ALLOWED_HOSTS", "nevus.example.com, Photos.Example.ORG ,")
+    settings = Settings(data_dir=tmp_path)
+    assert settings.allowed_hosts == ["nevus.example.com", "photos.example.org"]
