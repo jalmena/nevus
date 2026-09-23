@@ -26,6 +26,15 @@ class Settings(BaseSettings):
     workers: int = Field(default=1, ge=1, le=8, description="Analysis worker processes")
     bind: str = "0.0.0.0"  # noqa: S104 - the container binds all interfaces; the compose file publishes one host port
     port: int = Field(default=8080, ge=1, le=65535)
+    auto_migrate: bool = Field(default=True, description="Apply pending database migrations at start-up")
+    admin_user: str | None = Field(default=None, description="First administrator, created or reset at start-up")
+    admin_password: str | None = Field(default=None, description="Password for admin_user; read at start-up only")
+    session_idle_days: int = Field(default=14, ge=1, le=365)
+    session_max_days: int = Field(default=90, ge=1, le=3650)
+    sudo_minutes: int = Field(default=5, ge=1, le=60)
+    login_attempts: int = Field(default=10, ge=3, le=100, description="Failed logins allowed per window")
+    login_window_minutes: int = Field(default=15, ge=1, le=1440)
+    trust_proxy_headers: bool = Field(default=False, description="Trust X-Forwarded-Proto/For from a reverse proxy")
 
     @field_validator("allowed_hosts", mode="before")
     @classmethod
