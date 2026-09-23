@@ -83,3 +83,12 @@ MoleMapper for iOS is available under the BSD license:
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 ```
+
+## Typefaces
+
+The brand assets under `docs/design/brand/identity/` contain glyph outlines derived from the typefaces below, and the interface ships their font files self-hosted. Both are licensed under the SIL Open Font License, Version 1.1; the licence texts are kept next to the assets.
+
+| Typeface | Copyright | Licence | Use |
+| --- | --- | --- | --- |
+| B612 | Copyright 2012 The B612 Project Authors (https://github.com/polarsys/b612) | SIL OFL 1.1 ([`docs/design/brand/identity/licences/OFL-B612.txt`](docs/design/brand/identity/licences/OFL-B612.txt)) | wordmark outlines |
+| Epilogue | Copyright 2020 The Epilogue Project Authors (https://github.com/Etcetera-Type-Co/Epilogue) | SIL OFL 1.1 ([`docs/design/brand/identity/licences/OFL-Epilogue.txt`](docs/design/brand/identity/licences/OFL-Epilogue.txt)) | interface and report typeface; tagline outlines |

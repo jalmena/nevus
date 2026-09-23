@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/design/brand/identity/svg/wordmark-transparent-dark.svg">
+    <img src="docs/design/brand/identity/svg/wordmark-transparent.svg" alt="neVus" width="320">
+  </picture>
+</p>
+
 # neVus
 
 **Because "I think it was smaller" is not data.**

@@ -17,7 +17,8 @@ Visual metaphors: the dot under watch, rings of time, the letter V as two lines 
 
 - Name: **neVus**, always set with a lowercase n and e, a capital V, lowercase u and s. Identifiers stay `nevus`.
 - Tagline: **"Because 'I think it was smaller' is not data."** Used on the login page, the store card and the report footer. Other lines ("Evidence, not memory.", "Your moles, on the record.") may appear in the README.
-- Mark: three directions sketched in [`brand/README.md`](brand/README.md) for the Product Owner to choose; the chosen one is refined into icon sizes, the store card and the report header. The V is the only accent element next to the wordmark.
+- Mark: **the divider**, a measuring compass holding the mark between its points; the legs are the V of the name, the hinge carries a hole of half its diameter in the inverse colour, the mark between the points is the only accent. Settled after five rounds; sources and usage rules in [`brand/identity/README.md`](brand/identity/README.md).
+- Wordmark: `neVus` in B612 Bold with the mark standing in for the V, optically centred so the mark's axis is the centre of the word.
 - Tone: the sarcastic register lives in the README and marketing copy; in-app text is calm, short and descriptive (rules in the requirements, section 7).
 
 ## 3. Colour
@@ -48,8 +49,8 @@ Contrast: every text/background pair meets WCAG 2.2 AA (4.5:1 body, 3:1 large te
 
 ## 4. Typography
 
-- Family: the Product Owner asked for letterforms as symmetric as possible, which points at geometric sans-serifs (mirrored n/u, symmetric V, round e, rotationally symmetric s). Candidates are set as outlined wordmarks in [`brand/README.md`](brand/README.md), all under the SIL Open Font License 1.1 and self-hosted as WOFF2; the interface uses the chosen family where legibility allows and a companion text face if needed. No font is loaded from third parties at runtime; `system-ui` is the fallback stack.
-- Weights: 400 (text), 600 (headings, buttons). No 700.
+- Interface family: **Epilogue** (SIL Open Font License 1.1), variable weight, self-hosted as WOFF2. Body text 500, secondary text 400, emphasis and buttons 600; tabular figures (`tnum`) for measurements, dates and tables. **B612** is used for the wordmark only. No font is loaded from third parties at runtime; `system-ui` is the fallback stack.
+- Weights: 400 (secondary text), 500 (body), 600 (headings, buttons). No 700 in the interface.
 - Scale (rem, 16 px base): 0.75 / 0.875 / 1 / 1.125 / 1.375 / 1.75 / 2.25. Line heights 1.5 for text, 1.2 for headings.
 - Numbers: `font-variant-numeric: tabular-nums` for measurements, dates and tables so columns align; the ± sign and unit set in secondary ink.
 - Dates: absolute (`12 Mar 2026`) with a relative hint (`6 months ago`) where it helps; never only relative.
@@ -168,7 +169,11 @@ WCAG 2.2 AA from the first screen: semantic structure, visible focus (2 px accen
 
 Following the Tabernacle convention: `icon.svg` as the single source of the mark, a 512 px PNG generated from it, a 1200 × 630 store card rendered from an HTML file with the real typeface so the card and the application cannot drift apart, and three screenshots (home with the body map, a lesion timeline, a comparison) in the light theme on a phone frame.
 
-## 13. Decisions pending with the Product Owner
+## 13. Decisions taken with the Product Owner
 
-1. Mark direction: the first three sketches were declined; a second round is in `brand/README.md`.
-2. Typeface: chosen from the outlined wordmark candidates in `brand/README.md`.
+1. Mark: the divider (2026-09-23, after five rounds).
+2. Wordmark: B612 Bold with the mark as the V, optically centred.
+3. Interface typeface: Epilogue 400/500/600 with tabular figures.
+4. Tagline: "Because 'I think it was smaller' is not data."
+
+Remaining: none for the identity; the interface components follow this brief.

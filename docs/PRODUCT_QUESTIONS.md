@@ -154,8 +154,10 @@ Answers that depart from the proposed default are marked **(departs from default
 55. **Mark direction.** *Default:* the V as two observation lines converging on a dot.
     **Answer (departs from default):** Explore the three directions (converging V, time rings opening into a V, typographic V accent) as SVG sketches in the design brief before deciding.
     **Second round (same day):** none of the three sketches accepted; three new directions requested. The colours are approved.
+    **Settled (same day, after five rounds):** the divider mark, with a hinge hole of half the disc's diameter in the inverse colour; the mark stands in for the V of the wordmark. See `docs/design/brand/identity/`.
 56. **Type character.** *Default:* quiet humanist sans, self-hosted.
     **Answer:** A quiet humanist sans-serif with its own character, libre licence, self-hosted, tabular figures for measurements.
     **Revised (same day):** for the wordmark, a typeface whose letterforms are as symmetric as possible (geometric); several wordmarks in candidate typefaces to be offered. The interface typeface follows the wordmark's choice where legibility allows.
+    **Settled (same day):** wordmark in B612 Bold (wordmark only) with the mark as the V, optically centred; interface in Epilogue, body 500, secondary 400, emphasis 600, tabular figures.
 57. **Tagline.** *Default:* "Evidence, not memory." for the product.
     **Answer (departs from default):** The product tagline is **"Because 'I think it was smaller' is not data."** The other candidate lines may be used in README copy.
