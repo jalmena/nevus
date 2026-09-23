@@ -1,6 +1,6 @@
 # neVus
 
-**Evidence, not memory.**
+**Because "I think it was smaller" is not data.**
 
 neVus is a self-hosted application for keeping a longitudinal photographic record of your moles and other skin marks: where each one sits on your body, what it looked like on each date, how large it measured against a physical reference, and how those numbers moved between dermatology visits.
 
