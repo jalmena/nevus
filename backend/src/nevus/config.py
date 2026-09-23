@@ -35,6 +35,9 @@ class Settings(BaseSettings):
     login_attempts: int = Field(default=10, ge=3, le=100, description="Failed logins allowed per window")
     login_window_minutes: int = Field(default=15, ge=1, le=1440)
     trust_proxy_headers: bool = Field(default=False, description="Trust X-Forwarded-Proto/For from a reverse proxy")
+    max_upload_bytes: int = Field(default=30 * 1024 * 1024, ge=1024 * 1024)
+    max_upload_pixels: int = Field(default=24_000_000, ge=1_000_000)
+    min_free_bytes: int = Field(default=2 * 1024**3, ge=0, description="Refuse uploads below this free space")
 
     @field_validator("allowed_hosts", mode="before")
     @classmethod
