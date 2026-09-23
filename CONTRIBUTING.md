@@ -14,7 +14,7 @@ All project artefacts are written in English: code, identifiers, comments, docum
 - Releases are prepared on `release/<version>` branches and merged into `main`, then back into `develop`.
 - Production fixes use `hotfix/<short-name>` branches cut from `main`.
 
-Pull requests into `main` and `develop` require passing checks. Keep them focused: one logical change per pull request. Merges keep the author's identity and sign-off; maintainers configure their platform identity so that no work or third-party email appears in the history.
+Pull requests into `main` and `develop` require passing checks. Keep them focused: one logical change per pull request. Merges are performed by a maintainer as a local fast-forward after the checks pass (the web merge buttons are not used), so every commit keeps exactly the identity and sign-off its author gave it.
 
 ## Commits
 
