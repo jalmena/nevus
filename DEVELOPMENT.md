@@ -33,6 +33,8 @@ Without `just`: run the commands in `justfile` by hand; they are one line each.
 
 Every setting is an environment variable prefixed with `NEVUS_` (see `backend/src/nevus/config.py`). A checkout needs none: data goes to `./data`, SQLite is used, and the server answers to private addresses, `localhost` and `.local` names. Set `NEVUS_ALLOWED_HOSTS` to answer to a public hostname behind a reverse proxy, and `NEVUS_DATABASE_URL` to use an external PostgreSQL.
 
+A fresh instance has no accounts: the first person to open it claims it and becomes the administrator (`POST /api/auth/claim`). Alternatively set `NEVUS_ADMIN_USER` and `NEVUS_ADMIN_PASSWORD` before the first start; they are read at start-up only, and setting them again resets that account's password, which is the documented way back in after a forgotten one. Pending database migrations are applied at start-up (`NEVUS_AUTO_MIGRATE=false` disables that).
+
 ## Tests
 
 - Backend: `pytest` against a temporary data directory. Continuous integration runs the same suite twice, on SQLite and on PostgreSQL, plus `alembic upgrade head` and `alembic check` on both engines.
