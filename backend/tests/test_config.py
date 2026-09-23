@@ -2,10 +2,14 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from nevus.config import Settings
 
 
-def test_sqlite_is_the_default_database_inside_the_data_dir(tmp_path: Path) -> None:
+def test_sqlite_is_the_default_database_inside_the_data_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    # The suite also runs with NEVUS_DATABASE_URL pointing at PostgreSQL; this test is about the built-in default.
+    monkeypatch.delenv("NEVUS_DATABASE_URL", raising=False)
     settings = Settings(data_dir=tmp_path)
     assert settings.is_sqlite
     assert settings.effective_database_url == f"sqlite:///{(tmp_path / 'nevus.sqlite3').as_posix()}"
