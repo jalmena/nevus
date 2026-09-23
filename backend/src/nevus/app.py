@@ -11,6 +11,7 @@ from fastapi import FastAPI
 from nevus import __version__
 from nevus.api.auth import router as auth_router
 from nevus.api.health import router as health_router
+from nevus.api.images import router as images_router
 from nevus.api.persons import router as persons_router
 from nevus.api.users import router as users_router
 from nevus.auth.ratelimit import LoginRateLimiter
@@ -19,6 +20,7 @@ from nevus.config import Settings, get_settings
 from nevus.db.engine import make_engine, make_session_factory
 from nevus.db.migrate import upgrade_to_head
 from nevus.logging import configure_logging, get_logger
+from nevus.storage.blobs import BlobStore
 from nevus.web.csrf import CsrfMiddleware
 from nevus.web.security import HostAllowlistMiddleware, SecurityHeadersMiddleware
 from nevus.web.static import mount_frontend
@@ -62,6 +64,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.settings = settings
     app.state.engine = engine
     app.state.session_factory = session_factory
+    app.state.blob_store = BlobStore(settings.blobs_dir, settings.min_free_bytes)
     app.state.login_limiter = LoginRateLimiter(settings.login_attempts, settings.login_window_minutes * 60)
 
     app.add_middleware(SecurityHeadersMiddleware)
@@ -72,6 +75,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(auth_router)
     app.include_router(users_router)
     app.include_router(persons_router)
+    app.include_router(images_router)
     mount_frontend(app, _static_dir(settings))
     return app
 
