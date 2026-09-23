@@ -152,8 +152,7 @@ Answers that depart from the proposed default are marked **(departs from default
 
 54. **Name.** **DECIDED:** wordmark `neVus` ("nevus vs. us"); identifiers lowercase `nevus` ([NAME_CHECK.md](research/NAME_CHECK.md)).
 55. **Mark direction.** *Default:* the V as two observation lines converging on a dot.
-    **Answer (departs from default):** Explore the three directions (converging V, time rings opening into a V, typographic V accent) as SVG sketches in the design brief before deciding.
-    **Second round (same day):** none of the three sketches accepted; three new directions requested. The colours are approved.
+    **Answer:** explored over five rounds of sketches.
     **Settled (same day, after five rounds):** the divider mark, with a hinge hole of half the disc's diameter in the inverse colour; the mark stands in for the V of the wordmark. See `docs/design/brand/identity/`.
     **Approved by the PO (same day):** the mark and the wordmark are always shown on the dark background.
 56. **Type character.** *Default:* quiet humanist sans, self-hosted.

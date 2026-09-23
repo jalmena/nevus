@@ -17,7 +17,7 @@ Visual metaphors: the dot under watch, rings of time, the letter V as two lines 
 
 - Name: **neVus**, always set with a lowercase n and e, a capital V, lowercase u and s. Identifiers stay `nevus`.
 - Tagline: **"Because 'I think it was smaller' is not data."** Used on the login page, the store card and the report footer. Other lines ("Evidence, not memory.", "Your moles, on the record.") may appear in the README.
-- Mark: **the divider**, a measuring compass holding the mark between its points; the legs are the V of the name, the hinge carries a hole of half its diameter in the inverse colour, the mark between the points is the only accent. Settled after five rounds; sources and usage rules in [`brand/identity/README.md`](brand/identity/README.md).
+- Mark: **the divider**, a measuring compass holding the mark between its points; the legs are the V of the name, the hinge carries a hole of half its diameter in the inverse colour, the mark between the points is the only accent. Sources and usage rules in [`brand/identity/README.md`](brand/identity/README.md).
 - Wordmark: `neVus` in B612 Bold with the mark standing in for the V, optically centred so the mark's axis is the centre of the word.
 - The mark and the wordmark are always presented on the dark paper (`#17161A`), whatever the interface theme: app icon, favicon, login page, report header, store card and README. Light drawings exist only for a small inline mark on light surfaces.
 - Tone: the sarcastic register lives in the README and marketing copy; in-app text is calm, short and descriptive (rules in the requirements, section 7).

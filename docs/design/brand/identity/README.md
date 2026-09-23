@@ -1,12 +1,12 @@
 # neVus identity
 
-Settled on 2026-09-23 after five rounds (history in [`../README.md`](../README.md)). Everything here is generated from the sources in [`sources/`](sources/); change the parameters, not the drawings.
+Settled on 2026-09-23 after five rounds of exploration with the Product Owner. Everything here is generated from the sources in [`sources/`](sources/); change the parameters, not the drawings.
 
 **The mark and the wordmark are always shown on the dark paper** (`#17161A`, light ink `#EDE8E0`, accent `#5FB3AE`): app icon, favicon, README, store card, report header, login page. The light drawings exist only for light interface surfaces where the mark appears inline (for example a small mark in a light toolbar); they are never used for the brand block.
 
 ## The mark
 
-A divider, the measuring compass, holding the mark between its points. The legs are the V of the name, the hinge at the vertex is a disc with a hole of exactly half its diameter in the inverse colour, and the mark between the points is the only accent. The drawing is the one approved in round 5 (stroke 18 on the 256 grid, tips of radius 11, hinge of radius 18), with the hole (radius 9) as the only addition; a pixel comparison against the round-5 file shows no other difference. Symmetric to the pixel.
+A divider, the measuring compass, holding the mark between its points. The legs are the V of the name, the hinge at the vertex is a disc with a hole of exactly half its diameter in the inverse colour, and the mark between the points is the only accent. The drawing: stroke 18 on the 256 grid, tips of radius 11, hinge of radius 18, hole of radius 9. Symmetric to the pixel.
 
 ![The mark on the dark paper, and the light variant](boards/board-mark.png)
 

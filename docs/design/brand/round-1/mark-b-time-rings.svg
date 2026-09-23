@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="Mark B: a dot with time rings opening into a V">
-  <rect width="256" height="256" rx="56" fill="#F6F1EA"/>
-  <g fill="none" stroke="#2B2A28" stroke-linecap="round">
-    <circle cx="128" cy="140" r="60" stroke-width="14" stroke-dasharray="293 84" transform="rotate(-50 128 140)"/>
-    <circle cx="128" cy="140" r="92" stroke-width="14" stroke-dasharray="482 96" transform="rotate(-60 128 140)"/>
-    <path d="M82 60 L128 104 L174 60" stroke-width="14" stroke-linejoin="round"/>
-  </g>
-  <circle cx="128" cy="140" r="20" fill="#1F6F6B"/>
-</svg>
