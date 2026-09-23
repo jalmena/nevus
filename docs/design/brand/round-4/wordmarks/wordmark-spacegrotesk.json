@@ -1,0 +1,34 @@
+{
+  "font": "spacegrotesk.ttf",
+  "text": "neVus",
+  "weight": 600.0,
+  "cap_height_px": 100.0,
+  "x_height_px": 69.42857142857143,
+  "em_px": 142.85714285714286,
+  "width_px": 409.1500592912946,
+  "tracking_em": 0.0,
+  "adjustments_em_thousandths": {},
+  "advances_px": [
+    87.85714285714285,
+    83.0,
+    86.71428571428571,
+    87.85714285714285,
+    75.0
+  ],
+  "centring": {
+    "char": "V",
+    "left_ink_to_centre_px": 204.57502964564728,
+    "centre_to_right_ink_px": 199.29644775390625
+  },
+  "shifts_px": [
+    0.0,
+    0.0,
+    0.0,
+    2.6392909458705134,
+    5.278581891741027
+  ],
+  "view_w": 457.1500592912946,
+  "view_h": 219.04,
+  "pad": 24,
+  "baseline_y_px": 153.32571428571427
+}
