@@ -145,7 +145,11 @@ jobs:
       - uses: astral-sh/setup-uv@v6
       - name: Python dependency audit
         working-directory: backend
-        run: uv export --frozen --no-dev --no-emit-project --format requirements-txt | uvx pip-audit --strict -r /dev/stdin
+        # Hashes in the export are per wheel; pip-audit resolves on its own interpreter, so audit the pinned
+        # versions without hashes and on the project's Python.
+        run: |
+          uv export --frozen --no-dev --no-emit-project --no-hashes --format requirements-txt > /tmp/requirements.txt
+          uvx --python 3.13 pip-audit --strict -r /tmp/requirements.txt
       - uses: pnpm/action-setup@v4
         with:
           package_json_file: frontend/package.json
