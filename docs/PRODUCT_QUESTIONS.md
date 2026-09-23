@@ -1,159 +1,159 @@
 # Product questions for the Product Owner
 
-Date: 2026-09-23. These questions close the discovery phase. Each carries the default the engineering side will apply unless the Product Owner (PO) answers otherwise, so the whole list can be answered as "defaults OK except …". Priority: **P0** needed before `PRODUCT_REQUIREMENTS.md`; **P1** needed before the phase that implements the feature; **P2** can be postponed.
+Date: 2026-09-23. These questions closed the discovery phase. Every question carries the default the engineering side proposed and the Product Owner's (PO) answer, all recorded on 2026-09-23. Priority: **P0** needed before `PRODUCT_REQUIREMENTS.md`; **P1** needed before the phase that implements the feature. Items marked **DECIDED** earlier in the day are recorded in the ADRs where relevant.
 
-Decided items are marked **DECIDED** and recorded in the ADRs where relevant.
+Answers that depart from the proposed default are marked **(departs from default)**.
 
 ## 1. Product purpose (P0)
 
-1. **Who is tracked in v1?** Only the PO, or a household where one login manages several people (partner, children)? *Why:* decides whether `User` (login) and `Person` (the profile being tracked) are separate entities from day one. *Default:* separate `User` and `Person`; one user may manage several persons.
-   **Answer:** _pending_
-2. **Unit of value first:** per-lesion timeline (MoleMapper-style) first, full-body sessions later? *Default:* yes; lesion timeline first, full-body sessions as the Phase 6 differentiator.
-   **Answer:** _pending_
-3. **Scope of "lesion":** pigmented lesions/moles only, or any skin mark worth following (scars, patches, rashes)? *Why:* affects taxonomy, measurement methods and language. *Default:* moles plus a generic "other mark" type without special handling.
-   **Answer:** _pending_
+1. **Who is tracked in v1?** *Default:* separate `User` (login) and `Person` (profile being tracked); one user may manage several persons.
+   **Answer:** Household model. `User` and `Person` are separate from day one; one login manages several persons (partner, children); a person may receive their own login later.
+2. **Unit of value first.** *Default:* per-lesion timeline first, full-body sessions later.
+   **Answer:** Per-lesion timeline first; full-body sessions are the Phase 6 differentiator.
+3. **Scope of "lesion".** *Default:* moles plus a generic "other mark" type without special handling.
+   **Answer:** Moles plus a generic "other mark" type, no special handling.
 
 ## 2. UX (P0)
 
-4. **Capture path:** native camera through the file picker (works over plain HTTP, best image quality, no live guidance) vs in-browser live camera with a framing overlay (needs HTTPS). *Default:* native camera by default with a post-capture quality check; live camera as an enhancement when a secure context is available.
-   **Answer:** _pending_
-5. **Home screen:** body map first plus a compact "due for re-photo" strip? *Default:* yes.
-   **Answer:** _pending_
-6. **Onboarding depth:** minimal (technical user) or a first-run guided walkthrough? *Default:* minimal, with contextual empty states that teach.
-   **Answer:** _pending_
-7. **UI language:** English only, with strings externalised from day one so Spanish can be added? *Default:* yes.
-   **Answer:** _pending_
+4. **Capture path.** *Default:* native camera by default with a post-capture quality check; live guided capture when a secure context is available.
+   **Answer:** Native camera by default; live guided capture (framing, marker) enabled automatically when the context is secure.
+5. **Home screen.** *Default:* body map first plus a compact "due for re-photo" strip.
+   **Answer:** Body map plus a compact strip with the lesions due and the next appointment.
+6. **Onboarding depth.** *Default:* minimal, with contextual empty states that teach.
+   **Answer:** Minimal, with empty states that teach.
+7. **UI language.** *Default:* English only, strings externalised from day one.
+   **Answer (departs from default):** English **and Spanish from 0.1.0**, with a persistent per-user language setting stored with the account (as in Tabernacle).
 
 ## 3. Visual identity (P1)
 
-8. **Palette direction:** (a) warm neutrals with one calm accent (teal/moss), observational rather than clinical; (b) cool clinical white/blue; (c) dark-first. *Default:* (a) with full dark-mode support.
-   **Answer:** _pending_
-9. **Body illustration style:** flat schematic neutral silhouette (gender-neutral, skin-tone-neutral outline) vs realistic anatomy. *Default:* flat schematic.
-   **Answer:** _pending_
-10. **Tone split:** the sarcastic tone lives in the README and marketing copy; in-app microcopy stays calm and neutral. *Default:* yes.
-    **Answer:** _pending_
+8. **Palette direction.** *Default:* warm neutrals with one calm accent, full dark mode.
+   **Answer:** Warm neutrals with one calm accent (teal or moss), full dark-mode support; red is reserved for system errors and never used for lesions.
+9. **Body illustration style.** *Default:* flat schematic neutral silhouette.
+   **Answer:** Flat schematic silhouette, gender- and skin-tone-neutral.
+10. **Tone split.** *Default:* sarcasm in README and marketing, calm in-app microcopy.
+    **Answer:** Sarcasm outside (README, marketing), calm and neutral inside the application and the reports.
 
 ## 4. Data and privacy (P0)
 
-11. **Authentication:** local accounts (argon2id, server sessions) in 0.1.0; optional trusted-header SSO through the PO's reverse proxy and identity provider (forward-auth pattern) in 0.2.0; TOTP in 1.0. *Default:* yes, in that order.
-    **Answer:** _pending_
-12. **Encryption at rest:** rely on disk/volume encryption plus encrypted backups, or add app-level encryption of images and database (more complexity, key management)? *Default:* no app-level encryption; encrypted backups (`age`) yes.
-    **Answer:** _pending_
-13. **Deletion semantics:** immediate hard delete vs trash with a 30-day purge (images included). *Default:* trash plus purge; export offered before deletion.
-    **Answer:** _pending_
-14. **EXIF policy:** strip everything except capture time and orientation; never keep GPS; optionally keep the camera model for quality analytics. *Default:* as stated.
-    **Answer:** _pending_
-15. **Digital sharing:** PDF export only (no share links) in v1? *Default:* PDF only; no public exposure ever by default.
-    **Answer:** _pending_
+11. **Authentication.** *Default:* local accounts in 0.1.0; forward-auth SSO option in 0.2.0; TOTP in 1.0.
+    **Answer:** Yes, in that order.
+12. **Encryption at rest.** *Default:* no app-level encryption; encrypted backups (`age`).
+    **Answer:** No application-level encryption; disk or volume encryption is the operator's choice; every backup that leaves the server is encrypted with a passphrase (`age`).
+13. **Deletion semantics.** *Default:* trash plus 30-day purge; export offered before deletion.
+    **Answer:** Trash with automatic purge after 30 days, including image files; export offered before deletion; deleting a whole profile requires re-authentication.
+14. **EXIF policy.** *Default:* strip everything except capture time and orientation; never GPS.
+    **Answer:** Strip everything except capture time and orientation; never keep GPS; pixels untouched.
+15. **Digital sharing.** *Default:* PDF only; no public exposure.
+    **Answer:** PDF only; no share links.
 
 ## 5. Photography (P0/P1)
 
-16. **Phones in use:** Android, iOS, or both? *Why:* iOS Safari limits PWA, camera and push differently. *Default:* assume both.
-    **Answer:** _pending_
-17. **Originals:** always keep full-resolution originals (roughly 3–8 MB each)? *Default:* yes, immutable.
-    **Answer:** _pending_
-18. **Quality gate behaviour:** block saving on poor quality, or warn and allow with a visible flag? *Default:* warn and allow; block only unreadable files.
-    **Answer:** _pending_
-19. **Images per observation:** allow several with roles (overview, close-up, with reference)? *Default:* yes, one or more.
-    **Answer:** _pending_
-20. **Dermatoscope attachments:** does the PO own or plan a smartphone dermatoscope? *Default:* record a "modality" tag from day one, no special processing.
-    **Answer:** _pending_
-21. **Intimate regions in zone/full-body photos:** zones are always user-selectable (any can be skipped); add a privacy-blur tool for stored zone photos in a later phase? *Default:* skippable zones from day one; blur tool in Phase 7.
-    **Answer:** _pending_
+16. **Phones in use.** *Default:* assume both platforms.
+    **Answer:** Android and iOS; end-to-end tests on both engines.
+17. **Originals.** *Default:* keep full-resolution originals, immutable.
+    **Answer:** Always keep the full-resolution original, immutable.
+18. **Quality gate behaviour.** *Default:* warn and allow with a visible flag; block only unreadable files.
+    **Answer:** Warn and allow; the observation is marked "saved with quality warnings" in the timeline and reports; only unreadable files are blocked.
+19. **Images per observation.** *Default:* one or more, with roles.
+    **Answer:** One or more images per observation, each with a role (overview, close-up, with scale reference).
+20. **Dermatoscope attachments.** *Default:* record a capture "modality" tag from day one.
+    **Answer:** No dermatoscope planned; record the modality tag from day one anyway.
+21. **Intimate regions in zone/full-body photos.** *Default:* skippable zones from day one; blur tool in the hardening phase.
+    **Answer:** Zones skippable from v1; privacy-blur tool for stored zone photos in the hardening phase (1.0).
 
 ## 6. Body mapping (P0)
 
-22. **Granularity:** named zones (MoleMapper style) plus a free point inside the zone, on front/back SVG silhouettes. *Default:* yes (hybrid).
-    **Answer:** _pending_
-23. **Extra views:** face/scalp, hands, feet, left/right side views. *Default:* front/back in v1; detail views added progressively.
-    **Answer:** _pending_
-24. **Body types:** one neutral silhouette or selectable variants (adult/child, body shapes)? *Default:* one neutral silhouette; child scaling later if needed.
-    **Answer:** _pending_
-25. **3D body:** out of scope? *Default:* out of scope (complexity vs value for personal use).
-    **Answer:** _pending_
+22. **Granularity.** *Default:* named zones plus a free point inside the zone (hybrid).
+    **Answer:** Hybrid: named zones plus a free point inside the zone, on front and back SVG silhouettes.
+23. **Extra views.** *Default:* front/back in v1; detail views progressively.
+    **Answer:** Front and back in v1; detail views (face, scalp, hands, feet) added progressively.
+24. **Body types.** *Default:* one neutral silhouette.
+    **Answer:** One neutral silhouette; child scaling later if needed.
+25. **3D body.** *Default:* out of scope.
+    **Answer:** Out of scope.
 
 ## 7. Measurements (P1)
 
-26. **Reference objects actually available:** Euro coins, a printed neVus reference card (marker plus mm scale, designed by the project), a ruler, a bank card (85.60 × 53.98 mm). *Default:* printed reference card as primary (robust detection, known geometry), Euro coins as secondary, a manual two-point scale as fallback.
-    **Answer:** _pending_
-27. **Measurement mode:** semi-automatic (detected outline/diameter, always user-adjustable) vs manual only. *Default:* semi-automatic with a mandatory manual override.
-    **Answer:** _pending_
-28. **Uncertainty display:** show a ± range (e.g. 4.4 ± 0.3 mm) and never present sub-uncertainty differences as change. *Default:* yes.
-    **Answer:** _pending_
+26. **Reference objects.** *Default:* printed neVus card primary; Euro coins secondary; manual two-point scale fallback.
+    **Answer:** Printed neVus reference card (marker, mm scale, grey patch) as primary; Euro coins as secondary; manual two-point line as fallback.
+27. **Measurement mode.** *Default:* semi-automatic with mandatory manual override.
+    **Answer:** Semi-automatic (tap, proposed outline or diameter) with manual correction always available; nothing is saved without confirmation.
+28. **Uncertainty display.** *Default:* always show ±; never present sub-uncertainty differences as change.
+    **Answer (departs from default):** Uncertainty display is **enabled by default and can be switched off in the settings page**. Engineering interpretation, to confirm: the switch affects in-app display only; PDF reports always show ± and the "no detectable change" classification.
 
 ## 8. Reminders (P1)
 
-29. **Channels:** in-app due list; email (SMTP); outgoing webhook with presets for Home Assistant, n8n, ntfy and Gotify; ICS calendar feed; Web Push (needs HTTPS and relays through browser vendors' push services). *Default:* in-app plus email in 0.1.0; webhook plus ICS in 0.2.0; Web Push behind a flag later.
-    **Answer:** _pending_
-30. **Defaults:** global default interval (3 months) with per-lesion override; snooze semantics; full-body session cadence (12 months). *Default:* 3 months / 12 months.
-    **Answer:** _pending_
-31. **Appointment-driven mode:** a "Prepare my visit" flow (enter the appointment date → checklist of lesions due → guided capture → report) as the primary engagement loop, periodic reminders secondary. *Why:* MoleMapper saw near-zero habit formation and a 2020 randomised trial found monthly reminders gave no benefit. *Default:* yes.
-    **Answer:** _pending_
+29. **Channels.** *Default:* in-app + email in 0.1.0; webhook + ICS in 0.2.0; Web Push behind a flag later.
+    **Answer:** As proposed: in-app and email (SMTP) in 0.1.0; outgoing webhook (Home Assistant, n8n, ntfy, Gotify presets) and ICS calendar feed in 0.2.0; Web Push behind a feature flag later.
+30. **Defaults.** *Default:* 3 months per lesion, 12 months per full-body session.
+    **Answer:** 3 months per lesion (overridable per lesion), 12 months per full-body session; snooze options of 1 week and 1 month.
+31. **Appointment-driven mode.** *Default:* "Prepare my visit" as the primary engagement loop.
+    **Answer:** Yes: "Prepare my visit" (appointment date → lesions due → guided capture → report) is the primary flow, shipped with reports in 0.2.0; periodic reminders are secondary.
 
 ## 9. Medical reports (P1)
 
-32. **Report language:** ship report templates in English and Spanish (UI stays English)? *Why:* the brief allows other languages when there is a product requirement; the dermatologist may read Spanish. *Default:* both templates when reports arrive (0.2.0); language selectable per report.
-    **Answer:** _pending_
-33. **Report scopes:** single lesion; selected lesions; whole-profile summary (body map, list, highlights). *Default:* single lesion plus profile summary in v1.
-    **Answer:** _pending_
-34. **Paper:** A4, with US Letter as an option. *Default:* as stated.
-    **Answer:** _pending_
+32. **Report language.** *Default:* English and Spanish templates when reports arrive.
+    **Answer:** English and Spanish templates from the first report release; language selectable per report.
+33. **Report scopes.** *Default:* single lesion plus profile summary in v1.
+    **Answer:** Single lesion and profile summary first; free selection of lesions in a later iteration.
+34. **Paper.** *Default:* A4, with US Letter as an option.
+    **Answer:** A4 by default, US Letter as an option.
 
 ## 10. Computer vision / ML (P1/P2)
 
-35. **Model distribution:** bundle small models in the image (+100–300 MB) vs an optional, checksum-verified model pack fetched once from GitHub Releases. *Default:* classical CV always bundled; learned models as an optional pack.
-    **Answer:** _pending_
-36. **Priority order:** quality gate → segmentation/measurement → same-lesion alignment/change → session matching → new-lesion candidates. *Default:* confirmed.
-    **Answer:** _pending_
-37. **Hard no-go:** no malignancy classifier or risk score, not even "experimental", in the shipped UI. **DECIDED:** no-go (see [ADR-0003](adr/0003-automatic-analysis-boundary.md)).
-38. **Automatic-analysis boundary (regulatory).** **DECIDED:** automatic analyses (segmentation, change flags, new-lesion candidates) are opt-in per profile, off by default, labelled experimental and always user-confirmed, with an explicit intended-use statement and a CI lint that keeps disease names, risk words and thresholds out of UI copy and reports ([ADR-0003](adr/0003-automatic-analysis-boundary.md)).
-39. **Personal evaluation set:** is the PO willing to label a small set of their own photos to calibrate and evaluate (never leaving their server)? *Default:* yes.
-    **Answer:** _pending_
-40. **CPU-only inference** on the home server (seconds per image, in the background) acceptable for v1; iGPU acceleration only if it pays off later. *Default:* yes.
-    **Answer:** _pending_
+35. **Model distribution.** *Default:* classical CV always bundled; learned models as an optional pack.
+    **Answer:** Classical CV always bundled; small models (up to about 40 MB) inside the image; larger models in a separate image variant; nothing is downloaded at runtime.
+36. **Priority order.** *Default:* quality gate → segmentation/measurement → same-lesion alignment/change → session matching → new-lesion candidates.
+    **Answer:** Confirmed.
+37. **Hard no-go.** **DECIDED:** no malignancy classifier or risk score, ever ([ADR-0003](adr/0003-automatic-analysis-boundary.md)).
+38. **Automatic-analysis boundary (regulatory).** **DECIDED:** automatic analyses are opt-in per profile, off by default, labelled experimental and always user-confirmed, with an explicit intended-use statement and a CI lint on user-facing language ([ADR-0003](adr/0003-automatic-analysis-boundary.md)).
+39. **Personal evaluation set.** *Default:* yes.
+    **Answer:** Yes: the PO will label a small personal set (tens of photos with the card at known distances, reviewed contours); neVus ships a minimal labelling tool; the data never leaves the server.
+40. **CPU-only inference.** *Default:* yes; iGPU acceleration only if it pays off later.
+    **Answer:** CPU-only in v1 (small quantised models, one low-priority worker); iGPU acceleration only if it pays off later.
 
 ## 11. Multi-user (P0)
 
-41. **Roles:** admin vs member plus per-person access (two adults both managing a child's profile)? *Default:* admin/member plus explicit per-person sharing.
-    **Answer:** _pending_
-42. **Registration:** closed; the admin creates accounts; a first-run claim flow. *Default:* yes.
-    **Answer:** _pending_
+41. **Roles.** *Default:* admin/member plus explicit per-person sharing.
+    **Answer:** Admin and member roles plus per-person access (owner, manager, viewer), so two adults can manage a child's profile.
+42. **Registration.** *Default:* closed; admin creates accounts; first-run claim flow.
+    **Answer:** Closed registration; the admin creates accounts; the first person in claims the instance and becomes admin.
 
 ## 12. CasaOS deployment (P0)
 
-43. **Access path:** an HTTPS hostname behind the PO's reverse proxy with the internal certificate authority, plus VPN for remote access. **Do the PO's phones already trust that internal CA** (does an existing internal HTTPS service show a valid padlock on the phone)? *Why:* decides whether live camera, PWA installation and offline mode are available on day one.
-    **Answer:** _pending_
-44. **Database:** SQLite in a single container (backup is one directory; no coupling to any shared database container). Object only if there is a reason of the PO's own to prefer PostgreSQL. *Default:* SQLite.
-    **Answer:** _pending_
-45. **Backups:** destination path under the app's data directory picked up by the PO's existing backup job, encrypted with a passphrase (`age`); retention. *Default:* nightly, encrypted, 30 daily / 12 monthly.
-    **Answer:** _pending_
-46. **Architectures:** amd64 required; arm64 nice-to-have if CV wheels allow. *Default:* amd64 first, arm64 when cheap.
-    **Answer:** _pending_
+43. **Access path and internal CA trust.** *Why:* decides whether live camera, PWA installation and offline mode work on day one.
+    **Answer:** The PO's phones already trust the internal certificate authority used by the reverse proxy, so HTTPS is valid on mobile from day one; live camera, PWA installation and the offline capture queue are available in v1.
+44. **Database.** *Default:* SQLite in a single container.
+    **Answer (departs from default):** SQLite in a single container by default, **with a configurable external PostgreSQL option**. Both dialects are supported and exercised in CI; the backup procedure for the PostgreSQL option is documented separately.
+45. **Backups.** *Default:* nightly, encrypted, 30 daily / 12 monthly.
+    **Answer:** Nightly encrypted snapshot (`age`, passphrase) under the app's data directory, picked up by the operator's existing backup job; retention 30 daily and 12 monthly; command-line restore tested in CI.
+46. **Architectures.** *Default:* amd64 first, arm64 when cheap.
+    **Answer:** amd64 first (all builds); arm64 added on release and tag builds with a boot test, when the wheels allow.
 
-## 13. App store integration (P0 for the store, P1 for the neVus entry)
+## 13. App store integration
 
-47. **Store identity:** display name and one-line description for the personal store, and an icon direction. The internal `store_id` stays unchanged regardless (the specification requires stability).
-    **Answer:** _pending_
-48. **Rename now or later?** Step 1 (content migration) now; Step 2 (repository rename) later, only after verifying redirects on a throwaway repository. *Default:* Step 1 now, Step 2 later.
-    **Answer:** _pending_
-49. **Category for neVus:** there is no Health category in the fixed v2 list (`Media, Productivity, Home, Networking, AI, Finance, Social, Developer, Others`). *Default:* `Others`; alternative `Home`.
-    **Answer:** _pending_
+47. **Store identity.**
+    **Answer:** Display name **"jalmena store"**; the internal `store_id` stays unchanged.
+48. **Rename now or later?** *Default:* Step 1 now, Step 2 later.
+    **Answer:** The PO renamed the repository to `jalmena/jalmena-appstore` on 2026-09-23. Verified the same day: the old `raw.githubusercontent.com` and jsDelivr URLs still answer 200 with identical `Content-Length` and no redirect, and `github.com` redirects. Step 1 (content migration) is pending and must also update the base URL and README to the new name.
+49. **Category for neVus.** *Default:* `Others`.
+    **Answer:** `Others`.
 
 ## 14. Open source / licensing (P0)
 
-50. **Licence.** **DECIDED:** AGPL-3.0-only. MoleMapper's BSD-3 notices are preserved in `THIRD_PARTY_NOTICES.md`.
-51. **Relationship to MoleMapper:** "inspired by MoleMapper (OHSU)", BSD notice preserved, no OHSU/MoleMapper branding, no implied endorsement. *Default:* yes.
-    **Answer:** _pending_
+50. **Licence.** **DECIDED:** AGPL-3.0-only.
+51. **Relationship to MoleMapper.** *Default:* "inspired by", BSD notice preserved, no marks, no endorsement.
+    **Answer:** As written in the README and `THIRD_PARTY_NOTICES.md`.
 52. **Repository visibility.** **DECIDED:** public from day one.
-53. **Contributions:** DCO sign-off, no CLA; Conventional Commits enforced by CI. *Default:* yes.
-    **Answer:** _pending_
+53. **Contributions.** *Default:* DCO sign-off, no CLA; Conventional Commits enforced by CI.
+    **Answer:** DCO without CLA; Conventional Commits checked in CI.
 
 ## 15. Branding (P1)
 
-54. **Name.** **DECIDED:** wordmark `neVus` ("nevus vs. us"); identifiers lowercase `nevus`. Findings in [NAME_CHECK.md](research/NAME_CHECK.md).
-55. **Mark direction,** anchored by the capital V: (a) the V as two observation lines converging on a dot (the mole under watch); (b) a dot with concentric time rings where one ring opens into a V; (c) a pure typographic wordmark with the V as the only accent colour. *Default:* (a), with (c) as the compact/favicon fallback.
-    **Answer:** _pending_
-56. **Type character:** a neutral system-like humanist sans vs a more distinctive self-hosted typeface. *Default:* distinctive but quiet humanist sans, self-hosted (no third-party font services at runtime).
-    **Answer:** _pending_
-57. **Tagline tone:** "Evidence, not memory." / "Your moles, on the record." / "Because 'I think it was smaller' is not data." *Default:* "Evidence, not memory." for the product; the longer sarcastic lines for the README.
-    **Answer:** _pending_
+54. **Name.** **DECIDED:** wordmark `neVus` ("nevus vs. us"); identifiers lowercase `nevus` ([NAME_CHECK.md](research/NAME_CHECK.md)).
+55. **Mark direction.** *Default:* the V as two observation lines converging on a dot.
+    **Answer (departs from default):** Explore the three directions (converging V, time rings opening into a V, typographic V accent) as SVG sketches in the design brief before deciding.
+56. **Type character.** *Default:* quiet humanist sans, self-hosted.
+    **Answer:** A quiet humanist sans-serif with its own character, libre licence, self-hosted, tabular figures for measurements.
+57. **Tagline.** *Default:* "Evidence, not memory." for the product.
+    **Answer (departs from default):** The product tagline is **"Because 'I think it was smaller' is not data."** The other candidate lines may be used in README copy.
