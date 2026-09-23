@@ -61,6 +61,10 @@ jobs:
         env:
           NEVUS_DATABASE_URL: postgresql+psycopg://nevus:nevus@localhost:5432/nevus
         run: uv run pytest
+      - name: OpenAPI snapshot is current
+        run: |
+          uv run nevus openapi > /tmp/openapi.json
+          diff -q /tmp/openapi.json ../frontend/openapi.json || { echo "frontend/openapi.json is stale: run 'just openapi'"; exit 1; }
       - name: Migrations on SQLite
         env:
           NEVUS_DATA_DIR: ${{ runner.temp }}/sqlite
@@ -91,6 +95,10 @@ jobs:
           cache: pnpm
           cache-dependency-path: frontend/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
+      - name: Generated API types are current
+        run: |
+          pnpm openapi
+          git diff --exit-code -- src/lib/api/schema.d.ts || { echo "src/lib/api/schema.d.ts is stale: run 'just openapi'"; exit 1; }
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm format:check

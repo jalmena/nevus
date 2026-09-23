@@ -13,10 +13,27 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--version", action="version", version=f"nevus {__version__}")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("serve", help="run the web application")
+    sub.add_parser("openapi", help="print the OpenAPI schema as JSON")
     args = parser.parse_args(argv)
     if args.command == "serve":
         return _serve()
+    if args.command == "openapi":
+        return _openapi()
     return 2
+
+
+def _openapi() -> int:
+    import json
+    import tempfile
+    from pathlib import Path
+
+    from nevus.app import create_app
+    from nevus.config import Settings
+
+    with tempfile.TemporaryDirectory() as tmp:
+        app = create_app(Settings(data_dir=Path(tmp), log_level="warning"))
+        print(json.dumps(app.openapi(), indent=2, sort_keys=True))
+    return 0
 
 
 def _serve() -> int:

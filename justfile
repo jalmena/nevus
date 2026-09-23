@@ -34,6 +34,11 @@ image engine="podman" version="devel":
 run engine="podman" version="devel":
     {{engine}} run --rm -p 8080:8080 -v "$PWD/data:/data:Z" -e PUID=$(id -u) -e PGID=$(id -g) nevus:{{version}}
 
+# Regenerate the OpenAPI snapshot and the frontend's typed client from it.
+openapi:
+    cd backend && uv run nevus openapi > ../frontend/openapi.json
+    cd frontend && pnpm openapi
+
 # Database migrations.
 migrate:
     cd backend && uv run alembic upgrade head
