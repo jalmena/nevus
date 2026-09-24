@@ -146,6 +146,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/bodymap": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Body Map */
+        get: operations["get_body_map_api_bodymap_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/images/{image_id}": {
         parameters: {
             query?: never;
@@ -394,6 +411,26 @@ export interface components {
             user_id: string;
             /** Username */
             username: string;
+        };
+        /** BodyMap */
+        BodyMap: {
+            /** Attribution */
+            attribution: string;
+            /** Version */
+            version: string;
+            /** Viewbox */
+            viewBox: [
+                number,
+                number,
+                number,
+                number
+            ];
+            /** Views */
+            views: {
+                [key: string]: components["schemas"]["ViewData"];
+            };
+            /** Zones */
+            zones: components["schemas"]["Zone"][];
         };
         /** Body_upload_image_api_persons__person_id__images_post */
         Body_upload_image_api_persons__person_id__images_post: {
@@ -663,6 +700,51 @@ export interface components {
             /** Error Type */
             type: string;
         };
+        /** ViewData */
+        ViewData: {
+            /** Silhouette */
+            silhouette: string;
+            /** Zones */
+            zones: string[];
+        };
+        /** Zone */
+        Zone: {
+            /** Anchor */
+            anchor: [
+                number,
+                number
+            ];
+            /** Bbox */
+            bbox: [
+                number,
+                number,
+                number,
+                number
+            ];
+            /** Code */
+            code: string;
+            /** Molemapper Shape */
+            molemapper_shape: number;
+            /** Name */
+            name: string;
+            /** Path */
+            path: string;
+            /**
+             * Region
+             * @enum {string}
+             */
+            region: "head" | "trunk" | "arm" | "leg";
+            /**
+             * Side
+             * @enum {string}
+             */
+            side: "left" | "right" | "midline";
+            /**
+             * View
+             * @enum {string}
+             */
+            view: "front" | "back";
+        };
     };
     responses: never;
     parameters: never;
@@ -889,6 +971,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_body_map_api_bodymap_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BodyMap"];
                 };
             };
         };

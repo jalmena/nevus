@@ -55,6 +55,67 @@
         "title": "AccessOut",
         "type": "object"
       },
+      "BodyMap": {
+        "properties": {
+          "attribution": {
+            "title": "Attribution",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          },
+          "viewBox": {
+            "maxItems": 4,
+            "minItems": 4,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Viewbox",
+            "type": "array"
+          },
+          "views": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ViewData"
+            },
+            "propertyNames": {
+              "enum": [
+                "front",
+                "back"
+              ]
+            },
+            "title": "Views",
+            "type": "object"
+          },
+          "zones": {
+            "items": {
+              "$ref": "#/components/schemas/Zone"
+            },
+            "title": "Zones",
+            "type": "array"
+          }
+        },
+        "required": [
+          "version",
+          "viewBox",
+          "attribution",
+          "views",
+          "zones"
+        ],
+        "title": "BodyMap",
+        "type": "object"
+      },
       "Body_upload_image_api_persons__person_id__images_post": {
         "properties": {
           "captured_at": {
@@ -815,6 +876,121 @@
         ],
         "title": "ValidationError",
         "type": "object"
+      },
+      "ViewData": {
+        "properties": {
+          "silhouette": {
+            "title": "Silhouette",
+            "type": "string"
+          },
+          "zones": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Zones",
+            "type": "array"
+          }
+        },
+        "required": [
+          "silhouette",
+          "zones"
+        ],
+        "title": "ViewData",
+        "type": "object"
+      },
+      "Zone": {
+        "properties": {
+          "anchor": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Anchor",
+            "type": "array"
+          },
+          "bbox": {
+            "maxItems": 4,
+            "minItems": 4,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Bbox",
+            "type": "array"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "molemapper_shape": {
+            "title": "Molemapper Shape",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "region": {
+            "enum": [
+              "head",
+              "trunk",
+              "arm",
+              "leg"
+            ],
+            "title": "Region",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "left",
+              "right",
+              "midline"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "view": {
+            "enum": [
+              "front",
+              "back"
+            ],
+            "title": "View",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "view",
+          "side",
+          "region",
+          "name",
+          "molemapper_shape",
+          "path",
+          "anchor",
+          "bbox"
+        ],
+        "title": "Zone",
+        "type": "object"
       }
     }
   },
@@ -1078,6 +1254,27 @@
         "summary": "Sudo",
         "tags": [
           "auth"
+        ]
+      }
+    },
+    "/api/bodymap": {
+      "get": {
+        "operationId": "get_body_map_api_bodymap_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BodyMap"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Body Map",
+        "tags": [
+          "bodymap"
         ]
       }
     },
