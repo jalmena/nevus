@@ -4,9 +4,21 @@
     "tagline": "Because 'I think it was smaller' is not data.",
     "intendedUse": "neVus is a personal documentation and measurement aid. It does not diagnose, screen for, or assess the risk of any disease."
   },
-  "common": { "working": "Working…", "cancel": "Cancel", "close": "Close", "back": "Back" },
-  "shell": { "language": "Language", "navigation": "Main", "persons": "Persons" },
-  "languages": { "en": "English", "es": "Spanish" },
+  "common": {
+    "working": "Working…",
+    "cancel": "Cancel",
+    "close": "Close",
+    "back": "Back"
+  },
+  "shell": {
+    "language": "Language",
+    "navigation": "Main",
+    "persons": "Persons"
+  },
+  "languages": {
+    "en": "English",
+    "es": "Spanish"
+  },
   "auth": {
     "username": "Username",
     "password": "Password",
@@ -27,7 +39,11 @@
     "create": "Create",
     "emptyTitle": "No persons yet",
     "emptyText": "A person is somebody whose skin marks you keep a record of: you, or someone you look after.",
-    "role": { "owner": "Owner", "manager": "Manager", "viewer": "Viewer" }
+    "role": {
+      "owner": "Owner",
+      "manager": "Manager",
+      "viewer": "Viewer"
+    }
   },
   "images": {
     "addPhoto": "Add a photo",
@@ -54,9 +70,85 @@
   "settings": {
     "title": "Settings",
     "theme": "Theme",
-    "themes": { "system": "Follow the device", "light": "Light", "dark": "Dark" },
+    "themes": {
+      "system": "Follow the device",
+      "light": "Light",
+      "dark": "Dark"
+    },
     "showUncertainty": "Show measurement uncertainty (±)",
-    "roles": { "admin": "administrator", "member": "member" },
+    "roles": {
+      "admin": "administrator",
+      "member": "member"
+    },
     "signOut": "Sign out"
+  },
+  "bodymap": {
+    "label": "Body map, {{view}}",
+    "view": "View",
+    "views": {
+      "front": "Front",
+      "back": "Back"
+    },
+    "title": "Body map",
+    "hint": "Tap a zone to select it.",
+    "selected": "{{zone}} · {{view}}"
+  },
+  "zones": {
+    "1100": "Head",
+    "1200": "Neck and centre of chest",
+    "1250": "Right pectoral",
+    "1251": "Left pectoral",
+    "1300": "Right abdomen",
+    "1301": "Left abdomen",
+    "1350": "Right pelvis",
+    "1351": "Left pelvis",
+    "1400": "Right upper thigh",
+    "1401": "Left upper thigh",
+    "1450": "Right lower thigh and knee",
+    "1451": "Left lower thigh and knee",
+    "1500": "Right upper calf",
+    "1501": "Left upper calf",
+    "1550": "Right lower calf",
+    "1551": "Left lower calf",
+    "1600": "Right ankle and foot",
+    "1601": "Left ankle and foot",
+    "1650": "Right shoulder",
+    "1651": "Left shoulder",
+    "1700": "Right upper arm",
+    "1701": "Left upper arm",
+    "1750": "Right upper forearm",
+    "1751": "Left upper forearm",
+    "1800": "Right lower forearm",
+    "1801": "Left lower forearm",
+    "1850": "Right hand",
+    "1851": "Left hand",
+    "2100": "Head",
+    "2200": "Neck",
+    "2250": "Left upper back",
+    "2251": "Right upper back",
+    "2300": "Left lower back",
+    "2301": "Right lower back",
+    "2350": "Left buttock",
+    "2351": "Right buttock",
+    "2400": "Left upper thigh",
+    "2401": "Right upper thigh",
+    "2450": "Left lower thigh and knee",
+    "2451": "Right lower thigh and knee",
+    "2500": "Left upper calf",
+    "2501": "Right upper calf",
+    "2550": "Left lower calf",
+    "2551": "Right lower calf",
+    "2600": "Left ankle and foot",
+    "2601": "Right ankle and foot",
+    "2650": "Left shoulder",
+    "2651": "Right shoulder",
+    "2700": "Left upper arm",
+    "2701": "Right upper arm",
+    "2750": "Left elbow",
+    "2751": "Right elbow",
+    "2800": "Left lower forearm",
+    "2801": "Right lower forearm",
+    "2850": "Left hand",
+    "2851": "Right hand"
   }
 }

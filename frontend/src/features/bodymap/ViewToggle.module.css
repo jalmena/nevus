@@ -1,0 +1,23 @@
+.toggle {
+  display: inline-flex;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  background: var(--color-surface);
+}
+
+.toggle button {
+  min-height: var(--touch-target);
+  padding: 0 var(--space-4);
+  border: 0;
+  background: transparent;
+  color: var(--color-ink-2);
+  font: inherit;
+  font-weight: var(--font-weight-emphasis);
+  cursor: pointer;
+}
+
+.toggle button.active {
+  background: var(--color-accent);
+  color: var(--color-paper);
+}

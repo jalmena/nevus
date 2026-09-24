@@ -5,3 +5,4 @@ pnpm-lock.yaml
 # Generated from the backend schema; kept byte-identical to the generator output so CI can diff it.
 openapi.json
 src/lib/api/schema.d.ts
+src/features/bodymap/zones.json

@@ -2,6 +2,9 @@ import { useRef, useState, type ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router";
 import { Button } from "@/design-system/components/Button";
+import { BodyMap } from "@/features/bodymap/BodyMap";
+import { ViewToggle } from "@/features/bodymap/ViewToggle";
+import { type View, type Zone } from "@/features/bodymap/zones";
 import { EmptyState } from "@/design-system/components/EmptyState";
 import { Notice } from "@/design-system/components/Notice";
 import {
@@ -26,6 +29,8 @@ export function PersonPage() {
   const remove = useDeleteImage(personId);
   const [role, setRole] = useState<ImageRole>("close_up");
   const [open, setOpen] = useState<ImageOut | null>(null);
+  const [view, setView] = useState<View>("front");
+  const [zone, setZone] = useState<Zone | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
   const canEdit = person.data?.my_role === "owner" || person.data?.my_role === "manager";
 
@@ -55,6 +60,28 @@ export function PersonPage() {
         {person.data && <span className="text-secondary">{t(`persons.role.${person.data.my_role}`)}</span>}
       </header>
       {person.error && <Notice kind="error">{person.error.message}</Notice>}
+
+      <section className={styles.mapSection} aria-labelledby="map-heading">
+        <div className={styles.header}>
+          <h2 id="map-heading">{t("bodymap.title")}</h2>
+          <ViewToggle
+            view={view}
+            onChange={(next) => {
+              setView(next);
+              setZone(null);
+            }}
+          />
+        </div>
+        <BodyMap view={view} selectedZone={zone?.code} onSelectZone={setZone} />
+        <p className="text-secondary">
+          {zone
+            ? t("bodymap.selected", {
+                zone: t(`zones.${zone.code}`, { defaultValue: zone.name }),
+                view: t(`bodymap.views.${view}`),
+              })
+            : t("bodymap.hint")}
+        </p>
+      </section>
 
       {canEdit && (
         <section className={styles.upload} aria-labelledby="upload-heading">

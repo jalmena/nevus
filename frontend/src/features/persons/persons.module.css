@@ -127,3 +127,12 @@
   padding: var(--space-3) var(--space-4);
   color: var(--color-brand-ink);
 }
+
+.mapSection {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.mapSection h2 {
+  font-size: var(--text-lg);
+}

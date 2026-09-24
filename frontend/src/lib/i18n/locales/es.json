@@ -4,9 +4,21 @@
     "tagline": "Porque «creo que era más pequeño» no es un dato.",
     "intendedUse": "neVus es una ayuda personal de documentación y medición. No diagnostica, no criba ni evalúa el riesgo de ninguna enfermedad."
   },
-  "common": { "working": "Un momento…", "cancel": "Cancelar", "close": "Cerrar", "back": "Volver" },
-  "shell": { "language": "Idioma", "navigation": "Principal", "persons": "Personas" },
-  "languages": { "en": "Inglés", "es": "Español" },
+  "common": {
+    "working": "Un momento…",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "back": "Volver"
+  },
+  "shell": {
+    "language": "Idioma",
+    "navigation": "Principal",
+    "persons": "Personas"
+  },
+  "languages": {
+    "en": "Inglés",
+    "es": "Español"
+  },
   "auth": {
     "username": "Usuario",
     "password": "Contraseña",
@@ -27,7 +39,11 @@
     "create": "Crear",
     "emptyTitle": "Todavía no hay personas",
     "emptyText": "Una persona es alguien de cuyas marcas en la piel llevas registro: tú o alguien a tu cargo.",
-    "role": { "owner": "Propietario", "manager": "Gestor", "viewer": "Lector" }
+    "role": {
+      "owner": "Propietario",
+      "manager": "Gestor",
+      "viewer": "Lector"
+    }
   },
   "images": {
     "addPhoto": "Añadir una foto",
@@ -54,9 +70,85 @@
   "settings": {
     "title": "Ajustes",
     "theme": "Tema",
-    "themes": { "system": "Como el dispositivo", "light": "Claro", "dark": "Oscuro" },
+    "themes": {
+      "system": "Como el dispositivo",
+      "light": "Claro",
+      "dark": "Oscuro"
+    },
     "showUncertainty": "Mostrar la incertidumbre de las medidas (±)",
-    "roles": { "admin": "administración", "member": "miembro" },
+    "roles": {
+      "admin": "administración",
+      "member": "miembro"
+    },
     "signOut": "Cerrar sesión"
+  },
+  "bodymap": {
+    "label": "Mapa corporal, {{view}}",
+    "view": "Vista",
+    "views": {
+      "front": "Frente",
+      "back": "Espalda"
+    },
+    "title": "Mapa corporal",
+    "hint": "Toca una zona para seleccionarla.",
+    "selected": "{{zone}} · {{view}}"
+  },
+  "zones": {
+    "1100": "Cabeza",
+    "1200": "Cuello y centro del pecho",
+    "1250": "Pectoral derecho",
+    "1251": "Pectoral izquierdo",
+    "1300": "Abdomen derecho",
+    "1301": "Abdomen izquierdo",
+    "1350": "Pelvis derecha",
+    "1351": "Pelvis izquierda",
+    "1400": "Muslo superior derecho",
+    "1401": "Muslo superior izquierdo",
+    "1450": "Muslo inferior y rodilla derechos",
+    "1451": "Muslo inferior y rodilla izquierdos",
+    "1500": "Pantorrilla superior derecha",
+    "1501": "Pantorrilla superior izquierda",
+    "1550": "Pantorrilla inferior derecha",
+    "1551": "Pantorrilla inferior izquierda",
+    "1600": "Tobillo y pie derechos",
+    "1601": "Tobillo y pie izquierdos",
+    "1650": "Hombro derecho",
+    "1651": "Hombro izquierdo",
+    "1700": "Brazo derecho",
+    "1701": "Brazo izquierdo",
+    "1750": "Antebrazo superior derecho",
+    "1751": "Antebrazo superior izquierdo",
+    "1800": "Antebrazo inferior derecho",
+    "1801": "Antebrazo inferior izquierdo",
+    "1850": "Mano derecha",
+    "1851": "Mano izquierda",
+    "2100": "Cabeza",
+    "2200": "Cuello",
+    "2250": "Espalda superior izquierda",
+    "2251": "Espalda superior derecha",
+    "2300": "Espalda inferior izquierda",
+    "2301": "Espalda inferior derecha",
+    "2350": "Glúteo izquierdo",
+    "2351": "Glúteo derecho",
+    "2400": "Muslo superior izquierdo",
+    "2401": "Muslo superior derecho",
+    "2450": "Muslo inferior y rodilla izquierdos",
+    "2451": "Muslo inferior y rodilla derechos",
+    "2500": "Pantorrilla superior izquierda",
+    "2501": "Pantorrilla superior derecha",
+    "2550": "Pantorrilla inferior izquierda",
+    "2551": "Pantorrilla inferior derecha",
+    "2600": "Tobillo y pie izquierdos",
+    "2601": "Tobillo y pie derechos",
+    "2650": "Hombro izquierdo",
+    "2651": "Hombro derecho",
+    "2700": "Brazo izquierdo",
+    "2701": "Brazo derecho",
+    "2750": "Codo izquierdo",
+    "2751": "Codo derecho",
+    "2800": "Antebrazo inferior izquierdo",
+    "2801": "Antebrazo inferior derecho",
+    "2850": "Mano izquierda",
+    "2851": "Mano derecha"
   }
 }
