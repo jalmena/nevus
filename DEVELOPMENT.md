@@ -52,3 +52,7 @@ A fresh instance has no accounts: the first person to open it claims it and beco
 ## Migrations
 
 `just revision "add lesions"` autogenerates a migration from the models; review it (SQLite needs batch mode, which the environment enables automatically), then `just migrate`. Every migration must apply cleanly on both engines; the CI enforces it.
+
+## Body map
+
+The silhouette and the zone geometry are generated, not drawn by hand. `uv run tools/bodymap/build.py --preview docs/design/bodymap` rebuilds `zones.json` in both the backend and the frontend (the two copies must stay identical; CI checks it) and refreshes the labelled previews in `docs/design/bodymap/`. The zone identifiers, names and hit polygons come from MoleMapper (see `THIRD_PARTY_NOTICES.md`); the silhouette is neVus artwork built in `tools/bodymap/build.py`. Design notes: `docs/design/BODY_MAP.md`.

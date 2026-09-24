@@ -39,6 +39,10 @@ openapi:
     cd backend && uv run nevus openapi > ../frontend/openapi.json
     cd frontend && pnpm openapi
 
+# Regenerate the body map (zones.json in backend and frontend, previews in docs).
+bodymap:
+    uv run tools/bodymap/build.py --preview docs/design/bodymap
+
 # Database migrations.
 migrate:
     cd backend && uv run alembic upgrade head

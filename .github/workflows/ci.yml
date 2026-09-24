@@ -51,8 +51,8 @@ jobs:
       - run: uv sync --frozen
       - name: Lint and format
         run: |
-          uv run ruff check .
-          uv run ruff format --check .
+          uv run ruff check . ../tools
+          uv run ruff format --check . ../tools
       - name: Type check
         run: uv run mypy
       - name: Tests on SQLite
@@ -65,6 +65,8 @@ jobs:
         run: |
           uv run nevus openapi > /tmp/openapi.json
           diff -q /tmp/openapi.json ../frontend/openapi.json || { echo "frontend/openapi.json is stale: run 'just openapi'"; exit 1; }
+      - name: Body map copies are identical
+        run: cmp src/nevus/bodymap/zones.json ../frontend/src/features/bodymap/zones.json
       - name: Migrations on SQLite
         env:
           NEVUS_DATA_DIR: ${{ runner.temp }}/sqlite

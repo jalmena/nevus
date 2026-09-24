@@ -8,8 +8,8 @@ neVus is inspired by MoleMapper, the iOS application released by OHSU. The follo
 
 | Component | Origin in MoleMapper | Location in neVus |
 | --- | --- | --- |
-| 61-zone body taxonomy (identifiers and names) | `Source/CoreData/Zone30+CoreDataClass.swift` | planned (body-map data) |
-| 32 zone polygons and their per-view origins | `Source/Common/Helpers/VariableStore.m`, `BodyFrontView.m`, `BodyBackView.m`, `HeadDetailView.m` | planned (generated SVG regions) |
+| 61-zone body taxonomy (identifiers and names) | `Source/CoreData/Zone30+CoreDataClass.swift` | `tools/bodymap/molemapper_zones.py` |
+| 32 zone polygons and their per-view origins | `Source/Common/Helpers/VariableStore.m`, `BodyFrontView.m`, `BodyBackView.m`, `HeadDetailView.m` | `tools/bodymap/molemapper_zones.py`; clipped to the neVus silhouette by `tools/bodymap/build.py` into `backend/src/nevus/bodymap/zones.json` and `frontend/src/features/bodymap/zones.json` |
 | Reference-coin diameter table | `Source/Common/Helpers/TranslateUtils.swift` | planned (scale references) |
 | Tap-seeded auto-fit measurement algorithm (structure) | `Source/Common/OpenCVWrapper/Autosize.swift`, `OpenCVWrapper.mm` | planned (Python reimplementation) |
 
