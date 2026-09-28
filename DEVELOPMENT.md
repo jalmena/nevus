@@ -68,3 +68,7 @@ One release is one pull request into `main` plus what the release workflow does 
 5. Merge `main` back into `develop` and delete the release branch.
 
 Hotfixes branch from `main` (`hotfix/*`), bump the patch version the same way and follow steps 3 to 5.
+
+## Continuous integration runners
+
+The CI workflow runs on a self-hosted runner labelled `nevus`: an LXC on the maintainer's home lab, provisioned from the personal runners repository. Workflows from outside contributors need approval before they run there. The release workflow stays on GitHub-hosted runners because it builds arm64 images with QEMU. To run CI on GitHub-hosted runners instead, change `runs-on` in `.github/workflows/ci.yml` back to `ubuntu-latest`.
