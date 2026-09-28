@@ -18,6 +18,7 @@ import argparse
 import io
 import os
 import random
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -36,7 +37,7 @@ VIEWPORT = {"width": 390, "height": 844}
 
 def skin_photo(seed: int, spot: tuple[int, int] = (600, 450), radius: int = 70) -> bytes:
     """A plausible close-up: warm skin tone with grain and one soft, slightly irregular dark spot."""
-    rng = random.Random(seed)
+    rng = random.Random(seed)  # noqa: S311 - image noise, not security
     width, height = 1200, 900
     base = Image.new("RGB", (width, height), (222, 182, 156))
     noise = Image.effect_noise((width, height), 18).convert("L")
@@ -70,7 +71,8 @@ def wait_healthy(client: httpx.Client) -> None:
 
 def seed(client: httpx.Client) -> dict[str, str]:
     headers = {"sec-fetch-site": "same-origin"}
-    r = client.post(f"{BASE}/api/auth/claim", json={"username": "Jose", "password": "correct horse battery"}, headers=headers)
+    credentials = {"username": "Jose", "password": "correct horse battery"}
+    r = client.post(f"{BASE}/api/auth/claim", json=credentials, headers=headers)
     r.raise_for_status()
     client.patch(f"{BASE}/api/auth/me", json={"language": "en"}, headers=headers)
     person = client.post(f"{BASE}/api/persons", json={"display_name": "Ana"}, headers=headers).json()
@@ -84,7 +86,13 @@ def seed(client: httpx.Client) -> dict[str, str]:
     for label, zone, x, y, noticed, interval in marks:
         lesion = client.post(
             f"{BASE}/api/persons/{pid}/lesions",
-            json={"label": label, "location": {"zone": zone, "x": x, "y": y}, "first_noticed_on": noticed, "status": "active", "interval_days": interval},
+            json={
+                "label": label,
+                "location": {"zone": zone, "x": x, "y": y},
+                "first_noticed_on": noticed,
+                "status": "active",
+                "interval_days": interval,
+            },
             headers=headers,
         ).json()
         ids.append(lesion["id"])
@@ -120,8 +128,21 @@ def main() -> None:
         raise SystemExit("frontend/dist is missing: run pnpm build in frontend/ first")
     args.out.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory() as tmp:
-        env = {**os.environ, "NEVUS_DATA_DIR": tmp, "NEVUS_ALLOWED_HOSTS": "localhost", "NEVUS_PORT": str(PORT), "NEVUS_LOG_LEVEL": "warning"}
-        server = subprocess.Popen(["uv", "run", "nevus", "serve"], cwd=ROOT / "backend", env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        env = {
+            **os.environ,
+            "NEVUS_DATA_DIR": tmp,
+            "NEVUS_ALLOWED_HOSTS": "localhost",
+            "NEVUS_PORT": str(PORT),
+            "NEVUS_LOG_LEVEL": "warning",
+        }
+        uv = shutil.which("uv") or "uv"
+        server = subprocess.Popen(  # noqa: S603 - fixed argument list, no shell
+            [uv, "run", "nevus", "serve"],
+            cwd=ROOT / "backend",
+            env=env,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
         try:
             with httpx.Client(timeout=30) as client:
                 wait_healthy(client)
@@ -136,7 +157,9 @@ def main() -> None:
             with sync_playwright() as playwright:
                 browser = playwright.chromium.launch()
                 for scheme in ("light", "dark"):
-                    context = browser.new_context(viewport=VIEWPORT, device_scale_factor=2, color_scheme=scheme, locale="en-GB")
+                    context = browser.new_context(
+                        viewport=VIEWPORT, device_scale_factor=2, color_scheme=scheme, locale="en-GB"
+                    )
                     context.add_cookies([{"name": "nevus_session", "value": cookie, "url": BASE}])
                     page = context.new_page()
                     for name, path in pages:
