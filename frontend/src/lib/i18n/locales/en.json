@@ -8,7 +8,8 @@
     "working": "Working…",
     "cancel": "Cancel",
     "close": "Close",
-    "back": "Back"
+    "back": "Back",
+    "save": "Save"
   },
   "shell": {
     "language": "Language",
@@ -150,5 +151,66 @@
     "2801": "Right lower forearm",
     "2850": "Left hand",
     "2851": "Right hand"
+  },
+  "lesions": {
+    "title": "Marks",
+    "add": "Add a mark",
+    "placingHint": "Tap the place on the map where the mark is.",
+    "placed": "Now describe the mark below.",
+    "newTitle": "New mark",
+    "label": "Name",
+    "labelHint": "Optional. Otherwise the zone name is used.",
+    "type": "Type",
+    "types": {
+      "mole": "Mole",
+      "other": "Other mark"
+    },
+    "firstNoticed": "First noticed",
+    "interval": "Check every",
+    "intervals": {
+      "30": "month",
+      "90": "3 months",
+      "180": "6 months",
+      "365": "year"
+    },
+    "days": "{{count}} days",
+    "create": "Create the mark",
+    "edit": "Edit details",
+    "status": "Status",
+    "statuses": {
+      "active": "Active",
+      "removed": "Removed",
+      "resolved": "Resolved"
+    },
+    "notes": "Notes",
+    "nextDue": "Next check",
+    "dueNow": "Due",
+    "dueIn": "In {{count}} days",
+    "lastVisit": "last visit {{date}}",
+    "noVisits": "no visits yet",
+    "emptyTitle": "No marks yet",
+    "emptyTextEdit": "Add a mark by tapping its place on the body map.",
+    "emptyTextView": "Nobody has added marks for this person yet.",
+    "backToPerson": "Back to the person"
+  },
+  "observations": {
+    "title": "Visits",
+    "new": "New visit",
+    "emptyTitle": "No visits yet",
+    "emptyText": "A visit is one dated look at the mark: photos, your notes and what you noticed.",
+    "photoCount_one": "{{count}} photo",
+    "photoCount_other": "{{count}} photos",
+    "photos": "Photos",
+    "yourNotes": "Your notes",
+    "notesHint": "What you noticed, in your own words. neVus records it and never interprets it.",
+    "notes": "Notes",
+    "symptoms": {
+      "itching": "Itching",
+      "bleeding": "Bleeding",
+      "pain": "Pain",
+      "looks_different": "Looks different to me"
+    },
+    "backTo": "Back to {{lesion}}",
+    "delete": "Move visit to trash"
   }
 }

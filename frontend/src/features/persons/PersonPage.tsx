@@ -1,54 +1,57 @@
-import { useRef, useState, type ChangeEvent } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import { Button } from "@/design-system/components/Button";
-import { BodyMap } from "@/features/bodymap/BodyMap";
-import { ViewToggle } from "@/features/bodymap/ViewToggle";
-import { type View, type Zone } from "@/features/bodymap/zones";
 import { EmptyState } from "@/design-system/components/EmptyState";
 import { Notice } from "@/design-system/components/Notice";
-import {
-  imageUrl,
-  useDeleteImage,
-  useImages,
-  useUploadImage,
-  type ImageOut,
-  type ImageRole,
-} from "@/lib/images";
+import { BodyMap, type Marker } from "@/features/bodymap/BodyMap";
+import { ViewToggle } from "@/features/bodymap/ViewToggle";
+import { type MapPoint, type View, type Zone } from "@/features/bodymap/zones";
+import { LesionList } from "@/features/lesions/LesionList";
+import { NewLesionForm } from "@/features/lesions/NewLesionForm";
+import { lesionTitle } from "@/features/lesions/lesionName";
+import { useCreateLesion, useLesions } from "@/lib/lesions";
 import { usePerson } from "@/lib/persons";
 import styles from "./persons.module.css";
 
-const ROLES: ImageRole[] = ["close_up", "with_reference", "overview", "other"];
-
 export function PersonPage() {
   const { personId = "" } = useParams();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   const person = usePerson(personId);
-  const images = useImages(personId);
-  const upload = useUploadImage(personId);
-  const remove = useDeleteImage(personId);
-  const [role, setRole] = useState<ImageRole>("close_up");
-  const [open, setOpen] = useState<ImageOut | null>(null);
+  const lesions = useLesions(personId);
+  const create = useCreateLesion(personId);
   const [view, setView] = useState<View>("front");
   const [zone, setZone] = useState<Zone | null>(null);
-  const dialog = useRef<HTMLDialogElement>(null);
+  const [placing, setPlacing] = useState(false);
+  const [point, setPoint] = useState<MapPoint | null>(null);
   const canEdit = person.data?.my_role === "owner" || person.data?.my_role === "manager";
 
-  function onFile(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    event.target.value = "";
-    if (file) upload.mutate({ file, role });
+  const markers: Marker[] = (lesions.data ?? [])
+    .filter((lesion) => lesion.location.view === view)
+    .map((lesion) => ({
+      id: lesion.id,
+      x: lesion.location.x,
+      y: lesion.location.y,
+      label: lesionTitle(lesion, t),
+      due: lesion.due,
+      selected: false,
+    }));
+
+  function changeView(next: View) {
+    setView(next);
+    setZone(null);
+    setPoint(null);
   }
 
-  function show(image: ImageOut) {
-    setOpen(image);
-    dialog.current?.showModal();
+  function onPlace(next: MapPoint) {
+    if (placing) setPoint(next);
   }
 
-  const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
+  function cancelPlacing() {
+    setPlacing(false);
+    setPoint(null);
+  }
 
   return (
     <div className={styles.page}>
@@ -64,118 +67,70 @@ export function PersonPage() {
       <section className={styles.mapSection} aria-labelledby="map-heading">
         <div className={styles.header}>
           <h2 id="map-heading">{t("bodymap.title")}</h2>
-          <ViewToggle
-            view={view}
-            onChange={(next) => {
-              setView(next);
-              setZone(null);
-            }}
-          />
+          <ViewToggle view={view} onChange={changeView} />
         </div>
-        <BodyMap view={view} selectedZone={zone?.code} onSelectZone={setZone} />
-        <p className="text-secondary">
-          {zone
-            ? t("bodymap.selected", {
-                zone: t(`zones.${zone.code}`, { defaultValue: zone.name }),
-                view: t(`bodymap.views.${view}`),
-              })
-            : t("bodymap.hint")}
+        <BodyMap
+          view={view}
+          markers={markers}
+          selectedZone={placing ? (point?.zone ?? zone?.code) : zone?.code}
+          onSelectZone={setZone}
+          onPlace={onPlace}
+          onSelectMarker={(id) => void navigate(`/lesions/${id}`)}
+        />
+        <p className="text-secondary" role="status">
+          {placing
+            ? point
+              ? t("lesions.placed")
+              : t("lesions.placingHint")
+            : zone
+              ? t("bodymap.selected", {
+                  zone: t(`zones.${zone.code}`, { defaultValue: zone.name }),
+                  view: t(`bodymap.views.${view}`),
+                })
+              : t("bodymap.hint")}
         </p>
-      </section>
-
-      {canEdit && (
-        <section className={styles.upload} aria-labelledby="upload-heading">
-          <h2 id="upload-heading">{t("images.addPhoto")}</h2>
-          <div className={styles.roleRow}>
-            <label>
-              {t("images.role")}{" "}
-              <select value={role} onChange={(e) => setRole(e.target.value as ImageRole)}>
-                {ROLES.map((r) => (
-                  <option key={r} value={r}>
-                    {t(`images.roles.${r}`)}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <Button className={styles.fileButton} disabled={upload.isPending}>
-              {upload.isPending ? t("images.uploading") : t("images.takePhoto")}
-              <input
-                type="file"
-                accept="image/*"
-                capture="environment"
-                onChange={onFile}
-                aria-label={t("images.takePhoto")}
-              />
-            </Button>
-            <Button variant="secondary" className={styles.fileButton} disabled={upload.isPending}>
-              {t("images.chooseFile")}
-              <input type="file" accept="image/*" onChange={onFile} aria-label={t("images.chooseFile")} />
+        {canEdit && !placing && (
+          <div>
+            <Button onClick={() => setPlacing(true)}>{t("lesions.add")}</Button>
+          </div>
+        )}
+        {placing && !point && (
+          <div>
+            <Button variant="quiet" onClick={cancelPlacing}>
+              {t("common.cancel")}
             </Button>
           </div>
-          <p className="text-secondary">{t("images.privacyNote")}</p>
-          {upload.error && <Notice kind="error">{upload.error.message}</Notice>}
-          {upload.isSuccess && <Notice kind="success">{t("images.uploaded")}</Notice>}
-        </section>
-      )}
-
-      {images.data && images.data.length === 0 && (
-        <EmptyState
-          title={t("images.emptyTitle")}
-          text={canEdit ? t("images.emptyTextEdit") : t("images.emptyTextView")}
-        />
-      )}
-      <ul className={styles.gallery}>
-        {images.data?.map((image) => (
-          <li key={image.id}>
-            <button
-              type="button"
-              className={styles.thumb}
-              onClick={() => show(image)}
-              aria-label={t("images.open")}
-            >
-              <img
-                src={imageUrl(image.id, "thumb")}
-                alt={t("images.alt", {
-                  role: t(`images.roles.${image.role}`),
-                  date: image.captured_at ? dateFormat.format(new Date(image.captured_at)) : "",
-                })}
-                width={image.renditions.find((r) => r.kind === "thumb")?.width}
-                height={image.renditions.find((r) => r.kind === "thumb")?.height}
-                loading="lazy"
-                className={styles.thumb}
-              />
-            </button>
-          </li>
-        ))}
-      </ul>
-
-      <dialog ref={dialog} className={styles.preview} onClose={() => setOpen(null)}>
-        {open && (
-          <>
-            <img src={imageUrl(open.id, "preview")} alt={t(`images.roles.${open.role}`)} />
-            <div className={styles.previewBar}>
-              <span className="numeric">
-                {open.captured_at ? dateFormat.format(new Date(open.captured_at)) : t("images.noDate")} ·{" "}
-                {open.width}×{open.height}
-              </span>
-              <span>
-                {canEdit && (
-                  <Button
-                    variant="danger"
-                    onClick={() => remove.mutate(open.id, { onSuccess: () => dialog.current?.close() })}
-                    disabled={remove.isPending}
-                  >
-                    {t("images.delete")}
-                  </Button>
-                )}{" "}
-                <Button variant="secondary" onClick={() => dialog.current?.close()}>
-                  {t("common.close")}
-                </Button>
-              </span>
-            </div>
-          </>
         )}
-      </dialog>
+        {placing && point && (
+          <NewLesionForm
+            point={point}
+            view={view}
+            pending={create.isPending}
+            error={create.error?.message}
+            onCancel={cancelPlacing}
+            onSubmit={(body) =>
+              create.mutate(body, {
+                onSuccess: (lesion) => {
+                  cancelPlacing();
+                  void navigate(`/lesions/${lesion.id}`);
+                },
+              })
+            }
+          />
+        )}
+      </section>
+
+      <section className={styles.mapSection} aria-labelledby="marks-heading">
+        <h2 id="marks-heading">{t("lesions.title")}</h2>
+        {lesions.error && <Notice kind="error">{lesions.error.message}</Notice>}
+        {lesions.data && lesions.data.length === 0 && (
+          <EmptyState
+            title={t("lesions.emptyTitle")}
+            text={canEdit ? t("lesions.emptyTextEdit") : t("lesions.emptyTextView")}
+          />
+        )}
+        {lesions.data && lesions.data.length > 0 && <LesionList lesions={lesions.data} />}
+      </section>
     </div>
   );
 }

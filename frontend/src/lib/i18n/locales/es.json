@@ -8,7 +8,8 @@
     "working": "Un momento…",
     "cancel": "Cancelar",
     "close": "Cerrar",
-    "back": "Volver"
+    "back": "Volver",
+    "save": "Guardar"
   },
   "shell": {
     "language": "Idioma",
@@ -150,5 +151,66 @@
     "2801": "Antebrazo inferior derecho",
     "2850": "Mano izquierda",
     "2851": "Mano derecha"
+  },
+  "lesions": {
+    "title": "Marcas",
+    "add": "Añadir una marca",
+    "placingHint": "Toca en el mapa el lugar donde está la marca.",
+    "placed": "Ahora describe la marca aquí abajo.",
+    "newTitle": "Nueva marca",
+    "label": "Nombre",
+    "labelHint": "Opcional. Si no, se usa el nombre de la zona.",
+    "type": "Tipo",
+    "types": {
+      "mole": "Lunar",
+      "other": "Otra marca"
+    },
+    "firstNoticed": "Vista por primera vez",
+    "interval": "Revisar cada",
+    "intervals": {
+      "30": "mes",
+      "90": "3 meses",
+      "180": "6 meses",
+      "365": "año"
+    },
+    "days": "{{count}} días",
+    "create": "Crear la marca",
+    "edit": "Editar datos",
+    "status": "Estado",
+    "statuses": {
+      "active": "Activa",
+      "removed": "Extirpada",
+      "resolved": "Resuelta"
+    },
+    "notes": "Notas",
+    "nextDue": "Próxima revisión",
+    "dueNow": "Toca revisar",
+    "dueIn": "En {{count}} días",
+    "lastVisit": "última visita {{date}}",
+    "noVisits": "sin visitas todavía",
+    "emptyTitle": "Todavía no hay marcas",
+    "emptyTextEdit": "Añade una marca tocando su lugar en el mapa corporal.",
+    "emptyTextView": "Nadie ha añadido marcas de esta persona todavía.",
+    "backToPerson": "Volver a la persona"
+  },
+  "observations": {
+    "title": "Visitas",
+    "new": "Nueva visita",
+    "emptyTitle": "Todavía no hay visitas",
+    "emptyText": "Una visita es un vistazo con fecha a la marca: fotos, tus notas y lo que hayas notado.",
+    "photoCount_one": "{{count}} foto",
+    "photoCount_other": "{{count}} fotos",
+    "photos": "Fotos",
+    "yourNotes": "Tus notas",
+    "notesHint": "Lo que hayas notado, con tus palabras. neVus lo guarda y nunca lo interpreta.",
+    "notes": "Notas",
+    "symptoms": {
+      "itching": "Picor",
+      "bleeding": "Sangrado",
+      "pain": "Dolor",
+      "looks_different": "Me parece distinta"
+    },
+    "backTo": "Volver a {{lesion}}",
+    "delete": "Mover la visita a la papelera"
   }
 }

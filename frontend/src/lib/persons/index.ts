@@ -28,6 +28,7 @@ export function usePerson(personId: string) {
       if (!data) throw new Error(errorMessage(error, "This person could not be loaded."));
       return data;
     },
+    enabled: personId !== "",
   });
 }
 
