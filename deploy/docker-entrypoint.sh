@@ -10,7 +10,9 @@ if [ "$(id -u)" = "0" ]; then
     if [ "$(id -g nevus)" != "$PGID" ]; then groupmod -o -g "$PGID" nevus; fi
     if [ "$(id -u nevus)" != "$PUID" ]; then usermod -o -u "$PUID" nevus; fi
     mkdir -p "${NEVUS_DATA_DIR:-/data}"
-    chown -R "$PUID:$PGID" "${NEVUS_DATA_DIR:-/data}" /app
+    # Only the data directory changes hands: /app is world-readable and never written to,
+    # and walking its thousands of files on every start is slow on a busy disk.
+    chown -R "$PUID:$PGID" "${NEVUS_DATA_DIR:-/data}"
     exec setpriv --reuid="$PUID" --regid="$PGID" --init-groups "$@"
 fi
 
