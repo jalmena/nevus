@@ -8,8 +8,8 @@ neVus is inspired by MoleMapper, the iOS application released by OHSU. The follo
 
 | Component | Origin in MoleMapper | Location in neVus |
 | --- | --- | --- |
-| 61-zone body taxonomy (identifiers and names) | `Source/CoreData/Zone30+CoreDataClass.swift` | planned (body-map data) |
-| 32 zone polygons and their per-view origins | `Source/Common/Helpers/VariableStore.m`, `BodyFrontView.m`, `BodyBackView.m`, `HeadDetailView.m` | planned (generated SVG regions) |
+| 61-zone body taxonomy (identifiers and names) | `Source/CoreData/Zone30+CoreDataClass.swift` | `tools/bodymap/molemapper_zones.py` |
+| 32 zone polygons and their per-view origins | `Source/Common/Helpers/VariableStore.m`, `BodyFrontView.m`, `BodyBackView.m`, `HeadDetailView.m` | `tools/bodymap/molemapper_zones.py`; clipped to the neVus silhouette by `tools/bodymap/build.py` into `backend/src/nevus/bodymap/zones.json` and `frontend/src/features/bodymap/zones.json` |
 | Reference-coin diameter table | `Source/Common/Helpers/TranslateUtils.swift` | planned (scale references) |
 | Tap-seeded auto-fit measurement algorithm (structure) | `Source/Common/OpenCVWrapper/Autosize.swift`, `OpenCVWrapper.mm` | planned (Python reimplementation) |
 
@@ -83,3 +83,12 @@ MoleMapper for iOS is available under the BSD license:
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 ```
+
+## Typefaces
+
+The brand assets under `docs/design/brand/identity/` contain glyph outlines derived from the typefaces below, and the interface ships their font files self-hosted. Both are licensed under the SIL Open Font License, Version 1.1; the licence texts are kept next to the assets.
+
+| Typeface | Copyright | Licence | Use |
+| --- | --- | --- | --- |
+| B612 | Copyright 2012 The B612 Project Authors (https://github.com/polarsys/b612) | SIL OFL 1.1 ([`docs/design/brand/identity/licences/OFL-B612.txt`](docs/design/brand/identity/licences/OFL-B612.txt)) | wordmark outlines |
+| Epilogue | Copyright 2020 The Epilogue Project Authors (https://github.com/Etcetera-Type-Co/Epilogue) | SIL OFL 1.1 ([`docs/design/brand/identity/licences/OFL-Epilogue.txt`](docs/design/brand/identity/licences/OFL-Epilogue.txt)) | interface and report typeface; tagline outlines |

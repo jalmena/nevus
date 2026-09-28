@@ -1,0 +1,72 @@
+.map {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 70vh;
+  touch-action: manipulation;
+}
+
+.silhouette {
+  fill: var(--color-surface-2);
+  stroke: var(--color-ink-3);
+  stroke-width: 0.8;
+  stroke-linejoin: round;
+}
+
+.zone {
+  fill: transparent;
+  stroke: var(--color-border);
+  stroke-width: 0.5;
+  cursor: pointer;
+  transition: fill var(--motion-fast) var(--ease);
+}
+
+.zone:hover,
+.zone:focus-visible {
+  fill: var(--color-marker);
+  fill-opacity: 0.18;
+  outline: none;
+}
+
+.zone:focus-visible {
+  stroke: var(--color-accent);
+  stroke-width: 1.2;
+}
+
+.selected,
+.selected:hover {
+  fill: var(--color-accent);
+  fill-opacity: 0.28;
+  stroke: var(--color-accent);
+  stroke-width: 1;
+}
+
+.marker circle {
+  fill: var(--color-marker);
+  stroke: var(--color-paper);
+  stroke-width: 1;
+}
+
+.marker .markerHalo {
+  fill: var(--color-marker);
+  fill-opacity: 0.25;
+  stroke: none;
+}
+
+.marker[role="button"] {
+  cursor: pointer;
+}
+
+.due circle {
+  fill: var(--color-attention);
+}
+
+.markerSelected circle {
+  fill: var(--color-marker-selected);
+}
+
+.marker:focus-visible circle {
+  stroke: var(--color-accent);
+  stroke-width: 1.5;
+  outline: none;
+}

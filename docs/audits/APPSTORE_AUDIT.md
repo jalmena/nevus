@@ -2,6 +2,9 @@
 
 Date: 2026-09-23. Scope: the maintainer's CasaOS/ZimaOS app store repository, which today distributes a single application (Tabernacle) and must become the personal store that also distributes neVus without breaking the existing Tabernacle installation. Method: inspection of the local clone and of the published `gh-pages` branch, plus the conventions documented in [CasaOS / ZimaOS third-party app store conventions](../research/CASAOS_STORE_CONVENTIONS.md).
 
+
+> **Update, 2026-09-23.** The maintainer renamed the repository to `jalmena/jalmena-appstore` after this audit was written. Verified the same day: the old `raw.githubusercontent.com` feed URLs and the old jsDelivr base URL still answer HTTP 200 with the same `Content-Length` and no redirect, and `github.com` redirects with 301, so subscribed CasaOS and ZimaOS clients are unaffected. Step 2 below is therefore done; Step 1 must additionally update the `base-url` in both workflows and `scripts/build.sh`, and the README, to the new name, while documenting that the old URLs remain valid. The display name chosen by the maintainer is "jalmena store"; neVus goes under the `Others` category.
+
 ## 1. Current structure
 
 Tracked files:
@@ -77,7 +80,7 @@ Two independent, reversible steps.
 2. `category-list.json`: keep `Media`; add the v2-legal category neVus will use (`Others` or `Home`; there is no `Health` in the fixed v2 list).
 3. `Apps/Nevus/docker-compose.yml` + `icon.svg` + `thumbnail.png` + screenshots, mirroring the Tabernacle file: compose `name: nevus` (v1 store app id; free in the five large stores; chosen once, never renamed), `x-casaos.id: io.github.jalmena.nevus`, lowercase locale keys, absolute asset URLs, pinned semver image tag, `version`/`update_at`/`release_notes` bumped together, `$PUID`/`$PGID`/`$TZ` built-ins, `index: /`, a distinctive host port checked against the official and BigBear stores, HTTPS/reverse-proxy advice in `description` and `tips.before_install`.
 4. `validate.yml`: loop over `Apps/*/docker-compose.yml` (`docker compose config -q` each); lint `name` (`^[a-z0-9_-]+$`) and `x-casaos.id` (reverse-domain, ≥ 2 segments); category in the v2 list; lowercase locale keys; semver `version`; quoted `port_map`; every referenced asset exists; no two apps publish the same host port; the pinned tag exists in the registry (`docker manifest inspect`); no `latest`.
-5. Store versioning decoupled from app versions: deploy to `gh-pages` on every push to `main`; tag with CalVer (`YYYY.MM.DD`) for traceability. Add a jsDelivr purge step after deploy.
+5. Store versioning decoupled from app versions: every push to `main` deploys to `gh-pages`, and the `gh-pages` history (one commit per deploy, naming the source commit) is the release log; no store tags. Add a jsDelivr purge step after deploy.
 6. README rewrite: personal store, app list, `store.json` advertised as the ZimaOS URL, the unchanged CasaOS zip URL, a per-app publishing checklist.
 7. Keep `tabernacle-appstore.zip` and additionally publish `appstore.zip` (same content) so a future rename can advertise a clean canonical URL while the old one keeps working.
 

@@ -1,0 +1,3301 @@
+{
+  "components": {
+    "schemas": {
+      "AccessIn": {
+        "properties": {
+          "role": {
+            "enum": [
+              "manager",
+              "viewer"
+            ],
+            "title": "Role",
+            "type": "string"
+          },
+          "username": {
+            "maxLength": 64,
+            "minLength": 2,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "role"
+        ],
+        "title": "AccessIn",
+        "type": "object"
+      },
+      "AccessOut": {
+        "properties": {
+          "role": {
+            "enum": [
+              "owner",
+              "manager",
+              "viewer"
+            ],
+            "title": "Role",
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          },
+          "username": {
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id",
+          "username",
+          "role"
+        ],
+        "title": "AccessOut",
+        "type": "object"
+      },
+      "BodyMap": {
+        "properties": {
+          "attribution": {
+            "title": "Attribution",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          },
+          "viewBox": {
+            "maxItems": 4,
+            "minItems": 4,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Viewbox",
+            "type": "array"
+          },
+          "views": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ViewData"
+            },
+            "propertyNames": {
+              "enum": [
+                "front",
+                "back"
+              ]
+            },
+            "title": "Views",
+            "type": "object"
+          },
+          "zones": {
+            "items": {
+              "$ref": "#/components/schemas/Zone"
+            },
+            "title": "Zones",
+            "type": "array"
+          }
+        },
+        "required": [
+          "version",
+          "viewBox",
+          "attribution",
+          "views",
+          "zones"
+        ],
+        "title": "BodyMap",
+        "type": "object"
+      },
+      "Body_upload_image_api_persons__person_id__images_post": {
+        "properties": {
+          "captured_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captured At"
+          },
+          "captured_tz": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captured Tz"
+          },
+          "file": {
+            "contentMediaType": "application/octet-stream",
+            "title": "File",
+            "type": "string"
+          },
+          "modality": {
+            "default": "camera",
+            "enum": [
+              "camera",
+              "dermatoscope"
+            ],
+            "title": "Modality",
+            "type": "string"
+          },
+          "role": {
+            "default": "close_up",
+            "enum": [
+              "overview",
+              "close_up",
+              "with_reference",
+              "other"
+            ],
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_image_api_persons__person_id__images_post",
+        "type": "object"
+      },
+      "Body_upload_observation_image_api_observations__observation_id__images_post": {
+        "properties": {
+          "captured_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captured At"
+          },
+          "captured_tz": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captured Tz"
+          },
+          "file": {
+            "contentMediaType": "application/octet-stream",
+            "title": "File",
+            "type": "string"
+          },
+          "modality": {
+            "default": "camera",
+            "enum": [
+              "camera",
+              "dermatoscope"
+            ],
+            "title": "Modality",
+            "type": "string"
+          },
+          "role": {
+            "default": "close_up",
+            "enum": [
+              "overview",
+              "close_up",
+              "with_reference",
+              "other"
+            ],
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_observation_image_api_observations__observation_id__images_post",
+        "type": "object"
+      },
+      "Credentials": {
+        "properties": {
+          "password": {
+            "maxLength": 1024,
+            "minLength": 10,
+            "title": "Password",
+            "type": "string"
+          },
+          "username": {
+            "maxLength": 64,
+            "minLength": 2,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ],
+        "title": "Credentials",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "Health": {
+        "properties": {
+          "database": {
+            "enum": [
+              "ok",
+              "unavailable"
+            ],
+            "title": "Database",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "degraded"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "storage": {
+            "enum": [
+              "ok",
+              "unavailable"
+            ],
+            "title": "Storage",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "version",
+          "database",
+          "storage"
+        ],
+        "title": "Health",
+        "type": "object"
+      },
+      "ImageOut": {
+        "properties": {
+          "bytes": {
+            "title": "Bytes",
+            "type": "integer"
+          },
+          "captured_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captured At"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "height": {
+            "title": "Height",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "mime": {
+            "title": "Mime",
+            "type": "string"
+          },
+          "modality": {
+            "title": "Modality",
+            "type": "string"
+          },
+          "observation_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observation Id"
+          },
+          "orientation": {
+            "title": "Orientation",
+            "type": "integer"
+          },
+          "person_id": {
+            "format": "uuid",
+            "title": "Person Id",
+            "type": "string"
+          },
+          "re_encoded": {
+            "title": "Re Encoded",
+            "type": "boolean"
+          },
+          "renditions": {
+            "items": {
+              "$ref": "#/components/schemas/RenditionOut"
+            },
+            "title": "Renditions",
+            "type": "array"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "sha256": {
+            "title": "Sha256",
+            "type": "string"
+          },
+          "source_format": {
+            "title": "Source Format",
+            "type": "string"
+          },
+          "width": {
+            "title": "Width",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "person_id",
+          "observation_id",
+          "role",
+          "modality",
+          "sha256",
+          "bytes",
+          "mime",
+          "width",
+          "height",
+          "orientation",
+          "source_format",
+          "re_encoded",
+          "captured_at",
+          "created_at",
+          "renditions"
+        ],
+        "title": "ImageOut",
+        "type": "object"
+      },
+      "InstanceStatus": {
+        "properties": {
+          "claimed": {
+            "title": "Claimed",
+            "type": "boolean"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "claimed",
+          "version"
+        ],
+        "title": "InstanceStatus",
+        "type": "object"
+      },
+      "LesionIn": {
+        "properties": {
+          "first_noticed_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Noticed On"
+          },
+          "interval_days": {
+            "default": 90,
+            "maximum": 3650.0,
+            "minimum": 7.0,
+            "title": "Interval Days",
+            "type": "integer"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "location": {
+            "$ref": "#/components/schemas/LocationIn"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "status": {
+            "default": "active",
+            "enum": [
+              "active",
+              "removed",
+              "resolved"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "title": "Tags",
+            "type": "array"
+          },
+          "type": {
+            "default": "mole",
+            "enum": [
+              "mole",
+              "other"
+            ],
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "location"
+        ],
+        "title": "LesionIn",
+        "type": "object"
+      },
+      "LesionOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "due": {
+            "title": "Due",
+            "type": "boolean"
+          },
+          "first_noticed_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Noticed On"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "interval_days": {
+            "title": "Interval Days",
+            "type": "integer"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "last_observed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Observed At"
+          },
+          "latest_image_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Image Id"
+          },
+          "location": {
+            "$ref": "#/components/schemas/LocationOut"
+          },
+          "next_due_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Due On"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "observation_count": {
+            "title": "Observation Count",
+            "type": "integer"
+          },
+          "person_id": {
+            "format": "uuid",
+            "title": "Person Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Tags",
+            "type": "array"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "person_id",
+          "type",
+          "label",
+          "location",
+          "first_noticed_on",
+          "status",
+          "tags",
+          "notes",
+          "interval_days",
+          "created_at",
+          "updated_at",
+          "observation_count",
+          "last_observed_at",
+          "next_due_on",
+          "due",
+          "latest_image_id"
+        ],
+        "title": "LesionOut",
+        "type": "object"
+      },
+      "LesionUpdate": {
+        "properties": {
+          "first_noticed_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Noticed On"
+          },
+          "interval_days": {
+            "anyOf": [
+              {
+                "maximum": 3650.0,
+                "minimum": 7.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interval Days"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LocationIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "active",
+                  "removed",
+                  "resolved"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "tags": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 20,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tags"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "enum": [
+                  "mole",
+                  "other"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type"
+          }
+        },
+        "title": "LesionUpdate",
+        "type": "object"
+      },
+      "LocationIn": {
+        "properties": {
+          "x": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Y",
+            "type": "number"
+          },
+          "zone": {
+            "maxLength": 8,
+            "title": "Zone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "zone",
+          "x",
+          "y"
+        ],
+        "title": "LocationIn",
+        "type": "object"
+      },
+      "LocationOut": {
+        "properties": {
+          "body_map_version": {
+            "title": "Body Map Version",
+            "type": "string"
+          },
+          "side": {
+            "title": "Side",
+            "type": "string"
+          },
+          "view": {
+            "title": "View",
+            "type": "string"
+          },
+          "x": {
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "title": "Y",
+            "type": "number"
+          },
+          "zone": {
+            "title": "Zone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "zone",
+          "x",
+          "y",
+          "body_map_version",
+          "view",
+          "side"
+        ],
+        "title": "LocationOut",
+        "type": "object"
+      },
+      "ObservationIn": {
+        "properties": {
+          "captured_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captured At"
+          },
+          "captured_tz": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captured Tz"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "symptoms": {
+            "items": {
+              "enum": [
+                "itching",
+                "bleeding",
+                "pain",
+                "looks_different"
+              ],
+              "type": "string"
+            },
+            "title": "Symptoms",
+            "type": "array"
+          }
+        },
+        "title": "ObservationIn",
+        "type": "object"
+      },
+      "ObservationOut": {
+        "properties": {
+          "captured_at": {
+            "format": "date-time",
+            "title": "Captured At",
+            "type": "string"
+          },
+          "captured_local_date": {
+            "format": "date",
+            "title": "Captured Local Date",
+            "type": "string"
+          },
+          "captured_tz": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captured Tz"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "images": {
+            "items": {
+              "$ref": "#/components/schemas/ImageOut"
+            },
+            "title": "Images",
+            "type": "array"
+          },
+          "lesion_id": {
+            "format": "uuid",
+            "title": "Lesion Id",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "quality_flags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Quality Flags",
+            "type": "array"
+          },
+          "symptoms": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Symptoms",
+            "type": "array"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "lesion_id",
+          "captured_at",
+          "captured_tz",
+          "captured_local_date",
+          "notes",
+          "symptoms",
+          "quality_flags",
+          "created_at",
+          "updated_at",
+          "images"
+        ],
+        "title": "ObservationOut",
+        "type": "object"
+      },
+      "ObservationUpdate": {
+        "properties": {
+          "captured_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captured At"
+          },
+          "captured_tz": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captured Tz"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "symptoms": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "itching",
+                    "bleeding",
+                    "pain",
+                    "looks_different"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Symptoms"
+          }
+        },
+        "title": "ObservationUpdate",
+        "type": "object"
+      },
+      "PasswordChange": {
+        "properties": {
+          "current_password": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "title": "Current Password",
+            "type": "string"
+          },
+          "new_password": {
+            "maxLength": 1024,
+            "minLength": 10,
+            "title": "New Password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "current_password",
+          "new_password"
+        ],
+        "title": "PasswordChange",
+        "type": "object"
+      },
+      "PasswordReset": {
+        "properties": {
+          "new_password": {
+            "maxLength": 1024,
+            "minLength": 10,
+            "title": "New Password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "new_password"
+        ],
+        "title": "PasswordReset",
+        "type": "object"
+      },
+      "PersonIn": {
+        "properties": {
+          "birth_year": {
+            "anyOf": [
+              {
+                "maximum": 2100.0,
+                "minimum": 1900.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Birth Year"
+          },
+          "display_name": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Display Name",
+            "type": "string"
+          },
+          "skin_tone": {
+            "anyOf": [
+              {
+                "maxLength": 16,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Skin Tone"
+          }
+        },
+        "required": [
+          "display_name"
+        ],
+        "title": "PersonIn",
+        "type": "object"
+      },
+      "PersonOut": {
+        "properties": {
+          "birth_year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Birth Year"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "experimental_analysis": {
+            "title": "Experimental Analysis",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "my_role": {
+            "enum": [
+              "owner",
+              "manager",
+              "viewer"
+            ],
+            "title": "My Role",
+            "type": "string"
+          },
+          "owner_user_id": {
+            "format": "uuid",
+            "title": "Owner User Id",
+            "type": "string"
+          },
+          "skin_tone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Skin Tone"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "display_name",
+          "birth_year",
+          "skin_tone",
+          "owner_user_id",
+          "experimental_analysis",
+          "created_at",
+          "updated_at",
+          "my_role"
+        ],
+        "title": "PersonOut",
+        "type": "object"
+      },
+      "PersonUpdate": {
+        "properties": {
+          "birth_year": {
+            "anyOf": [
+              {
+                "maximum": 2100.0,
+                "minimum": 1900.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Birth Year"
+          },
+          "display_name": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "experimental_analysis": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Experimental Analysis"
+          },
+          "skin_tone": {
+            "anyOf": [
+              {
+                "maxLength": 16,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Skin Tone"
+          }
+        },
+        "title": "PersonUpdate",
+        "type": "object"
+      },
+      "RenditionOut": {
+        "properties": {
+          "bytes": {
+            "title": "Bytes",
+            "type": "integer"
+          },
+          "height": {
+            "title": "Height",
+            "type": "integer"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "width": {
+            "title": "Width",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "kind",
+          "width",
+          "height",
+          "bytes"
+        ],
+        "title": "RenditionOut",
+        "type": "object"
+      },
+      "SessionOut": {
+        "properties": {
+          "instance_claimed": {
+            "default": true,
+            "title": "Instance Claimed",
+            "type": "boolean"
+          },
+          "sudo_until": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sudo Until"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserOut"
+          }
+        },
+        "required": [
+          "user",
+          "sudo_until"
+        ],
+        "title": "SessionOut",
+        "type": "object"
+      },
+      "SudoIn": {
+        "properties": {
+          "password": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "title": "Password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "password"
+        ],
+        "title": "SudoIn",
+        "type": "object"
+      },
+      "UserCreate": {
+        "properties": {
+          "email": {
+            "anyOf": [
+              {
+                "maxLength": 254,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "password": {
+            "maxLength": 1024,
+            "minLength": 10,
+            "title": "Password",
+            "type": "string"
+          },
+          "role": {
+            "default": "member",
+            "enum": [
+              "admin",
+              "member"
+            ],
+            "title": "Role",
+            "type": "string"
+          },
+          "username": {
+            "maxLength": 64,
+            "minLength": 2,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ],
+        "title": "UserCreate",
+        "type": "object"
+      },
+      "UserOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "disabled_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Disabled At"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "language": {
+            "title": "Language",
+            "type": "string"
+          },
+          "last_login_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Login At"
+          },
+          "role": {
+            "enum": [
+              "admin",
+              "member"
+            ],
+            "title": "Role",
+            "type": "string"
+          },
+          "show_uncertainty": {
+            "title": "Show Uncertainty",
+            "type": "boolean"
+          },
+          "theme": {
+            "title": "Theme",
+            "type": "string"
+          },
+          "username": {
+            "title": "Username",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "email",
+          "role",
+          "language",
+          "theme",
+          "show_uncertainty",
+          "created_at",
+          "last_login_at",
+          "disabled_at"
+        ],
+        "title": "UserOut",
+        "type": "object"
+      },
+      "UserUpdateMe": {
+        "properties": {
+          "email": {
+            "anyOf": [
+              {
+                "maxLength": 254,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "enum": [
+                  "en",
+                  "es"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "show_uncertainty": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Show Uncertainty"
+          },
+          "theme": {
+            "anyOf": [
+              {
+                "enum": [
+                  "system",
+                  "light",
+                  "dark"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Theme"
+          }
+        },
+        "title": "UserUpdateMe",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "ViewData": {
+        "properties": {
+          "silhouette": {
+            "title": "Silhouette",
+            "type": "string"
+          },
+          "zones": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Zones",
+            "type": "array"
+          }
+        },
+        "required": [
+          "silhouette",
+          "zones"
+        ],
+        "title": "ViewData",
+        "type": "object"
+      },
+      "Zone": {
+        "properties": {
+          "anchor": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Anchor",
+            "type": "array"
+          },
+          "bbox": {
+            "maxItems": 4,
+            "minItems": 4,
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Bbox",
+            "type": "array"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "molemapper_shape": {
+            "title": "Molemapper Shape",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "region": {
+            "enum": [
+              "head",
+              "trunk",
+              "arm",
+              "leg"
+            ],
+            "title": "Region",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "left",
+              "right",
+              "midline"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "view": {
+            "enum": [
+              "front",
+              "back"
+            ],
+            "title": "View",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "view",
+          "side",
+          "region",
+          "name",
+          "molemapper_shape",
+          "path",
+          "anchor",
+          "bbox"
+        ],
+        "title": "Zone",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Personal documentation and measurement aid for skin marks. Not a diagnostic tool.",
+    "title": "neVus",
+    "version": "snapshot"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/auth/claim": {
+      "post": {
+        "description": "The first person in claims the instance and becomes its administrator. Refused once anybody exists.",
+        "operationId": "claim_api_auth_claim_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Credentials"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Claim",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/instance": {
+      "get": {
+        "operationId": "instance_status_api_auth_instance_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstanceStatus"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Instance Status",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "operationId": "login_api_auth_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Credentials"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Login",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "operationId": "logout_api_auth_logout_post",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Logout",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/me": {
+      "patch": {
+        "operationId": "update_me_api_auth_me_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUpdateMe"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Me",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/me/password": {
+      "post": {
+        "operationId": "change_password_api_auth_me_password_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordChange"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Change Password",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/session": {
+      "get": {
+        "operationId": "session_info_api_auth_session_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Session Info",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/sudo": {
+      "post": {
+        "description": "Re-authenticate for a few minutes before destructive actions.",
+        "operationId": "sudo_api_auth_sudo_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SudoIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Sudo",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/bodymap": {
+      "get": {
+        "operationId": "get_body_map_api_bodymap_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BodyMap"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Body Map",
+        "tags": [
+          "bodymap"
+        ]
+      }
+    },
+    "/api/images/{image_id}": {
+      "delete": {
+        "description": "Moves the image to the trash; the purge and the garbage collection of blobs arrive with data management.",
+        "operationId": "delete_image_api_images__image_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "image_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Image Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Image",
+        "tags": [
+          "images"
+        ]
+      },
+      "get": {
+        "operationId": "get_image_api_images__image_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "image_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Image Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Image",
+        "tags": [
+          "images"
+        ]
+      }
+    },
+    "/api/images/{image_id}/{kind}": {
+      "get": {
+        "description": "The bytes, only for people who may see the person; cacheable forever because the content is addressed by hash.",
+        "operationId": "image_file_api_images__image_id___kind__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "image_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Image Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "enum": [
+                "original",
+                "full",
+                "preview",
+                "thumb"
+              ],
+              "title": "Kind",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Image File",
+        "tags": [
+          "images"
+        ]
+      }
+    },
+    "/api/lesions/{lesion_id}": {
+      "delete": {
+        "description": "Moves the lesion, its observations and their photographs to the trash together.",
+        "operationId": "delete_lesion_api_lesions__lesion_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lesion_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Lesion Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Lesion",
+        "tags": [
+          "lesions"
+        ]
+      },
+      "get": {
+        "operationId": "get_lesion_api_lesions__lesion_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lesion_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Lesion Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LesionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Lesion",
+        "tags": [
+          "lesions"
+        ]
+      },
+      "patch": {
+        "operationId": "update_lesion_api_lesions__lesion_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lesion_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Lesion Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LesionUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LesionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Lesion",
+        "tags": [
+          "lesions"
+        ]
+      }
+    },
+    "/api/lesions/{lesion_id}/observations": {
+      "get": {
+        "operationId": "list_observations_api_lesions__lesion_id__observations_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lesion_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Lesion Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ObservationOut"
+                  },
+                  "title": "Response List Observations Api Lesions  Lesion Id  Observations Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Observations",
+        "tags": [
+          "lesions"
+        ]
+      },
+      "post": {
+        "operationId": "create_observation_api_lesions__lesion_id__observations_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lesion_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Lesion Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObservationIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObservationOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Observation",
+        "tags": [
+          "lesions"
+        ]
+      }
+    },
+    "/api/observations/{observation_id}": {
+      "delete": {
+        "description": "Moves the observation and its photographs to the trash together.",
+        "operationId": "delete_observation_api_observations__observation_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "observation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Observation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Observation",
+        "tags": [
+          "lesions"
+        ]
+      },
+      "get": {
+        "operationId": "get_observation_api_observations__observation_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "observation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Observation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObservationOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Observation",
+        "tags": [
+          "lesions"
+        ]
+      },
+      "patch": {
+        "operationId": "update_observation_api_observations__observation_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "observation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Observation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObservationUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObservationOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Observation",
+        "tags": [
+          "lesions"
+        ]
+      }
+    },
+    "/api/observations/{observation_id}/images": {
+      "get": {
+        "operationId": "list_observation_images_api_observations__observation_id__images_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "observation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Observation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ImageOut"
+                  },
+                  "title": "Response List Observation Images Api Observations  Observation Id  Images Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Observation Images",
+        "tags": [
+          "lesions"
+        ]
+      },
+      "post": {
+        "operationId": "upload_observation_image_api_observations__observation_id__images_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "observation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Observation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_observation_image_api_observations__observation_id__images_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Upload Observation Image",
+        "tags": [
+          "lesions"
+        ]
+      }
+    },
+    "/api/persons": {
+      "get": {
+        "operationId": "list_persons_api_persons_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PersonOut"
+                  },
+                  "title": "Response List Persons Api Persons Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Persons",
+        "tags": [
+          "persons"
+        ]
+      },
+      "post": {
+        "operationId": "create_person_api_persons_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PersonIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Person",
+        "tags": [
+          "persons"
+        ]
+      }
+    },
+    "/api/persons/{person_id}": {
+      "delete": {
+        "description": "Soft delete (30-day trash); the purge arrives with the data-management features. Needs sudo mode.",
+        "operationId": "delete_person_api_persons__person_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "person_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Person Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Person",
+        "tags": [
+          "persons"
+        ]
+      },
+      "get": {
+        "operationId": "get_person_api_persons__person_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "person_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Person Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Person",
+        "tags": [
+          "persons"
+        ]
+      },
+      "patch": {
+        "operationId": "update_person_api_persons__person_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "person_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Person Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PersonUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PersonOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Person",
+        "tags": [
+          "persons"
+        ]
+      }
+    },
+    "/api/persons/{person_id}/access": {
+      "get": {
+        "operationId": "list_access_api_persons__person_id__access_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "person_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Person Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AccessOut"
+                  },
+                  "title": "Response List Access Api Persons  Person Id  Access Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Access",
+        "tags": [
+          "persons"
+        ]
+      },
+      "put": {
+        "operationId": "grant_access_api_persons__person_id__access_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "person_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Person Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccessIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Grant Access",
+        "tags": [
+          "persons"
+        ]
+      }
+    },
+    "/api/persons/{person_id}/access/{user_id}": {
+      "delete": {
+        "operationId": "revoke_access_api_persons__person_id__access__user_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "person_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Person Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Revoke Access",
+        "tags": [
+          "persons"
+        ]
+      }
+    },
+    "/api/persons/{person_id}/images": {
+      "get": {
+        "operationId": "list_images_api_persons__person_id__images_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "person_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Person Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ImageOut"
+                  },
+                  "title": "Response List Images Api Persons  Person Id  Images Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Images",
+        "tags": [
+          "images"
+        ]
+      },
+      "post": {
+        "description": "A photograph of the person not tied to an observation (an overview, for example).",
+        "operationId": "upload_image_api_persons__person_id__images_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "person_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Person Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_image_api_persons__person_id__images_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Upload Image",
+        "tags": [
+          "images"
+        ]
+      }
+    },
+    "/api/persons/{person_id}/lesions": {
+      "get": {
+        "operationId": "list_lesions_api_persons__person_id__lesions_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "person_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Person Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/LesionOut"
+                  },
+                  "title": "Response List Lesions Api Persons  Person Id  Lesions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Lesions",
+        "tags": [
+          "lesions"
+        ]
+      },
+      "post": {
+        "operationId": "create_lesion_api_persons__person_id__lesions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "person_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Person Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LesionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LesionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Lesion",
+        "tags": [
+          "lesions"
+        ]
+      }
+    },
+    "/api/users": {
+      "get": {
+        "operationId": "list_users_api_users_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/UserOut"
+                  },
+                  "title": "Response List Users Api Users Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Users",
+        "tags": [
+          "users"
+        ]
+      },
+      "post": {
+        "operationId": "create_user_api_users_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create User",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/users/{user_id}/disable": {
+      "post": {
+        "operationId": "disable_user_api_users__user_id__disable_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Disable User",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/users/{user_id}/enable": {
+      "post": {
+        "operationId": "enable_user_api_users__user_id__enable_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Enable User",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/users/{user_id}/password": {
+      "post": {
+        "operationId": "reset_password_api_users__user_id__password_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordReset"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reset Password",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/healthz": {
+      "get": {
+        "operationId": "healthz_healthz_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Healthz",
+        "tags": [
+          "system"
+        ]
+      }
+    }
+  }
+}

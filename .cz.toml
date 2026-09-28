@@ -1,0 +1,15 @@
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.1.0-alpha.1"
+tag_format = "v$version"
+major_version_zero = true
+version_scheme = "semver2"
+prerelease_offset = 1
+update_changelog_on_bump = true
+changelog_incremental = true
+version_files = [
+  "backend/pyproject.toml:^version",
+  "frontend/package.json:\"version\"",
+  "deploy/compose.yaml:^  version:",
+  "deploy/compose.yaml:^    image: ghcr.io/jalmena/nevus:",
+]

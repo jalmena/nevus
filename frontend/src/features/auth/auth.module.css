@@ -1,0 +1,12 @@
+.form {
+  display: grid;
+  gap: var(--space-4);
+  max-width: 26rem;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4);
+}
+
+.form h1 {
+  font-size: var(--text-2xl);
+}

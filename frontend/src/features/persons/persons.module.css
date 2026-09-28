@@ -1,0 +1,56 @@
+.page {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.header h1 {
+  font-size: var(--text-2xl);
+}
+
+.addForm {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.personLink {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+  color: inherit;
+  text-decoration: none;
+}
+
+.personName {
+  font-weight: var(--font-weight-emphasis);
+  font-size: var(--text-lg);
+}
+
+.mapSection {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.mapSection h2 {
+  font-size: var(--text-lg);
+}

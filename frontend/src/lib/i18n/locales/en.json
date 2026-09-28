@@ -1,0 +1,216 @@
+{
+  "app": {
+    "name": "neVus",
+    "tagline": "Because 'I think it was smaller' is not data.",
+    "intendedUse": "neVus is a personal documentation and measurement aid. It does not diagnose, screen for, or assess the risk of any disease."
+  },
+  "common": {
+    "working": "Working…",
+    "cancel": "Cancel",
+    "close": "Close",
+    "back": "Back",
+    "save": "Save"
+  },
+  "shell": {
+    "language": "Language",
+    "navigation": "Main",
+    "persons": "Persons"
+  },
+  "languages": {
+    "en": "English",
+    "es": "Spanish"
+  },
+  "auth": {
+    "username": "Username",
+    "password": "Password",
+    "repeatPassword": "Repeat the password",
+    "passwordHint": "At least {{count}} characters. A sentence works well.",
+    "passwordTooShort": "The password needs at least {{count}} characters.",
+    "passwordsDiffer": "The two passwords are not the same.",
+    "claimTitle": "Claim this instance",
+    "claimIntro": "Nobody has an account yet. The first account becomes the administrator and creates the others; there is no open registration.",
+    "claimAction": "Create the administrator",
+    "loginTitle": "Sign in",
+    "loginAction": "Sign in"
+  },
+  "persons": {
+    "title": "Persons",
+    "name": "Name",
+    "add": "Add a person",
+    "create": "Create",
+    "emptyTitle": "No persons yet",
+    "emptyText": "A person is somebody whose skin marks you keep a record of: you, or someone you look after.",
+    "role": {
+      "owner": "Owner",
+      "manager": "Manager",
+      "viewer": "Viewer"
+    }
+  },
+  "images": {
+    "addPhoto": "Add a photo",
+    "role": "Kind",
+    "roles": {
+      "close_up": "Close-up",
+      "with_reference": "With reference card",
+      "overview": "Overview",
+      "other": "Other"
+    },
+    "takePhoto": "Take a photo",
+    "chooseFile": "Choose a file",
+    "uploading": "Uploading…",
+    "uploaded": "Saved. Location data and device identifiers were removed from the file.",
+    "privacyNote": "The photo stays on this server. Everything the camera embedded except the capture time and orientation is removed before it is stored.",
+    "emptyTitle": "No photos yet",
+    "emptyTextEdit": "Take the first photo of a mark, or choose one from the gallery.",
+    "emptyTextView": "Nobody has added photos for this person yet.",
+    "open": "Open the photo",
+    "alt": "{{role}}, {{date}}",
+    "noDate": "No capture date",
+    "delete": "Move to trash"
+  },
+  "settings": {
+    "title": "Settings",
+    "theme": "Theme",
+    "themes": {
+      "system": "Follow the device",
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "showUncertainty": "Show measurement uncertainty (±)",
+    "roles": {
+      "admin": "administrator",
+      "member": "member"
+    },
+    "signOut": "Sign out"
+  },
+  "bodymap": {
+    "label": "Body map, {{view}}",
+    "view": "View",
+    "views": {
+      "front": "Front",
+      "back": "Back"
+    },
+    "title": "Body map",
+    "hint": "Tap a zone to select it.",
+    "selected": "{{zone}} · {{view}}"
+  },
+  "zones": {
+    "1100": "Head",
+    "1200": "Neck and centre of chest",
+    "1250": "Right pectoral",
+    "1251": "Left pectoral",
+    "1300": "Right abdomen",
+    "1301": "Left abdomen",
+    "1350": "Right pelvis",
+    "1351": "Left pelvis",
+    "1400": "Right upper thigh",
+    "1401": "Left upper thigh",
+    "1450": "Right lower thigh and knee",
+    "1451": "Left lower thigh and knee",
+    "1500": "Right upper calf",
+    "1501": "Left upper calf",
+    "1550": "Right lower calf",
+    "1551": "Left lower calf",
+    "1600": "Right ankle and foot",
+    "1601": "Left ankle and foot",
+    "1650": "Right shoulder",
+    "1651": "Left shoulder",
+    "1700": "Right upper arm",
+    "1701": "Left upper arm",
+    "1750": "Right upper forearm",
+    "1751": "Left upper forearm",
+    "1800": "Right lower forearm",
+    "1801": "Left lower forearm",
+    "1850": "Right hand",
+    "1851": "Left hand",
+    "2100": "Head",
+    "2200": "Neck",
+    "2250": "Left upper back",
+    "2251": "Right upper back",
+    "2300": "Left lower back",
+    "2301": "Right lower back",
+    "2350": "Left buttock",
+    "2351": "Right buttock",
+    "2400": "Left upper thigh",
+    "2401": "Right upper thigh",
+    "2450": "Left lower thigh and knee",
+    "2451": "Right lower thigh and knee",
+    "2500": "Left upper calf",
+    "2501": "Right upper calf",
+    "2550": "Left lower calf",
+    "2551": "Right lower calf",
+    "2600": "Left ankle and foot",
+    "2601": "Right ankle and foot",
+    "2650": "Left shoulder",
+    "2651": "Right shoulder",
+    "2700": "Left upper arm",
+    "2701": "Right upper arm",
+    "2750": "Left elbow",
+    "2751": "Right elbow",
+    "2800": "Left lower forearm",
+    "2801": "Right lower forearm",
+    "2850": "Left hand",
+    "2851": "Right hand"
+  },
+  "lesions": {
+    "title": "Marks",
+    "add": "Add a mark",
+    "placingHint": "Tap the place on the map where the mark is.",
+    "placed": "Now describe the mark below.",
+    "newTitle": "New mark",
+    "label": "Name",
+    "labelHint": "Optional. Otherwise the zone name is used.",
+    "type": "Type",
+    "types": {
+      "mole": "Mole",
+      "other": "Other mark"
+    },
+    "firstNoticed": "First noticed",
+    "interval": "Check every",
+    "intervals": {
+      "30": "month",
+      "90": "3 months",
+      "180": "6 months",
+      "365": "year"
+    },
+    "days": "{{count}} days",
+    "create": "Create the mark",
+    "edit": "Edit details",
+    "status": "Status",
+    "statuses": {
+      "active": "Active",
+      "removed": "Removed",
+      "resolved": "Resolved"
+    },
+    "notes": "Notes",
+    "nextDue": "Next check",
+    "dueNow": "Due",
+    "dueIn": "In {{count}} days",
+    "lastVisit": "last visit {{date}}",
+    "noVisits": "no visits yet",
+    "emptyTitle": "No marks yet",
+    "emptyTextEdit": "Add a mark by tapping its place on the body map.",
+    "emptyTextView": "Nobody has added marks for this person yet.",
+    "backToPerson": "Back to the person"
+  },
+  "observations": {
+    "title": "Visits",
+    "new": "New visit",
+    "emptyTitle": "No visits yet",
+    "emptyText": "A visit is one dated look at the mark: photos, your notes and what you noticed.",
+    "photoCount_one": "{{count}} photo",
+    "photoCount_other": "{{count}} photos",
+    "photos": "Photos",
+    "yourNotes": "Your notes",
+    "notesHint": "What you noticed, in your own words. neVus records it and never interprets it.",
+    "notes": "Notes",
+    "symptoms": {
+      "itching": "Itching",
+      "bleeding": "Bleeding",
+      "pain": "Pain",
+      "looks_different": "Looks different to me"
+    },
+    "backTo": "Back to {{lesion}}",
+    "delete": "Move visit to trash"
+  }
+}
