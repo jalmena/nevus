@@ -1681,7 +1681,7 @@
   "info": {
     "description": "Personal documentation and measurement aid for skin marks. Not a diagnostic tool.",
     "title": "neVus",
-    "version": "0.0.0"
+    "version": "snapshot"
   },
   "openapi": "3.1.0",
   "paths": {

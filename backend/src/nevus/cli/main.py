@@ -32,7 +32,10 @@ def _openapi() -> int:
 
     with tempfile.TemporaryDirectory() as tmp:
         app = create_app(Settings(data_dir=Path(tmp), log_level="warning"))
-        print(json.dumps(app.openapi(), indent=2, sort_keys=True))
+        schema = app.openapi()
+        # The snapshot feeds the frontend's generated types; the release version would only make it stale.
+        schema["info"]["version"] = "snapshot"
+        print(json.dumps(schema, indent=2, sort_keys=True))
     return 0
 
 
