@@ -56,3 +56,15 @@ A fresh instance has no accounts: the first person to open it claims it and beco
 ## Body map
 
 The silhouette and the zone geometry are generated, not drawn by hand. `uv run tools/bodymap/build.py --preview docs/design/bodymap` rebuilds `zones.json` in both the backend and the frontend (the two copies must stay identical; CI checks it) and refreshes the labelled previews in `docs/design/bodymap/`. The zone identifiers, names and hit polygons come from MoleMapper (see `THIRD_PARTY_NOTICES.md`); the silhouette is neVus artwork built in `tools/bodymap/build.py`. Design notes: `docs/design/BODY_MAP.md`.
+
+## Releasing
+
+One release is one pull request into `main` plus what the release workflow does with it.
+
+1. `git checkout -b release/X.Y.Z develop`
+2. `uvx --from commitizen cz bump --yes` (add `--prerelease alpha --increment MINOR` for a pre-release). This rewrites the version in `backend/pyproject.toml`, `frontend/package.json` and `deploy/compose.yaml` (both the card version and the image tag), writes `CHANGELOG.md` and commits. Amend the commit with `git commit --amend -s --no-edit` so it carries the sign-off, then `cd backend && uv lock` and commit the refreshed lockfile. Delete the local tag commitizen created (`git tag -d vX.Y.Z`): the workflow tags the merge commit on `main`.
+3. Push the branch, open the pull request against `main`, wait for green checks, then merge locally with `git merge --no-ff` and push `main`.
+4. The release workflow publishes `ghcr.io/jalmena/nevus:X.Y.Z` (amd64 and arm64), smoke-tests and scans it, tags the commit, creates the GitHub Release from the changelog and, when a `STORE_TOKEN` secret exists, opens the store pull request; otherwise bump `Apps/Nevus` in the store by hand.
+5. Merge `main` back into `develop` and delete the release branch.
+
+Hotfixes branch from `main` (`hotfix/*`), bump the patch version the same way and follow steps 3 to 5.
