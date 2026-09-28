@@ -1,0 +1,174 @@
+# One release is one merge into main. This workflow reads the version commitizen wrote, builds and publishes the
+# image, tags the commit, writes the GitHub Release from the changelog and, when a store token is configured,
+# opens the pull request that updates the personal CasaOS store. Prereleases are never tagged `latest`.
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Publish ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Read the version
+        id: version
+        run: |
+          version=$(sed -n 's/^version = "\(.*\)"/\1/p' .cz.toml | head -n 1)
+          test -n "$version"
+          prerelease=false; case "$version" in *-*) prerelease=true ;; esac
+          if git ls-remote --exit-code --tags origin "refs/tags/v$version" >/dev/null 2>&1; then exists=true; else exists=false; fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$prerelease" >> "$GITHUB_OUTPUT"
+          echo "exists=$exists" >> "$GITHUB_OUTPUT"
+          echo "version $version (prerelease: $prerelease, tag exists: $exists)"
+
+      - name: Nothing to do
+        if: steps.version.outputs.exists == 'true'
+        run: echo "Tag ${{ steps.version.outputs.tag }} already exists; bump the version to publish again."
+
+      - uses: docker/setup-qemu-action@v3
+        if: steps.version.outputs.exists == 'false'
+      - uses: docker/setup-buildx-action@v3
+        if: steps.version.outputs.exists == 'false'
+      - uses: docker/login-action@v3
+        if: steps.version.outputs.exists == 'false'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Image tags
+        id: meta
+        if: steps.version.outputs.exists == 'false'
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=raw,value=${{ steps.version.outputs.version }}
+            type=raw,value=latest,enable=${{ steps.version.outputs.prerelease == 'false' }}
+          labels: |
+            org.opencontainers.image.title=neVus
+            org.opencontainers.image.version=${{ steps.version.outputs.version }}
+            org.opencontainers.image.licenses=AGPL-3.0-only
+
+      - name: Build and push (amd64 and arm64, with SBOM and provenance)
+        if: steps.version.outputs.exists == 'false'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: VERSION=${{ steps.version.outputs.version }}
+          provenance: mode=max
+          sbom: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke-test the published image
+        if: steps.version.outputs.exists == 'false'
+        run: |
+          image=ghcr.io/${{ github.repository }}:${{ steps.version.outputs.version }}
+          docker pull "$image"
+          docker run -d --name nevus -p 8080:8080 "$image"
+          for i in $(seq 1 60); do curl -fsS http://127.0.0.1:8080/healthz && break || sleep 1; done
+          curl -fsS http://127.0.0.1:8080/healthz | grep -q '"status":"ok"'
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/)" = "200"
+          curl -fsS http://127.0.0.1:8080/healthz | grep -q "\"version\":\"${{ steps.version.outputs.version }}\""
+          docker rm -f nevus
+
+      - name: Scan for critical vulnerabilities
+        if: steps.version.outputs.exists == 'false'
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ghcr.io/${{ github.repository }}:${{ steps.version.outputs.version }}
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+
+      - name: Tag the commit
+        if: steps.version.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # A lightweight tag: it points at the merge commit and carries no identity of its own.
+          gh api "repos/${{ github.repository }}/git/refs" -f ref="refs/tags/${{ steps.version.outputs.tag }}" -f sha="$GITHUB_SHA" >/dev/null
+          echo "tagged $GITHUB_SHA as ${{ steps.version.outputs.tag }}"
+
+      - name: Release notes from the changelog
+        if: steps.version.outputs.exists == 'false'
+        run: |
+          python3 - "${{ steps.version.outputs.version }}" > release-notes.md <<'PY'
+          import re, sys
+          version = sys.argv[1]
+          text = open("CHANGELOG.md", encoding="utf-8").read()
+          match = re.search(rf"^## v?{re.escape(version)}\b[^\n]*\n(.*?)(?=^## |\Z)", text, re.S | re.M)
+          body = match.group(1).strip() if match else "See the commit history for this release."
+          image = f"ghcr.io/jalmena/nevus:{version}"
+          print(body)
+          print()
+          print(f"Container image: `{image}` (linux/amd64, linux/arm64). neVus is a personal documentation and measurement aid; it does not diagnose, screen for, or assess the risk of any disease.")
+          PY
+          cat release-notes.md
+
+      - name: GitHub Release
+        if: steps.version.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          flags=""
+          if [ "${{ steps.version.outputs.prerelease }}" = "true" ]; then flags="--prerelease"; fi
+          gh release create "${{ steps.version.outputs.tag }}" --title "neVus ${{ steps.version.outputs.version }}" --notes-file release-notes.md $flags
+
+      - name: Update the personal store
+        if: steps.version.outputs.exists == 'false'
+        env:
+          STORE_TOKEN: ${{ secrets.STORE_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if [ -z "$STORE_TOKEN" ]; then
+            echo "STORE_TOKEN is not configured: bump Apps/Nevus in jalmena/jalmena-appstore by hand (see docs/DEPLOYMENT.md)."
+            exit 0
+          fi
+          git clone --depth 1 "https://x-access-token:${STORE_TOKEN}@github.com/jalmena/jalmena-appstore.git" store
+          python3 - <<'PY'
+          import datetime, os, pathlib, re
+          version = os.environ["VERSION"]
+          path = pathlib.Path("store/Apps/Nevus/docker-compose.yml")
+          text = path.read_text(encoding="utf-8")
+          text = re.sub(r"(image: ghcr\.io/jalmena/nevus:)\S+", rf"\g<1>{version}", text)
+          text = re.sub(r'(^  version: ")[^"]*(")', rf"\g<1>{version}\g<2>", text, flags=re.M)
+          text = re.sub(r'(^  update_at: ")[^"]*(")', rf"\g<1>{datetime.date.today().isoformat()}\g<2>", text, flags=re.M)
+          notes = pathlib.Path("release-notes.md").read_text(encoding="utf-8").strip().splitlines()
+          first = next((line.lstrip("-* ").strip() for line in notes if line.strip() and not line.startswith("#")), f"neVus {version}")
+          if "release_notes:" in text:
+              text = re.sub(r"(release_notes:\n    en_us: \|\n)(?:      .*\n)+", rf"\g<1>      {first}\n", text)
+          path.write_text(text, encoding="utf-8")
+          PY
+          cd store
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "nevus-$VERSION"
+          git add Apps/Nevus/docker-compose.yml
+          git commit -q -m "nevus: $VERSION"
+          git push -q origin "nevus-$VERSION"
+          GH_TOKEN="$STORE_TOKEN" gh pr create --repo jalmena/jalmena-appstore --head "nevus-$VERSION" --base main \
+            --title "nevus: $VERSION" --body "Image \`ghcr.io/jalmena/nevus:$VERSION\`, published by the release workflow of jalmena/nevus."

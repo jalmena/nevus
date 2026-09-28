@@ -10,7 +10,7 @@ name: nevus
 
 services:
   nevus:
-    image: ghcr.io/jalmena/nevus:latest
+    image: ghcr.io/jalmena/nevus:0.0.0
     container_name: nevus
     restart: unless-stopped
     ports:

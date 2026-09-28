@@ -1,7 +1,8 @@
 # syntax=docker/dockerfile:1.7
 # neVus: one image, one container. The frontend is built with Node and served by the Python backend.
 
-FROM node:24-alpine AS frontend
+# The frontend build is platform-independent: run it on the build host even for a cross-platform image.
+FROM --platform=$BUILDPLATFORM node:24-alpine AS frontend
 WORKDIR /src/frontend
 RUN corepack enable
 COPY frontend/package.json frontend/pnpm-lock.yaml frontend/pnpm-workspace.yaml ./

@@ -10,7 +10,7 @@ neVus is a self-hosted application for keeping a longitudinal photographic recor
 
 Your dermatologist has hundreds of patients and approximately seven minutes. Your mole does not care. When the question "has this changed since last time?" comes up, neVus exists so that the answer is a dated series of measured photographs rather than "I think it was a little smaller".
 
-> **Status: Phase 1, foundation.** There is nothing to install yet: the repository holds the discovery documents, the settled identity and the first application scaffold (backend, interface shell, container image and CI). The [roadmap](#roadmap) says what comes next.
+> **Status: alpha.** The first pre-release installs from the personal app store or from a compose file (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)): accounts, persons, the body map, marks, dated visits with scrubbed photographs, English and Spanish. Measurement with uncertainty, reminders and reports come next; the [roadmap](#roadmap) says in which order. Until 1.0.0 a minor version may change the data model; the release notes say so when it happens.
 
 ## What neVus is
 
@@ -49,7 +49,10 @@ neVus is inspired by [MoleMapper](https://github.com/ohsu-molemapper/MoleMapper_
 - Research: [landscape of projects, datasets, algorithms and regulation](docs/research/LANDSCAPE.md) · [name check](docs/research/NAME_CHECK.md) · [CasaOS / ZimaOS store conventions](docs/research/CASAOS_STORE_CONVENTIONS.md)
 - Product: [questions for the Product Owner](docs/PRODUCT_QUESTIONS.md)
 - Decisions: [architecture decision records](docs/adr/README.md)
-- Coming next: `PRODUCT_REQUIREMENTS.md`, `ARCHITECTURE.md`, `ROADMAP.md`, `DEVELOPMENT.md`, `DEPLOYMENT.md`, `SECURITY.md`, `PRIVACY.md`, `MODEL_CARD.md`
+- Requirements and plans: [product requirements](PRODUCT_REQUIREMENTS.md) · [architecture](ARCHITECTURE.md) · [roadmap](ROADMAP.md)
+- Running it: [development](DEVELOPMENT.md) · [deployment](docs/DEPLOYMENT.md) · [security](SECURITY.md) · [privacy](PRIVACY.md)
+- Design: [design brief](docs/design/DESIGN_BRIEF.md) · [identity](docs/design/brand/identity/README.md) · [body map](docs/design/BODY_MAP.md) · [reference card](docs/design/REFERENCE_CARD_SPEC.md)
+- Coming with the analysis features: `MODEL_CARD.md`
 
 ## Contributing
 
