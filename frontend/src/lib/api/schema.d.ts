@@ -204,6 +204,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/lesions/{lesion_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Lesion */
+        get: operations["get_lesion_api_lesions__lesion_id__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete Lesion
+         * @description Moves the lesion, its observations and their photographs to the trash together.
+         */
+        delete: operations["delete_lesion_api_lesions__lesion_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Lesion */
+        patch: operations["update_lesion_api_lesions__lesion_id__patch"];
+        trace?: never;
+    };
+    "/api/lesions/{lesion_id}/observations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Observations */
+        get: operations["list_observations_api_lesions__lesion_id__observations_get"];
+        put?: never;
+        /** Create Observation */
+        post: operations["create_observation_api_lesions__lesion_id__observations_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/observations/{observation_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Observation */
+        get: operations["get_observation_api_observations__observation_id__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete Observation
+         * @description Moves the observation and its photographs to the trash together.
+         */
+        delete: operations["delete_observation_api_observations__observation_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Observation */
+        patch: operations["update_observation_api_observations__observation_id__patch"];
+        trace?: never;
+    };
+    "/api/observations/{observation_id}/images": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Observation Images */
+        get: operations["list_observation_images_api_observations__observation_id__images_get"];
+        put?: never;
+        /** Upload Observation Image */
+        post: operations["upload_observation_image_api_observations__observation_id__images_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/persons": {
         parameters: {
             query?: never;
@@ -289,8 +369,29 @@ export interface paths {
         /** List Images */
         get: operations["list_images_api_persons__person_id__images_get"];
         put?: never;
-        /** Upload Image */
+        /**
+         * Upload Image
+         * @description A photograph of the person not tied to an observation (an overview, for example).
+         */
         post: operations["upload_image_api_persons__person_id__images_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/persons/{person_id}/lesions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Lesions */
+        get: operations["list_lesions_api_persons__person_id__lesions_get"];
+        put?: never;
+        /** Create Lesion */
+        post: operations["create_lesion_api_persons__person_id__lesions_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -453,6 +554,27 @@ export interface components {
              */
             role: "overview" | "close_up" | "with_reference" | "other";
         };
+        /** Body_upload_observation_image_api_observations__observation_id__images_post */
+        Body_upload_observation_image_api_observations__observation_id__images_post: {
+            /** Captured At */
+            captured_at?: string | null;
+            /** Captured Tz */
+            captured_tz?: string | null;
+            /** File */
+            file: string;
+            /**
+             * Modality
+             * @default camera
+             * @enum {string}
+             */
+            modality: "camera" | "dermatoscope";
+            /**
+             * Role
+             * @default close_up
+             * @enum {string}
+             */
+            role: "overview" | "close_up" | "with_reference" | "other";
+        };
         /** Credentials */
         Credentials: {
             /** Password */
@@ -507,6 +629,8 @@ export interface components {
             mime: string;
             /** Modality */
             modality: string;
+            /** Observation Id */
+            observation_id: string | null;
             /** Orientation */
             orientation: number;
             /**
@@ -533,6 +657,190 @@ export interface components {
             claimed: boolean;
             /** Version */
             version: string;
+        };
+        /** LesionIn */
+        LesionIn: {
+            /** First Noticed On */
+            first_noticed_on?: string | null;
+            /**
+             * Interval Days
+             * @default 90
+             */
+            interval_days: number;
+            /** Label */
+            label?: string | null;
+            location: components["schemas"]["LocationIn"];
+            /** Notes */
+            notes?: string | null;
+            /**
+             * Status
+             * @default active
+             * @enum {string}
+             */
+            status: "active" | "removed" | "resolved";
+            /** Tags */
+            tags?: string[];
+            /**
+             * Type
+             * @default mole
+             * @enum {string}
+             */
+            type: "mole" | "other";
+        };
+        /** LesionOut */
+        LesionOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Due */
+            due: boolean;
+            /** First Noticed On */
+            first_noticed_on: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Interval Days */
+            interval_days: number;
+            /** Label */
+            label: string | null;
+            /** Last Observed At */
+            last_observed_at: string | null;
+            /** Latest Image Id */
+            latest_image_id: string | null;
+            location: components["schemas"]["LocationOut"];
+            /** Next Due On */
+            next_due_on: string | null;
+            /** Notes */
+            notes: string | null;
+            /** Observation Count */
+            observation_count: number;
+            /**
+             * Person Id
+             * Format: uuid
+             */
+            person_id: string;
+            /** Status */
+            status: string;
+            /** Tags */
+            tags: string[];
+            /** Type */
+            type: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** LesionUpdate */
+        LesionUpdate: {
+            /** First Noticed On */
+            first_noticed_on?: string | null;
+            /** Interval Days */
+            interval_days?: number | null;
+            /** Label */
+            label?: string | null;
+            location?: components["schemas"]["LocationIn"] | null;
+            /** Notes */
+            notes?: string | null;
+            /** Status */
+            status?: ("active" | "removed" | "resolved") | null;
+            /** Tags */
+            tags?: string[] | null;
+            /** Type */
+            type?: ("mole" | "other") | null;
+        };
+        /** LocationIn */
+        LocationIn: {
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
+            /** Zone */
+            zone: string;
+        };
+        /** LocationOut */
+        LocationOut: {
+            /** Body Map Version */
+            body_map_version: string;
+            /** Side */
+            side: string;
+            /** View */
+            view: string;
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
+            /** Zone */
+            zone: string;
+        };
+        /** ObservationIn */
+        ObservationIn: {
+            /** Captured At */
+            captured_at?: string | null;
+            /** Captured Tz */
+            captured_tz?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Symptoms */
+            symptoms?: ("itching" | "bleeding" | "pain" | "looks_different")[];
+        };
+        /** ObservationOut */
+        ObservationOut: {
+            /**
+             * Captured At
+             * Format: date-time
+             */
+            captured_at: string;
+            /**
+             * Captured Local Date
+             * Format: date
+             */
+            captured_local_date: string;
+            /** Captured Tz */
+            captured_tz: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Images */
+            images: components["schemas"]["ImageOut"][];
+            /**
+             * Lesion Id
+             * Format: uuid
+             */
+            lesion_id: string;
+            /** Notes */
+            notes: string | null;
+            /** Quality Flags */
+            quality_flags: string[];
+            /** Symptoms */
+            symptoms: string[];
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** ObservationUpdate */
+        ObservationUpdate: {
+            /** Captured At */
+            captured_at?: string | null;
+            /** Captured Tz */
+            captured_tz?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Symptoms */
+            symptoms?: ("itching" | "bleeding" | "pain" | "looks_different")[] | null;
         };
         /** PasswordChange */
         PasswordChange: {
@@ -1085,6 +1393,328 @@ export interface operations {
             };
         };
     };
+    get_lesion_api_lesions__lesion_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lesion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LesionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_lesion_api_lesions__lesion_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lesion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_lesion_api_lesions__lesion_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lesion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LesionUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LesionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_observations_api_lesions__lesion_id__observations_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lesion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ObservationOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_observation_api_lesions__lesion_id__observations_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lesion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ObservationIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ObservationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_observation_api_observations__observation_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                observation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ObservationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_observation_api_observations__observation_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                observation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_observation_api_observations__observation_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                observation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ObservationUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ObservationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_observation_images_api_observations__observation_id__images_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                observation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImageOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_observation_image_api_observations__observation_id__images_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                observation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_observation_image_api_observations__observation_id__images_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImageOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_persons_api_persons_get: {
         parameters: {
             query?: never;
@@ -1382,6 +2012,72 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ImageOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_lesions_api_persons__person_id__lesions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                person_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LesionOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_lesion_api_persons__person_id__lesions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                person_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LesionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LesionOut"];
                 };
             };
             /** @description Validation Error */

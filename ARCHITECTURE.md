@@ -77,9 +77,8 @@ Identifiers are UUIDv7 everywhere (sortable; the PWA can mint them offline and t
 | `AuthSession` | id_hash, user_id, created_at, last_seen_at, expires_at, user_agent, ip |
 | `Person` | display_name, birth_year, skin_tone (optional, evaluation only), owner_user_id, experimental_analysis, deleted_at |
 | `PersonAccess` | user_id, person_id, role (owner, manager, viewer) |
-| `BodyMap` | name, version, svg_hash, zones (JSON: code, name, side, view, polygon) |
-| `BodyLocation` | person_id, body_map_id, zone_code, x, y (normalised to the view box), laterality, note |
-| `Lesion` | person_id, body_location_id, type (mole, other), label, first_noticed_on, status, tags, notes, interval_days, deleted_at |
+| Body map (static asset, not a table) | version, view box, zones (code, name, side, view, region, path, anchor); one generated file shared by backend and frontend (`docs/design/BODY_MAP.md`) |
+| `Lesion` | person_id, type (mole, other), label, zone_code, x, y (normalised to the view box), body_map_version, first_noticed_on, status (active, removed, resolved), tags, notes, interval_days, deleted_at. The location lives on the lesion: it moves with it and never exists without it |
 | `Observation` | lesion_id, captured_at, captured_tz, captured_local_date, notes, symptoms (JSON), quality_flags (JSON), created_by, deleted_at |
 | `Image` | person_id, observation_id, session_capture_id, role, modality, sha256, bytes, mime, width, height, source_format, exif_subset (JSON), deleted_at |
 | `Rendition` | image_id, kind (full, preview, thumb, mask, overlay), params_hash, sha256, width, height, bytes |

@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 
 from nevus.auth import service
 from nevus.auth.dependencies import AppSettings, CurrentUser, DbSession, client_ip
+from nevus.config import Settings
 from nevus.db.models import (
     ACCESS_MANAGER,
     ACCESS_OWNER,
@@ -52,6 +53,7 @@ class ImageOut(BaseModel):
 
     id: uuid.UUID
     person_id: uuid.UUID
+    observation_id: uuid.UUID | None
     role: str
     modality: str
     sha256: str
@@ -82,20 +84,25 @@ def _person_for(db: Session, person_id: uuid.UUID, user: User, *roles: str) -> P
     return person
 
 
-@router.post("/persons/{person_id}/images", response_model=ImageOut, status_code=status.HTTP_201_CREATED)
-async def upload_image(
-    person_id: uuid.UUID,
+async def ingest_upload(
     request: Request,
-    user: CurrentUser,
-    db: DbSession,
-    settings: AppSettings,
-    file: Annotated[UploadFile, File()],
-    role: Annotated[ImageRole, Form()] = "close_up",
-    modality: Annotated[Modality, Form()] = "camera",
-    captured_at: Annotated[datetime | None, Form()] = None,
-    captured_tz: Annotated[str | None, Form(max_length=64)] = None,
-) -> ImageOut:
-    _person_for(db, person_id, user, ACCESS_OWNER, ACCESS_MANAGER)
+    user: User,
+    db: Session,
+    settings: Settings,
+    person_id: uuid.UUID,
+    file: UploadFile,
+    role: str,
+    modality: str,
+    captured_at: datetime | None,
+    captured_tz: str | None,
+    observation_id: uuid.UUID | None = None,
+    fallback_captured_at: datetime | None = None,
+) -> Image:
+    """Scrub, store and describe one uploaded photograph. Access to the person is checked by the caller.
+
+    The capture time is the explicit value if given, else what the photo itself says, else the fallback
+    (an observation's visit time), else nothing.
+    """
     data = await file.read(settings.max_upload_bytes + 1)
     if len(data) > settings.max_upload_bytes:
         raise HTTPException(status.HTTP_413_CONTENT_TOO_LARGE, "The photo is larger than the upload limit.")
@@ -114,9 +121,10 @@ async def upload_image(
         stored = [(r, store.put(r.data, derived=True)) for r in renditions]
     except InsufficientStorageError as error:
         raise HTTPException(status.HTTP_507_INSUFFICIENT_STORAGE, "The data volume is nearly full.") from error
-    when = captured_at or scrubbed.captured_at
+    when = captured_at or scrubbed.captured_at or fallback_captured_at
     image = Image(
         person_id=person_id,
+        observation_id=observation_id,
         role=role,
         modality=modality,
         sha256=digest,
@@ -147,7 +155,29 @@ async def upload_image(
         )
     db.flush()
     db.refresh(image)
-    service.audit(db, "image.upload", user, "image", image.id, client_ip(request, settings), {"person": str(person_id)})
+    details = {"person": str(person_id)}
+    if observation_id:
+        details["observation"] = str(observation_id)
+    service.audit(db, "image.upload", user, "image", image.id, client_ip(request, settings), details)
+    return image
+
+
+@router.post("/persons/{person_id}/images", response_model=ImageOut, status_code=status.HTTP_201_CREATED)
+async def upload_image(
+    person_id: uuid.UUID,
+    request: Request,
+    user: CurrentUser,
+    db: DbSession,
+    settings: AppSettings,
+    file: Annotated[UploadFile, File()],
+    role: Annotated[ImageRole, Form()] = "close_up",
+    modality: Annotated[Modality, Form()] = "camera",
+    captured_at: Annotated[datetime | None, Form()] = None,
+    captured_tz: Annotated[str | None, Form(max_length=64)] = None,
+) -> ImageOut:
+    """A photograph of the person not tied to an observation (an overview, for example)."""
+    _person_for(db, person_id, user, ACCESS_OWNER, ACCESS_MANAGER)
+    image = await ingest_upload(request, user, db, settings, person_id, file, role, modality, captured_at, captured_tz)
     return ImageOut.model_validate(image)
 
 
@@ -211,4 +241,4 @@ def delete_image(
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-__all__ = ["IMAGE_MODALITIES", "IMAGE_ROLES", "router"]
+__all__ = ["IMAGE_MODALITIES", "IMAGE_ROLES", "ImageOut", "ImageRole", "Modality", "ingest_upload", "router"]

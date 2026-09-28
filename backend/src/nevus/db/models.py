@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 
-from sqlalchemy import JSON, BigInteger, Boolean, ForeignKey, Index, Integer, String, Uuid
+from sqlalchemy import JSON, BigInteger, Boolean, Date, Float, ForeignKey, Index, Integer, String, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from nevus.db.base import Base
@@ -19,6 +19,10 @@ ACCESS_OWNER = "owner"
 ACCESS_MANAGER = "manager"
 ACCESS_VIEWER = "viewer"
 ACCESS_ROLES = (ACCESS_OWNER, ACCESS_MANAGER, ACCESS_VIEWER)
+LESION_TYPES = ("mole", "other")
+LESION_STATUSES = ("active", "removed", "resolved")
+SYMPTOMS = ("itching", "bleeding", "pain", "looks_different")
+DEFAULT_INTERVAL_DAYS = 90
 
 
 class User(Base):
@@ -137,6 +141,7 @@ class Image(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
     person_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("persons.id", ondelete="CASCADE"), nullable=False)
+    observation_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("observations.id", ondelete="SET NULL"))
     role: Mapped[str] = mapped_column(String(16), nullable=False, default="close_up")
     modality: Mapped[str] = mapped_column(String(16), nullable=False, default="camera")
     sha256: Mapped[str] = mapped_column(String(64), nullable=False)
@@ -155,7 +160,11 @@ class Image(Base):
 
     renditions: Mapped[list[Rendition]] = relationship(back_populates="image", cascade="all, delete-orphan")
 
-    __table_args__ = (Index("ix_images_person_id", "person_id"), Index("ix_images_sha256", "sha256"))
+    __table_args__ = (
+        Index("ix_images_person_id", "person_id"),
+        Index("ix_images_sha256", "sha256"),
+        Index("ix_images_observation_id", "observation_id"),
+    )
 
 
 class Rendition(Base):
@@ -174,3 +183,64 @@ class Rendition(Base):
     image: Mapped[Image] = relationship(back_populates="renditions")
 
     __table_args__ = (Index("ix_renditions_image_id_kind", "image_id", "kind", unique=True),)
+
+
+class Lesion(Base):
+    """A tracked mark: where it is on the body map, what it is called, and how often to look at it.
+
+    The location is a zone code plus a point normalised to the map's view box, tagged with the
+    map version, so stored points keep their meaning if the artwork changes.
+    """
+
+    __tablename__ = "lesions"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    person_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("persons.id", ondelete="CASCADE"), nullable=False)
+    type: Mapped[str] = mapped_column(String(16), nullable=False, default="mole")
+    label: Mapped[str | None] = mapped_column(String(120))
+    zone_code: Mapped[str] = mapped_column(String(8), nullable=False)
+    x: Mapped[float] = mapped_column(Float, nullable=False)
+    y: Mapped[float] = mapped_column(Float, nullable=False)
+    body_map_version: Mapped[str] = mapped_column(String(32), nullable=False)
+    first_noticed_on: Mapped[date | None] = mapped_column(Date)
+    status: Mapped[str] = mapped_column(String(16), nullable=False, default="active")
+    tags: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
+    notes: Mapped[str | None] = mapped_column(Text)
+    interval_days: Mapped[int] = mapped_column(Integer, nullable=False, default=DEFAULT_INTERVAL_DAYS)
+    created_by: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"))
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow, onupdate=utcnow)
+    deleted_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+
+    observations: Mapped[list[Observation]] = relationship(back_populates="lesion", cascade="all, delete-orphan")
+
+    __table_args__ = (Index("ix_lesions_person_id", "person_id"),)
+
+
+class Observation(Base):
+    """One dated look at a lesion: photographs, the person's own notes and symptom flags. Never interpreted."""
+
+    __tablename__ = "observations"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    lesion_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("lesions.id", ondelete="CASCADE"), nullable=False)
+    captured_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
+    captured_tz: Mapped[str | None] = mapped_column(String(64))
+    captured_local_date: Mapped[date] = mapped_column(Date, nullable=False)
+    notes: Mapped[str | None] = mapped_column(Text)
+    symptoms: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
+    quality_flags: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
+    created_by: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"))
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow, onupdate=utcnow)
+    deleted_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+
+    lesion: Mapped[Lesion] = relationship(back_populates="observations")
+    images: Mapped[list[Image]] = relationship(
+        primaryjoin="Observation.id == Image.observation_id", foreign_keys="Image.observation_id", viewonly=True
+    )
+
+    __table_args__ = (
+        Index("ix_observations_lesion_id", "lesion_id"),
+        Index("ix_observations_captured_at", "captured_at"),
+    )
