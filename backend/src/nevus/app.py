@@ -16,12 +16,14 @@ from nevus.api.bodymap import router as bodymap_router
 from nevus.api.calendar import router as calendar_router
 from nevus.api.comparisons import router as comparisons_router
 from nevus.api.due import router as due_router
+from nevus.api.evaluation import router as evaluation_router
 from nevus.api.exports import router as exports_router
 from nevus.api.health import router as health_router
 from nevus.api.images import router as images_router
 from nevus.api.lesions import router as lesions_router
 from nevus.api.measurements import router as measurements_router
 from nevus.api.persons import router as persons_router
+from nevus.api.proposals import router as proposals_router
 from nevus.api.reports import router as reports_router
 from nevus.api.trash import router as trash_router
 from nevus.api.users import router as users_router
@@ -102,6 +104,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(persons_router)
     # Before the images router: its /images/{id}/{kind} would otherwise swallow /images/{id}/scale.
     app.include_router(measurements_router)
+    app.include_router(proposals_router)  # before images: /images/{id}/proposals is not a rendition
     app.include_router(images_router)
     app.include_router(lesions_router)
     app.include_router(bodymap_router)
@@ -114,6 +117,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(appointments_router)
     app.include_router(webhooks_router)
     app.include_router(calendar_router)
+    app.include_router(evaluation_router)
     mount_frontend(app, _static_dir(settings))
     return app
 

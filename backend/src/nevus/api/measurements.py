@@ -375,7 +375,7 @@ class MeasurementPreview(BaseModel):
 
 
 def _evaluate(
-    db: Session, observation: Observation, body: MeasurementIn, user: User
+    db: Session, observation: Observation, body: MeasurementIn, user: User, method: str | None = None
 ) -> tuple[Image, ScaleReference, measure.Scale, dict[str, Any], dict[str, Any], list[str]]:
     image = db.get(Image, body.image_id)
     if image is None or image.deleted_at is not None or image.observation_id != observation.id:
@@ -386,7 +386,7 @@ def _evaluate(
     scale = _scale_for(reference, user)
     shape = body.shape.model_dump()
     try:
-        values = measure.measure(shape, scale, measure.border_px(body.method, max(upright_size(image))))
+        values = measure.measure(shape, scale, measure.border_px(method or body.method, max(upright_size(image))))
     except ValueError as error:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(error)) from error
     flags: list[str] = []
@@ -431,13 +431,28 @@ def create_measurement(
 ) -> MeasurementOut:
     """Submitting a measurement is the confirmation: nothing proposed is ever stored without it."""
     observation, lesion = _observation(db, observation_id, user, ACCESS_OWNER, ACCESS_MANAGER)
-    image, reference, scale, shape, values, flags = _evaluate(db, observation, body, user)
+    row = save_measurement(db, observation, lesion, body, user, body.method)
+    service.audit(db, "measurement.create", user, "measurement", row.id, client_ip(request, settings))
+    return _measurement_out(db, row)
+
+
+def save_measurement(
+    db: Session,
+    observation: Observation,
+    lesion: Lesion,
+    body: MeasurementIn,
+    user: User,
+    method: str,
+    analysis_id: uuid.UUID | None = None,
+) -> Measurement:
+    """Compute and keep one measurement; `analysis_id` links one that started as an automatic proposal."""
+    image, reference, scale, shape, values, flags = _evaluate(db, observation, body, user, method)
     row = Measurement(
         observation_id=observation.id,
         lesion_id=lesion.id,
         image_id=image.id,
         scale_reference_id=reference.id,
-        method=body.method,
+        method=method,
         shape=shape,
         longest_mm=values["longest_mm"],
         perpendicular_mm=values["perpendicular_mm"],
@@ -452,13 +467,13 @@ def create_measurement(
             "border_mm": values["border_mm"],
             "print_factor": scale.print_factor,
         },
+        analysis_id=analysis_id,
         confirmed_by=user.id,
         confirmed_at=utcnow(),
     )
     db.add(row)
     db.flush()
-    service.audit(db, "measurement.create", user, "measurement", row.id, client_ip(request, settings))
-    return _measurement_out(db, row)
+    return row
 
 
 @router.get("/observations/{observation_id}/measurements", response_model=list[MeasurementOut])

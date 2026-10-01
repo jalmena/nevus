@@ -32,6 +32,14 @@ def main(argv: list[str] | None = None) -> int:
     )
     emergency.add_argument("username")
     emergency.add_argument("--base-url", help="address to put in the link (default: NEVUS_PUBLIC_URL)")
+    again = sub.add_parser(
+        "reanalyze", help="queue the current analyzers for stored photos again; earlier results are kept"
+    )
+    again.add_argument("--analyzer", choices=["quality", "card", "segment", "all"], default="all")
+    again.add_argument("--person", help="only the photos of this person (id)")
+    again.add_argument("--now", action="store_true", help="run the queue here rather than leave it to the server")
+    judge = sub.add_parser("evaluate", help="measure the outline analyzer on the labelled evaluation photos")
+    judge.add_argument("--json", action="store_true", help="print the report as JSON")
     args = parser.parse_args(argv)
     if args.command == "serve":
         return _serve()
@@ -47,6 +55,10 @@ def main(argv: list[str] | None = None) -> int:
         return _verify()
     if args.command == "housekeeping":
         return _housekeeping()
+    if args.command == "reanalyze":
+        return _reanalyze(args.analyzer, args.person, args.now)
+    if args.command == "evaluate":
+        return _evaluate(args.json)
     if args.command == "emergency-login":
         return _emergency_login(args.username, args.base_url)
     return 2
@@ -124,6 +136,72 @@ def _housekeeping() -> int:
         daily_housekeeping(JobContext(db, BlobStore(settings.blobs_dir, settings.min_free_bytes), settings))
         db.commit()
     print("Done.")
+    return 0
+
+
+def _reanalyze(which: str, person: str | None, now: bool) -> int:
+    """FR-ANA-04: a newer analyzer version runs over past photos; its results are added, never replacing."""
+    import uuid
+
+    from sqlalchemy import select
+
+    from nevus.config import get_settings
+    from nevus.cv import card_detect, quality
+    from nevus.cv.pipeline import CARD_KIND, QUALITY_KIND, enqueue_proposal
+    from nevus.db.engine import make_engine, make_session_factory
+    from nevus.db.models import Image
+    from nevus.jobs import queue
+    from nevus.jobs.runner import JobRunner
+    from nevus.storage.blobs import BlobStore
+
+    settings = get_settings()
+    factory = make_session_factory(make_engine(settings.effective_database_url))
+    counts = {"quality": 0, "card": 0, "segment": 0}
+    with factory() as db:
+        query = select(Image).where(Image.deleted_at.is_(None))
+        if person:
+            query = query.where(Image.person_id == uuid.UUID(person))
+        for image in db.scalars(query):
+            if which in ("quality", "all") and queue.enqueue(
+                db, QUALITY_KIND, {"image_id": str(image.id)}, dedupe_key=f"quality:{image.id}:{quality.VERSION}"
+            ):
+                counts["quality"] += 1
+            if (
+                which in ("card", "all")
+                and image.observation_id is not None
+                and queue.enqueue(
+                    db, CARD_KIND, {"image_id": str(image.id)}, dedupe_key=f"card:{image.id}:{card_detect.VERSION}"
+                )
+            ):
+                counts["card"] += 1
+            if which in ("segment", "all") and enqueue_proposal(db, image):
+                counts["segment"] += 1
+        db.commit()
+    print(
+        f"Queued {counts['quality']} quality, {counts['card']} card and {counts['segment']} outline analyses; "
+        "photos already analysed by the current versions are skipped."
+    )
+    if now:
+        runner = JobRunner(factory, BlobStore(settings.blobs_dir, settings.min_free_bytes), settings)
+        print(f"Ran {runner.run_until_idle()} jobs here.")
+    return 0
+
+
+def _evaluate(as_json: bool) -> int:
+    import json
+
+    from nevus import evaluation
+    from nevus.config import get_settings
+    from nevus.db.engine import make_engine, make_session_factory
+    from nevus.storage.blobs import BlobStore
+
+    settings = get_settings()
+    factory = make_session_factory(make_engine(settings.effective_database_url))
+    with factory() as db:
+        report = evaluation.evaluate(
+            db, evaluation.fresh_runner(db, BlobStore(settings.blobs_dir, settings.min_free_bytes))
+        )
+    print(json.dumps(report, indent=2) if as_json else evaluation.table(report))
     return 0
 
 

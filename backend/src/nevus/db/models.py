@@ -430,6 +430,25 @@ class Webhook(Base):
     __table_args__ = (Index("ix_webhooks_user_id", "user_id"),)
 
 
+class EvaluationLabel(Base):
+    """The operator's own truth for one photo of the personal evaluation set (FR-ANA-05).
+
+    An outline drawn or corrected by hand and a good or poor quality judgement. Used only to measure
+    how well the analyzers do on this household's photos; it never leaves the server.
+    """
+
+    __tablename__ = "evaluation_labels"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    image_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("images.id", ondelete="CASCADE"), nullable=False)
+    outline: Mapped[list[list[float]] | None] = mapped_column(JSON)
+    quality: Mapped[str | None] = mapped_column(String(8))
+    labelled_by: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"))
+    labelled_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
+
+    __table_args__ = (Index("ux_evaluation_labels_image_id", "image_id", unique=True),)
+
+
 class CalendarFeed(Base):
     """A secret calendar link for one person, made by one user; it stops when their access does.
 
