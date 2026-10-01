@@ -487,5 +487,24 @@
       "longest": "Diámetro mayor",
       "area": "Área"
     }
+  },
+  "reports": {
+    "title": "Informes",
+    "introProfile": "Un resumen en PDF de todas las marcas, con el mapa corporal y los últimos tamaños, para llevar a la consulta.",
+    "introLesion": "Un registro en PDF de esta marca para el profesional sanitario: sus fotos con escala, las medidas con su incertidumbre y tus notas.",
+    "language": "Idioma",
+    "paper": "Papel",
+    "letter": "Carta (EE. UU.)",
+    "makeProfile": "Hacer el resumen",
+    "makeLesion": "Hacer el registro de esta marca",
+    "profile": "Resumen de todas las marcas",
+    "lesion": "Registro de {{name}}",
+    "making": "Preparándose…",
+    "failed": "No se ha podido hacer.",
+    "download_one": "Descargar el PDF (1 página, {{size}})",
+    "download_other": "Descargar el PDF ({{count}} páginas, {{size}})",
+    "delete": "Borrar",
+    "deleteNamed": "Borrar: {{name}}",
+    "deletedMark": "una marca que ya no está"
   }
 }

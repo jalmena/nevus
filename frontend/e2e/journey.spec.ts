@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const PHOTO = fileURLToPath(new URL("./fixtures/card-disc-5mm.jpg", import.meta.url));
@@ -121,6 +122,16 @@ test("from a fresh instance to a measured mark, accessibly", async ({ page }) =>
   await shot(page, "compare-wipe");
   await page.getByRole("link", { name: "Back to the mark", exact: true }).click();
   await expect(chart).toBeVisible();
+
+  // The mark's record as a PDF, rendered by the background worker.
+  await page.getByRole("button", { name: "Make the record of this mark", exact: true }).click();
+  const pdf = page.getByRole("link", { name: /Download the PDF/ });
+  await expect(pdf).toBeVisible({ timeout: 60_000 });
+  await accessible(page, "mark with a report");
+  const [download] = await Promise.all([page.waitForEvent("download"), pdf.click()]);
+  const file = readFileSync(await download.path());
+  expect(file.subarray(0, 5).toString()).toBe("%PDF-");
+  if (process.env.NEVUS_E2E_SHOTS) await download.saveAs(`${process.env.NEVUS_E2E_SHOTS}/mark-report.pdf`);
   await page.getByRole("link", { name: "Settings", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Settings", exact: true })).toBeVisible();
   await accessible(page, "settings");

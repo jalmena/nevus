@@ -487,5 +487,24 @@
       "longest": "Longest diameter",
       "area": "Area"
     }
+  },
+  "reports": {
+    "title": "Reports",
+    "introProfile": "A PDF summary of every mark, with the body map and the latest sizes, to take to a consultation.",
+    "introLesion": "A PDF record of this mark for the clinician: its photos with a scale, the measurements with their uncertainty, and your notes.",
+    "language": "Language",
+    "paper": "Paper",
+    "letter": "US Letter",
+    "makeProfile": "Make the summary",
+    "makeLesion": "Make the record of this mark",
+    "profile": "Summary of all marks",
+    "lesion": "Record of {{name}}",
+    "making": "Being made…",
+    "failed": "It could not be made.",
+    "download_one": "Download the PDF (1 page, {{size}})",
+    "download_other": "Download the PDF ({{count}} pages, {{size}})",
+    "delete": "Delete",
+    "deleteNamed": "Delete: {{name}}",
+    "deletedMark": "a mark that is no longer here"
   }
 }

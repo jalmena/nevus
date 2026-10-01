@@ -12,6 +12,7 @@ import { formatDelta, formatMm } from "@/lib/measurements";
 import { usePerson } from "@/lib/persons";
 import { QuickVisit } from "@/features/capture/QuickVisit";
 import { SizeChart } from "@/features/measure/SizeChart";
+import { Reports } from "@/features/reports/Reports";
 import { SnoozeControls } from "@/features/reminders/SnoozeControls";
 import { DueBadge } from "./LesionList";
 import { lesionTitle, locationLine } from "./lesionName";
@@ -146,6 +147,7 @@ export function LesionPage() {
       )}
 
       <SizeChart lesionId={data.id} />
+      <Reports personId={data.person_id} lesionId={data.id} titleOf={() => lesionTitle(data, t)} />
 
       <section className={styles.section} aria-labelledby="visits-heading">
         <div className={styles.sectionHead}>

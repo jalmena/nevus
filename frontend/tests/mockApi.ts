@@ -45,6 +45,16 @@ export interface MockState {
   }[];
   /** What aligning two photos gives: lined up (with the card) or refused for a reason. */
   comparison: { status: "aligned" } | { status: "abstained"; reason: string };
+  /** Reports; a queued one is ready the next time the list is read, unless it is set to fail. */
+  reports: {
+    id: string;
+    scope: string;
+    lesion_ids: string[];
+    language: string;
+    paper: string;
+    status: string;
+    fail?: boolean;
+  }[];
   trash: { kind: string; id: string; label: string; person_id: string; person_name: string }[];
   exports: { id: string; status: string }[];
   sudo: boolean;
@@ -73,6 +83,8 @@ const user = (
   disabled_at: null,
 });
 
+const PERSON_ID = "0199a000-0000-7000-8000-000000000002";
+
 export function installMockApi(initial: Partial<MockState> = {}): MockState {
   const state: MockState = {
     claimed: false,
@@ -87,6 +99,7 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     sudo: false,
     calls: [],
     comparison: { status: "aligned" },
+    reports: [],
     ...initial,
   };
   const personOut = (p: { id: string; display_name: string }) => ({
@@ -518,6 +531,46 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
             .sort((x, y) => (x.captured_at ?? "").localeCompare(y.captured_at ?? ""))
             .map(measurementOut),
         );
+      }
+      const reportOut = (r: MockState["reports"][number]) => ({
+        id: r.id,
+        person_id: PERSON_ID,
+        scope: r.scope,
+        lesion_ids: r.lesion_ids,
+        language: r.language,
+        paper: r.paper,
+        status: r.status,
+        bytes: r.status === "ready" ? 32_000 : null,
+        pages: r.status === "ready" ? 2 : null,
+        error: r.status === "failed" ? "The report could not be made." : null,
+        created_at: "2026-10-01T10:00:00Z",
+        finished_at: r.status === "ready" ? "2026-10-01T10:00:03Z" : null,
+        download_url: r.status === "ready" ? `/api/reports/${r.id}/download` : null,
+        can_delete: true,
+      });
+      match = /^\/api\/persons\/([^/]+)\/reports$/.exec(path);
+      if (match && method === "GET") {
+        const listed = state.reports.map(reportOut);
+        for (const r of state.reports) if (r.status === "queued") r.status = r.fail ? "failed" : "ready";
+        return json(listed);
+      }
+      if (match && method === "POST") {
+        const input = body as { scope: string; lesion_id?: string; language?: string; paper?: string };
+        const created = {
+          id: nextId(),
+          scope: input.scope,
+          lesion_ids: input.lesion_id ? [input.lesion_id] : [],
+          language: input.language ?? "en",
+          paper: input.paper ?? "a4",
+          status: "queued",
+        };
+        state.reports.unshift(created);
+        return json(reportOut(created), 202);
+      }
+      match = /^\/api\/reports\/([^/]+)$/.exec(path);
+      if (match && method === "DELETE") {
+        state.reports = state.reports.filter((r) => r.id !== match?.[1]);
+        return new Response(null, { status: 204 });
       }
       if (path === "/api/comparisons" && method === "POST") {
         const pair = body as { image_a: string; image_b: string };
