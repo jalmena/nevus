@@ -106,6 +106,46 @@ NEVUS_PUBLIC_URL: "https://nevus.example.home"   # for the link in the email
 
 People who turn reminders on receive at most one email a day, after 08:00 (`NEVUS_REMINDER_HOUR`), listing names and dates; photographs never leave the server.
 
+## Webhooks
+
+An administrator adds webhooks under Settings. Once a day, after `NEVUS_REMINDER_HOUR`, and only when something is due, each webhook receives the list of due marks of the persons its administrator owns or manages: names and dates, never photographs or notes. "Send a test" checks the address at once. The address and the secret are stored encrypted with the server's key, and the interface shows only the start of the address.
+
+| Kind | Address to paste | Secret |
+| --- | --- | --- |
+| Home Assistant | the webhook URL of an automation's *Webhook* trigger (`https://ha.example.home/api/webhook/<id>`, method POST) | optional: signs the body |
+| ntfy | the topic URL (`https://ntfy.example.home/skin`) | an access token, if the topic is protected |
+| Gotify | the server URL (`https://gotify.example.home`); neVus posts to `/message` | the application token |
+| n8n | the production URL of a *Webhook* node | optional: signs the body |
+| Any address | any URL that accepts a JSON POST | optional: signs the body |
+
+The JSON body (Home Assistant, n8n, any address):
+
+```json
+{
+  "event": "due",
+  "count": 1,
+  "url": "https://nevus.example.home",
+  "items": [
+    {"person": "Ana", "mark": "Chest", "zone": "Right pectoral", "due_since": "2026-10-01",
+     "url": "https://nevus.example.home/lesions/<id>"}
+  ],
+  "title": "neVus: one mark is due for a photo",
+  "text": "Chest (Ana): due since 2026-10-01"
+}
+```
+
+With a secret, the header `X-Nevus-Signature: sha256=<hex>` carries the HMAC-SHA256 of the raw body, keyed with the secret; compare it before trusting the message. Links point to `NEVUS_PUBLIC_URL` (or the public address set under Settings) when it is known.
+
+## Calendar feed
+
+Anyone who may see a person can make a calendar link for them on the person's page: an iCalendar feed with the date each mark is next due for a photo and the appointments, each with a reminder. Calendar apps remind natively, which works over the VPN without any push service.
+
+- iPhone and iPad: Settings, Calendar, Accounts, Add Account, Other, Add Subscribed Calendar, and paste the link.
+- Android: Google Calendar subscribes only to addresses its servers can reach, so on a private network use an app that reads the feed from the phone itself, such as ICSx⁵.
+- Desktop calendars (Thunderbird, Apple Calendar, Outlook): add a calendar from a network address.
+
+The link is shown once; neVus keeps only a hash of it. Making a new link stops the old one, and the link stops when its maker loses access to the person. Treat it like a password: anyone who has it sees the marks' names and dates.
+
 ## Updating and removing
 
 Updating never touches the data directory; database migrations run at start-up. To remove neVus, remove the container and delete the data directory. Nothing else is written anywhere.

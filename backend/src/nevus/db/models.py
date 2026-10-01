@@ -400,6 +400,55 @@ class NotificationDelivery(Base):
     __table_args__ = (Index("ux_notification_deliveries_once", "user_id", "channel", "key", unique=True),)
 
 
+WEBHOOK_PRESETS = ("generic", "home_assistant", "n8n", "ntfy", "gotify")
+
+
+class Webhook(Base):
+    """An administrator's outgoing webhook: the daily digest of the marks they follow, sent to a URL.
+
+    It covers the persons its owner owns or manages, as the email digest does. The URL and the secret
+    often carry credentials, so both are sealed; the interface shows only `url_hint`.
+    """
+
+    __tablename__ = "webhooks"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    user_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    name: Mapped[str] = mapped_column(String(80), nullable=False)
+    preset: Mapped[str] = mapped_column(String(16), nullable=False, default="generic")
+    sealed_url: Mapped[str] = mapped_column(Text, nullable=False)
+    url_hint: Mapped[str] = mapped_column(String(200), nullable=False)
+    sealed_secret: Mapped[str | None] = mapped_column(Text)
+    enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    last_status: Mapped[str | None] = mapped_column(String(16))
+    last_error: Mapped[str | None] = mapped_column(String(200))
+    last_sent_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
+
+    __table_args__ = (Index("ix_webhooks_user_id", "user_id"),)
+
+
+class CalendarFeed(Base):
+    """A secret calendar link for one person, made by one user; it stops when their access does.
+
+    Only a hash of the token is kept: the link is shown once, and making a new one ends the old one.
+    """
+
+    __tablename__ = "calendar_feeds"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    person_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("persons.id", ondelete="CASCADE"), nullable=False)
+    user_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    token_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
+    last_used_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+
+    __table_args__ = (
+        Index("ux_calendar_feeds_token_hash", "token_hash", unique=True),
+        Index("ux_calendar_feeds_person_user", "person_id", "user_id", unique=True),
+    )
+
+
 class Export(Base):
     """An encrypted export being built or ready to download. The passphrase is sealed until the job uses it."""
 

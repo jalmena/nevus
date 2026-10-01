@@ -16,7 +16,7 @@ from typing import Any
 
 import pytest
 
-from nevus.notify import email
+from nevus.notify import calendar, email, webhooks
 from nevus.reports import i18n
 
 FRONTEND = Path(__file__).resolve().parents[2] / "frontend"
@@ -89,8 +89,9 @@ def _offences(text: str, language: str) -> list[str]:
 
 def _catalogues() -> Iterator[tuple[str, str, str]]:
     for language in ("en", "es"):
-        for text in _strings(email.TEXT[language]):
-            yield f"email/{language}", language, text
+        for name, catalogue in (("email", email.TEXT), ("webhooks", webhooks.TEXT), ("calendar", calendar.TEXT)):
+            for text in _strings(catalogue[language]):
+                yield f"{name}/{language}", language, text
         for text in _strings(i18n.TEXT[language]):
             yield f"reports/{language}", language, text
         locale = FRONTEND / f"src/lib/i18n/locales/{language}.json"

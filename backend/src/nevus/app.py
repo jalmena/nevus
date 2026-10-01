@@ -13,6 +13,7 @@ from nevus.api.admin import router as admin_router
 from nevus.api.appointments import router as appointments_router
 from nevus.api.auth import router as auth_router
 from nevus.api.bodymap import router as bodymap_router
+from nevus.api.calendar import router as calendar_router
 from nevus.api.comparisons import router as comparisons_router
 from nevus.api.due import router as due_router
 from nevus.api.exports import router as exports_router
@@ -24,6 +25,7 @@ from nevus.api.persons import router as persons_router
 from nevus.api.reports import router as reports_router
 from nevus.api.trash import router as trash_router
 from nevus.api.users import router as users_router
+from nevus.api.webhooks import router as webhooks_router
 from nevus.auth.ratelimit import LoginRateLimiter
 from nevus.auth.service import bootstrap_admin
 from nevus.config import Settings, get_settings
@@ -108,6 +110,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(comparisons_router)
     app.include_router(reports_router)
     app.include_router(appointments_router)
+    app.include_router(webhooks_router)
+    app.include_router(calendar_router)
     mount_frontend(app, _static_dir(settings))
     return app
 
