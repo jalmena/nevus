@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException, Request, Response, status
+from fastapi.responses import RedirectResponse
 
 from nevus import __version__
 from nevus.api.schemas import Credentials, InstanceStatus, PasswordChange, SessionOut, SudoIn, UserOut, UserUpdateMe
 from nevus.auth import service
 from nevus.auth.dependencies import AppSettings, CurrentSession, DbSession, client_ip, request_is_secure
 from nevus.auth.passwords import hash_password
+from nevus.auth.proxy import use_emergency_link
 from nevus.auth.ratelimit import LoginRateLimiter
 from nevus.auth.service import SESSION_COOKIE
 from nevus.db.models import ROLE_ADMIN
@@ -33,14 +35,36 @@ def _set_cookie(response: Response, token: str, request: Request, settings: AppS
     )
 
 
+def _local_only(settings: AppSettings) -> None:
+    if settings.auth_mode == "proxy":
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "This instance signs people in through single sign-on.")
+
+
 @router.get("/instance", response_model=InstanceStatus)
-def instance_status(db: DbSession) -> InstanceStatus:
-    return InstanceStatus(claimed=service.count_users(db) > 0, version=__version__)
+def instance_status(db: DbSession, settings: AppSettings) -> InstanceStatus:
+    return InstanceStatus(
+        claimed=service.count_users(db) > 0,
+        version=__version__,
+        auth_mode=settings.auth_mode,
+        logout_url=settings.proxy_logout_url if settings.auth_mode == "proxy" else None,
+    )
+
+
+@router.get("/emergency/{token}", include_in_schema=False)
+def emergency(token: str, request: Request, db: DbSession, settings: AppSettings) -> Response:
+    """Open a one-use link made with `nevus emergency-login`, for when the identity provider is down."""
+    session_token = use_emergency_link(db, settings, token, client_ip(request, settings))
+    if session_token is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "This link has been used or has expired.")
+    response = RedirectResponse("/", status_code=status.HTTP_303_SEE_OTHER)
+    _set_cookie(response, session_token, request, settings)
+    return response
 
 
 @router.post("/claim", response_model=SessionOut, status_code=status.HTTP_201_CREATED)
 def claim(body: Credentials, request: Request, response: Response, db: DbSession, settings: AppSettings) -> SessionOut:
     """The first person in claims the instance and becomes its administrator. Refused once anybody exists."""
+    _local_only(settings)
     if service.count_users(db) > 0:
         raise HTTPException(status.HTTP_409_CONFLICT, "This instance has already been claimed.")
     user = service.create_user(db, body.username, body.password, ROLE_ADMIN)
@@ -53,6 +77,7 @@ def claim(body: Credentials, request: Request, response: Response, db: DbSession
 
 @router.post("/login", response_model=SessionOut)
 def login(body: Credentials, request: Request, response: Response, db: DbSession, settings: AppSettings) -> SessionOut:
+    _local_only(settings)
     ip = client_ip(request, settings)
     key = f"{ip}|{service.normalise_username(body.username)}"
     limiter = _limiter(request)
@@ -84,8 +109,13 @@ def session_info(session: CurrentSession) -> SessionOut:
 
 @router.post("/sudo", response_model=SessionOut)
 def sudo(body: SudoIn, request: Request, session: CurrentSession, db: DbSession, settings: AppSettings) -> SessionOut:
-    """Re-authenticate for a few minutes before destructive actions."""
-    if service.authenticate(db, session.user.username, body.password) is None:
+    """Re-authenticate for a few minutes before destructive actions.
+
+    In proxy mode there is no local password: the proxy authenticated the person, and asking is an
+    explicit confirmation in the interface.
+    """
+    local = settings.auth_mode != "proxy"
+    if local and (not body.password or service.authenticate(db, session.user.username, body.password) is None):
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Wrong password.")
     service.grant_sudo(session, settings)
     service.audit(db, "sudo", session.user, "user", session.user.id, client_ip(request, settings))
@@ -105,6 +135,7 @@ def update_me(body: UserUpdateMe, session: CurrentSession, db: DbSession) -> Use
 def change_password(
     body: PasswordChange, request: Request, session: CurrentSession, db: DbSession, settings: AppSettings
 ) -> Response:
+    _local_only(settings)
     user = session.user
     if service.authenticate(db, user.username, body.current_password) is None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Wrong current password.")

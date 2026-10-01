@@ -312,6 +312,9 @@ export interface paths {
         /**
          * Sudo
          * @description Re-authenticate for a few minutes before destructive actions.
+         *
+         *     In proxy mode there is no local password: the proxy authenticated the person, and asking is an
+         *     explicit confirmation in the interface.
          */
         post: operations["sudo_api_auth_sudo_post"];
         delete?: never;
@@ -1699,8 +1702,16 @@ export interface components {
         };
         /** InstanceStatus */
         InstanceStatus: {
+            /**
+             * Auth Mode
+             * @default local
+             * @enum {string}
+             */
+            auth_mode: "local" | "proxy";
             /** Claimed */
             claimed: boolean;
+            /** Logout Url */
+            logout_url?: string | null;
             /** Version */
             version: string;
         };
@@ -2271,8 +2282,11 @@ export interface components {
         };
         /** SudoIn */
         SudoIn: {
-            /** Password */
-            password: string;
+            /**
+             * Password
+             * @description Not used in proxy mode
+             */
+            password?: string | null;
         };
         /** TestEmailIn */
         TestEmailIn: {

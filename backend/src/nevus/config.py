@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import ipaddress
 import secrets
 from functools import lru_cache
 from pathlib import Path
 from typing import Annotated, Literal
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
@@ -41,6 +42,17 @@ class Settings(BaseSettings):
     login_attempts: int = Field(default=10, ge=3, le=100, description="Failed logins allowed per window")
     login_window_minutes: int = Field(default=15, ge=1, le=1440)
     trust_proxy_headers: bool = Field(default=False, description="Trust X-Forwarded-Proto/For from a reverse proxy")
+    auth_mode: Literal["local", "proxy"] = Field(
+        default="local", description="proxy: a reverse proxy signs people in and passes the username in a header"
+    )
+    proxy_user_header: str = Field(default="Remote-User", description="Header carrying the signed-in username")
+    proxy_email_header: str | None = Field(default="Remote-Email", description="Header carrying the email, if any")
+    proxy_trusted: Annotated[list[str], NoDecode] = Field(
+        default_factory=list,
+        description="Addresses or networks of the reverse proxy, comma-separated; required in proxy mode",
+    )
+    proxy_auto_create: bool = Field(default=True, description="Create a member account for a new proxy username")
+    proxy_logout_url: str | None = Field(default=None, description="Where signing out goes in proxy mode")
     max_upload_bytes: int = Field(default=30 * 1024 * 1024, ge=1024 * 1024)
     max_upload_pixels: int = Field(default=24_000_000, ge=1_000_000)
     min_free_bytes: int = Field(default=2 * 1024**3, ge=0, description="Refuse uploads below this free space")
@@ -65,6 +77,25 @@ class Settings(BaseSettings):
         if isinstance(value, str):
             return [h.strip().lower() for h in value.split(",") if h.strip()]
         return value
+
+    @field_validator("proxy_trusted", mode="before")
+    @classmethod
+    def _split_networks(cls, value: object) -> object:
+        if isinstance(value, str):
+            value = [n.strip() for n in value.split(",") if n.strip()]
+        if isinstance(value, list):
+            for network in value:
+                ipaddress.ip_network(str(network), strict=False)  # a typo fails at start-up, not at sign-in
+        return value
+
+    @model_validator(mode="after")
+    def _proxy_needs_its_address(self) -> Settings:
+        if self.auth_mode == "proxy" and not self.proxy_trusted:
+            raise ValueError(
+                "NEVUS_AUTH_MODE=proxy needs NEVUS_PROXY_TRUSTED, the address or network of the reverse proxy: "
+                "without it anyone who reaches neVus could claim to be anyone."
+            )
+        return self
 
     @property
     def effective_database_url(self) -> str:

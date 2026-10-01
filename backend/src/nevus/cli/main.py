@@ -27,6 +27,11 @@ def main(argv: list[str] | None = None) -> int:
     back.add_argument("--force", action="store_true", help="restore over a data directory that is not empty")
     sub.add_parser("verify", help="check that every stored photo is present and intact")
     sub.add_parser("housekeeping", help="purge the trash and remove unreferenced files now")
+    emergency = sub.add_parser(
+        "emergency-login", help="print a one-use sign-in link, for when single sign-on is unavailable"
+    )
+    emergency.add_argument("username")
+    emergency.add_argument("--base-url", help="address to put in the link (default: NEVUS_PUBLIC_URL)")
     args = parser.parse_args(argv)
     if args.command == "serve":
         return _serve()
@@ -42,6 +47,8 @@ def main(argv: list[str] | None = None) -> int:
         return _verify()
     if args.command == "housekeeping":
         return _housekeeping()
+    if args.command == "emergency-login":
+        return _emergency_login(args.username, args.base_url)
     return 2
 
 
@@ -120,6 +127,31 @@ def _housekeeping() -> int:
     return 0
 
 
+def _emergency_login(username: str, base_url: str | None) -> int:
+    from nevus.auth.proxy import EMERGENCY_LINK_MINUTES, EMERGENCY_SESSION_HOURS, emergency_link
+    from nevus.auth.service import normalise_username
+    from nevus.config import get_settings
+    from nevus.db.engine import make_engine, make_session_factory
+
+    settings = get_settings()
+    factory = make_session_factory(make_engine(settings.effective_database_url))
+    with factory() as db:
+        try:
+            token = emergency_link(db, settings, normalise_username(username))
+        except LookupError as error:
+            print(f"neVus: {error}", file=sys.stderr)
+            return 1
+        db.commit()
+    base = (base_url or settings.public_url or f"http://localhost:{settings.port}").rstrip("/")
+    print(f"{base}/api/auth/emergency/{token}")
+    print(
+        f"Open it within {EMERGENCY_LINK_MINUTES} minutes; it works once and signs in for up to "
+        f"{EMERGENCY_SESSION_HOURS} hours, without the single sign-on.",
+        file=sys.stderr,
+    )
+    return 0
+
+
 def _card(page: str, lang: str, out: str) -> int:
     from pathlib import Path
 
@@ -163,6 +195,9 @@ def _serve() -> int:
         port=settings.port,
         log_level=settings.log_level,
         workers=1,
+        # The peer address must stay the real one: proxy sign-in trusts only the proxy's own address.
+        # X-Forwarded-* are read by neVus itself when NEVUS_TRUST_PROXY_HEADERS is on.
+        proxy_headers=False,
     )
     return 0
 

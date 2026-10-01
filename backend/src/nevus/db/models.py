@@ -65,6 +65,8 @@ class AuthSession(Base):
     last_seen_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
     expires_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False)
     sudo_until: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    # local (password), proxy (header from the reverse proxy), emergency_link (one use) or emergency.
+    kind: Mapped[str] = mapped_column(String(16), nullable=False, default="local", server_default="local")
     user_agent: Mapped[str | None] = mapped_column(String(255))
     ip: Mapped[str | None] = mapped_column(String(45))
 

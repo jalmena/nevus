@@ -52,7 +52,9 @@ def _hash_token(token: str) -> str:
     return hashlib.sha256(token.encode()).hexdigest()
 
 
-def create_session(db: Session, user: User, settings: Settings, user_agent: str | None, ip: str | None) -> str:
+def create_session(
+    db: Session, user: User, settings: Settings, user_agent: str | None, ip: str | None, kind: str = "local"
+) -> str:
     """Create a session and return the raw token for the cookie; only its hash is stored."""
     token = secrets.token_urlsafe(32)
     now = utcnow()
@@ -64,6 +66,7 @@ def create_session(db: Session, user: User, settings: Settings, user_agent: str 
         expires_at=now + timedelta(days=settings.session_max_days),
         user_agent=(user_agent or "")[:255] or None,
         ip=ip,
+        kind=kind,
     )
     db.add(session)
     db.flush()

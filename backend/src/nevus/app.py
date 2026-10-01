@@ -36,6 +36,7 @@ from nevus.logging import configure_logging, get_logger
 from nevus.storage.blobs import BlobStore
 from nevus.web.csrf import CsrfMiddleware
 from nevus.web.security import HostAllowlistMiddleware, SecurityHeadersMiddleware
+from nevus.web.session_cookie import SessionCookieMiddleware
 from nevus.web.static import mount_frontend
 
 log = get_logger(__name__)
@@ -90,6 +91,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.jobs = jobs
     app.state.login_limiter = LoginRateLimiter(settings.login_attempts, settings.login_window_minutes * 60)
 
+    app.add_middleware(SessionCookieMiddleware)
     app.add_middleware(SecurityHeadersMiddleware)
     app.add_middleware(CsrfMiddleware)
     app.add_middleware(HostAllowlistMiddleware, allowed_hosts=settings.allowed_hosts)

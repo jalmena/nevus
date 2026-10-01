@@ -1565,9 +1565,29 @@
       },
       "InstanceStatus": {
         "properties": {
+          "auth_mode": {
+            "default": "local",
+            "enum": [
+              "local",
+              "proxy"
+            ],
+            "title": "Auth Mode",
+            "type": "string"
+          },
           "claimed": {
             "title": "Claimed",
             "type": "boolean"
+          },
+          "logout_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logout Url"
           },
           "version": {
             "title": "Version",
@@ -3193,15 +3213,20 @@
       "SudoIn": {
         "properties": {
           "password": {
-            "maxLength": 1024,
-            "minLength": 1,
-            "title": "Password",
-            "type": "string"
+            "anyOf": [
+              {
+                "maxLength": 1024,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Not used in proxy mode",
+            "title": "Password"
           }
         },
-        "required": [
-          "password"
-        ],
         "title": "SudoIn",
         "type": "object"
       },
@@ -4749,7 +4774,7 @@
     },
     "/api/auth/sudo": {
       "post": {
-        "description": "Re-authenticate for a few minutes before destructive actions.",
+        "description": "Re-authenticate for a few minutes before destructive actions.\n\nIn proxy mode there is no local password: the proxy authenticated the person, and asking is an\nexplicit confirmation in the interface.",
         "operationId": "sudo_api_auth_sudo_post",
         "requestBody": {
           "content": {

@@ -27,7 +27,7 @@ Authentication and sessions
 - Passwords hashed with argon2id (parameters tuned to roughly 150 ms on the target hardware); login rate limiting; closed registration with a first-run claim flow; optional TOTP with recovery codes (1.0.0).
 - Server-side sessions with random identifiers stored hashed; cookies `HttpOnly`, `SameSite=Lax`, `Secure` when the request arrives over HTTPS; idle and absolute lifetimes; sign-out everywhere.
 - Re-authentication ("sudo mode") before purging a person, exporting all data, changing security settings or disabling a user.
-- Trusted-header mode for forward authentication is enabled only by explicit configuration, trusts headers only from configured proxy addresses, and disables local login while active; an emergency local login exists through the command line.
+- Trusted-header mode for forward authentication is enabled only by explicit configuration and refuses to start without the proxy's addresses. It trusts the header only on connections whose peer address is one of them (the application server does not rewrite peer addresses), and disables local login and password changes while active. A session stays valid only while the proxy keeps vouching for the same user, and sudo mode becomes an explicit confirmation, since there is no local password. For outages of the identity provider, `nevus emergency-login` prints a one-use link valid for 15 minutes that opens a session of at most 12 hours; making and using it are audited.
 
 Authorisation
 
