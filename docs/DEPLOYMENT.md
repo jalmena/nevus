@@ -59,9 +59,52 @@ The full list is in `backend/src/nevus/config.py`.
 
 ## The data directory
 
-`/data` inside the container holds everything neVus owns: `nevus.sqlite3` (the database, with its `-wal` and `-shm` companions), `blobs/` (the photographs, addressed by content hash, never rewritten), and `secret.key` (the server secret that signs sessions; keep it with the data, or every session ends on restore). Back up the directory and you have backed up everything. Until the built-in backup command ships, stop the container before copying, or copy the SQLite file with a tool that understands WAL mode.
+`/data` inside the container holds everything neVus owns: `nevus.sqlite3` (the database, with its `-wal` and `-shm` companions), `blobs/` (the photographs, addressed by content hash, never rewritten), `secret.key` (signs sessions and seals the few secrets kept in the database, such as the mail password), `backups/` and `exports/`.
 
-With an external PostgreSQL, the database is yours to back up; neVus only owns `blobs/` and `secret.key`.
+## Backups
+
+Set a passphrase and neVus writes an encrypted backup every night after 03:00 in the instance time zone, keeping the newest one of each of the last 30 days and of each of the last 12 months:
+
+```
+NEVUS_BACKUP_PASSPHRASE: "a long sentence only you know"
+NEVUS_BACKUP_HOUR: "3"
+```
+
+Backups land in `/data/backups/` as `nevus-backup-<date>.tar.age`. Copy that directory to another machine with your usual tool: a backup on the same disk does not survive the disk. The files are in the standard [age](https://age-encryption.org) format, so they open without neVus (`age -d backup.tar.age | tar -t`).
+
+By hand, and to restore:
+
+```sh
+docker exec -it nevus nevus backup            # asks for a passphrase, or reads NEVUS_BACKUP_PASSPHRASE
+docker exec -it nevus nevus verify            # every stored photo present and intact?
+# Restore into a fresh, empty data directory (stop the old container first):
+docker run --rm -it -v /DATA/AppData/nevus/data:/data ghcr.io/jalmena/nevus:<version> \
+       nevus restore /data/backups/nevus-backup-20261001T030000Z.tar.age
+```
+
+`nevus restore` refuses a data directory that is not empty unless you pass `--force`. The database is copied with SQLite's online backup API, so a backup taken while neVus runs is consistent.
+
+**With an external PostgreSQL** the backup holds the photographs and the server secret only; back the database up yourself, for example nightly with `pg_dump -Fc -d nevus -f /backups/nevus-$(date +%F).dump`, and restore both together.
+
+## Trash, quotas and exports
+
+Deleted marks, visits and photos stay in the trash for 30 days (`NEVUS_TRASH_DAYS`); a daily task then removes them and the files nobody refers to any more. `NEVUS_PERSON_QUOTA_BYTES` sets a soft per-person limit: uploads are never refused for it, the person's page says when it is exceeded. Encrypted exports stay downloadable for 7 days (`NEVUS_EXPORT_DAYS`).
+
+## Email reminders
+
+An administrator fills in the mail server under Settings, or you set it here; the interface values win:
+
+```
+NEVUS_SMTP_HOST: "smtp.example.home"
+NEVUS_SMTP_PORT: "587"
+NEVUS_SMTP_SECURITY: "starttls"     # starttls, ssl or none
+NEVUS_SMTP_USERNAME: "nevus"
+NEVUS_SMTP_PASSWORD: "..."
+NEVUS_SMTP_FROM: "nevus@example.home"
+NEVUS_PUBLIC_URL: "https://nevus.example.home"   # for the link in the email
+```
+
+People who turn reminders on receive at most one email a day, after 08:00 (`NEVUS_REMINDER_HOUR`), listing names and dates; photographs never leave the server.
 
 ## Updating and removing
 
