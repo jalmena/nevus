@@ -35,7 +35,7 @@ OUTPUTS = [
     ROOT / "backend" / "src" / "nevus" / "bodymap" / "zones.json",
     ROOT / "frontend" / "src" / "features" / "bodymap" / "zones.json",
 ]
-VERSION = "nevus-body-map/2"  # 2 adds the head detail view; front and back are unchanged
+VERSION = "nevus-body-map/3"  # 2 added the head view, 3 hands and feet; front and back are unchanged
 W, H = GRID
 MID = W / 2
 
@@ -217,6 +217,93 @@ def head_view() -> dict[str, Polygon]:
     return {code: shape.buffer(0.8).buffer(-0.8) for code, shape in shapes.items()}
 
 
+DETAIL_NAMES = {
+    "3210": "Right Palm",
+    "3211": "Left Palm",
+    "3220": "Back of Right Hand",
+    "3221": "Back of Left Hand",
+    "3310": "Sole of Right Foot",
+    "3311": "Sole of Left Foot",
+    "3320": "Top of Right Foot",
+    "3321": "Top of Left Foot",
+}
+
+
+def hand(thumb_left: bool) -> Polygon:
+    """A flat hand, fingers up, centred on the origin; the thumb on the left or on the right."""
+    palm = Polygon([(-15, -6), (15, -6), (13, 28), (-13, 28)]).buffer(6, join_style=1)
+    fingers = [
+        capsule((x, -6), 3.6, (x * 1.12, -6 - length), 3.0)
+        for x, length in ((-11, 26), (-3.6, 31), (3.6, 29), (11, 23))
+    ]
+    side = -1 if thumb_left else 1
+    thumb = capsule((side * 14, 16), 4.4, (side * 30, -2), 3.4)
+    return unary_union([palm, *fingers, thumb]).buffer(0.6).buffer(-0.6)
+
+
+def foot(big_toe_left: bool) -> Polygon:
+    """A foot seen from above or below, toes up, centred on the origin; the big toe on the left or right.
+
+    The forefoot and the heel are two ovals whose union narrows at the arch; the toes sit on the
+    forefoot's edge, overlapping it just enough to stay one shape.
+    """
+    side = -1 if big_toe_left else 1
+    forefoot = ellipse(side * 1.5, -10, 17, 21)
+    heel = ellipse(0, 25, 12.5, 17)
+    toes = []
+    for dx, top, r in (
+        (9.5, -31.0, 6.0),
+        (2.0, -32.5, 4.3),
+        (-4.0, -31.5, 3.9),
+        (-9.0, -29.0, 3.5),
+        (-13.0, -25.0, 3.1),
+    ):
+        toes.append(Point(side * dx + side * 1.5, top - r + 1.5).buffer(r, 32))
+    return unary_union([forefoot, heel, *toes]).buffer(1.0).buffer(-1.0)
+
+
+def detail_views() -> dict[str, dict[str, Polygon]]:
+    """Hands and feet, two rows each. The upper row follows the front view (the right side on the left of the
+    screen), the lower one the back view (the right side on the right): palms and tops of the feet are seen
+    from the front, backs of the hands and soles from behind. Thumbs point outward, big toes inward."""
+    left_x, right_x = MID - 52, MID + 52
+    place = affinity.translate
+    hands = {
+        "3210": place(hand(thumb_left=True), left_x, 105),
+        "3211": place(hand(thumb_left=False), right_x, 105),
+        "3221": place(hand(thumb_left=True), left_x, 285),
+        "3220": place(hand(thumb_left=False), right_x, 285),
+    }
+    feet = {
+        "3320": place(foot(big_toe_left=False), left_x, 105),
+        "3321": place(foot(big_toe_left=True), right_x, 105),
+        "3311": place(foot(big_toe_left=False), left_x, 290),
+        "3310": place(foot(big_toe_left=True), right_x, 290),
+    }
+    return {"hands": hands, "feet": feet}
+
+
+def build_detail(view: str, shapes: dict[str, Polygon]) -> tuple[Polygon | MultiPolygon, list[dict]]:
+    zones = []
+    for code, shape in sorted(shapes.items()):
+        rp = shape.representative_point()
+        name = DETAIL_NAMES[code]
+        zones.append(
+            {
+                "code": code,
+                "view": view,
+                "side": side_of(code, view, name.split(" of ")[-1]),
+                "region": "arm" if view == "hands" else "leg",
+                "name": name,
+                "molemapper_shape": 0,
+                "path": to_path(shape),
+                "anchor": [round(rp.x, 1), round(rp.y, 1)],
+                "bbox": [round(v, 1) for v in shape.bounds],
+            }
+        )
+    return unary_union(list(shapes.values())), zones
+
+
 def build_head() -> tuple[Polygon | MultiPolygon, list[dict]]:
     shapes = head_view()
     zones = []
@@ -255,6 +342,12 @@ def main() -> None:
     head, head_zones = build_head()
     views["head"] = {"silhouette": to_path(head), "zones": [z["code"] for z in head_zones]}
     zones.extend(head_zones)
+    outlines = {"head": head}
+    for view, shapes in detail_views().items():
+        outline, detail_zones = build_detail(view, shapes)
+        views[view] = {"silhouette": to_path(outline), "zones": [z["code"] for z in detail_zones]}
+        zones.extend(detail_zones)
+        outlines[view] = outline
     zones.sort(key=lambda z: z["code"])
     payload = {
         "version": VERSION,
@@ -274,8 +367,8 @@ def main() -> None:
     print(f"wrote {len(zones)} zones, silhouette {len(body.exterior.coords)} points, hash {payload_hash}")
     if args.preview:
         args.preview.mkdir(parents=True, exist_ok=True)
-        for view in ("front", "back", "head"):
-            outline = body if view != "head" else head
+        for view in ("front", "back", "head", "hands", "feet"):
+            outline = outlines.get(view, body)
             svg = preview_svg(outline, [z for z in zones if z["view"] == view], view)
             (args.preview / f"{view}.svg").write_text(svg + "\n")
             if args.png:

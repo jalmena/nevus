@@ -36,7 +36,7 @@ def test_a_lesion_is_a_zone_plus_a_point_and_gets_a_due_date(client: TestClient)
         "zone": "1250",
         "x": 0.4,
         "y": 0.25,
-        "body_map_version": "nevus-body-map/2",
+        "body_map_version": "nevus-body-map/3",
         "view": "front",
         "side": "right",
     }

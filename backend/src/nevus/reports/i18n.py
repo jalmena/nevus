@@ -44,6 +44,8 @@ TEXT: dict[str, dict[str, str]] = {
         "front": "front",
         "back": "back",
         "head": "head",
+        "hands": "hands",
+        "feet": "feet",
         "unknown": "not recorded",
         "measured_title": "Measured values",
         "measured_intro": "Sizes measured on the photographs, each with its standard uncertainty (±). A difference "
@@ -153,6 +155,8 @@ TEXT: dict[str, dict[str, str]] = {
         "front": "delante",
         "back": "detrás",
         "head": "cabeza",
+        "hands": "manos",
+        "feet": "pies",
         "unknown": "sin registrar",
         "measured_title": "Valores medidos",
         "measured_intro": "Tamaños medidos sobre las fotografías, cada uno con su incertidumbre típica (±). Una "

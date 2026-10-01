@@ -134,7 +134,7 @@ def body_view(
 ) -> str:
     """One view of the silhouette with numbered markers; the mark's own zone shaded when given."""
     data = body_map()
-    side: View = view if view in ("front", "back", "head") else "front"  # type: ignore[assignment]
+    side: View = view if view in ("front", "back", "head", "hands", "feet") else "front"  # type: ignore[assignment]
     vx, vy, vw, vh = data.viewBox
     width = height * vw / vh
     c = COLOURS
