@@ -63,8 +63,10 @@ jobs:
               libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 fonts-dejavu-core
           fi
       - name: Tests on SQLite
-        run: uv run pytest --cov=nevus --cov-report=term-missing
+        # Two workers for the runner's two cores; every test has its own data directory.
+        run: uv run pytest -n 2 --cov=nevus --cov-report=term-missing
       - name: Tests on PostgreSQL
+        # One worker: the tests share the service's single database.
         env:
           NEVUS_DATABASE_URL: postgresql+psycopg://nevus:nevus@localhost:5432/nevus
         run: uv run pytest

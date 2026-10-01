@@ -37,6 +37,7 @@ dev = [
   "ruff>=0.9",
   "mypy>=1.14",
   "pyrage>=1.2",
+  "pytest-xdist>=3.6",
 ]
 
 [build-system]

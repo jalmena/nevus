@@ -20,10 +20,18 @@ def test_what_we_encrypt_the_reference_decrypts(size: int) -> None:
     assert pyrage.passphrase.decrypt(sealed, "correct horse battery") == data
 
 
-@pytest.mark.parametrize("size", SIZES)
+# The reference always uses its full scrypt work factor (seconds per call), so it encrypts only the
+# cases that differ for the reader: nothing, a payload ending exactly on a chunk, and a partial tail.
+@pytest.mark.parametrize("size", [0, CHUNK, 3 * CHUNK + 17])
 def test_what_the_reference_encrypts_we_decrypt(size: int) -> None:
     data = os.urandom(size)
     assert decrypt_bytes(pyrage.passphrase.encrypt(data, "correct horse battery"), "correct horse battery") == data
+
+
+@pytest.mark.parametrize("size", SIZES)
+def test_every_chunk_boundary_survives_a_round_trip(size: int) -> None:
+    data = os.urandom(size)
+    assert decrypt_bytes(encrypt_bytes(data, "correct horse battery", work_factor=10), "correct horse battery") == data
 
 
 def test_a_wrong_passphrase_or_a_damaged_file_is_refused() -> None:
