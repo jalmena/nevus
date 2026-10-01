@@ -27,6 +27,9 @@ class Settings(BaseSettings):
     log_level: Literal["debug", "info", "warning", "error"] = "info"
     role: Literal["all", "web", "worker"] = "all"
     workers: int = Field(default=1, ge=1, le=8, description="Analysis worker processes")
+    jobs_enabled: bool = Field(default=True, description="Run the background job supervisor in this process")
+    job_poll_seconds: float = Field(default=1.0, gt=0, le=60)
+    job_lease_seconds: int = Field(default=300, ge=10, le=3600)
     bind: str = "0.0.0.0"  # noqa: S104 - the container binds all interfaces; the compose file publishes one host port
     port: int = Field(default=8080, ge=1, le=65535)
     auto_migrate: bool = Field(default=True, description="Apply pending database migrations at start-up")

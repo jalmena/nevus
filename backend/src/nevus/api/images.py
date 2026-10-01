@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 from nevus.auth import service
 from nevus.auth.dependencies import AppSettings, CurrentUser, DbSession, client_ip
 from nevus.config import Settings
+from nevus.cv.pipeline import enqueue_quality, refresh_observation_flags
 from nevus.db.models import (
     ACCESS_MANAGER,
     ACCESS_OWNER,
@@ -64,6 +65,8 @@ class ImageOut(BaseModel):
     orientation: int
     source_format: str
     re_encoded: bool
+    quality_flags: list[str]
+    quality_checked_at: datetime | None
     captured_at: datetime | None
     created_at: datetime
     renditions: list[RenditionOut]
@@ -155,6 +158,7 @@ async def ingest_upload(
         )
     db.flush()
     db.refresh(image)
+    enqueue_quality(db, image)
     details = {"person": str(person_id)}
     if observation_id:
         details["observation"] = str(observation_id)
@@ -237,6 +241,9 @@ def delete_image(
     """Moves the image to the trash; the purge and the garbage collection of blobs arrive with data management."""
     image = _image_for(db, image_id, user, ACCESS_OWNER, ACCESS_MANAGER)
     image.deleted_at = utcnow()
+    db.flush()
+    if image.observation_id is not None:
+        refresh_observation_flags(db, image.observation_id)
     service.audit(db, "image.delete", user, "image", image.id, client_ip(request, settings))
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 

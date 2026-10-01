@@ -152,6 +152,9 @@ class Image(Base):
     orientation: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     source_format: Mapped[str] = mapped_column(String(16), nullable=False)
     re_encoded: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    # Denormalised from the latest quality analysis so lists need no join; the analysis row is the source.
+    quality_flags: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
+    quality_checked_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
     captured_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
     captured_tz: Mapped[str | None] = mapped_column(String(64))
     created_by: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"))
@@ -243,4 +246,73 @@ class Observation(Base):
     __table_args__ = (
         Index("ix_observations_lesion_id", "lesion_id"),
         Index("ix_observations_captured_at", "captured_at"),
+    )
+
+
+JOB_QUEUED = "queued"
+JOB_RUNNING = "running"
+JOB_DONE = "done"
+JOB_FAILED = "failed"
+
+
+class Job(Base):
+    """A unit of background work, leased by a worker for a bounded time so a crash never loses it."""
+
+    __tablename__ = "jobs"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    kind: Mapped[str] = mapped_column(String(64), nullable=False)
+    payload: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False, default=dict)
+    dedupe_key: Mapped[str | None] = mapped_column(String(200), unique=True)
+    status: Mapped[str] = mapped_column(String(16), nullable=False, default=JOB_QUEUED)
+    priority: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    run_after: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
+    attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    max_attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=3)
+    lease_until: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    error: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
+    started_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    finished_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+
+    __table_args__ = (Index("ix_jobs_status_run_after", "status", "run_after"),)
+
+
+class Analysis(Base):
+    """One run of one analyzer version over one input. Never updated in place: a new version adds a row.
+
+    `decision` is `automatic` for analyses whose output is used as is (quality checks, reference
+    detection) and `pending` / `confirmed` / `rejected` for experimental proposals the person decides on.
+    """
+
+    __tablename__ = "analyses"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    target_type: Mapped[str] = mapped_column(String(32), nullable=False)
+    target_id: Mapped[uuid.UUID] = mapped_column(Uuid, nullable=False)
+    analyzer: Mapped[str] = mapped_column(String(64), nullable=False)
+    version: Mapped[str] = mapped_column(String(32), nullable=False)
+    params: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False, default=dict)
+    params_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    input_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    outputs: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False, default=dict)
+    status: Mapped[str] = mapped_column(String(16), nullable=False, default="ok")
+    error: Mapped[str | None] = mapped_column(Text)
+    decision: Mapped[str] = mapped_column(String(16), nullable=False, default="automatic")
+    decided_by: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"))
+    decided_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
+
+    __table_args__ = (
+        Index(
+            "ux_analyses_identity",
+            "target_type",
+            "target_id",
+            "analyzer",
+            "version",
+            "params_hash",
+            "input_hash",
+            unique=True,
+        ),
+        Index("ix_analyses_target", "target_type", "target_id"),
     )

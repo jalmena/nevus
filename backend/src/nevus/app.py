@@ -21,6 +21,7 @@ from nevus.auth.service import bootstrap_admin
 from nevus.config import Settings, get_settings
 from nevus.db.engine import make_engine, make_session_factory
 from nevus.db.migrate import upgrade_to_head
+from nevus.jobs.runner import JobRunner
 from nevus.logging import configure_logging, get_logger
 from nevus.storage.blobs import BlobStore
 from nevus.web.csrf import CsrfMiddleware
@@ -42,6 +43,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         bootstrap_admin(db, settings)
         db.commit()
 
+    blob_store = BlobStore(settings.blobs_dir, settings.min_free_bytes)
+    jobs = JobRunner(session_factory, blob_store, settings)
+    run_supervisor = settings.jobs_enabled and settings.role in ("all", "worker")
+
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         log.info(
@@ -49,8 +54,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             version=__version__,
             database="sqlite" if settings.is_sqlite else "postgresql",
             role=settings.role,
+            jobs=run_supervisor,
         )
+        if run_supervisor:
+            await jobs.start()
         yield
+        if run_supervisor:
+            await jobs.stop()
         engine.dispose()
         log.info("shutdown")
 
@@ -66,7 +76,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.settings = settings
     app.state.engine = engine
     app.state.session_factory = session_factory
-    app.state.blob_store = BlobStore(settings.blobs_dir, settings.min_free_bytes)
+    app.state.blob_store = blob_store
+    app.state.jobs = jobs
     app.state.login_limiter = LoginRateLimiter(settings.login_attempts, settings.login_window_minutes * 60)
 
     app.add_middleware(SecurityHeadersMiddleware)

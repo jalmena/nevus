@@ -22,7 +22,9 @@ def _reset_database(url: str) -> None:
 
 @pytest.fixture
 def settings(tmp_path: Path) -> Settings:
-    settings = Settings(data_dir=tmp_path / "data", allowed_hosts=["nevus.example.test"], log_level="warning")
+    settings = Settings(
+        data_dir=tmp_path / "data", allowed_hosts=["nevus.example.test"], log_level="warning", jobs_enabled=False
+    )
     if not settings.is_sqlite:
         _reset_database(settings.effective_database_url)
     return settings
