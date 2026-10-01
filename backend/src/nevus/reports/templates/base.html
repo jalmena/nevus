@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="{{ lang }}">
+<head>
+<meta charset="utf-8">
+<title>{{ title }} · {{ person }}</title>
+<meta name="author" content="neVus">
+<meta name="generator" content="neVus">
+<link rel="stylesheet" href="report.css">
+<style>
+:root {
+{% for name, value in colours.items() %}
+  --color-{{ name }}: {{ value }};
+{% endfor %}
+}
+@page {
+  size: {{ paper }};
+  margin: 15mm 15mm 18mm;
+  @bottom-left { content: {{ footer|safe }}; font-family: Epilogue; font-size: 7pt; color: var(--color-ink-3); }
+  @bottom-right { content: {{ page_counter|safe }}; font-family: Epilogue; font-size: 7pt; color: var(--color-ink-3); }
+}
+</style>
+</head>
+<body>
+<header class="brand">
+  <img src="wordmark.svg" alt="neVus">
+  <div class="title">
+    <h1>{{ title }}</h1>
+    <p>{{ generated }}</p>
+  </div>
+</header>
+<div class="notice">
+  <strong>{{ w("intended_use_title") }}</strong>
+  {{ w("intended_use") }}
+  <span class="secondary">{{ w("data_attached") }}</span>
+</div>
+{% block content %}{% endblock %}
+</body>
+</html>

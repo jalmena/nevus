@@ -26,6 +26,7 @@ from nevus.db.models import (
     Person,
     PersonAccess,
     Rendition,
+    Report,
     ScaleReference,
 )
 from nevus.db.types import utcnow
@@ -34,9 +35,38 @@ from nevus.storage.blobs import BlobStore
 GRACE_SECONDS = 24 * 3600
 
 
+def _delete_reports_showing(db: Session, lesion_ids: list[uuid.UUID]) -> None:
+    """A report is a snapshot of what it shows: it goes when any of that is purged.
+
+    Mark reports of the lesions concerned, and every profile summary of their persons (it lists them).
+    """
+    if not lesion_ids:
+        return
+    wanted = {str(i) for i in lesion_ids}
+    persons = set(db.scalars(select(Lesion.person_id).where(Lesion.id.in_(lesion_ids))))
+    doomed = [
+        row_id
+        for row_id, scope, shown, person_id in db.execute(
+            select(Report.id, Report.scope, Report.lesion_ids, Report.person_id).where(Report.person_id.in_(persons))
+        )
+        if scope == "profile" or wanted.intersection(shown or [])
+    ]
+    if doomed:
+        db.execute(delete(Report).where(Report.id.in_(doomed)))
+
+
 def _delete_images(db: Session, image_ids: list[uuid.UUID]) -> None:
     if not image_ids:
         return
+    lesions = list(
+        db.scalars(
+            select(Observation.lesion_id)
+            .join(Image, Image.observation_id == Observation.id)
+            .where(Image.id.in_(image_ids))
+            .distinct()
+        )
+    )
+    _delete_reports_showing(db, lesions)
     measurement_scales = select(ScaleReference.id).where(ScaleReference.image_id.in_(image_ids))
     db.execute(delete(Measurement).where(Measurement.scale_reference_id.in_(measurement_scales)))
     db.execute(delete(Measurement).where(Measurement.image_id.in_(image_ids)))
@@ -58,6 +88,9 @@ def _delete_images(db: Session, image_ids: list[uuid.UUID]) -> None:
 def _delete_observations(db: Session, observation_ids: list[uuid.UUID]) -> None:
     if not observation_ids:
         return
+    _delete_reports_showing(
+        db, list(db.scalars(select(Observation.lesion_id).where(Observation.id.in_(observation_ids)).distinct()))
+    )
     images = list(db.scalars(select(Image.id).where(Image.observation_id.in_(observation_ids))))
     _delete_images(db, images)
     db.execute(delete(Measurement).where(Measurement.observation_id.in_(observation_ids)))
@@ -67,6 +100,7 @@ def _delete_observations(db: Session, observation_ids: list[uuid.UUID]) -> None:
 def _delete_lesions(db: Session, lesion_ids: list[uuid.UUID]) -> None:
     if not lesion_ids:
         return
+    _delete_reports_showing(db, lesion_ids)
     observations = list(db.scalars(select(Observation.id).where(Observation.lesion_id.in_(lesion_ids))))
     _delete_observations(db, observations)
     db.execute(delete(Measurement).where(Measurement.lesion_id.in_(lesion_ids)))
@@ -79,6 +113,7 @@ def purge_person(db: Session, person_id: uuid.UUID) -> None:
     _delete_lesions(db, lesions)
     _delete_images(db, list(db.scalars(select(Image.id).where(Image.person_id == person_id))))
     db.execute(delete(Export).where(Export.person_id == person_id))
+    db.execute(delete(Report).where(Report.person_id == person_id))
     db.execute(delete(PersonAccess).where(PersonAccess.person_id == person_id))
     db.execute(delete(Person).where(Person.id == person_id))
     db.flush()
@@ -121,6 +156,7 @@ def purge_expired(db: Session, days: int, now: datetime | None = None) -> dict[s
 def collect_garbage(db: Session, store: BlobStore, grace_seconds: int = GRACE_SECONDS) -> int:
     """Remove blob files no row refers to. Returns how many files went."""
     referenced = set(db.scalars(select(Image.sha256))) | set(db.scalars(select(Rendition.sha256)))
+    referenced |= {sha for sha in db.scalars(select(Report.blob_sha256)) if sha}
     for outputs in db.scalars(select(Analysis.outputs).where(Analysis.target_type == "pair")):
         referenced.update(v for k, v in outputs.items() if k.endswith("_sha256") and isinstance(v, str))
     cutoff = time.time() - grace_seconds

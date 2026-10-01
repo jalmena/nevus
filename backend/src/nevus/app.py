@@ -20,6 +20,7 @@ from nevus.api.images import router as images_router
 from nevus.api.lesions import router as lesions_router
 from nevus.api.measurements import router as measurements_router
 from nevus.api.persons import router as persons_router
+from nevus.api.reports import router as reports_router
 from nevus.api.trash import router as trash_router
 from nevus.api.users import router as users_router
 from nevus.auth.ratelimit import LoginRateLimiter
@@ -104,6 +105,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(trash_router)
     app.include_router(exports_router)
     app.include_router(comparisons_router)
+    app.include_router(reports_router)
     mount_frontend(app, _static_dir(settings))
     return app
 

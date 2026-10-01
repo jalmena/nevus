@@ -418,3 +418,35 @@ class Export(Base):
     expires_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
 
     __table_args__ = (Index("ix_exports_requested_by", "requested_by"),)
+
+
+REPORT_SCOPES = ("lesion", "profile")
+
+
+class Report(Base):
+    """A PDF report of one mark or of a person's whole map, rendered in the background, kept until deleted.
+
+    The PDF is a derived blob; `analyzer_versions` records which analyzers produced the numbers in it,
+    so a report can always be traced back to the code that measured.
+    """
+
+    __tablename__ = "reports"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    person_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("persons.id", ondelete="CASCADE"), nullable=False)
+    requested_by: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"))
+    scope: Mapped[str] = mapped_column(String(16), nullable=False)
+    lesion_ids: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
+    language: Mapped[str] = mapped_column(String(8), nullable=False, default="en")
+    paper: Mapped[str] = mapped_column(String(8), nullable=False, default="a4")
+    options: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False, default=dict)
+    status: Mapped[str] = mapped_column(String(16), nullable=False, default="queued")
+    blob_sha256: Mapped[str | None] = mapped_column(String(64))
+    bytes: Mapped[int | None] = mapped_column(BigInteger)
+    pages: Mapped[int | None] = mapped_column(Integer)
+    analyzer_versions: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False, default=dict)
+    error: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
+    finished_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+
+    __table_args__ = (Index("ix_reports_person_id", "person_id"),)

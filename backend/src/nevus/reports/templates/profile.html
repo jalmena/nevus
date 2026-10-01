@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<section>
+  <dl class="facts">
+    <div><dt>{{ w("person") }}</dt><dd>{{ person }}{% if born %} · {{ born }}{% endif %}</dd></div>
+    <div><dt>{{ w("summary_marks") }}</dt><dd>{{ lesions|length }}</dd></div>
+  </dl>
+</section>
+
+<h2>{{ w("map_title") }}</h2>
+{% if lesions %}
+<div class="bodymaps">
+  <figure>{{ front|safe }}<figcaption>{{ w("front") }}</figcaption></figure>
+  <figure>{{ back|safe }}<figcaption>{{ w("back") }}</figcaption></figure>
+</div>
+
+<h2>{{ w("summary_marks") }}</h2>
+<table>
+  <thead><tr>
+    <th>{{ w("summary_number") }}</th><th>{{ w("mark") }}</th><th>{{ w("location") }}</th>
+    <th>{{ w("summary_latest") }}</th><th>{{ w("summary_last_visit") }}</th><th>{{ w("summary_next") }}</th>
+  </tr></thead>
+  <tbody>
+  {% for mark in lesions %}
+    <tr>
+      <td>{{ mark.number }}</td>
+      <td>{{ mark.title }}{% if mark.status != w("status_active") %}<br><span class="secondary small">{{ mark.status }}</span>{% endif %}</td>
+      <td>{{ mark.zone }} · {{ mark.view }}</td>
+      <td>{{ mark.latest }}</td>
+      <td>{{ mark.last_visit }}</td>
+      <td>{{ mark.next }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<h2>{{ w("highlights_title") }}</h2>
+<p class="secondary">{{ w("highlights_intro") }}</p>
+{% for mark in highlights %}
+  <p class="highlight">{{ mark.number }}. {{ mark.title }}: <span class="change-yes">{{ mark.change.value }}</span> {{ mark.change.since }} ({{ w("measured_change") }})</p>
+{% else %}
+  <p>{{ w("highlights_none") }}</p>
+{% endfor %}
+{% else %}
+<p>{{ w("no_marks") }}</p>
+{% endif %}
+
+<h2>{{ w("methods_title") }}</h2>
+{% if methods_scale %}<p>{{ methods_scale }}</p>{% endif %}
+<p>{{ w("methods_uncertainty") }}</p>
+<p class="secondary">{{ methods_software }}</p>
+
+<section class="together">
+  <h2>{{ w("clinician_title") }}</h2>
+  <p class="secondary small">{{ w("clinician_hint") }}</p>
+  <div class="clinician"></div>
+</section>
+{% endblock %}
