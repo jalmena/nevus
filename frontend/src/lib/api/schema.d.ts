@@ -2547,7 +2547,7 @@ export interface components {
              * View
              * @enum {string}
              */
-            view: "front" | "back";
+            view: "front" | "back" | "head";
         };
     };
     responses: never;

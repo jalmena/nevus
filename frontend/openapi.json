@@ -223,7 +223,8 @@
             "propertyNames": {
               "enum": [
                 "front",
-                "back"
+                "back",
+                "head"
               ]
             },
             "title": "Views",
@@ -3970,7 +3971,8 @@
           "view": {
             "enum": [
               "front",
-              "back"
+              "back",
+              "head"
             ],
             "title": "View",
             "type": "string"

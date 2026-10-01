@@ -238,6 +238,9 @@ def context(payload: dict[str, Any]) -> dict[str, Any]:
         "lesions": lesions,
         "front": svg.body_view("front", markers, height=300, radius=8),
         "back": svg.body_view("back", markers, height=300, radius=8),
+        "head": svg.body_view("head", markers, height=300, radius=8)
+        if any(raw["view"] == "head" for raw in payload["lesions"])
+        else "",
         "highlights": [lesion for lesion in lesions if lesion["change"] and lesion["change"]["detectable"]],
         "methods_scale": words("methods_scale", kinds=", ".join(words(f"scale_{k}") for k in scale_kinds))
         if scale_kinds

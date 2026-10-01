@@ -55,7 +55,12 @@
     "2800": "Left lower forearm",
     "2801": "Right lower forearm",
     "2850": "Left hand",
-    "2851": "Right hand"
+    "2851": "Right hand",
+    "3150": "Left side of the face",
+    "3151": "Right side of the face",
+    "3170": "Top of the head",
+    "3171": "Face",
+    "3172": "Back of the head"
   },
   "es": {
     "1100": "Cabeza",
@@ -113,6 +118,11 @@
     "2800": "Antebrazo inferior izquierdo",
     "2801": "Antebrazo inferior derecho",
     "2850": "Mano izquierda",
-    "2851": "Mano derecha"
+    "2851": "Mano derecha",
+    "3150": "Lado izquierdo de la cara",
+    "3151": "Lado derecho de la cara",
+    "3170": "Coronilla",
+    "3171": "Cara",
+    "3172": "Parte de atrás de la cabeza"
   }
 }

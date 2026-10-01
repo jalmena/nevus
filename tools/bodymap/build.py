@@ -35,7 +35,7 @@ OUTPUTS = [
     ROOT / "backend" / "src" / "nevus" / "bodymap" / "zones.json",
     ROOT / "frontend" / "src" / "features" / "bodymap" / "zones.json",
 ]
-VERSION = "nevus-body-map/1"
+VERSION = "nevus-body-map/2"  # 2 adds the head detail view; front and back are unchanged
 W, H = GRID
 MID = W / 2
 
@@ -184,6 +184,61 @@ def preview_svg(body: Polygon, zones: list[dict], view: str) -> str:
     return "".join(parts)
 
 
+HEAD_NAMES = {
+    "3150": "Face: Left Side",
+    "3151": "Face: Right Side",
+    "3170": "Top of Head",
+    "3171": "Face: Front",
+    "3172": "Back of Head",
+}
+
+
+def head_view() -> dict[str, Polygon]:
+    """The head detail view: five pictograms in a cross, each one a zone.
+
+    The top of the head sits above the face, with a small point marking the forehead; the profiles keep
+    MoleMapper's layout (the left side of the face on the left, nose pointing that way).
+    """
+    nose = Polygon([(-7, 0), (0, -9), (7, 0)]).buffer(3, join_style=1)
+    top = unary_union(
+        [Point(MID, 70).buffer(34, 64), affinity.translate(affinity.rotate(nose, 180, origin=(0, 0)), MID, 103)]
+    )
+    face = unary_union([ellipse(MID, 178, 33, 43), ellipse(MID - 34, 180, 6, 11), ellipse(MID + 34, 180, 6, 11)])
+    profile_nose = Polygon([(0, -6), (-10, 5), (0, 10)]).buffer(3, join_style=1)
+    left = unary_union([ellipse(38, 178, 25, 41), affinity.translate(profile_nose, 38 - 23, 176)])
+    right = unary_union(
+        [
+            ellipse(W - 38, 178, 25, 41),
+            affinity.translate(affinity.scale(profile_nose, -1, 1, origin=(0, 0)), W - 38 + 23, 176),
+        ]
+    )
+    back = unary_union([ellipse(MID, 300, 33, 41), capsule((MID, 330), 9, (MID, 350), 9)])
+    shapes = {"3170": top, "3171": face, "3150": left, "3151": right, "3172": back}
+    return {code: shape.buffer(0.8).buffer(-0.8) for code, shape in shapes.items()}
+
+
+def build_head() -> tuple[Polygon | MultiPolygon, list[dict]]:
+    shapes = head_view()
+    zones = []
+    for code, shape in sorted(shapes.items()):
+        rp = shape.representative_point()
+        name = HEAD_NAMES[code]
+        zones.append(
+            {
+                "code": code,
+                "view": "head",
+                "side": side_of(code, "head", name.split(": ")[-1]),
+                "region": "head",
+                "name": name,
+                "molemapper_shape": 15 if code in ("3150", "3151") else 17,
+                "path": to_path(shape),
+                "anchor": [round(rp.x, 1), round(rp.y, 1)],
+                "bbox": [round(v, 1) for v in shape.bounds],
+            }
+        )
+    return unary_union(list(shapes.values())), zones
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--preview", type=Path, help="directory for preview renders (SVG; PNG with --png)")
@@ -197,6 +252,10 @@ def main() -> None:
         zs = build_zones(body, view)
         views[view] = {"silhouette": body_path, "zones": [z["code"] for z in zs]}
         zones.extend(zs)
+    head, head_zones = build_head()
+    views["head"] = {"silhouette": to_path(head), "zones": [z["code"] for z in head_zones]}
+    zones.extend(head_zones)
+    zones.sort(key=lambda z: z["code"])
     payload = {
         "version": VERSION,
         "viewBox": [0, 0, W, H],
@@ -215,8 +274,9 @@ def main() -> None:
     print(f"wrote {len(zones)} zones, silhouette {len(body.exterior.coords)} points, hash {payload_hash}")
     if args.preview:
         args.preview.mkdir(parents=True, exist_ok=True)
-        for view in ("front", "back"):
-            svg = preview_svg(body, [z for z in zones if z["view"] == view], view)
+        for view in ("front", "back", "head"):
+            outline = body if view != "head" else head
+            svg = preview_svg(outline, [z for z in zones if z["view"] == view], view)
             (args.preview / f"{view}.svg").write_text(svg + "\n")
             if args.png:
                 import cairosvg

@@ -95,7 +95,8 @@
     "view": "View",
     "views": {
       "front": "Front",
-      "back": "Back"
+      "back": "Back",
+      "head": "Head"
     },
     "title": "Body map",
     "hint": "Tap a zone to select it.",
@@ -162,7 +163,12 @@
     "2800": "Left lower forearm",
     "2801": "Right lower forearm",
     "2850": "Left hand",
-    "2851": "Right hand"
+    "2851": "Right hand",
+    "3150": "Left side of the face",
+    "3151": "Right side of the face",
+    "3170": "Top of the head",
+    "3171": "Face",
+    "3172": "Back of the head"
   },
   "lesions": {
     "title": "Marks",

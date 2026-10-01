@@ -95,7 +95,8 @@
     "view": "Vista",
     "views": {
       "front": "Frente",
-      "back": "Espalda"
+      "back": "Espalda",
+      "head": "Cabeza"
     },
     "title": "Mapa corporal",
     "hint": "Toca una zona para seleccionarla.",
@@ -162,7 +163,12 @@
     "2800": "Antebrazo inferior izquierdo",
     "2801": "Antebrazo inferior derecho",
     "2850": "Mano izquierda",
-    "2851": "Mano derecha"
+    "2851": "Mano derecha",
+    "3150": "Lado izquierdo de la cara",
+    "3151": "Lado derecho de la cara",
+    "3170": "Coronilla",
+    "3171": "Cara",
+    "3172": "Parte de atrás de la cabeza"
   },
   "lesions": {
     "title": "Marcas",

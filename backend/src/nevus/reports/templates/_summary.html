@@ -11,6 +11,7 @@
 <div class="bodymaps">
   <figure>{{ front|safe }}<figcaption>{{ w("front") }}</figcaption></figure>
   <figure>{{ back|safe }}<figcaption>{{ w("back") }}</figcaption></figure>
+  {% if head %}<figure>{{ head|safe }}<figcaption>{{ w("head") }}</figcaption></figure>{% endif %}
 </div>
 
 <h2>{{ w("summary_marks") }}</h2>
