@@ -23,6 +23,7 @@ class JobContext:
 Loader = Callable[[JobContext, dict[str, Any]], Any]
 Computer = Callable[[Any], Any]
 Storer = Callable[[JobContext, dict[str, Any], Any], None]
+Failer = Callable[[JobContext, dict[str, Any], str], None]
 
 
 @dataclass(frozen=True)
@@ -36,6 +37,8 @@ class JobKind:
     """Main process. Writes the result."""
     timeout: float = 120.0
     max_attempts: int = 3
+    on_failure: Failer | None = None
+    """Main process. Called once when the last attempt has failed, to tell whoever is waiting."""
 
 
 KINDS: dict[str, JobKind] = {}

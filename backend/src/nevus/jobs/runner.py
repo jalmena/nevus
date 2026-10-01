@@ -16,7 +16,7 @@ from typing import Any
 from sqlalchemy.orm import Session, sessionmaker
 
 from nevus.config import Settings
-from nevus.db.models import Job
+from nevus.db.models import JOB_FAILED, Job
 from nevus.jobs import queue
 from nevus.jobs.registry import KINDS, JobContext, JobKind
 from nevus.logging import get_logger
@@ -128,9 +128,16 @@ class JobRunner:
                 queue.finish(db, job_id)
                 db.commit()
         except Exception as error:
+            message = "".join(traceback.format_exception_only(error)).strip()
             log.warning("job.failed", kind=kind_name, job=str(job_id), error=type(error).__name__)
             with self.session_factory() as db:
-                queue.fail(db, job_id, "".join(traceback.format_exception_only(error)).strip())
+                queue.fail(db, job_id, message)
+                job = db.get(Job, job_id)
+                if kind is not None and kind.on_failure is not None and job is not None and job.status == JOB_FAILED:
+                    try:
+                        kind.on_failure(JobContext(db, self.store, self.settings), payload, message)
+                    except Exception as hook_error:
+                        log.warning("job.on_failure_failed", kind=kind_name, error=type(hook_error).__name__)
                 db.commit()
 
     def _run_periodic(self, task: Periodic) -> None:
