@@ -87,6 +87,7 @@ test("from a fresh instance to a measured mark, accessibly", async ({ page }) =>
 
   await expect(page.getByRole("heading", { name: "Body map", exact: true })).toBeVisible();
   await accessible(page, "person");
+  await shot(page, "person");
   await page.getByRole("button", { name: "Add a mark", exact: true }).click();
   await page.getByRole("button", { name: "Right pectoral", exact: true }).click();
   await page.getByLabel("Name", { exact: true }).fill("Chest mark");

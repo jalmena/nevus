@@ -10,6 +10,7 @@ export function ViewToggle({ view, onChange }: { view: View; onChange: (view: Vi
       options={VIEWS.map((option) => ({ value: option, label: t(`bodymap.views.${option}`) }))}
       value={view}
       onChange={onChange}
+      wide
     />
   );
 }

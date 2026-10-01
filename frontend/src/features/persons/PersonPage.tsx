@@ -151,6 +151,7 @@ export function PersonPage() {
             const lesion = lesions.data?.find((item) => item.id === id);
             return lesion ? lesionTitle(lesion, t) : t("reports.deletedMark");
           }}
+          marks={(lesions.data ?? []).map((lesion) => ({ id: lesion.id, title: lesionTitle(lesion, t) }))}
         />
       )}
 

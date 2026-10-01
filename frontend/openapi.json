@@ -224,7 +224,9 @@
               "enum": [
                 "front",
                 "back",
-                "head"
+                "head",
+                "hands",
+                "feet"
               ]
             },
             "title": "Views",
@@ -825,6 +827,24 @@
         "title": "ComparisonOut",
         "type": "object"
       },
+      "ConfirmIn": {
+        "properties": {
+          "scale_reference_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scale Reference Id"
+          }
+        },
+        "title": "ConfirmIn",
+        "type": "object"
+      },
       "Credentials": {
         "properties": {
           "password": {
@@ -1079,6 +1099,112 @@
           "ready"
         ],
         "title": "EmailSettingsOut",
+        "type": "object"
+      },
+      "EvaluationPhoto": {
+        "properties": {
+          "captured_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captured On"
+          },
+          "image_id": {
+            "format": "uuid",
+            "title": "Image Id",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LabelOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mark": {
+            "title": "Mark",
+            "type": "string"
+          },
+          "person_name": {
+            "title": "Person Name",
+            "type": "string"
+          },
+          "proposal": {
+            "anyOf": [
+              {
+                "items": {
+                  "items": {
+                    "type": "number"
+                  },
+                  "type": "array"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Proposal"
+          },
+          "quality_flags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Quality Flags",
+            "type": "array"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "skin_tone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Skin Tone"
+          },
+          "upright_height": {
+            "title": "Upright Height",
+            "type": "integer"
+          },
+          "upright_width": {
+            "title": "Upright Width",
+            "type": "integer"
+          },
+          "zone": {
+            "title": "Zone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "image_id",
+          "person_name",
+          "skin_tone",
+          "mark",
+          "zone",
+          "captured_on",
+          "role",
+          "upright_width",
+          "upright_height",
+          "quality_flags",
+          "proposal",
+          "label"
+        ],
+        "title": "EvaluationPhoto",
         "type": "object"
       },
       "ExportIn": {
@@ -1600,6 +1726,94 @@
           "version"
         ],
         "title": "InstanceStatus",
+        "type": "object"
+      },
+      "LabelIn": {
+        "properties": {
+          "outline": {
+            "anyOf": [
+              {
+                "items": {
+                  "items": {
+                    "type": "number"
+                  },
+                  "type": "array"
+                },
+                "maxItems": 2000,
+                "minItems": 3,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outline"
+          },
+          "quality": {
+            "anyOf": [
+              {
+                "enum": [
+                  "good",
+                  "bad"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quality"
+          }
+        },
+        "title": "LabelIn",
+        "type": "object"
+      },
+      "LabelOut": {
+        "properties": {
+          "labelled_at": {
+            "format": "date-time",
+            "title": "Labelled At",
+            "type": "string"
+          },
+          "outline": {
+            "anyOf": [
+              {
+                "items": {
+                  "items": {
+                    "type": "number"
+                  },
+                  "type": "array"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outline"
+          },
+          "quality": {
+            "anyOf": [
+              {
+                "enum": [
+                  "good",
+                  "bad"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quality"
+          }
+        },
+        "required": [
+          "outline",
+          "quality",
+          "labelled_at"
+        ],
+        "title": "LabelOut",
         "type": "object"
       },
       "LesionIn": {
@@ -2824,6 +3038,181 @@
         "title": "PersonUpdate",
         "type": "object"
       },
+      "ProposalOut": {
+        "properties": {
+          "analyzer": {
+            "title": "Analyzer",
+            "type": "string"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "decision": {
+            "enum": [
+              "pending",
+              "confirmed",
+              "rejected",
+              "automatic"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "found": {
+            "title": "Found",
+            "type": "boolean"
+          },
+          "framing_flags": {
+            "items": {
+              "enum": [
+                "mark_off_centre",
+                "mark_small",
+                "mark_cut",
+                "no_mark_found"
+              ],
+              "type": "string"
+            },
+            "title": "Framing Flags",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "image_id": {
+            "format": "uuid",
+            "title": "Image Id",
+            "type": "string"
+          },
+          "outline": {
+            "anyOf": [
+              {
+                "items": {
+                  "items": {
+                    "type": "number"
+                  },
+                  "type": "array"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outline"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "enum": [
+                  "no_mark_found",
+                  "low_contrast",
+                  "irregular_region",
+                  "too_large",
+                  "too_small"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "size": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProposedSize"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "image_id",
+          "analyzer",
+          "version",
+          "found",
+          "reason",
+          "outline",
+          "confidence",
+          "framing_flags",
+          "decision",
+          "created_at",
+          "size"
+        ],
+        "title": "ProposalOut",
+        "type": "object"
+      },
+      "ProposedSize": {
+        "properties": {
+          "area_mm2": {
+            "title": "Area Mm2",
+            "type": "number"
+          },
+          "longest_mm": {
+            "title": "Longest Mm",
+            "type": "number"
+          },
+          "perpendicular_mm": {
+            "title": "Perpendicular Mm",
+            "type": "number"
+          },
+          "scale_kind": {
+            "title": "Scale Kind",
+            "type": "string"
+          },
+          "scale_reference_id": {
+            "format": "uuid",
+            "title": "Scale Reference Id",
+            "type": "string"
+          },
+          "sigma_area_mm2": {
+            "title": "Sigma Area Mm2",
+            "type": "number"
+          },
+          "sigma_longest_mm": {
+            "title": "Sigma Longest Mm",
+            "type": "number"
+          },
+          "sigma_perpendicular_mm": {
+            "title": "Sigma Perpendicular Mm",
+            "type": "number"
+          }
+        },
+        "required": [
+          "scale_reference_id",
+          "scale_kind",
+          "longest_mm",
+          "perpendicular_mm",
+          "area_mm2",
+          "sigma_longest_mm",
+          "sigma_perpendicular_mm",
+          "sigma_area_mm2"
+        ],
+        "title": "ProposedSize",
+        "type": "object"
+      },
       "RenditionOut": {
         "properties": {
           "bytes": {
@@ -2881,6 +3270,23 @@
             ],
             "title": "Lesion Id"
           },
+          "lesion_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "maxItems": 60,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "For a selection",
+            "title": "Lesion Ids"
+          },
           "paper": {
             "default": "a4",
             "enum": [
@@ -2893,7 +3299,8 @@
           "scope": {
             "enum": [
               "lesion",
-              "profile"
+              "profile",
+              "selection"
             ],
             "title": "Scope",
             "type": "string"
@@ -3010,7 +3417,8 @@
             "enum": [
               "lesion",
               "profile",
-              "visit"
+              "visit",
+              "selection"
             ],
             "title": "Scope",
             "type": "string"
@@ -3972,7 +4380,9 @@
             "enum": [
               "front",
               "back",
-              "head"
+              "head",
+              "hands",
+              "feet"
             ],
             "title": "View",
             "type": "string"
@@ -4949,6 +5359,169 @@
         ]
       }
     },
+    "/api/evaluation/photos": {
+      "get": {
+        "operationId": "list_photos_api_evaluation_photos_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "only",
+            "required": false,
+            "schema": {
+              "default": "all",
+              "enum": [
+                "all",
+                "unlabelled",
+                "labelled"
+              ],
+              "title": "Only",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EvaluationPhoto"
+                  },
+                  "title": "Response List Photos Api Evaluation Photos Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Photos",
+        "tags": [
+          "evaluation"
+        ]
+      }
+    },
+    "/api/evaluation/photos/{image_id}/label": {
+      "delete": {
+        "operationId": "delete_label_api_evaluation_photos__image_id__label_delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "image_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Image Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Label",
+        "tags": [
+          "evaluation"
+        ]
+      },
+      "put": {
+        "operationId": "put_label_api_evaluation_photos__image_id__label_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "image_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Image Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LabelIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LabelOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Label",
+        "tags": [
+          "evaluation"
+        ]
+      }
+    },
+    "/api/evaluation/summary": {
+      "get": {
+        "description": "Metrics from the proposals already recorded; `nevus evaluate` runs the current analyzer afresh.",
+        "operationId": "summary_api_evaluation_summary_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Summary Api Evaluation Summary Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Summary",
+        "tags": [
+          "evaluation"
+        ]
+      }
+    },
     "/api/exports": {
       "get": {
         "operationId": "list_exports_api_exports_get",
@@ -5215,6 +5788,54 @@
         "summary": "Propose Fit",
         "tags": [
           "measurements"
+        ]
+      }
+    },
+    "/api/images/{image_id}/proposals": {
+      "get": {
+        "description": "Nothing unless the person turned the experimental analysis on (FR-ANA-01).",
+        "operationId": "list_proposals_api_images__image_id__proposals_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "image_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Image Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProposalOut"
+                  },
+                  "title": "Response List Proposals Api Images  Image Id  Proposals Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Proposals",
+        "tags": [
+          "proposals"
         ]
       }
     },
@@ -7135,6 +7756,103 @@
         "summary": "Usage",
         "tags": [
           "persons"
+        ]
+      }
+    },
+    "/api/proposals/{proposal_id}/confirm": {
+      "post": {
+        "description": "The person accepts the proposed outline: it becomes a measurement, linked to the analysis.",
+        "operationId": "confirm_proposal_api_proposals__proposal_id__confirm_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "proposal_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Proposal Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeasurementOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Confirm Proposal",
+        "tags": [
+          "proposals"
+        ]
+      }
+    },
+    "/api/proposals/{proposal_id}/reject": {
+      "post": {
+        "operationId": "reject_proposal_api_proposals__proposal_id__reject_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "proposal_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Proposal Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProposalOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reject Proposal",
+        "tags": [
+          "proposals"
         ]
       }
     },

@@ -99,4 +99,24 @@ describe("reports", () => {
     await user.click(screen.getByRole("button", { name: "Delete: Summary of all marks" }));
     await waitFor(() => expect(state.reports).toHaveLength(0));
   });
+
+  it("makes a report of the marks chosen on the person's page", async () => {
+    const state = install();
+    renderApp(`/persons/${PERSON.id}`);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole("radio", { name: "the marks I choose, with their records" }));
+    const make = screen.getByRole("button", { name: "Make the report of 0 marks" });
+    expect(make).toBeDisabled();
+    await user.click(screen.getByRole("checkbox", { name: "Chest mark" }));
+    await user.click(screen.getByRole("button", { name: "Make the report of 1 mark" }));
+    await waitFor(() =>
+      expect(state.calls.find((c) => c.method === "POST" && c.url.endsWith("/reports"))?.body).toEqual({
+        scope: "selection",
+        lesion_ids: ["l1"],
+        language: "en",
+        paper: "a4",
+      }),
+    );
+    expect(await screen.findByText("Record of 1 chosen mark")).toBeInTheDocument();
+  });
 });

@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
 import { Button } from "@/design-system/components/Button";
 import { Card } from "@/design-system/components/Card";
 import { Notice } from "@/design-system/components/Notice";
@@ -138,6 +139,9 @@ export function AdminSettings() {
         {test.isSuccess && <Notice kind="success">{t("admin.testSent")}</Notice>}
       </Card>
       <WebhookSettings />
+      <Card className={styles.group}>
+        <Link to="/evaluation">{t("admin.evaluationLink")}</Link>
+      </Card>
       <Card className={styles.group}>
         <h2 className={styles.subheading}>{t("admin.instanceTitle")}</h2>
         <label className={styles.row}>

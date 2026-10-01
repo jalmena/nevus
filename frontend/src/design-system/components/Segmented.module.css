@@ -19,6 +19,7 @@
 
 .wide {
   display: flex;
+  flex: 1 1 18rem;
   width: 100%;
   border-radius: var(--radius-card);
 }
