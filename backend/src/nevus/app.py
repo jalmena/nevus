@@ -13,11 +13,13 @@ from nevus.api.admin import router as admin_router
 from nevus.api.auth import router as auth_router
 from nevus.api.bodymap import router as bodymap_router
 from nevus.api.due import router as due_router
+from nevus.api.exports import router as exports_router
 from nevus.api.health import router as health_router
 from nevus.api.images import router as images_router
 from nevus.api.lesions import router as lesions_router
 from nevus.api.measurements import router as measurements_router
 from nevus.api.persons import router as persons_router
+from nevus.api.trash import router as trash_router
 from nevus.api.users import router as users_router
 from nevus.auth.ratelimit import LoginRateLimiter
 from nevus.auth.service import bootstrap_admin
@@ -98,6 +100,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(bodymap_router)
     app.include_router(due_router)
     app.include_router(admin_router)
+    app.include_router(trash_router)
+    app.include_router(exports_router)
     mount_frontend(app, _static_dir(settings))
     return app
 

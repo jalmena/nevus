@@ -5,14 +5,16 @@ from __future__ import annotations
 import uuid
 
 from fastapi import APIRouter, HTTPException, Request, Response, status
-from sqlalchemy import select
+from pydantic import BaseModel
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from nevus.api.schemas import AccessIn, AccessOut, PersonIn, PersonOut, PersonUpdate
 from nevus.auth import service
 from nevus.auth.dependencies import AppSettings, CurrentUser, DbSession, SudoSession, client_ip
-from nevus.db.models import ACCESS_MANAGER, ACCESS_OWNER, ACCESS_VIEWER, Person, PersonAccess, User
+from nevus.db.models import ACCESS_MANAGER, ACCESS_OWNER, ACCESS_VIEWER, Image, Person, PersonAccess, User
 from nevus.db.types import utcnow
+from nevus.domain import purge
 
 router = APIRouter(prefix="/api/persons", tags=["persons"])
 
@@ -157,3 +159,38 @@ def revoke_access(
 
 
 __all__ = ["ACCESS_VIEWER", "router"]
+
+
+class UsageOut(BaseModel):
+    images: int
+    bytes: int
+    quota_bytes: int | None
+    over_quota: bool
+
+
+@router.get("/{person_id}/usage", response_model=UsageOut)
+def usage(person_id: uuid.UUID, user: CurrentUser, db: DbSession, settings: AppSettings) -> UsageOut:
+    """Storage used by one person's photographs, against the operator's soft quota."""
+    _load(db, person_id, user)
+    count, total = db.execute(
+        select(func.count(Image.id), func.coalesce(func.sum(Image.bytes), 0)).where(Image.person_id == person_id)
+    ).one()
+    quota = settings.person_quota_bytes
+    return UsageOut(
+        images=int(count), bytes=int(total), quota_bytes=quota, over_quota=quota is not None and int(total) > quota
+    )
+
+
+@router.delete("/{person_id}/purge", status_code=status.HTTP_204_NO_CONTENT)
+def purge_person(
+    person_id: uuid.UUID, request: Request, session: SudoSession, db: DbSession, settings: AppSettings
+) -> Response:
+    """Delete a person and everything about them for good, now. Owner only, password again."""
+    user = session.user
+    person = db.get(Person, person_id)
+    access = db.get(PersonAccess, (person_id, user.id)) if person else None
+    if person is None or access is None or access.role != ACCESS_OWNER:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No such person.")
+    purge.purge_person(db, person_id)
+    service.audit(db, "person.purge", user, "person", person_id, client_ip(request, settings))
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

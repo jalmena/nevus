@@ -47,6 +47,11 @@ class Settings(BaseSettings):
     timezone: str | None = Field(default=None, description="Instance time zone for daily tasks; falls back to TZ")
     public_url: str | None = Field(default=None, description="Address people use to reach neVus, for links in emails")
     reminder_hour: int = Field(default=8, ge=0, le=23, description="Local hour after which daily reminders go out")
+    trash_days: int = Field(default=30, ge=1, le=365, description="Days in the trash before the purge")
+    person_quota_bytes: int | None = Field(default=None, ge=0, description="Soft storage quota per person")
+    backup_passphrase: str | None = Field(default=None, description="Enables the nightly encrypted backup")
+    backup_hour: int = Field(default=3, ge=0, le=23, description="Local hour after which the nightly backup runs")
+    export_days: int = Field(default=7, ge=1, le=60, description="Days an export stays downloadable")
     smtp_host: str | None = None
     smtp_port: int = Field(default=587, ge=1, le=65535)
     smtp_security: Literal["starttls", "ssl", "none"] = "starttls"
@@ -74,6 +79,14 @@ class Settings(BaseSettings):
     @property
     def blobs_dir(self) -> Path:
         return self.data_dir / "blobs"
+
+    @property
+    def backups_dir(self) -> Path:
+        return self.data_dir / "backups"
+
+    @property
+    def exports_dir(self) -> Path:
+        return self.data_dir / "exports"
 
     @property
     def effective_timezone(self) -> str:

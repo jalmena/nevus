@@ -398,3 +398,23 @@ class NotificationDelivery(Base):
     created_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
 
     __table_args__ = (Index("ux_notification_deliveries_once", "user_id", "channel", "key", unique=True),)
+
+
+class Export(Base):
+    """An encrypted export being built or ready to download. The passphrase is sealed until the job uses it."""
+
+    __tablename__ = "exports"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    person_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("persons.id", ondelete="CASCADE"))
+    requested_by: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    status: Mapped[str] = mapped_column(String(16), nullable=False, default="queued")
+    file_name: Mapped[str | None] = mapped_column(String(200))
+    bytes: Mapped[int | None] = mapped_column(BigInteger)
+    sealed_passphrase: Mapped[str | None] = mapped_column(Text)
+    error: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
+    finished_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    expires_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+
+    __table_args__ = (Index("ix_exports_requested_by", "requested_by"),)
