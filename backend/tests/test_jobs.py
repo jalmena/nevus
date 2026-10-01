@@ -30,6 +30,13 @@ def _ok_store(ctx: JobContext, payload: dict[str, Any], result: Any) -> None:
     CALLS.append(f"store:{result['n']}")
 
 
+def _sleepy(value: Any) -> Any:
+    import time
+
+    time.sleep(60)
+    return value
+
+
 def _boom(ctx: JobContext, payload: dict[str, Any]) -> None:
     raise RuntimeError("deliberate")
 
@@ -103,3 +110,36 @@ def test_unknown_kinds_fail_instead_of_looping(settings: Settings) -> None:
     with factory() as db:
         assert db.query(Job).one().status == JOB_FAILED
     assert "test.nothing" not in KINDS
+
+
+def test_stopping_the_supervisor_cancels_a_running_job_and_returns_promptly(settings: Settings) -> None:
+    """A job still in the pool at shutdown must not keep a thread waiting forever."""
+    import asyncio
+    import time
+
+    register(JobKind("test.slow", _ok_load, _sleepy, _ok_store, timeout=120))
+    factory = _factory(settings)
+    with factory() as db:
+        queue.enqueue(db, "test.slow", {"n": 9})
+        db.commit()
+    live = settings.model_copy(update={"jobs_enabled": True, "job_poll_seconds": 0.1})
+    runner = JobRunner(factory, BlobStore(settings.blobs_dir), live)
+    runner.periodic = []
+
+    async def scenario() -> float:
+        await runner.start()
+        deadline = time.monotonic() + 30
+        while time.monotonic() < deadline:
+            with factory() as db:
+                if db.query(Job).one().status == JOB_RUNNING:
+                    break
+            await asyncio.sleep(0.1)
+        await asyncio.sleep(1.0)  # the job is now inside the worker process
+        started = time.monotonic()
+        await runner.stop()
+        return time.monotonic() - started
+
+    assert asyncio.run(scenario()) < 20
+    with factory() as db:
+        job = db.query(Job).one()
+        assert job.status in (JOB_QUEUED, JOB_RUNNING), "cancelled work comes back, it is not lost"

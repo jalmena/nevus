@@ -70,6 +70,7 @@ class JobRunner:
         self.settings = settings
         self.periodic: list[Periodic] = default_periodic()
         self._pool: Any = None
+        self._inflight: set[Future[Any]] = set()
         self._tasks: list[asyncio.Task[None]] = []
         self._stopping = asyncio.Event()
 
@@ -148,7 +149,15 @@ class JobRunner:
         log.info("jobs.started", workers=self.settings.workers)
 
     async def stop(self) -> None:
+        """Stop taking work, cancel what is running in the pool, and wait for the worker threads.
+
+        A running job is cancelled rather than awaited: its lease brings it back after a restart.
+        Without the cancellation a thread would wait forever on a result the stopped pool never
+        delivers, and the process could not exit.
+        """
         self._stopping.set()
+        for future in list(self._inflight):
+            future.cancel()
         for task in self._tasks:
             task.cancel()
         for task in self._tasks:
@@ -179,8 +188,15 @@ class JobRunner:
             return None if job is None else (job.id, job.kind, dict(job.payload))
 
     def _compute_in_pool(self, kind: JobKind, value: Any) -> Any:
+        if self._stopping.is_set() or self._pool is None:
+            raise RuntimeError("the job supervisor is stopping")
         future: Future[Any] = self._pool.schedule(kind.compute, args=(value,), timeout=kind.timeout)
-        return future.result()
+        self._inflight.add(future)
+        try:
+            # Pebble enforces kind.timeout in the worker; the margin only guards against a lost pool.
+            return future.result(timeout=kind.timeout + 60)
+        finally:
+            self._inflight.discard(future)
 
     async def _periodic_loop(self) -> None:
         loop = asyncio.get_running_loop()
