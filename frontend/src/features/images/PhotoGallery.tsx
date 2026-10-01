@@ -1,6 +1,7 @@
-import { useRef, useState, type ChangeEvent } from "react";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/design-system/components/Button";
+import { FileButton } from "@/design-system/components/FileButton";
 import { Notice } from "@/design-system/components/Notice";
 import { LiveCamera, liveCameraAvailable } from "@/features/capture/LiveCamera";
 import { IMAGE_ROLES, imageUrl, useDeleteImage, type ImageOut, type ImageRole } from "@/lib/images";
@@ -31,12 +32,6 @@ export function PhotoGallery({ images, canEdit, upload, previousImageId }: Props
     timeStyle: "short",
   });
 
-  function onFile(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    event.target.value = "";
-    if (file && upload) upload.mutate({ file, role });
-  }
-
   function show(image: ImageOut) {
     setOpen(image);
     dialog.current?.showModal();
@@ -56,25 +51,24 @@ export function PhotoGallery({ images, canEdit, upload, previousImageId }: Props
               ))}
             </select>
           </label>
-          <Button className={styles.fileButton} disabled={upload.isPending}>
-            {upload.isPending ? t("images.uploading") : t("images.takePhoto")}
-            <input
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={onFile}
-              aria-label={t("images.takePhoto")}
-            />
-          </Button>
+          <FileButton
+            label={upload.isPending ? t("images.uploading") : t("images.takePhoto")}
+            capture="environment"
+            disabled={upload.isPending}
+            onFiles={(files) => files.forEach((file) => upload.mutate({ file, role }))}
+          />
           {liveCameraAvailable() && (
             <Button variant="secondary" onClick={() => setLive(true)} disabled={upload.isPending}>
               {t("capture.open")}
             </Button>
           )}
-          <Button variant="secondary" className={styles.fileButton} disabled={upload.isPending}>
-            {t("images.chooseFile")}
-            <input type="file" accept="image/*" onChange={onFile} aria-label={t("images.chooseFile")} />
-          </Button>
+          <FileButton
+            label={t("images.chooseFile")}
+            variant="secondary"
+            multiple
+            disabled={upload.isPending}
+            onFiles={(files) => files.forEach((file) => upload.mutate({ file, role }))}
+          />
         </div>
       )}
       {canEdit && upload && previousImageId && (

@@ -1,6 +1,7 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/design-system/components/Button";
+import { FileButton } from "@/design-system/components/FileButton";
 import { Notice } from "@/design-system/components/Notice";
 import { useSession } from "@/lib/auth/session";
 import { IMAGE_ROLES, type ImageRole } from "@/lib/images";
@@ -25,12 +26,6 @@ export function QuickVisit({
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const userId = session.data?.user.id;
-
-  function onFile(event: ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(event.target.files ?? []);
-    event.target.value = "";
-    setPhotos((current) => [...current, ...files.map((file) => ({ file, role }))]);
-  }
 
   async function save(event: FormEvent) {
     event.preventDefault();
@@ -64,16 +59,11 @@ export function QuickVisit({
           ))}
         </select>
       </label>
-      <Button className={styles.fileButton} type="button">
-        {t("images.takePhoto")}
-        <input
-          type="file"
-          accept="image/*"
-          capture="environment"
-          onChange={onFile}
-          aria-label={t("images.takePhoto")}
-        />
-      </Button>
+      <FileButton
+        label={t("images.takePhoto")}
+        capture="environment"
+        onFiles={(files) => setPhotos((current) => [...current, ...files.map((file) => ({ file, role }))])}
+      />
       {photos.length > 0 && <p>{t("offline.photosReady", { count: photos.length })}</p>}
       <label>
         <span className="text-secondary">{t("observations.notes")}</span>

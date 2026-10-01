@@ -107,6 +107,46 @@ jobs:
       - run: pnpm test
       - run: pnpm build
 
+  e2e:
+    name: End to end
+    runs-on: [self-hosted, nevus]
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: frontend/.node-version
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - name: Backend environment
+        working-directory: backend
+        run: uv sync --frozen
+      - run: pnpm build
+      - name: Browser
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Journey on a phone-sized browser, with accessibility checks
+        env:
+          CI: "1"
+          NEVUS_E2E_DATA: ${{ runner.temp }}/e2e-data
+        run: pnpm e2e
+      - name: Keep the report when it fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report
+          retention-days: 7
+
   image:
     name: Container image
     runs-on: [self-hosted, nevus]
