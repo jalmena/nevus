@@ -2,7 +2,9 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/design-system/components/Button";
 import { Card } from "@/design-system/components/Card";
 import { Notice } from "@/design-system/components/Notice";
+import { AdminSettings } from "@/features/admin/AdminSettings";
 import { ReferenceCardSettings } from "./ReferenceCardSettings";
+import { ReminderSettings } from "./ReminderSettings";
 import { useInstance, useLogout, useSession, useUpdateMe } from "@/lib/auth/session";
 import { supportedLanguages } from "@/lib/i18n";
 import styles from "./settings.module.css";
@@ -57,7 +59,9 @@ export function SettingsPage() {
         </label>
         {update.error && <Notice kind="error">{update.error.message}</Notice>}
       </Card>
+      <ReminderSettings />
       <ReferenceCardSettings />
+      {user.role === "admin" && <AdminSettings />}
       <Card className={styles.group}>
         <p>
           <strong>{user.username}</strong> · {t(`settings.roles.${user.role}`)}

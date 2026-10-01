@@ -54,3 +54,16 @@
 .mapSection h2 {
   font-size: var(--text-lg);
 }
+
+.switchRow {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+
+.switchRow input {
+  width: 22px;
+  height: 22px;
+  margin-top: 2px;
+  accent-color: var(--color-accent);
+}

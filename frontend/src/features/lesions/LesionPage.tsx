@@ -10,6 +10,7 @@ import { useSession } from "@/lib/auth/session";
 import { INTERVALS, useCreateObservation, useLesion, useObservations, useUpdateLesion } from "@/lib/lesions";
 import { formatDelta, formatMm } from "@/lib/measurements";
 import { usePerson } from "@/lib/persons";
+import { SnoozeControls } from "@/features/reminders/SnoozeControls";
 import { DueBadge } from "./LesionList";
 import { lesionTitle, locationLine } from "./lesionName";
 import styles from "./lesions.module.css";
@@ -107,6 +108,7 @@ export function LesionPage() {
           </dd>
         </div>
       </dl>
+      <SnoozeControls lesion={data} canEdit={canEdit} />
       {data.notes && <p>{data.notes}</p>}
 
       {canEdit && (

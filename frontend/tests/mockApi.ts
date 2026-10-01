@@ -9,6 +9,7 @@ export interface MockLesion {
   x: number;
   y: number;
   due: boolean;
+  snoozed_until?: string | null;
 }
 
 export interface MockObservation {
@@ -22,7 +23,7 @@ export interface MockObservation {
 
 export interface MockState {
   claimed: boolean;
-  session: { username: string; language: string; theme: string } | null;
+  session: { username: string; language: string; theme: string; role?: string; email?: string | null } | null;
   persons: { id: string; display_name: string }[];
   lesions: MockLesion[];
   observations: MockObservation[];
@@ -32,11 +33,19 @@ export interface MockState {
   calls: { method: string; url: string; body?: unknown }[];
 }
 
-const user = (username: string, language = "en", theme = "system") => ({
+const user = (
+  username: string,
+  language = "en",
+  theme = "system",
+  role = "admin",
+  email: string | null = null,
+) => ({
   id: "0199a000-0000-7000-8000-000000000001",
   username,
-  email: null,
-  role: "admin",
+  email,
+  role,
+  card_line_mm: null,
+  email_reminders: false,
   language,
   theme,
   show_uncertainty: true,
@@ -98,7 +107,8 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
       observation_count: visits.length,
       last_observed_at: last,
       next_due_on: "2026-12-31",
-      due: l.due,
+      due: l.due && !l.snoozed_until,
+      snoozed_until: l.snoozed_until ?? null,
       latest_image_id: visits.flatMap((o) => o.images).at(-1) ?? null,
       latest_measurement: null,
       measurement_change: null,
@@ -184,7 +194,13 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
       if (path === "/api/auth/session") {
         return state.session
           ? json({
-              user: user(state.session.username, state.session.language, state.session.theme),
+              user: user(
+                state.session.username,
+                state.session.language,
+                state.session.theme,
+                state.session.role ?? "admin",
+                state.session.email ?? null,
+              ),
               sudo_until: null,
             })
           : json({ detail: "Sign in to continue." }, 401);
@@ -307,6 +323,42 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
         }
         return json(observationOut(found));
       }
+      if (path === "/api/due") {
+        return json(
+          state.lesions
+            .filter((l) => l.due && !l.snoozed_until)
+            .map((l) => ({
+              lesion_id: l.id,
+              label: l.label,
+              zone: l.zone,
+              person_id: l.person_id,
+              person_name: state.persons.find((p) => p.id === l.person_id)?.display_name ?? "",
+              next_due_on: "2026-09-20",
+              overdue_days: 11,
+              last_observed_at: null,
+            })),
+        );
+      }
+      match = /^\/api\/lesions\/([^/]+)\/snooze$/.exec(path);
+      if (match) {
+        const found = state.lesions.find((l) => l.id === match?.[1]);
+        if (!found) return json({ detail: "No such lesion." }, 404);
+        found.snoozed_until = method === "DELETE" ? null : "2026-10-08";
+        return json(lesionOut(found));
+      }
+      if (path === "/api/admin/email" && method === "GET") {
+        return json({
+          host: null,
+          port: 587,
+          security: "starttls",
+          username: null,
+          has_password: false,
+          sender: null,
+          public_url: null,
+          ready: false,
+        });
+      }
+      if (path === "/api/admin/instance" && method === "GET") return json({ default_language: "en" });
       match = /^\/api\/images\/([^/]+)\/scale$/.exec(path);
       if (match) {
         return json({

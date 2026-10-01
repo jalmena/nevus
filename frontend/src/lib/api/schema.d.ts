@@ -4,6 +4,62 @@
  */
 
 export interface paths {
+    "/api/admin/email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Email */
+        get: operations["get_email_api_admin_email_get"];
+        /** Put Email */
+        put: operations["put_email_api_admin_email_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/email/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Test Email
+         * @description Send one message now and say plainly what went wrong if it did not go.
+         */
+        post: operations["test_email_api_admin_email_test_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/instance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Instance */
+        get: operations["get_instance_api_admin_instance_get"];
+        /** Put Instance */
+        put: operations["put_instance_api_admin_instance_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/claim": {
         parameters: {
             query?: never;
@@ -163,6 +219,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/due": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Due List */
+        get: operations["due_list_api_due_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/images/{image_id}": {
         parameters: {
             query?: never;
@@ -310,6 +383,27 @@ export interface paths {
         /** Create Observation */
         post: operations["create_observation_api_lesions__lesion_id__observations_post"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/lesions/{lesion_id}/snooze": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Snooze
+         * @description Not now: the mark leaves the due list for a week or a month. A new visit ends the snooze.
+         */
+        post: operations["snooze_api_lesions__lesion_id__snooze_post"];
+        /** Unsnooze */
+        delete: operations["unsnooze_api_lesions__lesion_id__snooze_delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -809,6 +903,83 @@ export interface components {
             /** Username */
             username: string;
         };
+        /** DueOut */
+        DueOut: {
+            /** Label */
+            label: string | null;
+            /** Last Observed At */
+            last_observed_at: string | null;
+            /**
+             * Lesion Id
+             * Format: uuid
+             */
+            lesion_id: string;
+            /**
+             * Next Due On
+             * Format: date
+             */
+            next_due_on: string;
+            /** Overdue Days */
+            overdue_days: number;
+            /**
+             * Person Id
+             * Format: uuid
+             */
+            person_id: string;
+            /** Person Name */
+            person_name: string;
+            /** Zone */
+            zone: string;
+        };
+        /** EmailSettingsIn */
+        EmailSettingsIn: {
+            /** Host */
+            host?: string | null;
+            /**
+             * Password
+             * @description Omit to keep, empty to remove
+             */
+            password?: string | null;
+            /**
+             * Port
+             * @default 587
+             */
+            port: number;
+            /** Public Url */
+            public_url?: string | null;
+            /**
+             * Security
+             * @default starttls
+             * @enum {string}
+             */
+            security: "starttls" | "ssl" | "none";
+            /** Sender */
+            sender?: string | null;
+            /** Username */
+            username?: string | null;
+        };
+        /** EmailSettingsOut */
+        EmailSettingsOut: {
+            /** Has Password */
+            has_password: boolean;
+            /** Host */
+            host: string | null;
+            /** Port */
+            port: number;
+            /** Public Url */
+            public_url: string | null;
+            /** Ready */
+            ready: boolean;
+            /**
+             * Security
+             * @enum {string}
+             */
+            security: "starttls" | "ssl" | "none";
+            /** Sender */
+            sender: string | null;
+            /** Username */
+            username: string | null;
+        };
         /** FitIn */
         FitIn: {
             /**
@@ -926,6 +1097,14 @@ export interface components {
             /** Upright Width */
             upright_width: number;
         };
+        /** InstanceOut */
+        InstanceOut: {
+            /**
+             * Default Language
+             * @enum {string}
+             */
+            default_language: "en" | "es";
+        };
         /** InstanceStatus */
         InstanceStatus: {
             /** Claimed */
@@ -1000,6 +1179,8 @@ export interface components {
              * Format: uuid
              */
             person_id: string;
+            /** Snoozed Until */
+            snoozed_until?: string | null;
             /** Status */
             status: string;
             /** Tags */
@@ -1387,10 +1568,23 @@ export interface components {
             sudo_until: string | null;
             user: components["schemas"]["UserOut"];
         };
+        /** SnoozeIn */
+        SnoozeIn: {
+            /**
+             * Days
+             * @enum {integer}
+             */
+            days: 7 | 30;
+        };
         /** SudoIn */
         SudoIn: {
             /** Password */
             password: string;
+        };
+        /** TestEmailIn */
+        TestEmailIn: {
+            /** To */
+            to: string;
         };
         /** UserCreate */
         UserCreate: {
@@ -1420,6 +1614,8 @@ export interface components {
             disabled_at: string | null;
             /** Email */
             email: string | null;
+            /** Email Reminders */
+            email_reminders: boolean;
             /**
              * Id
              * Format: uuid
@@ -1450,6 +1646,8 @@ export interface components {
             card_line_mm?: number | null;
             /** Email */
             email?: string | null;
+            /** Email Reminders */
+            email_reminders?: boolean | null;
             /** Language */
             language?: ("en" | "es") | null;
             /** Show Uncertainty */
@@ -1524,6 +1722,143 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    get_email_api_admin_email_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmailSettingsOut"];
+                };
+            };
+        };
+    };
+    put_email_api_admin_email_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmailSettingsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmailSettingsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    test_email_api_admin_email_test_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TestEmailIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_instance_api_admin_instance_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InstanceOut"];
+                };
+            };
+        };
+    };
+    put_instance_api_admin_instance_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InstanceOut"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InstanceOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     claim_api_auth_claim_post: {
         parameters: {
             query?: never;
@@ -1761,6 +2096,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BodyMap"];
+                };
+            };
+        };
+    };
+    due_list_api_due_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DueOut"][];
                 };
             };
         };
@@ -2135,6 +2490,72 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ObservationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    snooze_api_lesions__lesion_id__snooze_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lesion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SnoozeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LesionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unsnooze_api_lesions__lesion_id__snooze_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lesion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LesionOut"];
                 };
             };
             /** @description Validation Error */

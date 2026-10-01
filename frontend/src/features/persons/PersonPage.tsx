@@ -11,7 +11,7 @@ import { LesionList } from "@/features/lesions/LesionList";
 import { NewLesionForm } from "@/features/lesions/NewLesionForm";
 import { lesionTitle } from "@/features/lesions/lesionName";
 import { useCreateLesion, useLesions } from "@/lib/lesions";
-import { usePerson } from "@/lib/persons";
+import { usePerson, useUpdatePerson } from "@/lib/persons";
 import styles from "./persons.module.css";
 
 export function PersonPage() {
@@ -26,6 +26,7 @@ export function PersonPage() {
   const [placing, setPlacing] = useState(false);
   const [point, setPoint] = useState<MapPoint | null>(null);
   const canEdit = person.data?.my_role === "owner" || person.data?.my_role === "manager";
+  const updatePerson = useUpdatePerson(personId);
 
   const markers: Marker[] = (lesions.data ?? [])
     .filter((lesion) => lesion.location.view === view)
@@ -131,6 +132,25 @@ export function PersonPage() {
         )}
         {lesions.data && lesions.data.length > 0 && <LesionList lesions={lesions.data} />}
       </section>
+
+      {person.data?.my_role === "owner" && (
+        <section className={styles.mapSection} aria-labelledby="profile-heading">
+          <h2 id="profile-heading">{t("persons.profileTitle")}</h2>
+          <label className={styles.switchRow}>
+            <input
+              type="checkbox"
+              checked={person.data.experimental_analysis}
+              aria-describedby="experimental-hint"
+              onChange={(e) => updatePerson.mutate({ experimental_analysis: e.target.checked })}
+            />
+            {t("persons.experimental")}
+          </label>
+          <p id="experimental-hint" className="text-secondary">
+            {t("persons.experimentalHint")}
+          </p>
+          {updatePerson.error && <Notice kind="error">{updatePerson.error.message}</Notice>}
+        </section>
+      )}
     </div>
   );
 }

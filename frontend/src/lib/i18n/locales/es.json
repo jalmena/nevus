@@ -44,7 +44,10 @@
       "owner": "Propietario",
       "manager": "Gestor",
       "viewer": "Lector"
-    }
+    },
+    "profileTitle": "Ajustes del perfil",
+    "experimental": "Análisis experimental",
+    "experimentalHint": "Desactivado por defecto. Si lo activas, neVus puede proponer contornos y cambios por su cuenta; cada propuesta se marca como experimental y tú la confirmas o la rechazas."
   },
   "images": {
     "addPhoto": "Añadir una foto",
@@ -196,7 +199,8 @@
     "latestSize": "Último tamaño",
     "sinceDate": "Desde el {{date}}",
     "measuredChange": "cambio medido",
-    "noDetectableChange": "sin cambio detectable"
+    "noDetectableChange": "sin cambio detectable",
+    "suggestName": "Sugerir un nombre"
   },
   "observations": {
     "title": "Visitas",
@@ -312,5 +316,41 @@
     "lineHint": "Después de imprimir, mide la línea con una regla y escribe lo que leas (por ejemplo 49,6).",
     "verified": "Impresión verificada: la línea midió {{mm}} mm.",
     "unverified": "Sin verificar todavía: las medidas con la tarjeta llevan una incertidumbre mayor."
+  },
+  "reminders": {
+    "title": "Toca hacer foto",
+    "nothing": "Ahora mismo no toca ninguna.",
+    "dueToday": "toca hoy",
+    "dueSince": "pendiente desde el {{date}}",
+    "snoozedUntil": "Recordatorio pospuesto hasta el {{date}}.",
+    "unsnooze": "Recordármelo de nuevo",
+    "notNow": "Ahora no:",
+    "snoozeWeek": "Dentro de una semana",
+    "snoozeMonth": "Dentro de un mes",
+    "settingsTitle": "Recordatorios",
+    "settingsIntro": "Las marcas a las que toca foto aparecen en la página de inicio. También puedes recibir un correo al día cuando toque alguna; lleva nombres y fechas, nunca fotos.",
+    "email": "Dirección de correo",
+    "emailReminders": "Enviarme un correo diario cuando toque fotografiar marcas",
+    "needEmail": "Añade una dirección de correo para activar los recordatorios por correo."
+  },
+  "admin": {
+    "emailTitle": "Envío de correo (administración)",
+    "emailIntro": "El servidor de correo que usa neVus para los recordatorios. No se envía nada hasta que esto esté completo y la gente active los recordatorios.",
+    "host": "Servidor",
+    "port": "Puerto",
+    "security": "Seguridad",
+    "securityNone": "Ninguna (solo en una red de confianza)",
+    "username": "Usuario",
+    "password": "Contraseña",
+    "passwordKept": "Hay una contraseña guardada. Déjalo vacío para conservarla.",
+    "sender": "Dirección del remitente",
+    "publicUrl": "Dirección de este neVus",
+    "publicUrlHint": "Se usa para el enlace de los correos, por ejemplo https://nevus.example.home",
+    "saved": "Guardado.",
+    "testTo": "Enviar un mensaje de prueba a",
+    "sendTest": "Enviar una prueba",
+    "testSent": "Enviado. Revisa la bandeja de entrada.",
+    "instanceTitle": "Instancia (administración)",
+    "defaultLanguage": "Idioma de las cuentas nuevas"
   }
 }

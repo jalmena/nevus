@@ -44,7 +44,10 @@
       "owner": "Owner",
       "manager": "Manager",
       "viewer": "Viewer"
-    }
+    },
+    "profileTitle": "Profile settings",
+    "experimental": "Experimental analysis",
+    "experimentalHint": "Off by default. When on, neVus may propose outlines and changes on its own; each proposal is labelled experimental and you confirm or reject it."
   },
   "images": {
     "addPhoto": "Add a photo",
@@ -196,7 +199,8 @@
     "latestSize": "Latest size",
     "sinceDate": "Since {{date}}",
     "measuredChange": "measured change",
-    "noDetectableChange": "no detectable change"
+    "noDetectableChange": "no detectable change",
+    "suggestName": "Suggest a name"
   },
   "observations": {
     "title": "Visits",
@@ -312,5 +316,41 @@
     "lineHint": "After printing, measure the line with a ruler and type what you read (for example 49.6).",
     "verified": "Print verified: the line measured {{mm}} mm.",
     "unverified": "Not verified yet: measurements made with the card carry a larger uncertainty."
+  },
+  "reminders": {
+    "title": "Due for a photo",
+    "nothing": "Nothing is due right now.",
+    "dueToday": "due today",
+    "dueSince": "due since {{date}}",
+    "snoozedUntil": "Reminder snoozed until {{date}}.",
+    "unsnooze": "Remind me again",
+    "notNow": "Not now:",
+    "snoozeWeek": "In a week",
+    "snoozeMonth": "In a month",
+    "settingsTitle": "Reminders",
+    "settingsIntro": "Marks due for a photo appear on the home page. You can also receive one email a day when something is due; it lists names and dates, never photos.",
+    "email": "Email address",
+    "emailReminders": "Send me a daily email when marks are due",
+    "needEmail": "Add an email address to turn email reminders on."
+  },
+  "admin": {
+    "emailTitle": "Email delivery (administrator)",
+    "emailIntro": "The mail server neVus uses to send reminders. Nothing is sent until this is filled in and people turn reminders on.",
+    "host": "Server",
+    "port": "Port",
+    "security": "Security",
+    "securityNone": "None (only on a trusted network)",
+    "username": "User name",
+    "password": "Password",
+    "passwordKept": "A password is stored. Leave this empty to keep it.",
+    "sender": "Sender address",
+    "publicUrl": "Address of this neVus",
+    "publicUrlHint": "Used for the link in emails, for example https://nevus.example.home",
+    "saved": "Saved.",
+    "testTo": "Send a test message to",
+    "sendTest": "Send a test",
+    "testSent": "Sent. Check the inbox.",
+    "instanceTitle": "Instance (administrator)",
+    "defaultLanguage": "Language for new accounts"
   }
 }

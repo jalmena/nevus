@@ -43,3 +43,18 @@ export function useCreatePerson() {
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: personsKey }),
   });
 }
+
+export function useUpdatePerson(personId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (body: components["schemas"]["PersonUpdate"]) => {
+      const { data, error } = await api.PATCH("/api/persons/{person_id}", {
+        params: { path: { person_id: personId } },
+        body,
+      });
+      if (!data) throw new Error(errorMessage(error, "The change could not be saved."));
+      return data;
+    },
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: personsKey }),
+  });
+}

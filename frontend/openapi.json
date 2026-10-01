@@ -466,6 +466,239 @@
         "title": "Credentials",
         "type": "object"
       },
+      "DueOut": {
+        "properties": {
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "last_observed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Observed At"
+          },
+          "lesion_id": {
+            "format": "uuid",
+            "title": "Lesion Id",
+            "type": "string"
+          },
+          "next_due_on": {
+            "format": "date",
+            "title": "Next Due On",
+            "type": "string"
+          },
+          "overdue_days": {
+            "title": "Overdue Days",
+            "type": "integer"
+          },
+          "person_id": {
+            "format": "uuid",
+            "title": "Person Id",
+            "type": "string"
+          },
+          "person_name": {
+            "title": "Person Name",
+            "type": "string"
+          },
+          "zone": {
+            "title": "Zone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "lesion_id",
+          "label",
+          "zone",
+          "person_id",
+          "person_name",
+          "next_due_on",
+          "overdue_days",
+          "last_observed_at"
+        ],
+        "title": "DueOut",
+        "type": "object"
+      },
+      "EmailSettingsIn": {
+        "properties": {
+          "host": {
+            "anyOf": [
+              {
+                "maxLength": 253,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Host"
+          },
+          "password": {
+            "anyOf": [
+              {
+                "maxLength": 1024,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Omit to keep, empty to remove",
+            "title": "Password"
+          },
+          "port": {
+            "default": 587,
+            "maximum": 65535.0,
+            "minimum": 1.0,
+            "title": "Port",
+            "type": "integer"
+          },
+          "public_url": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "pattern": "^https?://",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Public Url"
+          },
+          "security": {
+            "default": "starttls",
+            "enum": [
+              "starttls",
+              "ssl",
+              "none"
+            ],
+            "title": "Security",
+            "type": "string"
+          },
+          "sender": {
+            "anyOf": [
+              {
+                "maxLength": 254,
+                "pattern": "^[^@\\s]+@[^@\\s]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sender"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "maxLength": 254,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          }
+        },
+        "title": "EmailSettingsIn",
+        "type": "object"
+      },
+      "EmailSettingsOut": {
+        "properties": {
+          "has_password": {
+            "title": "Has Password",
+            "type": "boolean"
+          },
+          "host": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Host"
+          },
+          "port": {
+            "title": "Port",
+            "type": "integer"
+          },
+          "public_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Public Url"
+          },
+          "ready": {
+            "title": "Ready",
+            "type": "boolean"
+          },
+          "security": {
+            "enum": [
+              "starttls",
+              "ssl",
+              "none"
+            ],
+            "title": "Security",
+            "type": "string"
+          },
+          "sender": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sender"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          }
+        },
+        "required": [
+          "host",
+          "port",
+          "security",
+          "username",
+          "has_password",
+          "sender",
+          "public_url",
+          "ready"
+        ],
+        "title": "EmailSettingsOut",
+        "type": "object"
+      },
       "FitIn": {
         "properties": {
           "target": {
@@ -778,6 +1011,23 @@
         "title": "ImageScaleOut",
         "type": "object"
       },
+      "InstanceOut": {
+        "properties": {
+          "default_language": {
+            "enum": [
+              "en",
+              "es"
+            ],
+            "title": "Default Language",
+            "type": "string"
+          }
+        },
+        "required": [
+          "default_language"
+        ],
+        "title": "InstanceOut",
+        "type": "object"
+      },
       "InstanceStatus": {
         "properties": {
           "claimed": {
@@ -999,6 +1249,18 @@
             "format": "uuid",
             "title": "Person Id",
             "type": "string"
+          },
+          "snoozed_until": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Snoozed Until"
           },
           "status": {
             "title": "Status",
@@ -2103,6 +2365,23 @@
         "title": "SessionOut",
         "type": "object"
       },
+      "SnoozeIn": {
+        "properties": {
+          "days": {
+            "enum": [
+              7,
+              30
+            ],
+            "title": "Days",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "days"
+        ],
+        "title": "SnoozeIn",
+        "type": "object"
+      },
       "SudoIn": {
         "properties": {
           "password": {
@@ -2116,6 +2395,21 @@
           "password"
         ],
         "title": "SudoIn",
+        "type": "object"
+      },
+      "TestEmailIn": {
+        "properties": {
+          "to": {
+            "maxLength": 254,
+            "pattern": "^[^@\\s]+@[^@\\s]+$",
+            "title": "To",
+            "type": "string"
+          }
+        },
+        "required": [
+          "to"
+        ],
+        "title": "TestEmailIn",
         "type": "object"
       },
       "UserCreate": {
@@ -2203,6 +2497,10 @@
             ],
             "title": "Email"
           },
+          "email_reminders": {
+            "title": "Email Reminders",
+            "type": "boolean"
+          },
           "id": {
             "format": "uuid",
             "title": "Id",
@@ -2254,6 +2552,7 @@
           "theme",
           "show_uncertainty",
           "card_line_mm",
+          "email_reminders",
           "created_at",
           "last_login_at",
           "disabled_at"
@@ -2288,6 +2587,17 @@
               }
             ],
             "title": "Email"
+          },
+          "email_reminders": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email Reminders"
           },
           "language": {
             "anyOf": [
@@ -2499,6 +2809,161 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/admin/email": {
+      "get": {
+        "operationId": "get_email_api_admin_email_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailSettingsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Email",
+        "tags": [
+          "admin"
+        ]
+      },
+      "put": {
+        "operationId": "put_email_api_admin_email_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailSettingsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailSettingsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Email",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/admin/email/test": {
+      "post": {
+        "description": "Send one message now and say plainly what went wrong if it did not go.",
+        "operationId": "test_email_api_admin_email_test_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestEmailIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Test Email",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/admin/instance": {
+      "get": {
+        "operationId": "get_instance_api_admin_instance_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstanceOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Instance",
+        "tags": [
+          "admin"
+        ]
+      },
+      "put": {
+        "operationId": "put_instance_api_admin_instance_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InstanceOut"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstanceOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Instance",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
     "/api/auth/claim": {
       "post": {
         "description": "The first person in claims the instance and becomes its administrator. Refused once anybody exists.",
@@ -2773,6 +3238,31 @@
         "summary": "Get Body Map",
         "tags": [
           "bodymap"
+        ]
+      }
+    },
+    "/api/due": {
+      "get": {
+        "operationId": "due_list_api_due_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DueOut"
+                  },
+                  "title": "Response Due List Api Due Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Due List",
+        "tags": [
+          "reminders"
         ]
       }
     },
@@ -3340,6 +3830,101 @@
           }
         },
         "summary": "Create Observation",
+        "tags": [
+          "lesions"
+        ]
+      }
+    },
+    "/api/lesions/{lesion_id}/snooze": {
+      "delete": {
+        "operationId": "unsnooze_api_lesions__lesion_id__snooze_delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lesion_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Lesion Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LesionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Unsnooze",
+        "tags": [
+          "lesions"
+        ]
+      },
+      "post": {
+        "description": "Not now: the mark leaves the due list for a week or a month. A new visit ends the snooze.",
+        "operationId": "snooze_api_lesions__lesion_id__snooze_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lesion_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Lesion Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SnoozeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LesionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Snooze",
         "tags": [
           "lesions"
         ]
