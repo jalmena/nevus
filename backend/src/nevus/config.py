@@ -44,6 +44,15 @@ class Settings(BaseSettings):
     max_upload_bytes: int = Field(default=30 * 1024 * 1024, ge=1024 * 1024)
     max_upload_pixels: int = Field(default=24_000_000, ge=1_000_000)
     min_free_bytes: int = Field(default=2 * 1024**3, ge=0, description="Refuse uploads below this free space")
+    timezone: str | None = Field(default=None, description="Instance time zone for daily tasks; falls back to TZ")
+    public_url: str | None = Field(default=None, description="Address people use to reach neVus, for links in emails")
+    reminder_hour: int = Field(default=8, ge=0, le=23, description="Local hour after which daily reminders go out")
+    smtp_host: str | None = None
+    smtp_port: int = Field(default=587, ge=1, le=65535)
+    smtp_security: Literal["starttls", "ssl", "none"] = "starttls"
+    smtp_username: str | None = None
+    smtp_password: str | None = None
+    smtp_from: str | None = None
 
     @field_validator("allowed_hosts", mode="before")
     @classmethod
@@ -65,6 +74,21 @@ class Settings(BaseSettings):
     @property
     def blobs_dir(self) -> Path:
         return self.data_dir / "blobs"
+
+    @property
+    def effective_timezone(self) -> str:
+        """NEVUS_TIMEZONE, else the container's TZ (CasaOS sets it), else UTC."""
+        import os
+        from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
+        for candidate in (self.timezone, os.environ.get("TZ"), "UTC"):
+            if candidate:
+                try:
+                    ZoneInfo(candidate)
+                    return candidate
+                except (ZoneInfoNotFoundError, ValueError):
+                    continue
+        return "UTC"
 
     def secret_key(self) -> bytes:
         """Return the server secret, creating it with restrictive permissions on first use."""

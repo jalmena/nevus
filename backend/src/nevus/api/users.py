@@ -7,6 +7,7 @@ import uuid
 from fastapi import APIRouter, HTTPException, Request, Response, status
 from sqlalchemy import select
 
+from nevus import settings_store
 from nevus.api.schemas import PasswordReset, UserCreate, UserOut
 from nevus.auth import service
 from nevus.auth.dependencies import AdminUser, AppSettings, DbSession, client_ip
@@ -34,6 +35,7 @@ def create_user(body: UserCreate, request: Request, admin: AdminUser, db: DbSess
     if service.get_user_by_username(db, body.username) is not None:
         raise HTTPException(status.HTTP_409_CONFLICT, "That username is taken.")
     user = service.create_user(db, body.username, body.password, body.role, body.email)
+    user.language = settings_store.default_language(db)
     service.audit(db, "user.create", admin, "user", user.id, client_ip(request, settings), {"role": body.role})
     return UserOut.model_validate(user)
 

@@ -9,8 +9,10 @@ from pathlib import Path
 from fastapi import FastAPI
 
 from nevus import __version__
+from nevus.api.admin import router as admin_router
 from nevus.api.auth import router as auth_router
 from nevus.api.bodymap import router as bodymap_router
+from nevus.api.due import router as due_router
 from nevus.api.health import router as health_router
 from nevus.api.images import router as images_router
 from nevus.api.lesions import router as lesions_router
@@ -94,6 +96,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(images_router)
     app.include_router(lesions_router)
     app.include_router(bodymap_router)
+    app.include_router(due_router)
+    app.include_router(admin_router)
     mount_frontend(app, _static_dir(settings))
     return app
 

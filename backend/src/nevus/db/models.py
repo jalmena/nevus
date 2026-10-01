@@ -38,6 +38,7 @@ class User(Base):
     show_uncertainty: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     card_line_mm: Mapped[float | None] = mapped_column(Float)
     """What the person measured on the printed card's 50 mm verification line; None = not verified."""
+    email_reminders: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     created_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow, onupdate=utcnow)
     last_login_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
@@ -212,6 +213,7 @@ class Lesion(Base):
     tags: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
     notes: Mapped[str | None] = mapped_column(Text)
     interval_days: Mapped[int] = mapped_column(Integer, nullable=False, default=DEFAULT_INTERVAL_DAYS)
+    snoozed_until: Mapped[date | None] = mapped_column(Date)
     created_by: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"))
     created_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow, onupdate=utcnow)
@@ -380,3 +382,19 @@ class Measurement(Base):
         Index("ix_measurements_lesion_id", "lesion_id"),
         Index("ix_measurements_observation_id", "observation_id"),
     )
+
+
+class NotificationDelivery(Base):
+    """One message sent (or attempted) on one channel for one occasion: the key makes it happen once."""
+
+    __tablename__ = "notification_deliveries"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    user_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    channel: Mapped[str] = mapped_column(String(16), nullable=False)
+    key: Mapped[str] = mapped_column(String(100), nullable=False)
+    status: Mapped[str] = mapped_column(String(16), nullable=False)
+    error: Mapped[str | None] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
+
+    __table_args__ = (Index("ux_notification_deliveries_once", "user_id", "channel", "key", unique=True),)

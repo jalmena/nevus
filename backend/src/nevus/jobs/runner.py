@@ -30,6 +30,16 @@ def _load_kinds() -> None:
     import nevus.jobs.kinds  # noqa: F401
 
 
+def default_periodic() -> list[Periodic]:
+    """Recurring work: queue the daily email digests (cheap, so checked every quarter of an hour)."""
+    from nevus.notify.email import schedule_digests
+
+    def digests(ctx: JobContext) -> None:
+        schedule_digests(ctx)
+
+    return [Periodic("email-digests", 900.0, digests)]
+
+
 def _init_worker() -> None:
     """Workers run at lower priority with one thread each, so the web stays responsive on four cores."""
     with contextlib.suppress(OSError):
@@ -58,7 +68,7 @@ class JobRunner:
         self.session_factory = session_factory
         self.store = store
         self.settings = settings
-        self.periodic: list[Periodic] = []
+        self.periodic: list[Periodic] = default_periodic()
         self._pool: Any = None
         self._tasks: list[asyncio.Task[None]] = []
         self._stopping = asyncio.Event()

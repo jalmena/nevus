@@ -29,6 +29,7 @@ from nevus.db.models import (
     User,
 )
 from nevus.db.types import utcnow
+from nevus.domain import due
 
 router = APIRouter(prefix="/api", tags=["lesions"])
 
@@ -132,6 +133,7 @@ class LesionOut(BaseModel):
     last_observed_at: datetime | None
     next_due_on: date | None
     due: bool
+    snoozed_until: date | None = None
     latest_image_id: uuid.UUID | None
     latest_measurement: MeasurementBrief | None = None
     measurement_change: ChangeBrief | None = None
@@ -228,17 +230,10 @@ def _summaries(
     return result
 
 
-def _next_due(lesion: Lesion, last_observed_at: datetime | None) -> date | None:
-    if lesion.status != "active":
-        return None
-    anchor = last_observed_at.date() if last_observed_at else (lesion.first_noticed_on or lesion.created_at.date())
-    return date.fromordinal(anchor.toordinal() + lesion.interval_days)
-
-
 def _lesion_out(lesion: Lesion, summary: tuple[int, datetime | None, uuid.UUID | None]) -> LesionOut:
     count, last_observed_at, latest_image_id = summary
     zone = body_map().zone(lesion.zone_code)
-    next_due = _next_due(lesion, last_observed_at)
+    next_due = due.next_due(lesion, last_observed_at)
     return LesionOut(
         id=lesion.id,
         person_id=lesion.person_id,
@@ -262,7 +257,8 @@ def _lesion_out(lesion: Lesion, summary: tuple[int, datetime | None, uuid.UUID |
         observation_count=count,
         last_observed_at=last_observed_at,
         next_due_on=next_due,
-        due=next_due is not None and next_due <= utcnow().date(),
+        due=due.is_due(lesion, next_due, utcnow().date()),
+        snoozed_until=lesion.snoozed_until,
         latest_image_id=latest_image_id,
     )
 
@@ -437,7 +433,7 @@ def create_observation(
     db: DbSession,
     settings: AppSettings,
 ) -> ObservationOut:
-    _lesion_for(db, lesion_id, user, ACCESS_OWNER, ACCESS_MANAGER)
+    lesion = _lesion_for(db, lesion_id, user, ACCESS_OWNER, ACCESS_MANAGER)
     captured_at = body.captured_at or utcnow()
     if captured_at.tzinfo is None:
         captured_at = captured_at.replace(tzinfo=UTC)
@@ -451,6 +447,7 @@ def create_observation(
         created_by=user.id,
     )
     db.add(observation)
+    lesion.snoozed_until = None  # a new visit is what ends a snooze
     db.flush()
     db.refresh(observation)
     service.audit(
@@ -561,3 +558,27 @@ def list_observation_images(observation_id: uuid.UUID, user: CurrentUser, db: Db
         .order_by(Image.created_at)
     )
     return [ImageOut.model_validate(i) for i in rows]
+
+
+class SnoozeIn(BaseModel):
+    days: Literal[7, 30]
+
+
+@router.post("/lesions/{lesion_id}/snooze", response_model=LesionOut)
+def snooze(
+    lesion_id: uuid.UUID, body: SnoozeIn, request: Request, user: CurrentUser, db: DbSession, settings: AppSettings
+) -> LesionOut:
+    """Not now: the mark leaves the due list for a week or a month. A new visit ends the snooze."""
+    lesion = _lesion_for(db, lesion_id, user, ACCESS_OWNER, ACCESS_MANAGER)
+    lesion.snoozed_until = date.fromordinal(utcnow().date().toordinal() + body.days)
+    db.flush()
+    service.audit(db, "lesion.snooze", user, "lesion", lesion.id, client_ip(request, settings), {"days": body.days})
+    return _one(db, lesion)
+
+
+@router.delete("/lesions/{lesion_id}/snooze", response_model=LesionOut)
+def unsnooze(lesion_id: uuid.UUID, user: CurrentUser, db: DbSession) -> LesionOut:
+    lesion = _lesion_for(db, lesion_id, user, ACCESS_OWNER, ACCESS_MANAGER)
+    lesion.snoozed_until = None
+    db.flush()
+    return _one(db, lesion)
