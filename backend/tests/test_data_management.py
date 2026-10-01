@@ -153,8 +153,11 @@ def test_backup_wipe_restore_round_trip(client: TestClient, settings: Any, tmp_p
     target = tmp_path / "restored"
     manifest = backup.restore(archive, "backup passphrase 1", target)
     assert manifest["format"] == "nevus-backup/1"
+    assert manifest["database"] == ("sqlite" if settings.is_sqlite else "postgresql")
     assert (target / "secret.key").read_bytes() == settings.secret_key()
-    restored = settings.model_copy(update={"data_dir": target, "database_url": None})
+    # A PostgreSQL database is not in the archive (pg_dump backs it up), so the restored files use it as it is.
+    database = None if settings.is_sqlite else settings.database_url
+    restored = settings.model_copy(update={"data_dir": target, "database_url": database})
     assert backup.verify(restored) == {"checked": 4, "missing": 0, "corrupt": 0}
     from nevus.app import create_app
 
