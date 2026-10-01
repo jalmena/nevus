@@ -10,8 +10,8 @@ export function Notice({
   children: ReactNode;
 }) {
   return (
-    <p className={[styles.notice, styles[kind]].join(" ")} role={kind === "error" ? "alert" : "status"}>
+    <div className={[styles.notice, styles[kind]].join(" ")} role={kind === "error" ? "alert" : "status"}>
       {children}
-    </p>
+    </div>
   );
 }

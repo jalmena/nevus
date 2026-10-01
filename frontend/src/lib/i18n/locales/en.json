@@ -96,7 +96,12 @@
     },
     "title": "Body map",
     "hint": "Tap a zone to select it.",
-    "selected": "{{zone}} · {{view}}"
+    "selected": "{{zone}} · {{view}}",
+    "cluster_one": "One mark here",
+    "cluster_other": "{{count}} marks here: zoom in",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "zoomReset": "Show the whole body"
   },
   "zones": {
     "1100": "Head",
@@ -402,5 +407,30 @@
     "purgeIntro": "Every mark, visit, measurement and photo of {{name}} will be removed now, without passing through the trash. Export first if you want to keep a copy.",
     "typeName": "Type {{name}} to confirm",
     "purgeAction": "Delete for good"
+  },
+  "offline": {
+    "offline": "Offline.",
+    "waiting_one": "One visit is waiting to upload.",
+    "waiting_other": "{{count}} visits are waiting to upload.",
+    "uploading": "Uploading saved visits…",
+    "failed_one": "one could not upload yet",
+    "failed_other": "{{count}} could not upload yet",
+    "uploadNow": "Upload now",
+    "quickIntro": "No connection. Take the photos now: the visit is kept on this device and uploads by itself when you are back online.",
+    "photosReady_one": "One photo ready.",
+    "photosReady_other": "{{count}} photos ready.",
+    "keep": "Keep this visit",
+    "saved": "Kept on this device. It will upload when the connection is back."
+  },
+  "capture": {
+    "open": "Live camera",
+    "title": "Live camera",
+    "preview": "Camera preview",
+    "ghost": "Last photo",
+    "torch": "Torch",
+    "shutter": "Take the photo",
+    "error": "The camera could not start: {{message}}. Use Take a photo instead.",
+    "lastTime": "Last time: try to match the distance and the angle.",
+    "lastTimeAlt": "Previous close-up"
   }
 }

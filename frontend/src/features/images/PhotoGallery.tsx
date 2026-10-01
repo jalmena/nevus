@@ -2,12 +2,15 @@ import { useRef, useState, type ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/design-system/components/Button";
 import { Notice } from "@/design-system/components/Notice";
+import { LiveCamera, liveCameraAvailable } from "@/features/capture/LiveCamera";
 import { IMAGE_ROLES, imageUrl, useDeleteImage, type ImageOut, type ImageRole } from "@/lib/images";
 import styles from "./PhotoGallery.module.css";
 
 interface Props {
   images: ImageOut[];
   canEdit: boolean;
+  /** The previous visit's close-up: shown as "last time" and as the ghost in the live camera. */
+  previousImageId?: string | null;
   upload?: {
     mutate: (input: { file: File; role: ImageRole }) => void;
     isPending: boolean;
@@ -16,11 +19,12 @@ interface Props {
 }
 
 /** Thumbnails with a preview dialog, plus the camera and file buttons when the viewer may add photos. */
-export function PhotoGallery({ images, canEdit, upload }: Props) {
+export function PhotoGallery({ images, canEdit, upload, previousImageId }: Props) {
   const { t, i18n } = useTranslation();
   const remove = useDeleteImage();
   const [role, setRole] = useState<ImageRole>("close_up");
   const [open, setOpen] = useState<ImageOut | null>(null);
+  const [live, setLive] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, {
     dateStyle: "medium",
@@ -62,11 +66,29 @@ export function PhotoGallery({ images, canEdit, upload }: Props) {
               aria-label={t("images.takePhoto")}
             />
           </Button>
+          {liveCameraAvailable() && (
+            <Button variant="secondary" onClick={() => setLive(true)} disabled={upload.isPending}>
+              {t("capture.open")}
+            </Button>
+          )}
           <Button variant="secondary" className={styles.fileButton} disabled={upload.isPending}>
             {t("images.chooseFile")}
             <input type="file" accept="image/*" onChange={onFile} aria-label={t("images.chooseFile")} />
           </Button>
         </div>
+      )}
+      {canEdit && upload && previousImageId && (
+        <div className={styles.lastTime}>
+          <img src={imageUrl(previousImageId, "thumb")} alt={t("capture.lastTimeAlt")} />
+          <span className="text-secondary">{t("capture.lastTime")}</span>
+        </div>
+      )}
+      {live && upload && (
+        <LiveCamera
+          previousImageId={previousImageId}
+          onCapture={(file) => upload.mutate({ file, role })}
+          onClose={() => setLive(false)}
+        />
       )}
       {canEdit && upload?.error && <Notice kind="error">{upload.error.message}</Notice>}
       {images.length === 0 ? (

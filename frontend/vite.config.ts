@@ -29,11 +29,24 @@ export default defineConfig({
         globPatterns: ["**/*.{js,css,html,svg,png,woff2,webmanifest}"],
         navigateFallback: "/index.html",
         navigateFallbackDenylist: [/^\/api\//, /^\/healthz$/],
+        // Patterns are matched against the full URL, so they test the path explicitly.
         runtimeCaching: [
           {
-            urlPattern: /^\/api\//,
+            // Small renditions, immutable by hash: kept for offline viewing, a bounded number of them.
+            urlPattern: ({ url }) => /^\/api\/images\/[^/]+\/(thumb|preview)$/.test(url.pathname),
+            handler: "CacheFirst",
+            options: { cacheName: "photos", expiration: { maxEntries: 400, maxAgeSeconds: 30 * 24 * 3600 } },
+          },
+          {
+            // Everything else the app reads, so a known page opens without a connection.
+            // Never the originals, the full renditions or downloads.
+            urlPattern: ({ url }) =>
+              url.pathname.startsWith("/api/") &&
+              !/\/(original|full)$/.test(url.pathname) &&
+              !url.pathname.includes("/download") &&
+              !url.pathname.startsWith("/api/reference-card"),
             handler: "NetworkFirst",
-            options: { cacheName: "api", networkTimeoutSeconds: 4 },
+            options: { cacheName: "api", networkTimeoutSeconds: 4, expiration: { maxEntries: 500 } },
           },
         ],
       },

@@ -1,9 +1,13 @@
+.wrapper {
+  position: relative;
+}
+
 .map {
   display: block;
   width: 100%;
   height: auto;
   max-height: 70vh;
-  touch-action: manipulation;
+  touch-action: none;
 }
 
 .silhouette {
@@ -69,4 +73,53 @@
   stroke: var(--color-accent);
   stroke-width: 1.5;
   outline: none;
+}
+
+.clusterDot {
+  fill: var(--color-accent);
+  stroke: var(--color-paper);
+  stroke-width: 1;
+}
+
+.clusterDotDue {
+  fill: var(--color-attention);
+}
+
+.clusterCount {
+  fill: var(--color-paper);
+  font-weight: var(--font-weight-emphasis);
+  pointer-events: none;
+}
+
+.clusterCountDue {
+  fill: var(--color-ink);
+}
+
+.cluster {
+  cursor: zoom-in;
+}
+
+.zoom {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  display: grid;
+  gap: var(--space-1);
+}
+
+.zoom button {
+  width: var(--touch-target);
+  height: var(--touch-target);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: var(--text-lg);
+  cursor: pointer;
+}
+
+.zoom button:disabled {
+  opacity: 0.4;
+  cursor: default;
 }

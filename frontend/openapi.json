@@ -200,6 +200,18 @@
             ],
             "title": "Captured Tz"
           },
+          "client_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Id"
+          },
           "file": {
             "contentMediaType": "application/octet-stream",
             "title": "File",
@@ -1932,6 +1944,19 @@
               }
             ],
             "title": "Captured Tz"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Minted by the client (UUIDv7) so a retried upload from the offline queue is a no-op",
+            "title": "Id"
           },
           "notes": {
             "anyOf": [

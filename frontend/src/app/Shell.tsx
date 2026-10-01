@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from "react-router";
 import { useTranslation } from "react-i18next";
+import { OutboxBar } from "@/features/capture/OutboxBar";
 import { SudoProvider } from "@/lib/sudo/SudoProvider";
 import styles from "./Shell.module.css";
 
@@ -21,6 +22,7 @@ export function Shell() {
           </NavLink>
         </nav>
       </header>
+      <OutboxBar />
       <main className={styles.main}>
         <SudoProvider>
           <Outlet />

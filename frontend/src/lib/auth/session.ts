@@ -72,6 +72,15 @@ export function useClaim() {
   });
 }
 
+/** Signing out leaves nothing of this account on the device: queued visits and cached responses go. */
+async function forgetDevice(): Promise<void> {
+  const { clearOutbox } = await import("@/lib/offline/outbox");
+  await clearOutbox().catch(() => undefined);
+  if (typeof caches !== "undefined") {
+    for (const name of ["api", "photos"]) await caches.delete(name).catch(() => false);
+  }
+}
+
 export function useLogout() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -81,6 +90,7 @@ export function useLogout() {
     onSettled: () => {
       queryClient.setQueryData(sessionKey, null);
       queryClient.clear();
+      void forgetDevice();
     },
   });
 }

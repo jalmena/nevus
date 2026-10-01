@@ -109,3 +109,17 @@
   margin: var(--space-2) 0;
   padding-left: var(--space-5);
 }
+
+.lastTime {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.lastTime img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: var(--radius-control);
+  background: var(--color-photo-frame);
+}

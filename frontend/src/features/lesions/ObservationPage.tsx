@@ -11,6 +11,7 @@ import {
   useDeleteObservation,
   useLesion,
   useObservation,
+  useObservations,
   useUpdateObservation,
   useUploadObservationImage,
   type Symptom,
@@ -26,6 +27,7 @@ export function ObservationPage() {
   const observation = useObservation(observationId);
   const lesionId = observation.data?.lesion_id ?? "";
   const lesion = useLesion(lesionId);
+  const visits = useObservations(lesionId);
   const person = usePerson(lesion.data?.person_id ?? "");
   const update = useUpdateObservation(observationId);
   const remove = useDeleteObservation(observationId, lesionId);
@@ -49,6 +51,13 @@ export function ObservationPage() {
   if (observation.error) return <Notice kind="error">{observation.error.message}</Notice>;
   if (!observation.data) return <p className="text-secondary">…</p>;
   const data = observation.data;
+  const previous = (visits.data ?? [])
+    .filter(
+      (visit) => visit.id !== data.id && visit.captured_at < data.captured_at && visit.images.length > 0,
+    )
+    .sort((a, b) => b.captured_at.localeCompare(a.captured_at))[0];
+  const previousImageId =
+    previous?.images.find((image) => image.role === "close_up")?.id ?? previous?.images[0]?.id ?? null;
 
   function toggle(symptom: Symptom, checked: boolean) {
     setDirty(true);
@@ -76,7 +85,12 @@ export function ObservationPage() {
           flags={data.quality_flags}
           checking={data.images.some((image) => !image.quality_checked_at)}
         />
-        <PhotoGallery images={data.images} canEdit={canEdit} upload={upload} />
+        <PhotoGallery
+          images={data.images}
+          canEdit={canEdit}
+          upload={upload}
+          previousImageId={previousImageId}
+        />
       </section>
 
       <VisitMeasurements observationId={data.id} images={data.images} canEdit={canEdit} />

@@ -955,6 +955,8 @@ export interface components {
             captured_at?: string | null;
             /** Captured Tz */
             captured_tz?: string | null;
+            /** Client Id */
+            client_id?: string | null;
             /** File */
             file: string;
             /**
@@ -1564,6 +1566,11 @@ export interface components {
             captured_at?: string | null;
             /** Captured Tz */
             captured_tz?: string | null;
+            /**
+             * Id
+             * @description Minted by the client (UUIDv7) so a retried upload from the offline queue is a no-op
+             */
+            id?: string | null;
             /** Notes */
             notes?: string | null;
             /** Symptoms */

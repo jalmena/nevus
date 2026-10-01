@@ -96,7 +96,12 @@
     },
     "title": "Mapa corporal",
     "hint": "Toca una zona para seleccionarla.",
-    "selected": "{{zone}} · {{view}}"
+    "selected": "{{zone}} · {{view}}",
+    "cluster_one": "Una marca aquí",
+    "cluster_other": "{{count}} marcas aquí: ampliar",
+    "zoomIn": "Ampliar",
+    "zoomOut": "Reducir",
+    "zoomReset": "Ver el cuerpo entero"
   },
   "zones": {
     "1100": "Cabeza",
@@ -402,5 +407,30 @@
     "purgeIntro": "Todas las marcas, visitas, medidas y fotos de {{name}} se eliminarán ahora, sin pasar por la papelera. Exporta antes si quieres conservar una copia.",
     "typeName": "Escribe {{name}} para confirmar",
     "purgeAction": "Borrar para siempre"
+  },
+  "offline": {
+    "offline": "Sin conexión.",
+    "waiting_one": "Una visita espera para subirse.",
+    "waiting_other": "{{count}} visitas esperan para subirse.",
+    "uploading": "Subiendo las visitas guardadas…",
+    "failed_one": "una no se ha podido subir todavía",
+    "failed_other": "{{count}} no se han podido subir todavía",
+    "uploadNow": "Subir ahora",
+    "quickIntro": "Sin conexión. Haz las fotos ahora: la visita se guarda en este dispositivo y se sube sola cuando vuelvas a tener conexión.",
+    "photosReady_one": "Una foto lista.",
+    "photosReady_other": "{{count}} fotos listas.",
+    "keep": "Guardar esta visita",
+    "saved": "Guardada en este dispositivo. Se subirá cuando vuelva la conexión."
+  },
+  "capture": {
+    "open": "Cámara en directo",
+    "title": "Cámara en directo",
+    "preview": "Vista de la cámara",
+    "ghost": "Foto anterior",
+    "torch": "Linterna",
+    "shutter": "Hacer la foto",
+    "error": "La cámara no ha podido arrancar: {{message}}. Usa Hacer una foto.",
+    "lastTime": "La última vez: intenta repetir la distancia y el ángulo.",
+    "lastTimeAlt": "Primer plano anterior"
   }
 }

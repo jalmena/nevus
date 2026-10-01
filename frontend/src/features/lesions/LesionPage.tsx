@@ -10,6 +10,7 @@ import { useSession } from "@/lib/auth/session";
 import { INTERVALS, useCreateObservation, useLesion, useObservations, useUpdateLesion } from "@/lib/lesions";
 import { formatDelta, formatMm } from "@/lib/measurements";
 import { usePerson } from "@/lib/persons";
+import { QuickVisit } from "@/features/capture/QuickVisit";
 import { SnoozeControls } from "@/features/reminders/SnoozeControls";
 import { DueBadge } from "./LesionList";
 import { lesionTitle, locationLine } from "./lesionName";
@@ -25,6 +26,7 @@ export function LesionPage() {
   const createVisit = useCreateObservation(lesionId);
   const update = useUpdateLesion(lesionId);
   const [editing, setEditing] = useState(false);
+  const [quick, setQuick] = useState(false);
   const canEdit = person.data?.my_role === "owner" || person.data?.my_role === "manager";
   const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "long" });
   const session = useSession();
@@ -32,9 +34,18 @@ export function LesionPage() {
   const locale = i18n.resolvedLanguage ?? "en";
 
   function newVisit() {
+    if (!navigator.onLine) {
+      setQuick(true); // no connection: record the visit on this device and upload it later
+      return;
+    }
     createVisit.mutate(
       { captured_tz: Intl.DateTimeFormat().resolvedOptions().timeZone },
-      { onSuccess: (observation) => void navigate(`/observations/${observation.id}`) },
+      {
+        onSuccess: (observation) => void navigate(`/observations/${observation.id}`),
+        onError: (error) => {
+          if (error instanceof TypeError) setQuick(true); // the network went away mid-request
+        },
+      },
     );
   }
 
@@ -121,7 +132,8 @@ export function LesionPage() {
           </Button>
         </div>
       )}
-      {createVisit.error && <Notice kind="error">{createVisit.error.message}</Notice>}
+      {createVisit.error && !quick && <Notice kind="error">{createVisit.error.message}</Notice>}
+      {quick && <QuickVisit lesionId={data.id} lesionLabel={lesionTitle(data, t)} onDone={() => undefined} />}
       {editing && (
         <EditLesionForm
           lesion={data}
