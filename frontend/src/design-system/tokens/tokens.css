@@ -24,6 +24,7 @@
   --color-accent-2: #ddedea;
   --color-info: #3e6d9c;
   --color-attention: #b9791b;
+  --color-on-attention: #1b1a19; /* text on an attention fill: 4.81:1 */
   --color-danger: #a8402f;
   --color-success: #4e7d3a;
   --color-photo-frame: #e9e3da;
@@ -89,6 +90,7 @@
     --color-accent-2: #1b3735;
     --color-info: #8db4de;
     --color-attention: #e3b25f;
+    --color-on-attention: #17161a; /* 9.26:1 */
     --color-danger: #e07a67;
     --color-success: #8fbf7a;
     --color-photo-frame: #2e2d33;
@@ -111,6 +113,7 @@
   --color-accent-2: #1b3735;
   --color-info: #8db4de;
   --color-attention: #e3b25f;
+  --color-on-attention: #17161a;
   --color-danger: #e07a67;
   --color-success: #8fbf7a;
   --color-photo-frame: #2e2d33;

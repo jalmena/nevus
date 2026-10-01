@@ -81,7 +81,7 @@
 
 .due {
   background: var(--color-attention);
-  color: var(--color-ink);
+  color: var(--color-on-attention);
 }
 
 .page {
