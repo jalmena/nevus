@@ -66,7 +66,8 @@
     "open": "Abrir la foto",
     "alt": "{{role}}, {{date}}",
     "noDate": "Sin fecha de captura",
-    "delete": "Mover a la papelera"
+    "delete": "Mover a la papelera",
+    "openWithWarnings": "Abrir la foto (tiene avisos de calidad)"
   },
   "settings": {
     "title": "Ajustes",
@@ -212,5 +213,18 @@
     },
     "backTo": "Volver a {{lesion}}",
     "delete": "Mover la visita a la papelera"
+  },
+  "quality": {
+    "title": "Guardada con avisos de calidad",
+    "short": "Avisos de calidad",
+    "checking": "Revisando las fotos…",
+    "hint": "La visita se guarda tal cual. Si puedes, repite la foto.",
+    "flags": {
+      "blurry": "Borrosa: sujeta el móvil firme y toca la marca para enfocar.",
+      "too_dark": "Demasiado oscura: añade luz o acércate a una ventana.",
+      "too_bright": "Sobreexpuesta: evita el sol directo y el flash.",
+      "glare": "Brillos: inclina un poco el móvil para que los reflejos salgan de la marca.",
+      "low_resolution": "Poca resolución: usa la cámara a tamaño completo, no una captura ni una copia reenviada."
+    }
   }
 }

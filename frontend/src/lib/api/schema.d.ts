@@ -638,6 +638,10 @@ export interface components {
              * Format: uuid
              */
             person_id: string;
+            /** Quality Checked At */
+            quality_checked_at: string | null;
+            /** Quality Flags */
+            quality_flags: string[];
             /** Re Encoded */
             re_encoded: boolean;
             /** Renditions */

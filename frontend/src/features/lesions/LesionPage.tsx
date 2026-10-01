@@ -114,6 +114,11 @@ export function LesionPage() {
                     ))}
                   </span>
                 )}
+                {visit.quality_flags.length > 0 && (
+                  <span className={styles.chips}>
+                    <span className={[styles.badge, styles.due].join(" ")}>{t("quality.short")}</span>
+                  </span>
+                )}
                 {visit.symptoms.length > 0 && (
                   <span className={styles.chips}>
                     {visit.symptoms.map((symptom) => (

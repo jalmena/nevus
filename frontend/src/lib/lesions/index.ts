@@ -105,6 +105,9 @@ export function useObservation(observationId: string) {
       return data;
     },
     enabled: observationId !== "",
+    // Quality checks run in the background after an upload; look again until every photo has one.
+    refetchInterval: (query) =>
+      query.state.data?.images.some((image) => !image.quality_checked_at) ? 2000 : false,
   });
 }
 

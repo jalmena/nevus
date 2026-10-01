@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from "react-router";
 import { Button } from "@/design-system/components/Button";
 import { Notice } from "@/design-system/components/Notice";
 import { PhotoGallery } from "@/features/images/PhotoGallery";
+import { QualityNotice } from "@/features/images/QualityNotice";
 import {
   SYMPTOMS,
   useDeleteObservation,
@@ -70,6 +71,10 @@ export function ObservationPage() {
 
       <section className={styles.section} aria-labelledby="photos-heading">
         <h2 id="photos-heading">{t("observations.photos")}</h2>
+        <QualityNotice
+          flags={data.quality_flags}
+          checking={data.images.some((image) => !image.quality_checked_at)}
+        />
         <PhotoGallery images={data.images} canEdit={canEdit} upload={upload} />
       </section>
 

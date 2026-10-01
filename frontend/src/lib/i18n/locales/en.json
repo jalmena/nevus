@@ -66,7 +66,8 @@
     "open": "Open the photo",
     "alt": "{{role}}, {{date}}",
     "noDate": "No capture date",
-    "delete": "Move to trash"
+    "delete": "Move to trash",
+    "openWithWarnings": "Open the photo (has quality warnings)"
   },
   "settings": {
     "title": "Settings",
@@ -212,5 +213,18 @@
     },
     "backTo": "Back to {{lesion}}",
     "delete": "Move visit to trash"
+  },
+  "quality": {
+    "title": "Saved with quality warnings",
+    "short": "Quality warnings",
+    "checking": "Checking the photos…",
+    "hint": "The visit is kept as it is. If you can, take the photo again.",
+    "flags": {
+      "blurry": "Blurry: hold the phone steady and tap the mark to focus.",
+      "too_dark": "Too dark: add light or move closer to a window.",
+      "too_bright": "Overexposed: avoid direct sunlight and the flash.",
+      "glare": "Glare: tilt the phone a little so reflections move off the mark.",
+      "low_resolution": "Low resolution: use the camera at full size rather than a screenshot or a forwarded copy."
+    }
   }
 }

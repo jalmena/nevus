@@ -369,6 +369,25 @@
             "title": "Person Id",
             "type": "string"
           },
+          "quality_checked_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quality Checked At"
+          },
+          "quality_flags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Quality Flags",
+            "type": "array"
+          },
           "re_encoded": {
             "title": "Re Encoded",
             "type": "boolean"
@@ -411,6 +430,8 @@
           "orientation",
           "source_format",
           "re_encoded",
+          "quality_flags",
+          "quality_checked_at",
           "captured_at",
           "created_at",
           "renditions"

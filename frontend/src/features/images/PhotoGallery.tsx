@@ -77,9 +77,9 @@ export function PhotoGallery({ images, canEdit, upload }: Props) {
             <li key={image.id}>
               <button
                 type="button"
-                className={styles.thumb}
+                className={styles.thumbButton}
                 onClick={() => show(image)}
-                aria-label={t("images.open")}
+                aria-label={image.quality_flags.length > 0 ? t("images.openWithWarnings") : t("images.open")}
               >
                 <img
                   src={imageUrl(image.id, "thumb")}
@@ -92,6 +92,11 @@ export function PhotoGallery({ images, canEdit, upload }: Props) {
                   loading="lazy"
                   className={styles.thumb}
                 />
+                {image.quality_flags.length > 0 && (
+                  <span className={styles.warningDot} aria-hidden="true">
+                    !
+                  </span>
+                )}
               </button>
             </li>
           ))}

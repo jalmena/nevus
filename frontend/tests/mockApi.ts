@@ -26,6 +26,8 @@ export interface MockState {
   persons: { id: string; display_name: string }[];
   lesions: MockLesion[];
   observations: MockObservation[];
+  /** Image ids whose quality check found a warning. */
+  flagged: string[];
   calls: { method: string; url: string; body?: unknown }[];
 }
 
@@ -49,6 +51,7 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     persons: [],
     lesions: [],
     observations: [],
+    flagged: [],
     calls: [],
     ...initial,
   };
@@ -111,6 +114,8 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     orientation: 1,
     source_format: "JPEG",
     re_encoded: false,
+    quality_flags: state.flagged.includes(id) ? ["blurry"] : [],
+    quality_checked_at: "2026-09-12T10:41:08Z",
     captured_at: "2026-09-12T10:41:07Z",
     created_at: "2026-09-12T10:41:07Z",
     renditions: [{ kind: "thumb", width: 256, height: 192, bytes: 100 }],
@@ -123,7 +128,7 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     captured_local_date: o.captured_at.slice(0, 10),
     notes: o.notes,
     symptoms: o.symptoms,
-    quality_flags: [],
+    quality_flags: o.images.some((id) => state.flagged.includes(id)) ? ["blurry"] : [],
     created_at: o.captured_at,
     updated_at: o.captured_at,
     images: o.images.map((id) => imageOut(id, o.id)),

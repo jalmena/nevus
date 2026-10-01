@@ -125,3 +125,32 @@ describe("visits", () => {
     expect(items[1]).toHaveTextContent("First look");
   });
 });
+
+describe("quality warnings", () => {
+  it("shows what was found and how to retake, without blocking the visit", async () => {
+    installMockApi({
+      claimed: true,
+      session: SESSION,
+      persons: [PERSON],
+      lesions: [
+        { id: "l1", person_id: PERSON.id, label: "Chest mark", zone: "1250", x: 0.4, y: 0.25, due: false },
+      ],
+      observations: [
+        {
+          id: "o1",
+          lesion_id: "l1",
+          captured_at: "2026-09-01T10:00:00Z",
+          notes: null,
+          symptoms: [],
+          images: ["i1"],
+        },
+      ],
+      flagged: ["i1"],
+    });
+    await i18n.changeLanguage("en");
+    renderApp("/observations/o1");
+    expect(await screen.findByText("Saved with quality warnings")).toBeInTheDocument();
+    expect(screen.getByText(/hold the phone steady/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Open the photo (has quality warnings)" })).toBeInTheDocument();
+  });
+});
