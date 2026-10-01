@@ -184,6 +184,60 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/images/{image_id}/fit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Propose Fit
+         * @description A proposal around a tap, in the photo's upright pixels. Nothing is stored.
+         */
+        post: operations["propose_fit_api_images__image_id__fit_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/images/{image_id}/scale": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Image Scale */
+        get: operations["image_scale_api_images__image_id__scale_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/images/{image_id}/scale-references": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add Scale Reference */
+        post: operations["add_scale_reference_api_images__image_id__scale_references_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/images/{image_id}/{kind}": {
         parameters: {
             query?: never;
@@ -226,6 +280,23 @@ export interface paths {
         patch: operations["update_lesion_api_lesions__lesion_id__patch"];
         trace?: never;
     };
+    "/api/lesions/{lesion_id}/measurements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lesion Measurements */
+        get: operations["lesion_measurements_api_lesions__lesion_id__measurements_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/lesions/{lesion_id}/observations": {
         parameters: {
             query?: never;
@@ -239,6 +310,23 @@ export interface paths {
         /** Create Observation */
         post: operations["create_observation_api_lesions__lesion_id__observations_post"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/measurements/{measurement_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Measurement */
+        delete: operations["delete_measurement_api_measurements__measurement_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -278,6 +366,47 @@ export interface paths {
         put?: never;
         /** Upload Observation Image */
         post: operations["upload_observation_image_api_observations__observation_id__images_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/observations/{observation_id}/measurements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Observation Measurements */
+        get: operations["observation_measurements_api_observations__observation_id__measurements_get"];
+        put?: never;
+        /**
+         * Create Measurement
+         * @description Submitting a measurement is the confirmation: nothing proposed is ever stored without it.
+         */
+        post: operations["create_measurement_api_observations__observation_id__measurements_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/observations/{observation_id}/measurements/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preview Measurement
+         * @description The same computation as saving, without saving: the interface shows it while the outline moves.
+         */
+        post: operations["preview_measurement_api_observations__observation_id__measurements_preview_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -392,6 +521,26 @@ export interface paths {
         put?: never;
         /** Create Lesion */
         post: operations["create_lesion_api_persons__person_id__lesions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/reference-card": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Reference Card
+         * @description Two window cards, two strips and a 50 mm line to verify the printer did not scale the page.
+         */
+        get: operations["reference_card_api_reference_card_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -575,12 +724,115 @@ export interface components {
              */
             role: "overview" | "close_up" | "with_reference" | "other";
         };
+        /** CardOut */
+        CardOut: {
+            /** Card */
+            card?: string | null;
+            /** Centre Px */
+            centre_px?: number[] | null;
+            /** Flags */
+            flags?: string[];
+            /** Found */
+            found: boolean;
+            /** Marker Px */
+            marker_px?: number | null;
+            /** Mm Per Px */
+            mm_per_px?: number | null;
+            /** Tilt Deg */
+            tilt_deg?: number | null;
+        };
+        /** ChangeBrief */
+        ChangeBrief: {
+            /** Delta Mm */
+            delta_mm: number;
+            /** Detectable */
+            detectable: boolean;
+            /** Sigma Mm */
+            sigma_mm: number;
+            /**
+             * Since
+             * Format: date-time
+             */
+            since: string;
+        };
+        /** ChangeOut */
+        ChangeOut: {
+            /** Delta Mm */
+            delta_mm: number;
+            /** Detectable */
+            detectable: boolean;
+            /** Sigma Mm */
+            sigma_mm: number;
+            /**
+             * Since
+             * Format: date-time
+             */
+            since: string;
+        };
+        /** CircleShape */
+        CircleShape: {
+            /** Cx */
+            cx: number;
+            /** Cy */
+            cy: number;
+            /** R */
+            r: number;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "circle";
+        };
+        /** CoinIn */
+        CoinIn: {
+            /** Cx */
+            cx: number;
+            /** Cy */
+            cy: number;
+            /**
+             * Denomination
+             * @enum {string}
+             */
+            denomination: "1c" | "2c" | "5c" | "10c" | "20c" | "50c" | "1e" | "2e";
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "coin";
+            /** R */
+            r: number;
+        };
         /** Credentials */
         Credentials: {
             /** Password */
             password: string;
             /** Username */
             username: string;
+        };
+        /** FitIn */
+        FitIn: {
+            /**
+             * Target
+             * @enum {string}
+             */
+            target: "coin" | "lesion";
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
+        };
+        /** FitOut */
+        FitOut: {
+            /** Cx */
+            cx: number;
+            /** Cy */
+            cy: number;
+            /** Method */
+            method: string;
+            /** Outline */
+            outline: number[][] | null;
+            /** R */
+            r: number;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -655,6 +907,25 @@ export interface components {
             /** Width */
             width: number;
         };
+        /** ImageScaleOut */
+        ImageScaleOut: {
+            card: components["schemas"]["CardOut"] | null;
+            /** Card Checked */
+            card_checked: boolean;
+            /**
+             * Image Id
+             * Format: uuid
+             */
+            image_id: string;
+            /** References */
+            references: components["schemas"]["ScaleReferenceOut"][];
+            /** Tilt Limit Deg */
+            tilt_limit_deg: number;
+            /** Upright Height */
+            upright_height: number;
+            /** Upright Width */
+            upright_width: number;
+        };
         /** InstanceStatus */
         InstanceStatus: {
             /** Claimed */
@@ -715,7 +986,9 @@ export interface components {
             last_observed_at: string | null;
             /** Latest Image Id */
             latest_image_id: string | null;
+            latest_measurement?: components["schemas"]["MeasurementBrief"] | null;
             location: components["schemas"]["LocationOut"];
+            measurement_change?: components["schemas"]["ChangeBrief"] | null;
             /** Next Due On */
             next_due_on: string | null;
             /** Notes */
@@ -781,6 +1054,142 @@ export interface components {
             /** Zone */
             zone: string;
         };
+        /** ManualIn */
+        ManualIn: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "manual";
+            /** Length Mm */
+            length_mm: number;
+            /** X1 */
+            x1: number;
+            /** X2 */
+            x2: number;
+            /** Y1 */
+            y1: number;
+            /** Y2 */
+            y2: number;
+        };
+        /** MeasurementBrief */
+        MeasurementBrief: {
+            /** Flags */
+            flags: string[];
+            /** Longest Mm */
+            longest_mm: number;
+            /**
+             * Measured At
+             * Format: date-time
+             */
+            measured_at: string;
+            /** Perpendicular Mm */
+            perpendicular_mm: number;
+            /** Sigma Longest Mm */
+            sigma_longest_mm: number;
+        };
+        /** MeasurementIn */
+        MeasurementIn: {
+            /**
+             * Image Id
+             * Format: uuid
+             */
+            image_id: string;
+            /**
+             * Method
+             * @enum {string}
+             */
+            method: "assisted" | "manual";
+            /**
+             * Scale Reference Id
+             * Format: uuid
+             */
+            scale_reference_id: string;
+            /** Shape */
+            shape: components["schemas"]["CircleShape"] | components["schemas"]["OutlineShape"];
+        };
+        /** MeasurementOut */
+        MeasurementOut: {
+            /** Area Mm2 */
+            area_mm2: number;
+            /**
+             * Captured At
+             * Format: date-time
+             */
+            captured_at: string;
+            change?: components["schemas"]["ChangeOut"] | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Flags */
+            flags: string[];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Image Id
+             * Format: uuid
+             */
+            image_id: string;
+            /**
+             * Lesion Id
+             * Format: uuid
+             */
+            lesion_id: string;
+            /** Longest Mm */
+            longest_mm: number;
+            /** Method */
+            method: string;
+            /**
+             * Observation Id
+             * Format: uuid
+             */
+            observation_id: string;
+            /** Perpendicular Mm */
+            perpendicular_mm: number;
+            /** Scale Kind */
+            scale_kind: string;
+            /**
+             * Scale Reference Id
+             * Format: uuid
+             */
+            scale_reference_id: string;
+            /** Shape */
+            shape: {
+                [key: string]: unknown;
+            };
+            /** Sigma Area Mm2 */
+            sigma_area_mm2: number;
+            /** Sigma Longest Mm */
+            sigma_longest_mm: number;
+            /** Sigma Perpendicular Mm */
+            sigma_perpendicular_mm: number;
+            /** Tilt Deg */
+            tilt_deg: number | null;
+        };
+        /** MeasurementPreview */
+        MeasurementPreview: {
+            /** Area Mm2 */
+            area_mm2: number;
+            /** Flags */
+            flags: string[];
+            /** Longest Mm */
+            longest_mm: number;
+            /** Perpendicular Mm */
+            perpendicular_mm: number;
+            /** Sigma Area Mm2 */
+            sigma_area_mm2: number;
+            /** Sigma Longest Mm */
+            sigma_longest_mm: number;
+            /** Sigma Perpendicular Mm */
+            sigma_perpendicular_mm: number;
+            /** Tilt Deg */
+            tilt_deg: number | null;
+        };
         /** ObservationIn */
         ObservationIn: {
             /** Captured At */
@@ -845,6 +1254,16 @@ export interface components {
             notes?: string | null;
             /** Symptoms */
             symptoms?: ("itching" | "bleeding" | "pain" | "looks_different")[] | null;
+        };
+        /** OutlineShape */
+        OutlineShape: {
+            /** Points */
+            points: number[][];
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "outline";
         };
         /** PasswordChange */
         PasswordChange: {
@@ -925,6 +1344,38 @@ export interface components {
             /** Width */
             width: number;
         };
+        /** ScaleReferenceOut */
+        ScaleReferenceOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Geometry */
+            geometry: {
+                [key: string]: unknown;
+            };
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Image Id
+             * Format: uuid
+             */
+            image_id: string;
+            /** Kind */
+            kind: string;
+            /** Mm Per Px */
+            mm_per_px: number;
+            /** Reference Mm */
+            reference_mm: number | null;
+            /** Sigma Scale */
+            sigma_scale: number;
+            /** Tilt Deg */
+            tilt_deg: number | null;
+        };
         /** SessionOut */
         SessionOut: {
             /**
@@ -958,6 +1409,8 @@ export interface components {
         };
         /** UserOut */
         UserOut: {
+            /** Card Line Mm */
+            card_line_mm: number | null;
             /**
              * Created At
              * Format: date-time
@@ -990,6 +1443,11 @@ export interface components {
         };
         /** UserUpdateMe */
         UserUpdateMe: {
+            /**
+             * Card Line Mm
+             * @description Measured length of the printed card's 50 mm line
+             */
+            card_line_mm?: number | null;
             /** Email */
             email?: string | null;
             /** Language */
@@ -1367,6 +1825,107 @@ export interface operations {
             };
         };
     };
+    propose_fit_api_images__image_id__fit_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                image_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FitIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FitOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    image_scale_api_images__image_id__scale_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                image_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImageScaleOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_scale_reference_api_images__image_id__scale_references_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                image_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CoinIn"] | components["schemas"]["ManualIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScaleReferenceOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     image_file_api_images__image_id___kind__get: {
         parameters: {
             query?: never;
@@ -1492,6 +2051,37 @@ export interface operations {
             };
         };
     };
+    lesion_measurements_api_lesions__lesion_id__measurements_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lesion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeasurementOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_observations_api_lesions__lesion_id__observations_get: {
         parameters: {
             query?: never;
@@ -1546,6 +2136,35 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ObservationOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_measurement_api_measurements__measurement_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                measurement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
@@ -1706,6 +2325,107 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ImageOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    observation_measurements_api_observations__observation_id__measurements_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                observation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeasurementOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_measurement_api_observations__observation_id__measurements_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                observation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MeasurementIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeasurementOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_measurement_api_observations__observation_id__measurements_preview_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                observation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MeasurementIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeasurementPreview"];
                 };
             };
             /** @description Validation Error */
@@ -2082,6 +2802,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["LesionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reference_card_api_reference_card_get: {
+        parameters: {
+            query?: {
+                page?: "a4" | "letter";
+                lang?: "en" | "es";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": unknown;
                 };
             };
             /** @description Validation Error */

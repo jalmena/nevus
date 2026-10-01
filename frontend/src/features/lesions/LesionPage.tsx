@@ -6,7 +6,9 @@ import { EmptyState } from "@/design-system/components/EmptyState";
 import { Notice } from "@/design-system/components/Notice";
 import { TextField } from "@/design-system/components/TextField";
 import { imageUrl } from "@/lib/images";
+import { useSession } from "@/lib/auth/session";
 import { INTERVALS, useCreateObservation, useLesion, useObservations, useUpdateLesion } from "@/lib/lesions";
+import { formatDelta, formatMm } from "@/lib/measurements";
 import { usePerson } from "@/lib/persons";
 import { DueBadge } from "./LesionList";
 import { lesionTitle, locationLine } from "./lesionName";
@@ -24,6 +26,9 @@ export function LesionPage() {
   const [editing, setEditing] = useState(false);
   const canEdit = person.data?.my_role === "owner" || person.data?.my_role === "manager";
   const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "long" });
+  const session = useSession();
+  const showUncertainty = session.data?.user.show_uncertainty ?? true;
+  const locale = i18n.resolvedLanguage ?? "en";
 
   function newVisit() {
     createVisit.mutate(
@@ -63,6 +68,38 @@ export function LesionPage() {
             })}
           </dd>
         </div>
+        <div>
+          <dt>{t("lesions.latestSize")}</dt>
+          <dd className="numeric">
+            {data.latest_measurement
+              ? formatMm(
+                  data.latest_measurement.longest_mm,
+                  data.latest_measurement.sigma_longest_mm,
+                  locale,
+                  showUncertainty,
+                )
+              : "—"}
+          </dd>
+        </div>
+        {data.measurement_change && (
+          <div>
+            <dt>
+              {t("lesions.sinceDate", { date: dateFormat.format(new Date(data.measurement_change.since)) })}
+            </dt>
+            <dd className="numeric">
+              {formatDelta(
+                data.measurement_change.delta_mm,
+                data.measurement_change.sigma_mm,
+                locale,
+                showUncertainty,
+              )}{" "}
+              ·{" "}
+              {data.measurement_change.detectable
+                ? t("lesions.measuredChange")
+                : t("lesions.noDetectableChange")}
+            </dd>
+          </div>
+        )}
         <div>
           <dt>{t("lesions.nextDue")}</dt>
           <dd className="numeric">

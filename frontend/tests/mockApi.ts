@@ -28,6 +28,7 @@ export interface MockState {
   observations: MockObservation[];
   /** Image ids whose quality check found a warning. */
   flagged: string[];
+  measurements: { id: string; observation_id: string; image_id: string; longest_mm: number }[];
   calls: { method: string; url: string; body?: unknown }[];
 }
 
@@ -52,6 +53,7 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     lesions: [],
     observations: [],
     flagged: [],
+    measurements: [],
     calls: [],
     ...initial,
   };
@@ -98,6 +100,8 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
       next_due_on: "2026-12-31",
       due: l.due,
       latest_image_id: visits.flatMap((o) => o.images).at(-1) ?? null,
+      latest_measurement: null,
+      measurement_change: null,
     };
   };
   const imageOut = (id: string, observationId: string) => ({
@@ -132,6 +136,32 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     created_at: o.captured_at,
     updated_at: o.captured_at,
     images: o.images.map((id) => imageOut(id, o.id)),
+  });
+  const measurementOut = (m: {
+    id: string;
+    observation_id: string;
+    image_id: string;
+    longest_mm: number;
+  }) => ({
+    id: m.id,
+    observation_id: m.observation_id,
+    lesion_id: "l1",
+    image_id: m.image_id,
+    scale_reference_id: "ref-card",
+    scale_kind: "card",
+    method: "assisted",
+    shape: {},
+    longest_mm: m.longest_mm,
+    perpendicular_mm: 4.9,
+    area_mm2: 19.6,
+    sigma_longest_mm: 0.2,
+    sigma_perpendicular_mm: 0.2,
+    sigma_area_mm2: 1.5,
+    tilt_deg: 4,
+    flags: [],
+    captured_at: "2026-09-01T10:00:00Z",
+    created_at: "2026-09-01T10:00:00Z",
+    change: null,
   });
   let counter = 100;
   const nextId = () => `0199a000-0000-7000-8000-${String(counter++).padStart(12, "0")}`;
@@ -276,6 +306,75 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
           if (patch.symptoms !== undefined) found.symptoms = patch.symptoms;
         }
         return json(observationOut(found));
+      }
+      match = /^\/api\/images\/([^/]+)\/scale$/.exec(path);
+      if (match) {
+        return json({
+          image_id: match[1],
+          upright_width: 3000,
+          upright_height: 2250,
+          card_checked: true,
+          card: {
+            found: true,
+            card: "window",
+            tilt_deg: 4,
+            mm_per_px: 0.05,
+            centre_px: [1500, 1125],
+            marker_px: 240,
+            flags: [],
+          },
+          references: [
+            {
+              id: "ref-card",
+              image_id: match[1],
+              kind: "card",
+              reference_mm: null,
+              mm_per_px: 0.05,
+              sigma_scale: 0.01,
+              tilt_deg: 4,
+              geometry: {},
+              created_at: "2026-10-01T10:00:00Z",
+            },
+          ],
+          tilt_limit_deg: 15,
+        });
+      }
+      match = /^\/api\/images\/([^/]+)\/fit$/.exec(path);
+      if (match && method === "POST") {
+        const tap = body as { x: number; y: number };
+        const outline = Array.from({ length: 12 }, (_, i) => [
+          tap.x + 50 * Math.cos((i / 12) * 2 * Math.PI),
+          tap.y + 50 * Math.sin((i / 12) * 2 * Math.PI),
+        ]);
+        return json({ cx: tap.x, cy: tap.y, r: 50, outline, method: "threshold" });
+      }
+      match = /^\/api\/observations\/([^/]+)\/measurements\/preview$/.exec(path);
+      if (match && method === "POST") {
+        return json({
+          longest_mm: 5.1,
+          perpendicular_mm: 4.9,
+          area_mm2: 19.6,
+          sigma_longest_mm: 0.2,
+          sigma_perpendicular_mm: 0.2,
+          sigma_area_mm2: 1.5,
+          tilt_deg: 4,
+          flags: [],
+        });
+      }
+      match = /^\/api\/observations\/([^/]+)\/measurements$/.exec(path);
+      if (match && method === "POST") {
+        const input = body as { image_id: string };
+        const created = {
+          id: nextId(),
+          observation_id: match[1] ?? "",
+          image_id: input.image_id,
+          longest_mm: 5.1,
+        };
+        state.measurements.push(created);
+        return json(measurementOut(created), 201);
+      }
+      if (match && method === "GET") {
+        return json(state.measurements.filter((m) => m.observation_id === match?.[1]).map(measurementOut));
       }
       match = /^\/api\/observations\/([^/]+)\/images$/.exec(path);
       if (match && method === "POST") {

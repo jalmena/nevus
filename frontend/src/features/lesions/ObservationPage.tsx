@@ -5,6 +5,7 @@ import { Button } from "@/design-system/components/Button";
 import { Notice } from "@/design-system/components/Notice";
 import { PhotoGallery } from "@/features/images/PhotoGallery";
 import { QualityNotice } from "@/features/images/QualityNotice";
+import { VisitMeasurements } from "@/features/measure/VisitMeasurements";
 import {
   SYMPTOMS,
   useDeleteObservation,
@@ -77,6 +78,8 @@ export function ObservationPage() {
         />
         <PhotoGallery images={data.images} canEdit={canEdit} upload={upload} />
       </section>
+
+      <VisitMeasurements observationId={data.id} images={data.images} canEdit={canEdit} />
 
       <section className={styles.section} aria-labelledby="notes-heading">
         <h2 id="notes-heading">{t("observations.yourNotes")}</h2>

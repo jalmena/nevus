@@ -232,6 +232,217 @@
         "title": "Body_upload_observation_image_api_observations__observation_id__images_post",
         "type": "object"
       },
+      "CardOut": {
+        "properties": {
+          "card": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Card"
+          },
+          "centre_px": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Centre Px"
+          },
+          "flags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Flags",
+            "type": "array"
+          },
+          "found": {
+            "title": "Found",
+            "type": "boolean"
+          },
+          "marker_px": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Marker Px"
+          },
+          "mm_per_px": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mm Per Px"
+          },
+          "tilt_deg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tilt Deg"
+          }
+        },
+        "required": [
+          "found"
+        ],
+        "title": "CardOut",
+        "type": "object"
+      },
+      "ChangeBrief": {
+        "properties": {
+          "delta_mm": {
+            "title": "Delta Mm",
+            "type": "number"
+          },
+          "detectable": {
+            "title": "Detectable",
+            "type": "boolean"
+          },
+          "sigma_mm": {
+            "title": "Sigma Mm",
+            "type": "number"
+          },
+          "since": {
+            "format": "date-time",
+            "title": "Since",
+            "type": "string"
+          }
+        },
+        "required": [
+          "delta_mm",
+          "sigma_mm",
+          "detectable",
+          "since"
+        ],
+        "title": "ChangeBrief",
+        "type": "object"
+      },
+      "ChangeOut": {
+        "properties": {
+          "delta_mm": {
+            "title": "Delta Mm",
+            "type": "number"
+          },
+          "detectable": {
+            "title": "Detectable",
+            "type": "boolean"
+          },
+          "sigma_mm": {
+            "title": "Sigma Mm",
+            "type": "number"
+          },
+          "since": {
+            "format": "date-time",
+            "title": "Since",
+            "type": "string"
+          }
+        },
+        "required": [
+          "delta_mm",
+          "sigma_mm",
+          "detectable",
+          "since"
+        ],
+        "title": "ChangeOut",
+        "type": "object"
+      },
+      "CircleShape": {
+        "properties": {
+          "cx": {
+            "title": "Cx",
+            "type": "number"
+          },
+          "cy": {
+            "title": "Cy",
+            "type": "number"
+          },
+          "r": {
+            "exclusiveMinimum": 0.5,
+            "title": "R",
+            "type": "number"
+          },
+          "type": {
+            "const": "circle",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "cx",
+          "cy",
+          "r"
+        ],
+        "title": "CircleShape",
+        "type": "object"
+      },
+      "CoinIn": {
+        "properties": {
+          "cx": {
+            "title": "Cx",
+            "type": "number"
+          },
+          "cy": {
+            "title": "Cy",
+            "type": "number"
+          },
+          "denomination": {
+            "enum": [
+              "1c",
+              "2c",
+              "5c",
+              "10c",
+              "20c",
+              "50c",
+              "1e",
+              "2e"
+            ],
+            "title": "Denomination",
+            "type": "string"
+          },
+          "kind": {
+            "const": "coin",
+            "title": "Kind",
+            "type": "string"
+          },
+          "r": {
+            "exclusiveMinimum": 2.0,
+            "title": "R",
+            "type": "number"
+          }
+        },
+        "required": [
+          "kind",
+          "cx",
+          "cy",
+          "r",
+          "denomination"
+        ],
+        "title": "CoinIn",
+        "type": "object"
+      },
       "Credentials": {
         "properties": {
           "password": {
@@ -253,6 +464,81 @@
           "password"
         ],
         "title": "Credentials",
+        "type": "object"
+      },
+      "FitIn": {
+        "properties": {
+          "target": {
+            "enum": [
+              "coin",
+              "lesion"
+            ],
+            "title": "Target",
+            "type": "string"
+          },
+          "x": {
+            "minimum": 0.0,
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "minimum": 0.0,
+            "title": "Y",
+            "type": "number"
+          }
+        },
+        "required": [
+          "x",
+          "y",
+          "target"
+        ],
+        "title": "FitIn",
+        "type": "object"
+      },
+      "FitOut": {
+        "properties": {
+          "cx": {
+            "title": "Cx",
+            "type": "number"
+          },
+          "cy": {
+            "title": "Cy",
+            "type": "number"
+          },
+          "method": {
+            "title": "Method",
+            "type": "string"
+          },
+          "outline": {
+            "anyOf": [
+              {
+                "items": {
+                  "items": {
+                    "type": "number"
+                  },
+                  "type": "array"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outline"
+          },
+          "r": {
+            "title": "R",
+            "type": "number"
+          }
+        },
+        "required": [
+          "cx",
+          "cy",
+          "r",
+          "outline",
+          "method"
+        ],
+        "title": "FitOut",
         "type": "object"
       },
       "HTTPValidationError": {
@@ -439,6 +725,59 @@
         "title": "ImageOut",
         "type": "object"
       },
+      "ImageScaleOut": {
+        "properties": {
+          "card": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CardOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "card_checked": {
+            "title": "Card Checked",
+            "type": "boolean"
+          },
+          "image_id": {
+            "format": "uuid",
+            "title": "Image Id",
+            "type": "string"
+          },
+          "references": {
+            "items": {
+              "$ref": "#/components/schemas/ScaleReferenceOut"
+            },
+            "title": "References",
+            "type": "array"
+          },
+          "tilt_limit_deg": {
+            "title": "Tilt Limit Deg",
+            "type": "number"
+          },
+          "upright_height": {
+            "title": "Upright Height",
+            "type": "integer"
+          },
+          "upright_width": {
+            "title": "Upright Width",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "image_id",
+          "upright_width",
+          "upright_height",
+          "card_checked",
+          "card",
+          "references",
+          "tilt_limit_deg"
+        ],
+        "title": "ImageScaleOut",
+        "type": "object"
+      },
       "InstanceStatus": {
         "properties": {
           "claimed": {
@@ -606,8 +945,28 @@
             ],
             "title": "Latest Image Id"
           },
+          "latest_measurement": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MeasurementBrief"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "location": {
             "$ref": "#/components/schemas/LocationOut"
+          },
+          "measurement_change": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ChangeBrief"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "next_due_on": {
             "anyOf": [
@@ -861,6 +1220,316 @@
         "title": "LocationOut",
         "type": "object"
       },
+      "ManualIn": {
+        "properties": {
+          "kind": {
+            "const": "manual",
+            "title": "Kind",
+            "type": "string"
+          },
+          "length_mm": {
+            "exclusiveMinimum": 0.5,
+            "maximum": 500.0,
+            "title": "Length Mm",
+            "type": "number"
+          },
+          "x1": {
+            "title": "X1",
+            "type": "number"
+          },
+          "x2": {
+            "title": "X2",
+            "type": "number"
+          },
+          "y1": {
+            "title": "Y1",
+            "type": "number"
+          },
+          "y2": {
+            "title": "Y2",
+            "type": "number"
+          }
+        },
+        "required": [
+          "kind",
+          "x1",
+          "y1",
+          "x2",
+          "y2",
+          "length_mm"
+        ],
+        "title": "ManualIn",
+        "type": "object"
+      },
+      "MeasurementBrief": {
+        "properties": {
+          "flags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Flags",
+            "type": "array"
+          },
+          "longest_mm": {
+            "title": "Longest Mm",
+            "type": "number"
+          },
+          "measured_at": {
+            "format": "date-time",
+            "title": "Measured At",
+            "type": "string"
+          },
+          "perpendicular_mm": {
+            "title": "Perpendicular Mm",
+            "type": "number"
+          },
+          "sigma_longest_mm": {
+            "title": "Sigma Longest Mm",
+            "type": "number"
+          }
+        },
+        "required": [
+          "longest_mm",
+          "sigma_longest_mm",
+          "perpendicular_mm",
+          "measured_at",
+          "flags"
+        ],
+        "title": "MeasurementBrief",
+        "type": "object"
+      },
+      "MeasurementIn": {
+        "properties": {
+          "image_id": {
+            "format": "uuid",
+            "title": "Image Id",
+            "type": "string"
+          },
+          "method": {
+            "enum": [
+              "assisted",
+              "manual"
+            ],
+            "title": "Method",
+            "type": "string"
+          },
+          "scale_reference_id": {
+            "format": "uuid",
+            "title": "Scale Reference Id",
+            "type": "string"
+          },
+          "shape": {
+            "discriminator": {
+              "mapping": {
+                "circle": "#/components/schemas/CircleShape",
+                "outline": "#/components/schemas/OutlineShape"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CircleShape"
+              },
+              {
+                "$ref": "#/components/schemas/OutlineShape"
+              }
+            ],
+            "title": "Shape"
+          }
+        },
+        "required": [
+          "image_id",
+          "scale_reference_id",
+          "method",
+          "shape"
+        ],
+        "title": "MeasurementIn",
+        "type": "object"
+      },
+      "MeasurementOut": {
+        "properties": {
+          "area_mm2": {
+            "title": "Area Mm2",
+            "type": "number"
+          },
+          "captured_at": {
+            "format": "date-time",
+            "title": "Captured At",
+            "type": "string"
+          },
+          "change": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ChangeOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "flags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Flags",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "image_id": {
+            "format": "uuid",
+            "title": "Image Id",
+            "type": "string"
+          },
+          "lesion_id": {
+            "format": "uuid",
+            "title": "Lesion Id",
+            "type": "string"
+          },
+          "longest_mm": {
+            "title": "Longest Mm",
+            "type": "number"
+          },
+          "method": {
+            "title": "Method",
+            "type": "string"
+          },
+          "observation_id": {
+            "format": "uuid",
+            "title": "Observation Id",
+            "type": "string"
+          },
+          "perpendicular_mm": {
+            "title": "Perpendicular Mm",
+            "type": "number"
+          },
+          "scale_kind": {
+            "title": "Scale Kind",
+            "type": "string"
+          },
+          "scale_reference_id": {
+            "format": "uuid",
+            "title": "Scale Reference Id",
+            "type": "string"
+          },
+          "shape": {
+            "additionalProperties": true,
+            "title": "Shape",
+            "type": "object"
+          },
+          "sigma_area_mm2": {
+            "title": "Sigma Area Mm2",
+            "type": "number"
+          },
+          "sigma_longest_mm": {
+            "title": "Sigma Longest Mm",
+            "type": "number"
+          },
+          "sigma_perpendicular_mm": {
+            "title": "Sigma Perpendicular Mm",
+            "type": "number"
+          },
+          "tilt_deg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tilt Deg"
+          }
+        },
+        "required": [
+          "id",
+          "observation_id",
+          "lesion_id",
+          "image_id",
+          "scale_reference_id",
+          "scale_kind",
+          "method",
+          "shape",
+          "longest_mm",
+          "perpendicular_mm",
+          "area_mm2",
+          "sigma_longest_mm",
+          "sigma_perpendicular_mm",
+          "sigma_area_mm2",
+          "tilt_deg",
+          "flags",
+          "captured_at",
+          "created_at"
+        ],
+        "title": "MeasurementOut",
+        "type": "object"
+      },
+      "MeasurementPreview": {
+        "properties": {
+          "area_mm2": {
+            "title": "Area Mm2",
+            "type": "number"
+          },
+          "flags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Flags",
+            "type": "array"
+          },
+          "longest_mm": {
+            "title": "Longest Mm",
+            "type": "number"
+          },
+          "perpendicular_mm": {
+            "title": "Perpendicular Mm",
+            "type": "number"
+          },
+          "sigma_area_mm2": {
+            "title": "Sigma Area Mm2",
+            "type": "number"
+          },
+          "sigma_longest_mm": {
+            "title": "Sigma Longest Mm",
+            "type": "number"
+          },
+          "sigma_perpendicular_mm": {
+            "title": "Sigma Perpendicular Mm",
+            "type": "number"
+          },
+          "tilt_deg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tilt Deg"
+          }
+        },
+        "required": [
+          "longest_mm",
+          "perpendicular_mm",
+          "area_mm2",
+          "sigma_longest_mm",
+          "sigma_perpendicular_mm",
+          "sigma_area_mm2",
+          "tilt_deg",
+          "flags"
+        ],
+        "title": "MeasurementPreview",
+        "type": "object"
+      },
       "ObservationIn": {
         "properties": {
           "captured_at": {
@@ -1068,6 +1737,33 @@
           }
         },
         "title": "ObservationUpdate",
+        "type": "object"
+      },
+      "OutlineShape": {
+        "properties": {
+          "points": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "maxItems": 400,
+            "minItems": 3,
+            "title": "Points",
+            "type": "array"
+          },
+          "type": {
+            "const": "outline",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "points"
+        ],
+        "title": "OutlineShape",
         "type": "object"
       },
       "PasswordChange": {
@@ -1306,6 +2002,77 @@
         "title": "RenditionOut",
         "type": "object"
       },
+      "ScaleReferenceOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "geometry": {
+            "additionalProperties": true,
+            "title": "Geometry",
+            "type": "object"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "image_id": {
+            "format": "uuid",
+            "title": "Image Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "mm_per_px": {
+            "title": "Mm Per Px",
+            "type": "number"
+          },
+          "reference_mm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference Mm"
+          },
+          "sigma_scale": {
+            "title": "Sigma Scale",
+            "type": "number"
+          },
+          "tilt_deg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tilt Deg"
+          }
+        },
+        "required": [
+          "id",
+          "image_id",
+          "kind",
+          "reference_mm",
+          "mm_per_px",
+          "sigma_scale",
+          "tilt_deg",
+          "geometry",
+          "created_at"
+        ],
+        "title": "ScaleReferenceOut",
+        "type": "object"
+      },
       "SessionOut": {
         "properties": {
           "instance_claimed": {
@@ -1397,6 +2164,17 @@
       },
       "UserOut": {
         "properties": {
+          "card_line_mm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Card Line Mm"
+          },
           "created_at": {
             "format": "date-time",
             "title": "Created At",
@@ -1475,6 +2253,7 @@
           "language",
           "theme",
           "show_uncertainty",
+          "card_line_mm",
           "created_at",
           "last_login_at",
           "disabled_at"
@@ -1484,6 +2263,20 @@
       },
       "UserUpdateMe": {
         "properties": {
+          "card_line_mm": {
+            "anyOf": [
+              {
+                "maximum": 55.0,
+                "minimum": 45.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Measured length of the printed card's 50 mm line",
+            "title": "Card Line Mm"
+          },
           "email": {
             "anyOf": [
               {
@@ -2061,6 +2854,171 @@
         ]
       }
     },
+    "/api/images/{image_id}/fit": {
+      "post": {
+        "description": "A proposal around a tap, in the photo's upright pixels. Nothing is stored.",
+        "operationId": "propose_fit_api_images__image_id__fit_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "image_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Image Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FitIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FitOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Propose Fit",
+        "tags": [
+          "measurements"
+        ]
+      }
+    },
+    "/api/images/{image_id}/scale": {
+      "get": {
+        "operationId": "image_scale_api_images__image_id__scale_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "image_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Image Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageScaleOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Image Scale",
+        "tags": [
+          "measurements"
+        ]
+      }
+    },
+    "/api/images/{image_id}/scale-references": {
+      "post": {
+        "operationId": "add_scale_reference_api_images__image_id__scale_references_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "image_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Image Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "discriminator": {
+                  "mapping": {
+                    "coin": "#/components/schemas/CoinIn",
+                    "manual": "#/components/schemas/ManualIn"
+                  },
+                  "propertyName": "kind"
+                },
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CoinIn"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ManualIn"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScaleReferenceOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add Scale Reference",
+        "tags": [
+          "measurements"
+        ]
+      }
+    },
     "/api/images/{image_id}/{kind}": {
       "get": {
         "description": "The bytes, only for people who may see the person; cacheable forever because the content is addressed by hash.",
@@ -2242,6 +3200,53 @@
         ]
       }
     },
+    "/api/lesions/{lesion_id}/measurements": {
+      "get": {
+        "operationId": "lesion_measurements_api_lesions__lesion_id__measurements_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lesion_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Lesion Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MeasurementOut"
+                  },
+                  "title": "Response Lesion Measurements Api Lesions  Lesion Id  Measurements Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Lesion Measurements",
+        "tags": [
+          "measurements"
+        ]
+      }
+    },
     "/api/lesions/{lesion_id}/observations": {
       "get": {
         "operationId": "list_observations_api_lesions__lesion_id__observations_get",
@@ -2337,6 +3342,42 @@
         "summary": "Create Observation",
         "tags": [
           "lesions"
+        ]
+      }
+    },
+    "/api/measurements/{measurement_id}": {
+      "delete": {
+        "operationId": "delete_measurement_api_measurements__measurement_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "measurement_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Measurement Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Measurement",
+        "tags": [
+          "measurements"
         ]
       }
     },
@@ -2564,6 +3605,159 @@
         "summary": "Upload Observation Image",
         "tags": [
           "lesions"
+        ]
+      }
+    },
+    "/api/observations/{observation_id}/measurements": {
+      "get": {
+        "operationId": "observation_measurements_api_observations__observation_id__measurements_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "observation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Observation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MeasurementOut"
+                  },
+                  "title": "Response Observation Measurements Api Observations  Observation Id  Measurements Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Observation Measurements",
+        "tags": [
+          "measurements"
+        ]
+      },
+      "post": {
+        "description": "Submitting a measurement is the confirmation: nothing proposed is ever stored without it.",
+        "operationId": "create_measurement_api_observations__observation_id__measurements_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "observation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Observation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MeasurementIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeasurementOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Measurement",
+        "tags": [
+          "measurements"
+        ]
+      }
+    },
+    "/api/observations/{observation_id}/measurements/preview": {
+      "post": {
+        "description": "The same computation as saving, without saving: the interface shows it while the outline moves.",
+        "operationId": "preview_measurement_api_observations__observation_id__measurements_preview_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "observation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Observation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MeasurementIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeasurementPreview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Preview Measurement",
+        "tags": [
+          "measurements"
         ]
       }
     },
@@ -3098,6 +4292,64 @@
         "summary": "Create Lesion",
         "tags": [
           "lesions"
+        ]
+      }
+    },
+    "/api/reference-card": {
+      "get": {
+        "description": "Two window cards, two strips and a 50 mm line to verify the printer did not scale the page.",
+        "operationId": "reference_card_api_reference_card_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": "a4",
+              "enum": [
+                "a4",
+                "letter"
+              ],
+              "title": "Page",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "lang",
+            "required": false,
+            "schema": {
+              "default": "en",
+              "enum": [
+                "en",
+                "es"
+              ],
+              "title": "Lang",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/pdf": {}
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reference Card",
+        "tags": [
+          "measurements"
         ]
       }
     },
