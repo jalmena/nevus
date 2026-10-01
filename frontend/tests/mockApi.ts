@@ -53,6 +53,8 @@ export interface MockState {
     report_id: string | null;
     created_at: string;
   }[];
+  webhooks: { id: string; name: string; preset: string; url: string; enabled: boolean }[];
+  calendar: { exists: boolean };
   /** Reports; a queued one is ready the next time the list is read, unless it is set to fail. */
   reports: {
     id: string;
@@ -109,6 +111,8 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     comparison: { status: "aligned" },
     reports: [],
     appointments: [],
+    webhooks: [],
+    calendar: { exists: false },
     ...initial,
   };
   const personOut = (p: { id: string; display_name: string }) => ({
@@ -653,6 +657,64 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
           if (patch.notes !== undefined) found.notes = patch.notes;
         }
         return json(appointmentOut(found));
+      }
+      const hookOut = (h: MockState["webhooks"][number]) => ({
+        id: h.id,
+        name: h.name,
+        preset: h.preset,
+        url_hint: h.url.slice(0, 30),
+        has_secret: false,
+        enabled: h.enabled,
+        last_status: null,
+        last_error: null,
+        last_sent_at: null,
+        created_at: "2026-10-01T10:00:00Z",
+      });
+      if (path === "/api/admin/webhooks" && method === "GET") return json(state.webhooks.map(hookOut));
+      if (path === "/api/admin/webhooks" && method === "POST") {
+        const input = body as { name: string; preset: string; url: string; enabled: boolean };
+        const created = {
+          id: nextId(),
+          name: input.name,
+          preset: input.preset,
+          url: input.url,
+          enabled: input.enabled,
+        };
+        state.webhooks.push(created);
+        return json(hookOut(created), 201);
+      }
+      match = /^\/api\/admin\/webhooks\/([^/]+)\/test$/.exec(path);
+      if (match && method === "POST") return json({ ok: true, detail: null });
+      match = /^\/api\/admin\/webhooks\/([^/]+)$/.exec(path);
+      if (match) {
+        const found = state.webhooks.find((h) => h.id === match?.[1]);
+        if (!found) return json({ detail: "No such webhook." }, 404);
+        if (method === "DELETE") {
+          state.webhooks = state.webhooks.filter((h) => h.id !== found.id);
+          return new Response(null, { status: 204 });
+        }
+        const patch = body as { enabled?: boolean };
+        if (patch.enabled !== undefined) found.enabled = patch.enabled;
+        return json(hookOut(found));
+      }
+      match = /^\/api\/persons\/([^/]+)\/calendar$/.exec(path);
+      if (match) {
+        if (method === "POST") {
+          state.calendar.exists = true;
+          return json(
+            { url: "http://localhost/api/calendar/secret-token-123.ics", created_at: "2026-10-01T10:00:00Z" },
+            201,
+          );
+        }
+        if (method === "DELETE") {
+          state.calendar.exists = false;
+          return new Response(null, { status: 204 });
+        }
+        return json({
+          exists: state.calendar.exists,
+          created_at: state.calendar.exists ? "2026-10-01T10:00:00Z" : null,
+          last_used_at: null,
+        });
       }
       if (path === "/api/comparisons" && method === "POST") {
         const pair = body as { image_a: string; image_b: string };

@@ -539,5 +539,57 @@
     "left_one": "1 mark to photograph",
     "left_other": "{{count}} marks to photograph",
     "upcoming": "Coming appointments"
+  },
+  "webhooks": {
+    "title": "Webhooks",
+    "intro": "Send the daily list of marks due for a photo to Home Assistant, ntfy, Gotify, n8n or any address. Each webhook covers the persons you own or manage, and carries names and dates only, never photos or notes.",
+    "preset": "Kind",
+    "presets": {
+      "home_assistant": "Home Assistant",
+      "ntfy": "ntfy",
+      "gotify": "Gotify",
+      "n8n": "n8n",
+      "generic": "Any address (JSON)"
+    },
+    "name": "Name (optional)",
+    "url": "Address",
+    "urlHints": {
+      "home_assistant": "The webhook address of an automation's trigger, such as https://ha.example/api/webhook/…",
+      "ntfy": "The topic address, such as https://ntfy.example/my-topic",
+      "gotify": "The server address, such as https://gotify.example",
+      "n8n": "The production address of a Webhook node",
+      "generic": "Receives a JSON POST with the list of due marks."
+    },
+    "secret": "Secret or token (optional)",
+    "secretHints": {
+      "home_assistant": "If set, the JSON is signed in the X-Nevus-Signature header (HMAC-SHA256).",
+      "ntfy": "An access token, if the topic is protected.",
+      "gotify": "The application token (required by Gotify).",
+      "n8n": "If set, the JSON is signed in the X-Nevus-Signature header (HMAC-SHA256).",
+      "generic": "If set, the JSON is signed in the X-Nevus-Signature header (HMAC-SHA256)."
+    },
+    "add": "Add the webhook",
+    "enabled": "On",
+    "test": "Send a test",
+    "delete": "Delete",
+    "deleteNamed": "Delete the webhook {{name}}",
+    "arrived": "The test message arrived.",
+    "didNotArrive": "It did not arrive: {{detail}}",
+    "lastSent": "Last sent {{date}}",
+    "lastFailed": "Last attempt failed: {{detail}}",
+    "notYet": "Nothing sent yet",
+    "testNamed": "Send a test to {{name}}"
+  },
+  "calendar": {
+    "title": "Calendar",
+    "intro": "Subscribe from your calendar app to see when each mark is due for a photo, and the appointments. The calendar reminds you on the day; it works over your VPN, with no push service.",
+    "make": "Make a calendar link",
+    "again": "Make a new link",
+    "stop": "Stop the link",
+    "link": "Calendar link",
+    "copy": "Copy the link",
+    "copied": "Copied",
+    "warning": "This link is shown only now. Anyone with it sees the names of the marks and their dates, so keep it private. Making a new link stops this one.",
+    "exists": "A calendar link exists since {{date}}. To see it again, make a new one."
   }
 }

@@ -56,7 +56,7 @@ describe("reports", () => {
     const download = await screen.findByRole(
       "link",
       { name: /Download the PDF \(2 pages, 32 kB\)/ },
-      { timeout: 4000 },
+      { timeout: 10_000 },
     );
     expect(download).toHaveAttribute("href", expect.stringMatching(/^\/api\/reports\/.+\/download$/));
   });

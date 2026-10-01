@@ -113,7 +113,7 @@ describe("preparing an appointment", () => {
     await waitFor(() => expect(state.reports[0]?.scope).toBe("visit"));
     expect(state.reports[0]?.language).toBe("es");
     expect(
-      await screen.findByRole("link", { name: /Download the PDF/ }, { timeout: 4000 }),
+      await screen.findByRole("link", { name: /Download the PDF/ }, { timeout: 10_000 }),
     ).toBeInTheDocument();
   });
 

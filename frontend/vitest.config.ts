@@ -7,6 +7,8 @@ export default defineConfig({
   resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
   test: {
     environment: "jsdom",
+    // Some tests wait for a polling interval (reports being made); slow CI runners need the room.
+    testTimeout: 20_000,
     globals: true,
     setupFiles: ["tests/setup.ts"],
     include: ["tests/**/*.test.tsx", "src/**/*.test.ts"],

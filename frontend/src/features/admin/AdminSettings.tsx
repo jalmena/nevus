@@ -12,6 +12,7 @@ import {
   useTestEmail,
 } from "@/lib/admin";
 import { supportedLanguages } from "@/lib/i18n";
+import { WebhookSettings } from "./WebhookSettings";
 import styles from "@/features/settings/settings.module.css";
 
 /** For administrators: how reminder emails leave the server, and the language of new accounts. */
@@ -136,6 +137,7 @@ export function AdminSettings() {
         {test.error && <Notice kind="error">{test.error.message}</Notice>}
         {test.isSuccess && <Notice kind="success">{t("admin.testSent")}</Notice>}
       </Card>
+      <WebhookSettings />
       <Card className={styles.group}>
         <h2 className={styles.subheading}>{t("admin.instanceTitle")}</h2>
         <label className={styles.row}>

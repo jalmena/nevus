@@ -542,5 +542,57 @@
     "left_many": "{{count}} marcas por fotografiar",
     "left_other": "{{count}} marcas por fotografiar",
     "upcoming": "Próximas citas"
+  },
+  "webhooks": {
+    "title": "Webhooks",
+    "intro": "Envía la lista diaria de marcas que toca fotografiar a Home Assistant, ntfy, Gotify, n8n o cualquier dirección. Cada webhook cubre las personas de las que eres propietario o gestor, y solo lleva nombres y fechas, nunca fotos ni notas.",
+    "preset": "Tipo",
+    "presets": {
+      "home_assistant": "Home Assistant",
+      "ntfy": "ntfy",
+      "gotify": "Gotify",
+      "n8n": "n8n",
+      "generic": "Cualquier dirección (JSON)"
+    },
+    "name": "Nombre (opcional)",
+    "url": "Dirección",
+    "urlHints": {
+      "home_assistant": "La dirección del webhook del disparador de una automatización, como https://ha.example/api/webhook/…",
+      "ntfy": "La dirección del tema, como https://ntfy.example/mi-tema",
+      "gotify": "La dirección del servidor, como https://gotify.example",
+      "n8n": "La dirección de producción de un nodo Webhook",
+      "generic": "Recibe un POST en JSON con la lista de marcas pendientes."
+    },
+    "secret": "Secreto o token (opcional)",
+    "secretHints": {
+      "home_assistant": "Si lo indicas, el JSON va firmado en la cabecera X-Nevus-Signature (HMAC-SHA256).",
+      "ntfy": "Un token de acceso, si el tema está protegido.",
+      "gotify": "El token de la aplicación (Gotify lo exige).",
+      "n8n": "Si lo indicas, el JSON va firmado en la cabecera X-Nevus-Signature (HMAC-SHA256).",
+      "generic": "Si lo indicas, el JSON va firmado en la cabecera X-Nevus-Signature (HMAC-SHA256)."
+    },
+    "add": "Añadir el webhook",
+    "enabled": "Activo",
+    "test": "Enviar una prueba",
+    "delete": "Borrar",
+    "deleteNamed": "Borrar el webhook {{name}}",
+    "arrived": "El mensaje de prueba ha llegado.",
+    "didNotArrive": "No ha llegado: {{detail}}",
+    "lastSent": "Último envío: {{date}}",
+    "lastFailed": "El último intento falló: {{detail}}",
+    "notYet": "Aún no se ha enviado nada",
+    "testNamed": "Enviar una prueba a {{name}}"
+  },
+  "calendar": {
+    "title": "Calendario",
+    "intro": "Suscríbete desde tu aplicación de calendario para ver cuándo toca fotografiar cada marca, y las citas. El calendario te avisa ese día; funciona a través de tu VPN, sin servicios de notificaciones.",
+    "make": "Crear un enlace de calendario",
+    "again": "Crear un enlace nuevo",
+    "stop": "Desactivar el enlace",
+    "link": "Enlace del calendario",
+    "copy": "Copiar el enlace",
+    "copied": "Copiado",
+    "warning": "Este enlace solo se muestra ahora. Quien lo tenga verá los nombres de las marcas y sus fechas, así que guárdalo en privado. Crear un enlace nuevo desactiva este.",
+    "exists": "Hay un enlace de calendario desde el {{date}}. Para verlo de nuevo, crea uno nuevo."
   }
 }
