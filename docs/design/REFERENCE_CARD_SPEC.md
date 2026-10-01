@@ -27,10 +27,14 @@ Coordinates in millimetres from the top-left corner of the card; the card outlin
 | Fiducial markers | four ArUco markers from `DICT_4X4_50`, ids 0, 1, 2, 3, 12.0 mm square, at the four corners of a 60 × 40 mm rectangle centred on the aperture: centres at (12.8, 7.0), (72.8, 7.0), (12.8, 47.0), (72.8, 47.0) | 1.5 mm white quiet zone around each marker; marker ids are fixed so the analyzer knows the card orientation |
 | Grey patch | 10 × 10 mm at (78.0, 22.0) to (85.0 − 1.5 margin) → use (74.0, 22.0) size 8 × 8 mm | 18 % reflectance neutral grey (`#777777` in sRGB print terms; verify with the printer profile) for exposure reference |
 | White patch | 8 × 8 mm at (74.0, 32.0) | Paper white, for white balance |
-| Print-verification scale | 50.0 mm line with end ticks along the bottom edge from (17.8, 51.0) to (67.8, 51.0) | The person measures it with a ruler after printing; if it is not 50 ± 0.5 mm the printer scaled the page |
-| Wordmark and id | `neVus` wordmark 14 mm wide at (4.0, 50.0) and the text `card v1 · 24 mm` in 2 mm type | Card version is read by the analyzer from the marker ids (v1 = ids 0–3); the text is for humans |
+| Print-verification scale | 50.0 mm line with end ticks, printed on the sheet below the cards (not on the card) | The person measures it with a ruler after printing; if it is not 50 ± 0.5 mm the printer scaled the page, and the measured length entered in Settings corrects every card on that sheet |
+| Label | `neVus · card v1 · 24 mm` in 2.2 mm bold type centred at the top, between the upper markers | Card version is read by the analyzer from the marker ids (v1 = ids 0–3); the text is for humans |
 
-Strip variant: two markers (ids 4 and 5, 12 mm) at each end of a 60 × 20 mm strip, a 30 mm scale bar with 1 mm ticks between them, grey and white patches of 6 × 6 mm.
+Correction to the first draft of this table (2026-10-01): a 50 mm line along the bottom edge does not fit between the lower markers, whose inner edges are 48 mm apart, and the wordmark position overlapped the lower-left marker. The line moved to the sheet, where one line verifies all four cards printed with it, and the label moved to the free band at the top.
+
+Strip variant: two markers (ids 4 and 5, 12 mm) centred at (8, 10) and (52, 10) on a 60 × 20 mm strip, a 30 mm scale bar with 1 mm ticks between them at y = 15, grey and white patches of 6 × 6 mm at (18, 1.5) and (36, 1.5).
+
+The constants live in `backend/src/nevus/cv/card.py`; the generator and the detector both read them.
 
 ## 4. Printing
 
@@ -60,8 +64,12 @@ Two points placed by the person on an object of known length (a ruler mark, the 
 
 ## 8. Generator
 
-A script in the backend project (`nevus card --page a4|letter --out cards.pdf`) draws the cards with OpenCV's ArUco module for the markers and vector primitives for everything else, rendered to PDF at exact millimetre dimensions, and embeds the bilingual verification instructions. The same geometry constants feed the analyzer, so the card and its detector cannot disagree. The generated PDFs for version 1 are published as release assets and linked from the deployment guide and the in-app onboarding.
+`nevus card --page a4|letter --lang en|es --out cards.pdf` and `GET /api/reference-card` (Settings → Reference card in the app) draw the sheet with a small built-in vector PDF writer: marker cells come from OpenCV's ArUco dictionary, each marker filled as one path so no hairline seams appear, everything else as exact millimetre primitives, with the instructions in the chosen language. The same constants feed the detector, so the card and its detector cannot disagree; a test rasterises the generated PDF at 300 dpi and finds the card at the expected 0.0847 mm per pixel.
+
+Detection groups markers into physical cards before fitting: each marker's own corners predict where its siblings should be, and only markers that sit there join it, so a photo with two cards, or of the whole sheet, still yields one consistent card.
 
 ## 9. Evaluation
+
+Implemented now (`backend/tests/test_scale.py`), on synthetic photographs: the card rendered at 20 px/mm with a disc of known size in its window, projected by a pinhole camera at 0°, 10°, 20° and 30° of tilt. The card is found at every tilt, the tilt estimate is within 2°, flagging switches on beyond 15°, the scale error is within 2 % when flat, and the 5 mm disc measures within 0.3 mm up to the limit (observed 5.08 to 5.11 mm, perspective corrected by the homography). The photographic fixtures below are the next step and need real prints.
 
 Fixture photographs of a printed card next to discs of known diameter (3, 5, 8 and 12 mm) at 8, 12 and 18 cm, at 0°, 10°, 20° and 30° tilt, under warm, cool and mixed light, on paper backgrounds of several tones. Gates in CI: detection rate ≥ 0.98 at ≤ 20° tilt; millimetre-per-pixel error ≤ 2 % at ≤ 15° tilt; disc diameter error ≤ 0.3 mm for the 5 mm disc within the tilt limit; correct tilt flagging beyond it. The Product Owner's own card photographs at known distances join the evaluation set without leaving the server.
