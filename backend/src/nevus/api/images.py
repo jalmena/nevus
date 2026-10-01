@@ -100,6 +100,7 @@ async def ingest_upload(
     captured_tz: str | None,
     observation_id: uuid.UUID | None = None,
     fallback_captured_at: datetime | None = None,
+    image_id: uuid.UUID | None = None,
 ) -> Image:
     """Scrub, store and describe one uploaded photograph. Access to the person is checked by the caller.
 
@@ -126,6 +127,7 @@ async def ingest_upload(
         raise HTTPException(status.HTTP_507_INSUFFICIENT_STORAGE, "The data volume is nearly full.") from error
     when = captured_at or scrubbed.captured_at or fallback_captured_at
     image = Image(
+        **({"id": image_id} if image_id else {}),
         person_id=person_id,
         observation_id=observation_id,
         role=role,

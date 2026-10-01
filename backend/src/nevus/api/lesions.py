@@ -140,6 +140,9 @@ class LesionOut(BaseModel):
 
 
 class ObservationIn(BaseModel):
+    id: uuid.UUID | None = Field(
+        default=None, description="Minted by the client (UUIDv7) so a retried upload from the offline queue is a no-op"
+    )
     captured_at: datetime | None = None
     captured_tz: str | None = Field(default=None, max_length=64)
     notes: str | None = Field(default=None, max_length=4000)
@@ -434,10 +437,17 @@ def create_observation(
     settings: AppSettings,
 ) -> ObservationOut:
     lesion = _lesion_for(db, lesion_id, user, ACCESS_OWNER, ACCESS_MANAGER)
+    if body.id is not None:
+        existing = db.get(Observation, body.id)
+        if existing is not None:
+            if existing.lesion_id != lesion.id:
+                raise HTTPException(status.HTTP_409_CONFLICT, "That identifier belongs to another visit.")
+            return _observation_out(db, existing)
     captured_at = body.captured_at or utcnow()
     if captured_at.tzinfo is None:
         captured_at = captured_at.replace(tzinfo=UTC)
     observation = Observation(
+        **({"id": body.id} if body.id else {}),
         lesion_id=lesion_id,
         captured_at=captured_at,
         captured_tz=body.captured_tz,
@@ -530,8 +540,15 @@ async def upload_observation_image(
     modality: Annotated[Modality, Form()] = "camera",
     captured_at: Annotated[datetime | None, Form()] = None,
     captured_tz: Annotated[str | None, Form(max_length=64)] = None,
+    client_id: Annotated[uuid.UUID | None, Form()] = None,
 ) -> ImageOut:
     observation, lesion = _observation_for(db, observation_id, user, ACCESS_OWNER, ACCESS_MANAGER)
+    if client_id is not None:
+        existing = db.get(Image, client_id)
+        if existing is not None:
+            if existing.observation_id != observation.id:
+                raise HTTPException(status.HTTP_409_CONFLICT, "That identifier belongs to another photo.")
+            return ImageOut.model_validate(existing)
     image = await ingest_upload(
         request,
         user,
@@ -545,6 +562,7 @@ async def upload_observation_image(
         captured_tz or observation.captured_tz,
         observation_id=observation.id,
         fallback_captured_at=observation.captured_at,
+        image_id=client_id,
     )
     return ImageOut.model_validate(image)
 
