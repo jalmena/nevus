@@ -45,6 +45,14 @@ export interface MockState {
   }[];
   /** What aligning two photos gives: lined up (with the card) or refused for a reason. */
   comparison: { status: "aligned" } | { status: "abstained"; reason: string };
+  appointments: {
+    id: string;
+    person_id: string;
+    date: string;
+    notes: string | null;
+    report_id: string | null;
+    created_at: string;
+  }[];
   /** Reports; a queued one is ready the next time the list is read, unless it is set to fail. */
   reports: {
     id: string;
@@ -100,6 +108,7 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     calls: [],
     comparison: { status: "aligned" },
     reports: [],
+    appointments: [],
     ...initial,
   };
   const personOut = (p: { id: string; display_name: string }) => ({
@@ -571,6 +580,79 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
       if (match && method === "DELETE") {
         state.reports = state.reports.filter((r) => r.id !== match?.[1]);
         return new Response(null, { status: 204 });
+      }
+      const appointmentOut = (a: MockState["appointments"][number]) => ({
+        ...a,
+        person_name: state.persons.find((p) => p.id === a.person_id)?.display_name ?? "",
+        can_edit: true,
+        checklist: state.lesions
+          .filter((l) => l.person_id === a.person_id)
+          .map((l) => {
+            const visits = state.observations.filter((o) => o.lesion_id === l.id).map((o) => o.captured_at);
+            const last = visits.sort().at(-1) ?? null;
+            const state_ =
+              last === null ? "never_photographed" : last >= a.created_at ? "photographed" : "to_photograph";
+            return {
+              lesion_id: l.id,
+              label: l.label,
+              zone: l.zone,
+              state: state_,
+              last_observed_at: last,
+              next_due_on: last === null ? null : "2026-10-10",
+            };
+          }),
+      });
+      if (path === "/api/appointments/upcoming") {
+        return json(state.appointments.filter((a) => a.date >= "2026-10-01").map(appointmentOut));
+      }
+      match = /^\/api\/persons\/([^/]+)\/appointments$/.exec(path);
+      if (match && method === "GET") {
+        return json(state.appointments.filter((a) => a.person_id === match?.[1]).map(appointmentOut));
+      }
+      if (match && method === "POST") {
+        const input = body as { date: string; notes: string | null };
+        const created = {
+          id: nextId(),
+          person_id: match[1] ?? "",
+          date: input.date,
+          notes: input.notes,
+          report_id: null,
+          created_at: "2026-10-01T10:00:00Z",
+        };
+        state.appointments.push(created);
+        return json(appointmentOut(created), 201);
+      }
+      match = /^\/api\/appointments\/([^/]+)\/report$/.exec(path);
+      if (match && method === "POST") {
+        const found = state.appointments.find((a) => a.id === match?.[1]);
+        if (!found) return json({ detail: "No such appointment." }, 404);
+        const input = body as { language?: string; paper?: string };
+        const created = {
+          id: nextId(),
+          scope: "visit",
+          lesion_ids: [],
+          language: input.language ?? "en",
+          paper: input.paper ?? "a4",
+          status: "queued",
+        };
+        state.reports.unshift(created);
+        found.report_id = created.id;
+        return json(reportOut(created), 202);
+      }
+      match = /^\/api\/appointments\/([^/]+)$/.exec(path);
+      if (match) {
+        const found = state.appointments.find((a) => a.id === match?.[1]);
+        if (!found) return json({ detail: "No such appointment." }, 404);
+        if (method === "DELETE") {
+          state.appointments = state.appointments.filter((a) => a.id !== found.id);
+          return new Response(null, { status: 204 });
+        }
+        if (method === "PATCH") {
+          const patch = body as { date?: string; notes?: string | null };
+          if (patch.date) found.date = patch.date;
+          if (patch.notes !== undefined) found.notes = patch.notes;
+        }
+        return json(appointmentOut(found));
       }
       if (path === "/api/comparisons" && method === "POST") {
         const pair = body as { image_a: string; image_b: string };

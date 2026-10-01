@@ -13,6 +13,7 @@ import { lesionTitle } from "@/features/lesions/lesionName";
 import { useCreateLesion, useLesions } from "@/lib/lesions";
 import { ExportForm } from "@/features/data/ExportForm";
 import { PurgePerson } from "@/features/data/PurgePerson";
+import { PrepareAppointment } from "@/features/appointments/PrepareAppointment";
 import { Reports } from "@/features/reports/Reports";
 import { formatBytes, useUsage } from "@/lib/data";
 import { usePerson, useUpdatePerson } from "@/lib/persons";
@@ -137,6 +138,8 @@ export function PersonPage() {
         )}
         {lesions.data && lesions.data.length > 0 && <LesionList lesions={lesions.data} />}
       </section>
+
+      {person.data && <PrepareAppointment personId={personId} canEdit={canEdit} />}
 
       {person.data && (
         <Reports
