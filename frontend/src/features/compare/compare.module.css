@@ -1,0 +1,97 @@
+.page {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.page h1 {
+  font-size: var(--text-2xl);
+}
+
+.pickers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: var(--space-3);
+}
+
+.picker {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.picker select {
+  min-height: var(--touch-target);
+}
+
+.sideBySide {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: var(--space-3);
+}
+
+.figure {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.slider {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.slider input {
+  width: 100%;
+  min-height: var(--touch-target);
+  accent-color: var(--color-accent);
+}
+
+.split {
+  stroke: var(--color-paper);
+}
+
+.scaleBar line {
+  stroke: var(--color-ink);
+  stroke-linecap: butt;
+}
+
+.scaleBar line.scaleHalo {
+  stroke: var(--color-paper);
+  stroke-opacity: 0.85;
+}
+
+.scaleBar text {
+  fill: var(--color-ink);
+  stroke: var(--color-paper);
+  stroke-opacity: 0.85;
+  paint-order: stroke;
+  font-family: var(--font-ui);
+  font-weight: var(--font-weight-emphasis);
+}
+
+.legend {
+  display: grid;
+  gap: var(--space-1);
+  max-width: 28rem;
+}
+
+/* The map's own ramp: one hue, transparent where the photos agree, darker and more opaque where they differ. */
+.ramp {
+  height: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background:
+    linear-gradient(
+      to right,
+      transparent,
+      color-mix(in srgb, color-mix(in srgb, var(--color-diff-low), var(--color-diff-high)) 43%, transparent),
+      color-mix(in srgb, var(--color-diff-high) 86%, transparent)
+    ),
+    var(--color-diff-backdrop);
+}
+
+.rampLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-sm);
+  color: var(--color-ink-3);
+}

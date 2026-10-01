@@ -20,16 +20,32 @@ interface ViewBox {
   h: number;
 }
 
+/** A view as fractions of the photo, so two photos of different sizes can share one zoom and pan. */
+export type SharedView = ViewBox;
+export const WHOLE: SharedView = { x: 0, y: 0, w: 1, h: 1 };
+
 interface CanvasContext {
   toImage: (clientX: number, clientY: number) => Point;
   /** Size of one screen pixel in image pixels: handles stay the same size on screen whatever the zoom. */
   unit: number;
+  /** The visible part of the photo, in its pixels. */
+  view: ViewBox;
 }
 
-const Context = createContext<CanvasContext>({ toImage: (x, y) => ({ x, y }), unit: 1 });
+const Context = createContext<CanvasContext>({
+  toImage: (x, y) => ({ x, y }),
+  unit: 1,
+  view: { x: 0, y: 0, w: 1, h: 1 },
+});
 export const useCanvas = () => useContext(Context);
 
 const MAX_ZOOM = 12;
+const PAN_KEYS: Record<string, [number, number]> = {
+  ArrowLeft: [-1, 0],
+  ArrowRight: [1, 0],
+  ArrowUp: [0, -1],
+  ArrowDown: [0, 1],
+};
 
 /** The photo in its own pixel coordinates, with zoom and pan by wheel, pinch and drag; a tap reports a point. */
 export function PhotoCanvas({
@@ -38,6 +54,8 @@ export function PhotoCanvas({
   height,
   label,
   onTap,
+  view,
+  onViewChange,
   children,
 }: {
   src: string;
@@ -45,15 +63,36 @@ export function PhotoCanvas({
   height: number;
   label: string;
   onTap?: (point: Point) => void;
+  /** Controlled zoom and pan, shared with another canvas. */
+  view?: SharedView;
+  onViewChange?: (view: SharedView) => void;
   children?: ReactNode;
 }) {
   const svg = useRef<SVGSVGElement>(null);
-  const [vb, setVb] = useState<ViewBox>({ x: 0, y: 0, w: width, h: height });
+  const [ownVb, setOwnVb] = useState<ViewBox>({ x: 0, y: 0, w: width, h: height });
+  const vb: ViewBox = view
+    ? { x: view.x * width, y: view.y * height, w: view.w * width, h: view.h * height }
+    : ownVb;
+  const latest = useRef(vb);
+  useEffect(() => {
+    latest.current = vb;
+  });
+  const setVb = useCallback(
+    (next: ViewBox | ((current: ViewBox) => ViewBox)) => {
+      const value = typeof next === "function" ? next(latest.current) : next;
+      latest.current = value;
+      if (onViewChange) {
+        onViewChange({ x: value.x / width, y: value.y / height, w: value.w / width, h: value.h / height });
+      }
+      if (!view) setOwnVb(value);
+    },
+    [onViewChange, view, width, height],
+  );
   const pointers = useRef(new Map<number, { x: number; y: number }>());
   const gesture = useRef<{ moved: boolean; startDist: number; startVb: ViewBox } | null>(null);
   const [screenWidth, setScreenWidth] = useState(1);
 
-  useEffect(() => setVb({ x: 0, y: 0, w: width, h: height }), [width, height]);
+  useEffect(() => setOwnVb({ x: 0, y: 0, w: width, h: height }), [width, height]);
   useEffect(() => {
     const element = svg.current;
     if (!element || typeof ResizeObserver === "undefined") return;
@@ -155,16 +194,26 @@ export function PhotoCanvas({
 
   function onKeyDown(event: KeyboardEvent<SVGSVGElement>) {
     const centre = { x: vb.x + vb.w / 2, y: vb.y + vb.h / 2 };
+    const pan = PAN_KEYS[event.key];
     if (event.key === "+" || event.key === "=") zoomAt(centre, 1.25);
     else if (event.key === "-") zoomAt(centre, 0.8);
     else if (event.key === "Enter" && onTap) onTap(centre);
-    else return;
+    else if (pan) {
+      // A tenth of the view per press; handles keep their own arrow keys.
+      setVb((current) =>
+        clamp({
+          ...current,
+          x: current.x + pan[0] * current.w * 0.1,
+          y: current.y + pan[1] * current.h * 0.1,
+        }),
+      );
+    } else return;
     event.preventDefault();
   }
 
   const unit = vb.w / Math.max(screenWidth, 1);
   return (
-    <Context.Provider value={{ toImage, unit }}>
+    <Context.Provider value={{ toImage, unit, view: vb }}>
       <svg
         ref={svg}
         className={styles.canvas}

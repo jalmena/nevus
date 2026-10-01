@@ -23,13 +23,28 @@ export interface MockObservation {
 
 export interface MockState {
   claimed: boolean;
-  session: { username: string; language: string; theme: string; role?: string; email?: string | null } | null;
+  session: {
+    username: string;
+    language: string;
+    theme: string;
+    role?: string;
+    email?: string | null;
+    showUncertainty?: boolean;
+  } | null;
   persons: { id: string; display_name: string }[];
   lesions: MockLesion[];
   observations: MockObservation[];
   /** Image ids whose quality check found a warning. */
   flagged: string[];
-  measurements: { id: string; observation_id: string; image_id: string; longest_mm: number }[];
+  measurements: {
+    id: string;
+    observation_id: string;
+    image_id: string;
+    longest_mm: number;
+    captured_at?: string;
+  }[];
+  /** What aligning two photos gives: lined up (with the card) or refused for a reason. */
+  comparison: { status: "aligned" } | { status: "abstained"; reason: string };
   trash: { kind: string; id: string; label: string; person_id: string; person_name: string }[];
   exports: { id: string; status: string }[];
   sudo: boolean;
@@ -42,6 +57,7 @@ const user = (
   theme = "system",
   role = "admin",
   email: string | null = null,
+  showUncertainty = true,
 ) => ({
   id: "0199a000-0000-7000-8000-000000000001",
   username,
@@ -51,7 +67,7 @@ const user = (
   email_reminders: false,
   language,
   theme,
-  show_uncertainty: true,
+  show_uncertainty: showUncertainty,
   created_at: "2026-09-23T10:00:00Z",
   last_login_at: null,
   disabled_at: null,
@@ -70,6 +86,7 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     exports: [],
     sudo: false,
     calls: [],
+    comparison: { status: "aligned" },
     ...initial,
   };
   const personOut = (p: { id: string; display_name: string }) => ({
@@ -158,6 +175,7 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     observation_id: string;
     image_id: string;
     longest_mm: number;
+    captured_at?: string;
   }) => ({
     id: m.id,
     observation_id: m.observation_id,
@@ -175,8 +193,8 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     sigma_area_mm2: 1.5,
     tilt_deg: 4,
     flags: [],
-    captured_at: "2026-09-01T10:00:00Z",
-    created_at: "2026-09-01T10:00:00Z",
+    captured_at: m.captured_at ?? "2026-09-01T10:00:00Z",
+    created_at: m.captured_at ?? "2026-09-01T10:00:00Z",
     change: null,
   });
   let counter = 100;
@@ -206,6 +224,7 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
                 state.session.theme,
                 state.session.role ?? "admin",
                 state.session.email ?? null,
+                state.session.showUncertainty ?? true,
               ),
               sudo_until: null,
             })
@@ -491,6 +510,46 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
       }
       if (match && method === "GET") {
         return json(state.measurements.filter((m) => m.observation_id === match?.[1]).map(measurementOut));
+      }
+      match = /^\/api\/lesions\/([^/]+)\/measurements$/.exec(path);
+      if (match && method === "GET") {
+        return json(
+          [...state.measurements]
+            .sort((x, y) => (x.captured_at ?? "").localeCompare(y.captured_at ?? ""))
+            .map(measurementOut),
+        );
+      }
+      if (path === "/api/comparisons" && method === "POST") {
+        const pair = body as { image_a: string; image_b: string };
+        const aligned = state.comparison.status === "aligned";
+        const side = (id: string) => ({
+          image_id: id,
+          upright_width: 640,
+          upright_height: 480,
+          mm_per_px: 0.05,
+          scale_kind: "card",
+        });
+        return json({
+          id: "c1",
+          status: state.comparison.status,
+          reason: state.comparison.status === "abstained" ? state.comparison.reason : null,
+          method: aligned ? "card" : "features",
+          inliers: aligned ? null : 6,
+          inlier_ratio: aligned ? null : 0.1,
+          matrix: aligned
+            ? [
+                [1, 0, 0],
+                [0, 1, 0],
+                [0, 0, 1],
+              ]
+            : null,
+          a: side(pair.image_a),
+          b: side(pair.image_b),
+          overlay_url: aligned ? "/api/comparisons/c1/overlay" : null,
+          heatmap_url: aligned ? "/api/comparisons/c1/heatmap" : null,
+          coverage: aligned ? 0.98 : null,
+          mean_difference: aligned ? 3.1 : null,
+        });
       }
       match = /^\/api\/observations\/([^/]+)\/images$/.exec(path);
       if (match && method === "POST") {

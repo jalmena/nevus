@@ -248,7 +248,7 @@
     "stepMark": "La marca",
     "canvasScale": "Foto. Toca la moneda o los extremos de una longitud conocida.",
     "canvasMark": "Foto. Toca la marca para contornearla.",
-    "zoomHint": "Pellizca o usa la rueda del ratón para ampliar y arrastra para moverte. Con teclado: + y − amplían, Intro marca el centro.",
+    "zoomHint": "Pellizca o usa la rueda del ratón para ampliar y arrastra para moverte. Con teclado: + y − amplían, las flechas mueven, Intro marca el centro.",
     "cardSearching": "Buscando la tarjeta de referencia…",
     "cardFound": "Tarjeta de referencia encontrada, inclinada {{tilt}}°.",
     "cardTilted": "Tarjeta encontrada, pero inclinada {{tilt}}° (límite {{limit}}°). Si puedes, repite la foto con el móvil paralelo a la piel.",
@@ -432,5 +432,60 @@
     "error": "La cámara no ha podido arrancar: {{message}}. Usa Hacer una foto.",
     "lastTime": "La última vez: intenta repetir la distancia y el ángulo.",
     "lastTimeAlt": "Primer plano anterior"
+  },
+  "compare": {
+    "open": "Comparar visitas",
+    "back": "Volver a la marca",
+    "title": "Comparar",
+    "titleFor": "Comparar: {{name}}",
+    "needTwo": "Para comparar hacen falta fotos de dos visitas, o dos fotos de una misma visita.",
+    "earlier": "Antes",
+    "later": "Después",
+    "samePhoto": "Los dos lados muestran la misma foto. Elige otra para uno de ellos.",
+    "aligning": "Alineando las fotos…",
+    "alignedCard": "Alineadas con la tarjeta de referencia de ambas fotos.",
+    "alignedPoints": "Alineadas con {{count}} puntos que las dos fotos tienen en común.",
+    "abstained": "Estas fotos no se han podido alinear con fiabilidad, así que solo se ofrece verlas lado a lado.",
+    "abstainedHint": "Para las otras vistas, haz las fotos con la tarjeta de referencia, o a una distancia y ángulo parecidos.",
+    "reasons": {
+      "too_little_detail": "Hay muy poco detalle que emparejar.",
+      "too_few_matches": "Tienen muy pocos puntos en común.",
+      "no_consistent_alignment": "No hay una única forma de alinearlas que encaje.",
+      "matches_disagree": "Los puntos en común no concuerdan entre sí.",
+      "mirrored": "Una de las fotos tendría que estar en espejo.",
+      "distance": "Se hicieron desde distancias muy distintas.",
+      "angle": "Se hicieron desde ángulos muy distintos."
+    },
+    "mode": "Vista",
+    "modes": {
+      "side": "Lado a lado",
+      "overlay": "Superpuestas",
+      "wipe": "Cortinilla",
+      "difference": "Diferencias"
+    },
+    "canvas": "{{photo}}. El zoom y el desplazamiento se comparten con la otra foto.",
+    "canvasLayered": "Las dos fotos alineadas ({{mode}}).",
+    "opacity": "Cuánto se ve de la foto posterior",
+    "wipe": "Dónde empieza la foto posterior",
+    "similar": "Parecido",
+    "different": "Distinto",
+    "differenceNote": "Sombreado donde los colores difieren una vez alineadas las fotos. Indica dónde mirar y no mide nada: la luz, el enfoque y el vello también aparecen aquí.",
+    "zoomHint": "Pellizca o usa la rueda del ratón para ampliar y arrastra para moverte; lado a lado, las dos fotos se mueven a la vez. Con teclado: + y − amplían, las flechas mueven."
+  },
+  "chart": {
+    "title": "Tamaño a lo largo del tiempo",
+    "subtitle": "En cada visita.",
+    "subtitleBand": "En cada visita. La banda sombreada es la incertidumbre de la medida.",
+    "roleDescription": "gráfica",
+    "label": "{{metric}} en {{count}} visitas. Usa las flechas para recorrerlas.",
+    "date": "Fecha",
+    "showTable": "Ver como tabla",
+    "showChart": "Ver como gráfica",
+    "csv": "Descargar en CSV",
+    "metric": "Mostrar",
+    "metrics": {
+      "longest": "Diámetro mayor",
+      "area": "Área"
+    }
   }
 }

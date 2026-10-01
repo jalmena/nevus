@@ -248,7 +248,7 @@
     "stepMark": "The mark",
     "canvasScale": "Photo. Tap the coin or the ends of a known length.",
     "canvasMark": "Photo. Tap the mark to outline it.",
-    "zoomHint": "Pinch or use the mouse wheel to zoom, drag to move. With a keyboard: + and − zoom, Enter places at the centre.",
+    "zoomHint": "Pinch or use the mouse wheel to zoom, drag to move. With a keyboard: + and − zoom, the arrows move, Enter places at the centre.",
     "cardSearching": "Looking for the reference card…",
     "cardFound": "Reference card found, tilted {{tilt}}°.",
     "cardTilted": "Reference card found, but tilted {{tilt}}° (limit {{limit}}°). If you can, retake the photo holding the phone parallel to the skin.",
@@ -432,5 +432,60 @@
     "error": "The camera could not start: {{message}}. Use Take a photo instead.",
     "lastTime": "Last time: try to match the distance and the angle.",
     "lastTimeAlt": "Previous close-up"
+  },
+  "compare": {
+    "open": "Compare visits",
+    "back": "Back to the mark",
+    "title": "Compare",
+    "titleFor": "Compare: {{name}}",
+    "needTwo": "Comparing needs photos from two visits, or two photos of one visit.",
+    "earlier": "Earlier",
+    "later": "Later",
+    "samePhoto": "Both sides show the same photo. Choose another one for one of them.",
+    "aligning": "Lining up the photos…",
+    "alignedCard": "Lined up with the reference card in both photos.",
+    "alignedPoints": "Lined up using {{count}} points the two photos have in common.",
+    "abstained": "These photos could not be lined up reliably, so only side by side is offered.",
+    "abstainedHint": "For the other views, take the photos with the reference card, or from a similar distance and angle.",
+    "reasons": {
+      "too_little_detail": "There is too little detail to match.",
+      "too_few_matches": "They have too few points in common.",
+      "no_consistent_alignment": "No single way to line them up fits.",
+      "matches_disagree": "The points in common do not agree with each other.",
+      "mirrored": "One photo would have to be mirrored.",
+      "distance": "They were taken from very different distances.",
+      "angle": "They were taken from very different angles."
+    },
+    "mode": "View",
+    "modes": {
+      "side": "Side by side",
+      "overlay": "On top",
+      "wipe": "Slider",
+      "difference": "Differences"
+    },
+    "canvas": "{{photo}}. Zoom and pan are shared with the other photo.",
+    "canvasLayered": "Both photos lined up ({{mode}}).",
+    "opacity": "How much of the later photo shows",
+    "wipe": "Where the later photo starts",
+    "similar": "Similar",
+    "different": "Different",
+    "differenceNote": "Shaded where the colours differ once the photos are lined up. It shows where to look and measures nothing: light, focus and hair show up here too.",
+    "zoomHint": "Pinch or use the mouse wheel to zoom, drag to move; side by side, both photos follow. With a keyboard: + and − zoom, the arrows move."
+  },
+  "chart": {
+    "title": "Size over time",
+    "subtitle": "At each visit.",
+    "subtitleBand": "At each visit. The shaded band is the measurement uncertainty.",
+    "roleDescription": "chart",
+    "label": "{{metric}} at {{count}} visits. Use the arrow keys to go through them.",
+    "date": "Date",
+    "showTable": "Show as a table",
+    "showChart": "Show as a chart",
+    "csv": "Download as CSV",
+    "metric": "Show",
+    "metrics": {
+      "longest": "Longest diameter",
+      "area": "Area"
+    }
   }
 }
