@@ -54,6 +54,8 @@ export interface MockState {
     created_at: string;
   }[];
   webhooks: { id: string; name: string; preset: string; url: string; enabled: boolean }[];
+  /** "proxy": a reverse proxy signs people in; there are no local passwords. */
+  authMode: "local" | "proxy";
   calendar: { exists: boolean };
   /** Reports; a queued one is ready the next time the list is read, unless it is set to fail. */
   reports: {
@@ -113,6 +115,7 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     appointments: [],
     webhooks: [],
     calendar: { exists: false },
+    authMode: "local",
     ...initial,
   };
   const personOut = (p: { id: string; display_name: string }) => ({
@@ -240,7 +243,14 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
       const body = text ? (JSON.parse(text) as unknown) : undefined;
       state.calls.push({ method, url, body });
       const path = url.replace(/^https?:\/\/[^/]+/, "");
-      if (path === "/api/auth/instance") return json({ claimed: state.claimed, version: "test" });
+      if (path === "/api/auth/instance") {
+        return json({
+          claimed: state.claimed,
+          version: "test",
+          auth_mode: state.authMode,
+          logout_url: state.authMode === "proxy" ? "https://sso.example/out" : null,
+        });
+      }
       if (path === "/api/auth/session") {
         return state.session
           ? json({
@@ -380,8 +390,9 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
           headers: { "content-type": "application/json", "x-sudo-required": "1" },
         });
       if (path === "/api/auth/sudo" && method === "POST") {
-        const given = body as { password: string };
-        if (given.password !== "correct horse battery") return json({ detail: "Wrong password." }, 401);
+        const given = body as { password?: string };
+        if (state.authMode !== "proxy" && given.password !== "correct horse battery")
+          return json({ detail: "Wrong password." }, 401);
         state.sudo = true;
         return json({ user: user(state.session?.username ?? "jose"), sudo_until: "2026-10-01T10:05:00Z" });
       }

@@ -31,7 +31,10 @@
     "claimIntro": "Nobody has an account yet. The first account becomes the administrator and creates the others; there is no open registration.",
     "claimAction": "Create the administrator",
     "loginTitle": "Sign in",
-    "loginAction": "Sign in"
+    "loginAction": "Sign in",
+    "proxyTitle": "Sign in through single sign-on",
+    "proxyText": "This neVus signs people in through your single sign-on. Sign in there, then come back here.",
+    "proxyRetry": "I have signed in"
   },
   "persons": {
     "title": "Persons",
@@ -363,7 +366,9 @@
     "intro": "This action needs your password again.",
     "confirm": "Confirm",
     "wrong": "Wrong password.",
-    "cancelled": "Cancelled."
+    "cancelled": "Cancelled.",
+    "introProxy": "This action cannot be undone easily. Confirm that you want to go ahead.",
+    "confirmProxy": "Go ahead"
   },
   "trash": {
     "title": "Trash",

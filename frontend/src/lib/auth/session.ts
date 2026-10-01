@@ -7,6 +7,7 @@ import { applyTheme } from "@/lib/theme";
 export type SessionInfo = components["schemas"]["SessionOut"];
 export type UserOut = components["schemas"]["UserOut"];
 export type Credentials = components["schemas"]["Credentials"];
+export type InstanceStatus = components["schemas"]["InstanceStatus"];
 
 export const sessionKey = ["session"] as const;
 export const instanceKey = ["instance"] as const;
@@ -88,9 +89,12 @@ export function useLogout() {
       await api.POST("/api/auth/logout");
     },
     onSettled: () => {
+      const instance = queryClient.getQueryData<InstanceStatus>(instanceKey);
       queryClient.setQueryData(sessionKey, null);
       queryClient.clear();
       void forgetDevice();
+      // Behind a single sign-on proxy, signing out here alone would sign straight back in.
+      if (instance?.logout_url) window.location.assign(instance.logout_url);
     },
   });
 }

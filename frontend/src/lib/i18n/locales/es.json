@@ -31,7 +31,10 @@
     "claimIntro": "Todavía nadie tiene cuenta. La primera cuenta será la administradora y creará las demás; no hay registro abierto.",
     "claimAction": "Crear la cuenta administradora",
     "loginTitle": "Iniciar sesión",
-    "loginAction": "Entrar"
+    "loginAction": "Entrar",
+    "proxyTitle": "Inicia sesión con el inicio de sesión único",
+    "proxyText": "Este neVus da acceso a través de tu inicio de sesión único. Inicia sesión allí y vuelve aquí.",
+    "proxyRetry": "Ya he iniciado sesión"
   },
   "persons": {
     "title": "Personas",
@@ -363,7 +366,9 @@
     "intro": "Esta acción necesita tu contraseña otra vez.",
     "confirm": "Confirmar",
     "wrong": "Contraseña incorrecta.",
-    "cancelled": "Cancelado."
+    "cancelled": "Cancelado.",
+    "introProxy": "Esta acción no se deshace con facilidad. Confirma que quieres seguir.",
+    "confirmProxy": "Seguir"
   },
   "trash": {
     "title": "Papelera",

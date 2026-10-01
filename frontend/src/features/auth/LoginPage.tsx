@@ -1,7 +1,9 @@
 import { useTranslation } from "react-i18next";
 import { Navigate } from "react-router";
+import { Button } from "@/design-system/components/Button";
 import { useInstance, useLogin, useSession } from "@/lib/auth/session";
 import { CredentialsForm } from "./CredentialsForm";
+import styles from "./auth.module.css";
 
 export function LoginPage() {
   const { t } = useTranslation();
@@ -9,6 +11,19 @@ export function LoginPage() {
   const instance = useInstance();
   const login = useLogin();
   if (session.data) return <Navigate to="/" replace />;
+  if (instance.data?.auth_mode === "proxy") {
+    return (
+      <section className={styles.form}>
+        <h1>{t("auth.proxyTitle")}</h1>
+        <p className="text-secondary">{t("auth.proxyText")}</p>
+        <div>
+          <Button onClick={() => void session.refetch()} disabled={session.isFetching}>
+            {t("auth.proxyRetry")}
+          </Button>
+        </div>
+      </section>
+    );
+  }
   if (instance.data && !instance.data.claimed) return <Navigate to="/claim" replace />;
   return (
     <CredentialsForm
