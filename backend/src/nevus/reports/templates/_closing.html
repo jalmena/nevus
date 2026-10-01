@@ -1,0 +1,12 @@
+{% macro closing() %}
+<h2>{{ w("methods_title") }}</h2>
+{% if methods_scale %}<p>{{ methods_scale }}</p>{% endif %}
+<p>{{ w("methods_uncertainty") }}</p>
+<p class="secondary">{{ methods_software }}</p>
+
+<section class="together">
+  <h2>{{ w("clinician_title") }}</h2>
+  <p class="secondary small">{{ w("clinician_hint") }}</p>
+  <div class="clinician"></div>
+</section>
+{% endmacro %}

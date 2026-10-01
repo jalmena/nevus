@@ -319,3 +319,17 @@ h2.visits {
 .together {
   break-inside: avoid;
 }
+
+/* In an appointment's report, each mark's record starts on a new page after the summary. */
+.record {
+  break-before: page;
+}
+
+.record h2.visits {
+  break-before: auto;
+}
+
+.appointment ul {
+  margin: 2pt 0 8pt;
+  padding-left: 14pt;
+}

@@ -55,6 +55,137 @@
         "title": "AccessOut",
         "type": "object"
       },
+      "AppointmentIn": {
+        "properties": {
+          "date": {
+            "format": "date",
+            "title": "Date",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          }
+        },
+        "required": [
+          "date"
+        ],
+        "title": "AppointmentIn",
+        "type": "object"
+      },
+      "AppointmentOut": {
+        "properties": {
+          "can_edit": {
+            "title": "Can Edit",
+            "type": "boolean"
+          },
+          "checklist": {
+            "items": {
+              "$ref": "#/components/schemas/ChecklistItem"
+            },
+            "title": "Checklist",
+            "type": "array"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "date": {
+            "format": "date",
+            "title": "Date",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "person_id": {
+            "format": "uuid",
+            "title": "Person Id",
+            "type": "string"
+          },
+          "person_name": {
+            "title": "Person Name",
+            "type": "string"
+          },
+          "report_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Report Id"
+          }
+        },
+        "required": [
+          "id",
+          "person_id",
+          "person_name",
+          "date",
+          "notes",
+          "report_id",
+          "created_at",
+          "checklist",
+          "can_edit"
+        ],
+        "title": "AppointmentOut",
+        "type": "object"
+      },
+      "AppointmentUpdate": {
+        "properties": {
+          "date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          }
+        },
+        "title": "AppointmentUpdate",
+        "type": "object"
+      },
       "BodyMap": {
         "properties": {
           "attribution": {
@@ -378,6 +509,73 @@
           "since"
         ],
         "title": "ChangeOut",
+        "type": "object"
+      },
+      "ChecklistItem": {
+        "properties": {
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "last_observed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Observed At"
+          },
+          "lesion_id": {
+            "format": "uuid",
+            "title": "Lesion Id",
+            "type": "string"
+          },
+          "next_due_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Due On"
+          },
+          "state": {
+            "enum": [
+              "to_photograph",
+              "never_photographed",
+              "photographed"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "zone": {
+            "title": "Zone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "lesion_id",
+          "label",
+          "zone",
+          "state",
+          "last_observed_at",
+          "next_due_on"
+        ],
+        "title": "ChecklistItem",
         "type": "object"
       },
       "CircleShape": {
@@ -2732,7 +2930,8 @@
           "scope": {
             "enum": [
               "lesion",
-              "profile"
+              "profile",
+              "visit"
             ],
             "title": "Scope",
             "type": "string"
@@ -3345,6 +3544,36 @@
         "title": "ViewData",
         "type": "object"
       },
+      "VisitReportIn": {
+        "properties": {
+          "language": {
+            "anyOf": [
+              {
+                "enum": [
+                  "en",
+                  "es"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "paper": {
+            "default": "a4",
+            "enum": [
+              "a4",
+              "letter"
+            ],
+            "title": "Paper",
+            "type": "string"
+          }
+        },
+        "title": "VisitReportIn",
+        "type": "object"
+      },
       "Zone": {
         "properties": {
           "anchor": {
@@ -3600,6 +3829,214 @@
         "summary": "Put Instance",
         "tags": [
           "admin"
+        ]
+      }
+    },
+    "/api/appointments/upcoming": {
+      "get": {
+        "description": "Every visit from today on, for the persons this user may see: the home page's reminder of them.",
+        "operationId": "upcoming_appointments_api_appointments_upcoming_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AppointmentOut"
+                  },
+                  "title": "Response Upcoming Appointments Api Appointments Upcoming Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Upcoming Appointments",
+        "tags": [
+          "appointments"
+        ]
+      }
+    },
+    "/api/appointments/{appointment_id}": {
+      "delete": {
+        "operationId": "delete_appointment_api_appointments__appointment_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "appointment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Appointment Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Appointment",
+        "tags": [
+          "appointments"
+        ]
+      },
+      "get": {
+        "operationId": "get_appointment_api_appointments__appointment_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "appointment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Appointment Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Appointment",
+        "tags": [
+          "appointments"
+        ]
+      },
+      "patch": {
+        "operationId": "update_appointment_api_appointments__appointment_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "appointment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Appointment Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppointmentUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Appointment",
+        "tags": [
+          "appointments"
+        ]
+      }
+    },
+    "/api/appointments/{appointment_id}/report": {
+      "post": {
+        "description": "The summary of every mark, then the record of each mark on the checklist.",
+        "operationId": "visit_report_api_appointments__appointment_id__report_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "appointment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Appointment Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VisitReportIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Visit Report",
+        "tags": [
+          "appointments"
         ]
       }
     },
@@ -5583,6 +6020,105 @@
         "summary": "Revoke Access",
         "tags": [
           "persons"
+        ]
+      }
+    },
+    "/api/persons/{person_id}/appointments": {
+      "get": {
+        "description": "Upcoming visits first (soonest first), then past ones (latest first).",
+        "operationId": "list_appointments_api_persons__person_id__appointments_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "person_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Person Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AppointmentOut"
+                  },
+                  "title": "Response List Appointments Api Persons  Person Id  Appointments Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Appointments",
+        "tags": [
+          "appointments"
+        ]
+      },
+      "post": {
+        "operationId": "create_appointment_api_persons__person_id__appointments_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "person_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Person Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppointmentIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Appointment",
+        "tags": [
+          "appointments"
         ]
       }
     },

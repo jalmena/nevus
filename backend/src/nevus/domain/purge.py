@@ -18,6 +18,7 @@ from sqlalchemy.orm import Session
 
 from nevus.db.models import (
     Analysis,
+    Appointment,
     Export,
     Image,
     Lesion,
@@ -113,6 +114,7 @@ def purge_person(db: Session, person_id: uuid.UUID) -> None:
     _delete_lesions(db, lesions)
     _delete_images(db, list(db.scalars(select(Image.id).where(Image.person_id == person_id))))
     db.execute(delete(Export).where(Export.person_id == person_id))
+    db.execute(delete(Appointment).where(Appointment.person_id == person_id))
     db.execute(delete(Report).where(Report.person_id == person_id))
     db.execute(delete(PersonAccess).where(PersonAccess.person_id == person_id))
     db.execute(delete(Person).where(Person.id == person_id))

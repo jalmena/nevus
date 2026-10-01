@@ -14,6 +14,10 @@ NBSP = "\u00a0"
 TEXT: dict[str, dict[str, str]] = {
     "en": {
         "lesion_title": "Skin mark record",
+        "visit_report_title": "Prepared for an appointment",
+        "appointment_title": "Appointment on {date}",
+        "visit_marks": "The marks prepared for this appointment; their records follow the summary:",
+        "visit_no_marks": "No mark needed a new photo for this appointment.",
         "profile_title": "Skin marks: summary",
         "person": "Person",
         "born": "born {year}",
@@ -61,6 +65,7 @@ TEXT: dict[str, dict[str, str]] = {
         "flag_unverified_card": "card print size not verified",
         "flag_tilt_unknown": "tilt unknown",
         "visits_title": "Visits",
+        "no_visits": "No photo of this mark has been taken yet.",
         "visit": "Visit of {date}",
         "photos": "Photographs",
         "role_close_up": "close-up",
@@ -115,6 +120,10 @@ TEXT: dict[str, dict[str, str]] = {
     },
     "es": {
         "lesion_title": "Registro de una marca de la piel",
+        "visit_report_title": "Preparado para una cita",
+        "appointment_title": "Cita del {date}",
+        "visit_marks": "Las marcas preparadas para esta cita; su registro sigue al resumen:",
+        "visit_no_marks": "Ninguna marca necesitaba una foto nueva para esta cita.",
         "profile_title": "Marcas de la piel: resumen",
         "person": "Persona",
         "born": "año de nacimiento {year}",
@@ -162,6 +171,7 @@ TEXT: dict[str, dict[str, str]] = {
         "flag_unverified_card": "tamaño de impresión de la tarjeta sin verificar",
         "flag_tilt_unknown": "inclinación desconocida",
         "visits_title": "Visitas",
+        "no_visits": "Todavía no hay ninguna foto de esta marca.",
         "visit": "Visita del {date}",
         "photos": "Fotografías",
         "role_close_up": "primer plano",

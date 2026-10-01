@@ -60,6 +60,65 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/appointments/upcoming": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Upcoming Appointments
+         * @description Every visit from today on, for the persons this user may see: the home page's reminder of them.
+         */
+        get: operations["upcoming_appointments_api_appointments_upcoming_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/appointments/{appointment_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Appointment */
+        get: operations["get_appointment_api_appointments__appointment_id__get"];
+        put?: never;
+        post?: never;
+        /** Delete Appointment */
+        delete: operations["delete_appointment_api_appointments__appointment_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Appointment */
+        patch: operations["update_appointment_api_appointments__appointment_id__patch"];
+        trace?: never;
+    };
+    "/api/appointments/{appointment_id}/report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Visit Report
+         * @description The summary of every mark, then the record of each mark on the checklist.
+         */
+        post: operations["visit_report_api_appointments__appointment_id__report_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/claim": {
         parameters: {
             query?: never;
@@ -694,6 +753,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/persons/{person_id}/appointments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Appointments
+         * @description Upcoming visits first (soonest first), then past ones (latest first).
+         */
+        get: operations["list_appointments_api_persons__person_id__appointments_get"];
+        put?: never;
+        /** Create Appointment */
+        post: operations["create_appointment_api_persons__person_id__appointments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/persons/{person_id}/images": {
         parameters: {
             query?: never;
@@ -1021,6 +1101,56 @@ export interface components {
             /** Username */
             username: string;
         };
+        /** AppointmentIn */
+        AppointmentIn: {
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Notes */
+            notes?: string | null;
+        };
+        /** AppointmentOut */
+        AppointmentOut: {
+            /** Can Edit */
+            can_edit: boolean;
+            /** Checklist */
+            checklist: components["schemas"]["ChecklistItem"][];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Notes */
+            notes: string | null;
+            /**
+             * Person Id
+             * Format: uuid
+             */
+            person_id: string;
+            /** Person Name */
+            person_name: string;
+            /** Report Id */
+            report_id: string | null;
+        };
+        /** AppointmentUpdate */
+        AppointmentUpdate: {
+            /** Date */
+            date?: string | null;
+            /** Notes */
+            notes?: string | null;
+        };
         /** BodyMap */
         BodyMap: {
             /** Attribution */
@@ -1129,6 +1259,27 @@ export interface components {
              * Format: date-time
              */
             since: string;
+        };
+        /** ChecklistItem */
+        ChecklistItem: {
+            /** Label */
+            label: string | null;
+            /** Last Observed At */
+            last_observed_at: string | null;
+            /**
+             * Lesion Id
+             * Format: uuid
+             */
+            lesion_id: string;
+            /** Next Due On */
+            next_due_on: string | null;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "to_photograph" | "never_photographed" | "photographed";
+            /** Zone */
+            zone: string;
         };
         /** CircleShape */
         CircleShape: {
@@ -1944,7 +2095,7 @@ export interface components {
              * Scope
              * @enum {string}
              */
-            scope: "lesion" | "profile";
+            scope: "lesion" | "profile" | "visit";
             /**
              * Status
              * @enum {string}
@@ -2160,6 +2311,17 @@ export interface components {
             /** Zones */
             zones: string[];
         };
+        /** VisitReportIn */
+        VisitReportIn: {
+            /** Language */
+            language?: ("en" | "es") | null;
+            /**
+             * Paper
+             * @default a4
+             * @enum {string}
+             */
+            paper: "a4" | "letter";
+        };
         /** Zone */
         Zone: {
             /** Anchor */
@@ -2331,6 +2493,156 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["InstanceOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upcoming_appointments_api_appointments_upcoming_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppointmentOut"][];
+                };
+            };
+        };
+    };
+    get_appointment_api_appointments__appointment_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                appointment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppointmentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_appointment_api_appointments__appointment_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                appointment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_appointment_api_appointments__appointment_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                appointment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AppointmentUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppointmentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    visit_report_api_appointments__appointment_id__report_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                appointment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VisitReportIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportOut"];
                 };
             };
             /** @description Validation Error */
@@ -3782,6 +4094,72 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_appointments_api_persons__person_id__appointments_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                person_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppointmentOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_appointment_api_persons__person_id__appointments_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                person_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AppointmentIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppointmentOut"];
+                };
             };
             /** @description Validation Error */
             422: {

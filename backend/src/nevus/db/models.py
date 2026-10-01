@@ -420,7 +420,7 @@ class Export(Base):
     __table_args__ = (Index("ix_exports_requested_by", "requested_by"),)
 
 
-REPORT_SCOPES = ("lesion", "profile")
+REPORT_SCOPES = ("lesion", "profile", "visit")
 
 
 class Report(Base):
@@ -450,3 +450,20 @@ class Report(Base):
     finished_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
 
     __table_args__ = (Index("ix_reports_person_id", "person_id"),)
+
+
+class Appointment(Base):
+    """A planned visit to a clinician: the date to prepare for, a note, and the report made for it."""
+
+    __tablename__ = "appointments"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    person_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("persons.id", ondelete="CASCADE"), nullable=False)
+    date: Mapped[date] = mapped_column(Date, nullable=False)
+    notes: Mapped[str | None] = mapped_column(Text)
+    report_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("reports.id", ondelete="SET NULL"))
+    created_by: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"))
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow, onupdate=utcnow)
+
+    __table_args__ = (Index("ix_appointments_person_id_date", "person_id", "date"),)

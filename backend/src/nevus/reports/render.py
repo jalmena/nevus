@@ -175,6 +175,7 @@ def context(payload: dict[str, Any]) -> dict[str, Any]:
         change = latest.get("change") if latest else None
         lesions.append(
             {
+                "id": lesion["id"],
                 "number": lesion["number"],
                 "title": _title(lesion, words),
                 "zone": words.zone(lesion["zone"]),
@@ -213,13 +214,24 @@ def context(payload: dict[str, Any]) -> dict[str, Any]:
     )
     analyzers = ", ".join(f"{name} {'/'.join(versions)}" for name, versions in payload["analyzers"].items()) or "—"
     page = words("page", page='" counter(page) "', pages='" counter(pages) "')
-    first = lesions[0]["title"] if payload["scope"] == "lesion" and lesions else None
+    scope = payload["scope"]
+    first = lesions[0]["title"] if scope == "lesion" and lesions else None
+    raw_appointment = payload.get("appointment")
+    appointment = None
+    if raw_appointment:
+        on = words.day(date.fromisoformat(raw_appointment["date"]))
+        appointment = {"title": words("appointment_title", date=on), "notes": raw_appointment.get("notes")}
+        first = appointment["title"]
+    titles = {"lesion": "lesion_title", "profile": "profile_title", "visit": "visit_report_title"}
+    wanted = set(payload.get("records") or [])
     return {
         "w": words,
         "lang": words.language,
-        "scope": payload["scope"],
+        "scope": scope,
         "paper": "letter" if payload["paper"] == "letter" else "A4",
-        "title": words("lesion_title") if payload["scope"] == "lesion" else words("profile_title"),
+        "title": words(titles.get(scope, "profile_title")),
+        "appointment": appointment,
+        "records": [lesion for lesion in lesions if lesion["id"] in wanted],
         "generated": words("generated", date=words.day(generated)),
         "person": person["name"],
         "born": words("born", year=person["birth_year"]) if person.get("birth_year") else None,

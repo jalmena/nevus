@@ -192,7 +192,9 @@ def gather(
     lesion_ids: list[str],
     language: str,
     paper: str,
+    appointment: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    """A mark's record (`lesion`), the summary of every mark (`profile`), or both for an appointment (`visit`)."""
     if scope == "lesion":
         lesions = [db.get(Lesion, uuid.UUID(i)) for i in lesion_ids]
         chosen = [lesion for lesion in lesions if lesion is not None and lesion.deleted_at is None]
@@ -201,7 +203,11 @@ def gather(
             db.scalars(select(Lesion).where(Lesion.person_id == person.id, Lesion.deleted_at.is_(None))).all(),
             key=_order,
         )
-    lesions_data = [_lesion(db, store, lesion, n, with_visits=scope == "lesion") for n, lesion in enumerate(chosen, 1)]
+    with_records = set(lesion_ids) if scope == "visit" else set()
+    lesions_data = [
+        _lesion(db, store, lesion, n, with_visits=scope == "lesion" or str(lesion.id) in with_records)
+        for n, lesion in enumerate(chosen, 1)
+    ]
     images = [
         photo["image_id"] for lesion in lesions_data for visit in lesion["visits"] for photo in visit["photos"]
     ] + [m["image_id"] for lesion in lesions_data for m in lesion["measurements"]]
@@ -215,5 +221,7 @@ def gather(
         "version": nevus.__version__,
         "person": {"id": str(person.id), "name": person.display_name, "birth_year": person.birth_year},
         "lesions": lesions_data,
+        "records": [lesion["id"] for lesion in lesions_data if lesion["id"] in with_records],
+        "appointment": appointment,
         "analyzers": _analyzers(db, sorted(set(images))),
     }

@@ -6,7 +6,7 @@ from __future__ import annotations
 import uuid
 from typing import Any
 
-from nevus.db.models import Person, Report
+from nevus.db.models import Appointment, Person, Report
 from nevus.db.types import utcnow
 from nevus.jobs.registry import JobContext, JobKind, register
 from nevus.reports import render
@@ -24,7 +24,22 @@ def _load(ctx: JobContext, payload: dict[str, Any]) -> dict[str, Any] | None:
         row.status, row.error, row.finished_at = "failed", "The person is no longer available.", utcnow()
         return None
     row.status = "rendering"
-    data = gather(ctx.db, ctx.store, ctx.settings, person, row.scope, list(row.lesion_ids), row.language, row.paper)
+    appointment = None
+    if row.scope == "visit" and row.options.get("appointment_id"):
+        found = ctx.db.get(Appointment, uuid.UUID(row.options["appointment_id"]))
+        if found is not None:
+            appointment = {"id": str(found.id), "date": found.date.isoformat(), "notes": found.notes}
+    data = gather(
+        ctx.db,
+        ctx.store,
+        ctx.settings,
+        person,
+        row.scope,
+        list(row.lesion_ids),
+        row.language,
+        row.paper,
+        appointment=appointment,
+    )
     row.analyzer_versions = data["analyzers"]
     return data
 

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% from "_record.html" import record with context %}
+{% from "_summary.html" import summary with context %}
+{% from "_closing.html" import closing with context %}
+{% block content %}
+<section class="appointment">
+  <h2>{{ appointment.title }}</h2>
+  {% if appointment.notes %}<p class="quote">{{ appointment.notes }}</p>{% endif %}
+  {% if records %}
+  <p>{{ w("visit_marks") }}</p>
+  <ul>
+    {% for mark in records %}<li>{{ mark.number }}. {{ mark.title }} · {{ mark.zone }}</li>{% endfor %}
+  </ul>
+  {% else %}
+  <p>{{ w("visit_no_marks") }}</p>
+  {% endif %}
+</section>
+{{ summary() }}
+{% for mark in records %}
+<div class="record">
+  {{ record(mark) }}
+</div>
+{% endfor %}
+{{ closing() }}
+{% endblock %}

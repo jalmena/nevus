@@ -5,12 +5,13 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
-from typing import Literal
+from typing import Any, Literal
 
 from fastapi import APIRouter, HTTPException, Request, Response, status
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 from nevus.auth import service
 from nevus.auth.dependencies import AppSettings, CurrentUser, DbSession, client_ip
@@ -20,13 +21,14 @@ from nevus.reports.jobs import REPORT_KIND
 from nevus.storage.blobs import BlobStore
 
 router = APIRouter(prefix="/api", tags=["reports"])
-Scope = Literal["lesion", "profile"]
+Scope = Literal["lesion", "profile", "visit"]
+RequestScope = Literal["lesion", "profile"]
 Language = Literal["en", "es"]
 Paper = Literal["a4", "letter"]
 
 
 class ReportIn(BaseModel):
-    scope: Scope
+    scope: RequestScope
     lesion_id: uuid.UUID | None = None
     language: Language | None = None
     paper: Paper = "a4"
@@ -91,6 +93,36 @@ def _report(db: DbSession, report_id: uuid.UUID, user: User) -> tuple[Report, Pe
     return row, access
 
 
+def create_report(
+    db: Session,
+    user: User,
+    person_id: uuid.UUID,
+    scope: str,
+    lesion_ids: list[str],
+    language: str | None,
+    paper: str,
+    ip: str | None,
+    options: dict[str, Any] | None = None,
+) -> Report:
+    """A report row and its job; the PDF is ready a few seconds later."""
+    row = Report(
+        person_id=person_id,
+        requested_by=user.id,
+        scope=scope,
+        lesion_ids=lesion_ids,
+        language=language or (user.language if user.language in ("en", "es") else "en"),
+        paper=paper,
+        options=options or {},
+    )
+    db.add(row)
+    db.flush()
+    queue.enqueue(
+        db, REPORT_KIND, {"report_id": str(row.id)}, dedupe_key=f"report:{row.id}", priority=2, max_attempts=2
+    )
+    service.audit(db, "report.request", user, "report", row.id, ip, {"scope": scope})
+    return row
+
+
 @router.post("/persons/{person_id}/reports", response_model=ReportOut, status_code=status.HTTP_202_ACCEPTED)
 def request_report(
     person_id: uuid.UUID, body: ReportIn, request: Request, user: CurrentUser, db: DbSession, settings: AppSettings
@@ -103,21 +135,9 @@ def request_report(
         if lesion is None or lesion.person_id != person_id or lesion.deleted_at is not None:
             raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Choose a mark of this person.")
         lesion_ids = [str(lesion.id)]
-    language = body.language or (user.language if user.language in ("en", "es") else "en")
-    row = Report(
-        person_id=person_id,
-        requested_by=user.id,
-        scope=body.scope,
-        lesion_ids=lesion_ids,
-        language=language,
-        paper=body.paper,
+    row = create_report(
+        db, user, person_id, body.scope, lesion_ids, body.language, body.paper, client_ip(request, settings)
     )
-    db.add(row)
-    db.flush()
-    queue.enqueue(
-        db, REPORT_KIND, {"report_id": str(row.id)}, dedupe_key=f"report:{row.id}", priority=2, max_attempts=2
-    )
-    service.audit(db, "report.request", user, "report", row.id, client_ip(request, settings), {"scope": body.scope})
     return _out(row, user, access)
 
 
