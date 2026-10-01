@@ -30,6 +30,9 @@ export interface MockState {
   /** Image ids whose quality check found a warning. */
   flagged: string[];
   measurements: { id: string; observation_id: string; image_id: string; longest_mm: number }[];
+  trash: { kind: string; id: string; label: string; person_id: string; person_name: string }[];
+  exports: { id: string; status: string }[];
+  sudo: boolean;
   calls: { method: string; url: string; body?: unknown }[];
 }
 
@@ -63,6 +66,9 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     observations: [],
     flagged: [],
     measurements: [],
+    trash: [],
+    exports: [],
+    sudo: false,
     calls: [],
     ...initial,
   };
@@ -254,7 +260,7 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
           201,
         );
       }
-      let match = /^\/api\/persons\/([^/]+)$/.exec(path);
+      let match: RegExpExecArray | null = /^\/api\/persons\/([^/]+)$/.exec(path);
       if (match && method === "GET") {
         const found = state.persons.find((p) => p.id === match?.[1]);
         return found ? json(personOut(found)) : json({ detail: "No such person." }, 404);
@@ -323,6 +329,64 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
         }
         return json(observationOut(found));
       }
+      const needSudo = () =>
+        new Response(JSON.stringify({ detail: "Confirm your password to continue." }), {
+          status: 403,
+          headers: { "content-type": "application/json", "x-sudo-required": "1" },
+        });
+      if (path === "/api/auth/sudo" && method === "POST") {
+        const given = body as { password: string };
+        if (given.password !== "correct horse battery") return json({ detail: "Wrong password." }, 401);
+        state.sudo = true;
+        return json({ user: user(state.session?.username ?? "jose"), sudo_until: "2026-10-01T10:05:00Z" });
+      }
+      if (path === "/api/trash" && method === "GET") {
+        return json(
+          state.trash.map((item) => ({
+            ...item,
+            deleted_at: "2026-09-30T10:00:00Z",
+            purge_after: "2026-10-30T10:00:00Z",
+          })),
+        );
+      }
+      match = /^\/api\/trash\/([^/]+)\/([^/]+)(\/restore)?$/.exec(path);
+      if (match) {
+        if (!match[3] && !state.sudo) return needSudo();
+        state.trash = state.trash.filter((item) => item.id !== match?.[2]);
+        return new Response(null, { status: 204 });
+      }
+      if (path === "/api/exports" && method === "POST") {
+        if (!state.sudo) return needSudo();
+        const created = { id: nextId(), status: "ready" };
+        state.exports.push(created);
+        return json(
+          {
+            ...created,
+            person_id: null,
+            file_name: "nevus-export.zip.age",
+            bytes: 2048,
+            error: null,
+            created_at: "2026-10-01T10:00:00Z",
+            expires_at: "2026-10-08T10:00:00Z",
+          },
+          202,
+        );
+      }
+      if (path === "/api/exports" && method === "GET") {
+        return json(
+          state.exports.map((e) => ({
+            ...e,
+            person_id: null,
+            file_name: "nevus-export.zip.age",
+            bytes: 2048,
+            error: null,
+            created_at: "2026-10-01T10:00:00Z",
+            expires_at: "2026-10-08T10:00:00Z",
+          })),
+        );
+      }
+      match = /^\/api\/persons\/([^/]+)\/usage$/.exec(path);
+      if (match) return json({ images: 3, bytes: 4_500_000, quota_bytes: null, over_quota: false });
       if (path === "/api/due") {
         return json(
           state.lesions

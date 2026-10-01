@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from "react-router";
 import { useTranslation } from "react-i18next";
+import { SudoProvider } from "@/lib/sudo/SudoProvider";
 import styles from "./Shell.module.css";
 
 /** Brand block on the dark paper, content below, a small navigation bar. */
@@ -21,7 +22,9 @@ export function Shell() {
         </nav>
       </header>
       <main className={styles.main}>
-        <Outlet />
+        <SudoProvider>
+          <Outlet />
+        </SudoProvider>
       </main>
     </div>
   );

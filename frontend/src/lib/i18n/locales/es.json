@@ -352,5 +352,55 @@
     "testSent": "Enviado. Revisa la bandeja de entrada.",
     "instanceTitle": "Instancia (administración)",
     "defaultLanguage": "Idioma de las cuentas nuevas"
+  },
+  "sudo": {
+    "title": "Confirma que eres tú",
+    "intro": "Esta acción necesita tu contraseña otra vez.",
+    "confirm": "Confirmar",
+    "wrong": "Contraseña incorrecta.",
+    "cancelled": "Cancelado."
+  },
+  "trash": {
+    "title": "Papelera",
+    "intro": "Las marcas, visitas y fotos borradas se quedan aquí 30 días y luego se eliminan para siempre.",
+    "emptyTitle": "La papelera está vacía",
+    "emptyText": "Lo que borras se queda aquí un tiempo por si cambias de idea.",
+    "kinds": {
+      "person": "Persona",
+      "lesion": "Marca",
+      "observation": "Visita",
+      "image": "Foto"
+    },
+    "goesOn": "se elimina para siempre el {{date}}",
+    "restore": "Restaurar",
+    "deleteNow": "Borrar ya",
+    "open": "Abrir la papelera",
+    "backToSettings": "Volver a ajustes"
+  },
+  "data": {
+    "title": "Tus datos",
+    "intro": "Llévate todo en un solo archivo cifrado, o recupera lo que borraste.",
+    "exportPerson": "Exportar esta persona",
+    "exportAll": "Exportar toda la instancia (administración)",
+    "exportIntro": "Elige una frase de paso. La necesitarás para abrir el archivo; neVus no la guarda, así que sin ella nadie puede recuperarlo. Se abre con la herramienta estándar age.",
+    "passphrase": "Frase de paso",
+    "passphraseAgain": "Repite la frase de paso",
+    "startExport": "Empezar la exportación",
+    "exportStarted": "Se está preparando la exportación. Aparecerá en Ajustes, Tus datos.",
+    "status": {
+      "queued": "En espera",
+      "building": "Preparándose…",
+      "ready": "Lista",
+      "failed": "Ha fallado"
+    },
+    "expires": "descargable hasta el {{date}}",
+    "remove": "Quitar",
+    "usage_one": "{{count}} foto, {{size}}",
+    "usage_other": "{{count}} fotos, {{size}}",
+    "overQuota": "Las fotos de esta persona ocupan más del límite que fijó la administración. No se rechaza nada; quizá convenga quitar duplicados antiguos.",
+    "purgeTitle": "Borrar esta persona para siempre",
+    "purgeIntro": "Todas las marcas, visitas, medidas y fotos de {{name}} se eliminarán ahora, sin pasar por la papelera. Exporta antes si quieres conservar una copia.",
+    "typeName": "Escribe {{name}} para confirmar",
+    "purgeAction": "Borrar para siempre"
   }
 }

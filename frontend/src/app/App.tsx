@@ -8,6 +8,7 @@ import { MeasurePage } from "@/features/measure/MeasurePage";
 import { HomePage } from "@/features/persons/HomePage";
 import { PersonPage } from "@/features/persons/PersonPage";
 import { SettingsPage } from "@/features/settings/SettingsPage";
+import { TrashPage } from "@/features/trash/TrashPage";
 import { Shell } from "./Shell";
 
 export function AppRoutes() {
@@ -28,6 +29,7 @@ export function AppRoutes() {
         <Route path="observations/:observationId" element={<ObservationPage />} />
         <Route path="observations/:observationId/measure/:imageId" element={<MeasurePage />} />
         <Route path="settings" element={<SettingsPage />} />
+        <Route path="trash" element={<TrashPage />} />
       </Route>
     </Routes>
   );

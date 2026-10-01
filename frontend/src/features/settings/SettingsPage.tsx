@@ -3,6 +3,9 @@ import { Button } from "@/design-system/components/Button";
 import { Card } from "@/design-system/components/Card";
 import { Notice } from "@/design-system/components/Notice";
 import { AdminSettings } from "@/features/admin/AdminSettings";
+import { ExportForm } from "@/features/data/ExportForm";
+import { ExportList } from "@/features/data/ExportList";
+import { Link } from "react-router";
 import { ReferenceCardSettings } from "./ReferenceCardSettings";
 import { ReminderSettings } from "./ReminderSettings";
 import { useInstance, useLogout, useSession, useUpdateMe } from "@/lib/auth/session";
@@ -61,6 +64,13 @@ export function SettingsPage() {
       </Card>
       <ReminderSettings />
       <ReferenceCardSettings />
+      <Card className={styles.group}>
+        <h2 className={styles.subheading}>{t("data.title")}</h2>
+        <p className="text-secondary">{t("data.intro")}</p>
+        <ExportList />
+        {user.role === "admin" && <ExportForm personId={null} label={t("data.exportAll")} />}
+        <Link to="/trash">{t("trash.open")}</Link>
+      </Card>
       {user.role === "admin" && <AdminSettings />}
       <Card className={styles.group}>
         <p>

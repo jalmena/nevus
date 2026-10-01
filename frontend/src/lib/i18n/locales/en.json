@@ -352,5 +352,55 @@
     "testSent": "Sent. Check the inbox.",
     "instanceTitle": "Instance (administrator)",
     "defaultLanguage": "Language for new accounts"
+  },
+  "sudo": {
+    "title": "Confirm it is you",
+    "intro": "This action needs your password again.",
+    "confirm": "Confirm",
+    "wrong": "Wrong password.",
+    "cancelled": "Cancelled."
+  },
+  "trash": {
+    "title": "Trash",
+    "intro": "Deleted marks, visits and photos stay here for 30 days, then go for good.",
+    "emptyTitle": "The trash is empty",
+    "emptyText": "What you delete stays here for a while in case you change your mind.",
+    "kinds": {
+      "person": "Person",
+      "lesion": "Mark",
+      "observation": "Visit",
+      "image": "Photo"
+    },
+    "goesOn": "removed for good on {{date}}",
+    "restore": "Restore",
+    "deleteNow": "Delete now",
+    "open": "Open the trash",
+    "backToSettings": "Back to settings"
+  },
+  "data": {
+    "title": "Your data",
+    "intro": "Take everything with you as one encrypted file, or recover what you deleted.",
+    "exportPerson": "Export this person",
+    "exportAll": "Export the whole instance (administrator)",
+    "exportIntro": "Choose a passphrase. You will need it to open the file; neVus does not keep it, so nobody can recover the file without it. It opens with the standard age tool.",
+    "passphrase": "Passphrase",
+    "passphraseAgain": "Repeat the passphrase",
+    "startExport": "Start the export",
+    "exportStarted": "The export is being prepared. It appears under Settings, Your data.",
+    "status": {
+      "queued": "Waiting",
+      "building": "Being prepared…",
+      "ready": "Ready",
+      "failed": "Failed"
+    },
+    "expires": "downloadable until {{date}}",
+    "remove": "Remove",
+    "usage_one": "{{count}} photo, {{size}}",
+    "usage_other": "{{count}} photos, {{size}}",
+    "overQuota": "This person's photos use more space than the limit the administrator set. Nothing is refused; consider removing old duplicates.",
+    "purgeTitle": "Delete this person for good",
+    "purgeIntro": "Every mark, visit, measurement and photo of {{name}} will be removed now, without passing through the trash. Export first if you want to keep a copy.",
+    "typeName": "Type {{name}} to confirm",
+    "purgeAction": "Delete for good"
   }
 }
