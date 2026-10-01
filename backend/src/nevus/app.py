@@ -12,6 +12,7 @@ from nevus import __version__
 from nevus.api.admin import router as admin_router
 from nevus.api.auth import router as auth_router
 from nevus.api.bodymap import router as bodymap_router
+from nevus.api.comparisons import router as comparisons_router
 from nevus.api.due import router as due_router
 from nevus.api.exports import router as exports_router
 from nevus.api.health import router as health_router
@@ -102,6 +103,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(admin_router)
     app.include_router(trash_router)
     app.include_router(exports_router)
+    app.include_router(comparisons_router)
     mount_frontend(app, _static_dir(settings))
     return app
 

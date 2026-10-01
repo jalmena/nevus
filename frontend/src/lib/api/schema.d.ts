@@ -219,6 +219,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/comparisons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Compare
+         * @description Align photo B onto photo A (same person). The result is cached as an analysis record.
+         */
+        post: operations["compare_api_comparisons_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/comparisons/{comparison_id}/{kind}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Picture */
+        get: operations["picture_api_comparisons__comparison_id___kind__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/due": {
         parameters: {
             query?: never;
@@ -417,6 +454,26 @@ export interface paths {
         };
         /** Lesion Measurements */
         get: operations["lesion_measurements_api_lesions__lesion_id__measurements_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/lesions/{lesion_id}/measurements.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Lesion Measurements Csv
+         * @description The series as CSV: one row per visit, millimetres with their standard deviation.
+         */
+        get: operations["lesion_measurements_csv_api_lesions__lesion_id__measurements_csv_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1049,6 +1106,55 @@ export interface components {
             kind: "coin";
             /** R */
             r: number;
+        };
+        /** ComparisonIn */
+        ComparisonIn: {
+            /**
+             * Image A
+             * Format: uuid
+             */
+            image_a: string;
+            /**
+             * Image B
+             * Format: uuid
+             */
+            image_b: string;
+        };
+        /** ComparisonOut */
+        ComparisonOut: {
+            a: components["schemas"]["SideOut"];
+            b: components["schemas"]["SideOut"];
+            /** Coverage */
+            coverage: number | null;
+            /** Heatmap Url */
+            heatmap_url: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Inlier Ratio */
+            inlier_ratio: number | null;
+            /** Inliers */
+            inliers: number | null;
+            /** Matrix */
+            matrix: number[][] | null;
+            /** Mean Difference */
+            mean_difference: number | null;
+            /**
+             * Method
+             * @enum {string}
+             */
+            method: "card" | "features";
+            /** Overlay Url */
+            overlay_url: string | null;
+            /** Reason */
+            reason: ("too_little_detail" | "too_few_matches" | "no_consistent_alignment" | "matches_disagree" | "mirrored" | "distance" | "angle") | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "aligned" | "abstained";
         };
         /** Credentials */
         Credentials: {
@@ -1762,6 +1868,22 @@ export interface components {
             sudo_until: string | null;
             user: components["schemas"]["UserOut"];
         };
+        /** SideOut */
+        SideOut: {
+            /**
+             * Image Id
+             * Format: uuid
+             */
+            image_id: string;
+            /** Mm Per Px */
+            mm_per_px: number | null;
+            /** Scale Kind */
+            scale_kind: string | null;
+            /** Upright Height */
+            upright_height: number;
+            /** Upright Width */
+            upright_width: number;
+        };
         /** SnoozeIn */
         SnoozeIn: {
             /**
@@ -2337,6 +2459,69 @@ export interface operations {
             };
         };
     };
+    compare_api_comparisons_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ComparisonIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ComparisonOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    picture_api_comparisons__comparison_id___kind__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                comparison_id: string;
+                kind: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     due_list_api_due_get: {
         parameters: {
             query?: never;
@@ -2772,6 +2957,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MeasurementOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lesion_measurements_csv_api_lesions__lesion_id__measurements_csv_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lesion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": unknown;
                 };
             };
             /** @description Validation Error */

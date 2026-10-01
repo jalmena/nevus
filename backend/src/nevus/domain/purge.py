@@ -42,6 +42,15 @@ def _delete_images(db: Session, image_ids: list[uuid.UUID]) -> None:
     db.execute(delete(Measurement).where(Measurement.image_id.in_(image_ids)))
     db.execute(delete(ScaleReference).where(ScaleReference.image_id.in_(image_ids)))
     db.execute(delete(Analysis).where(Analysis.target_type == "image", Analysis.target_id.in_(image_ids)))
+    # A comparison holds a warped copy of both photos: it goes with either of them.
+    gone = {str(i) for i in image_ids}
+    pairs = [
+        row_id
+        for row_id, outputs in db.execute(select(Analysis.id, Analysis.outputs).where(Analysis.target_type == "pair"))
+        if outputs.get("image_a") in gone or outputs.get("image_b") in gone
+    ]
+    if pairs:
+        db.execute(delete(Analysis).where(Analysis.id.in_(pairs)))
     db.execute(delete(Rendition).where(Rendition.image_id.in_(image_ids)))
     db.execute(delete(Image).where(Image.id.in_(image_ids)))
 
@@ -112,6 +121,8 @@ def purge_expired(db: Session, days: int, now: datetime | None = None) -> dict[s
 def collect_garbage(db: Session, store: BlobStore, grace_seconds: int = GRACE_SECONDS) -> int:
     """Remove blob files no row refers to. Returns how many files went."""
     referenced = set(db.scalars(select(Image.sha256))) | set(db.scalars(select(Rendition.sha256)))
+    for outputs in db.scalars(select(Analysis.outputs).where(Analysis.target_type == "pair")):
+        referenced.update(v for k, v in outputs.items() if k.endswith("_sha256") and isinstance(v, str))
     cutoff = time.time() - grace_seconds
     removed = 0
     for kind in ("originals", "derived"):

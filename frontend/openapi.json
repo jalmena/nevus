@@ -455,6 +455,177 @@
         "title": "CoinIn",
         "type": "object"
       },
+      "ComparisonIn": {
+        "properties": {
+          "image_a": {
+            "format": "uuid",
+            "title": "Image A",
+            "type": "string"
+          },
+          "image_b": {
+            "format": "uuid",
+            "title": "Image B",
+            "type": "string"
+          }
+        },
+        "required": [
+          "image_a",
+          "image_b"
+        ],
+        "title": "ComparisonIn",
+        "type": "object"
+      },
+      "ComparisonOut": {
+        "properties": {
+          "a": {
+            "$ref": "#/components/schemas/SideOut"
+          },
+          "b": {
+            "$ref": "#/components/schemas/SideOut"
+          },
+          "coverage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Coverage"
+          },
+          "heatmap_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Heatmap Url"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "inlier_ratio": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inlier Ratio"
+          },
+          "inliers": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inliers"
+          },
+          "matrix": {
+            "anyOf": [
+              {
+                "items": {
+                  "items": {
+                    "type": "number"
+                  },
+                  "type": "array"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Matrix"
+          },
+          "mean_difference": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Difference"
+          },
+          "method": {
+            "enum": [
+              "card",
+              "features"
+            ],
+            "title": "Method",
+            "type": "string"
+          },
+          "overlay_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Overlay Url"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "enum": [
+                  "too_little_detail",
+                  "too_few_matches",
+                  "no_consistent_alignment",
+                  "matches_disagree",
+                  "mirrored",
+                  "distance",
+                  "angle"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "status": {
+            "enum": [
+              "aligned",
+              "abstained"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "reason",
+          "method",
+          "inliers",
+          "inlier_ratio",
+          "matrix",
+          "a",
+          "b",
+          "overlay_url",
+          "heatmap_url",
+          "coverage",
+          "mean_difference"
+        ],
+        "title": "ComparisonOut",
+        "type": "object"
+      },
       "Credentials": {
         "properties": {
           "password": {
@@ -2505,6 +2676,54 @@
         "title": "SessionOut",
         "type": "object"
       },
+      "SideOut": {
+        "properties": {
+          "image_id": {
+            "format": "uuid",
+            "title": "Image Id",
+            "type": "string"
+          },
+          "mm_per_px": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mm Per Px"
+          },
+          "scale_kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scale Kind"
+          },
+          "upright_height": {
+            "title": "Upright Height",
+            "type": "integer"
+          },
+          "upright_width": {
+            "title": "Upright Width",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "image_id",
+          "upright_width",
+          "upright_height",
+          "mm_per_px",
+          "scale_kind"
+        ],
+        "title": "SideOut",
+        "type": "object"
+      },
       "SnoozeIn": {
         "properties": {
           "days": {
@@ -3469,6 +3688,93 @@
         ]
       }
     },
+    "/api/comparisons": {
+      "post": {
+        "description": "Align photo B onto photo A (same person). The result is cached as an analysis record.",
+        "operationId": "compare_api_comparisons_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComparisonIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComparisonOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Compare",
+        "tags": [
+          "comparisons"
+        ]
+      }
+    },
+    "/api/comparisons/{comparison_id}/{kind}": {
+      "get": {
+        "operationId": "picture_api_comparisons__comparison_id___kind__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "comparison_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Comparison Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "title": "Kind",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Picture",
+        "tags": [
+          "comparisons"
+        ]
+      }
+    },
     "/api/due": {
       "get": {
         "operationId": "due_list_api_due_get",
@@ -4097,6 +4403,46 @@
           }
         },
         "summary": "Lesion Measurements",
+        "tags": [
+          "measurements"
+        ]
+      }
+    },
+    "/api/lesions/{lesion_id}/measurements.csv": {
+      "get": {
+        "description": "The series as CSV: one row per visit, millimetres with their standard deviation.",
+        "operationId": "lesion_measurements_csv_api_lesions__lesion_id__measurements_csv_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lesion_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Lesion Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/csv": {}
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Lesion Measurements Csv",
         "tags": [
           "measurements"
         ]
