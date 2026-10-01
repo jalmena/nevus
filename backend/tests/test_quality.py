@@ -87,8 +87,8 @@ def test_warnings_reach_the_photo_and_the_visit_after_the_job_runs(client: TestC
     assert before["quality_checked_at"] is None and before["quality_flags"] == []
 
     jobs = client.app.state.jobs  # type: ignore[attr-defined]
-    assert jobs.run_until_idle() == 1
-    assert jobs.run_until_idle() == 0, "the same check is not queued twice"
+    assert jobs.run_until_idle() == 2, "the quality check and the reference-card search"
+    assert jobs.run_until_idle() == 0, "the same checks are not queued twice"
 
     after = client.get(f"/api/images/{image_id}").json()
     assert after["quality_flags"] == ["blurry"] and after["quality_checked_at"] is not None

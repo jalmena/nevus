@@ -36,6 +36,8 @@ class User(Base):
     language: Mapped[str] = mapped_column(String(8), nullable=False, default="en")
     theme: Mapped[str] = mapped_column(String(8), nullable=False, default="system")
     show_uncertainty: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    card_line_mm: Mapped[float | None] = mapped_column(Float)
+    """What the person measured on the printed card's 50 mm verification line; None = not verified."""
     created_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow, onupdate=utcnow)
     last_login_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
@@ -315,4 +317,66 @@ class Analysis(Base):
             unique=True,
         ),
         Index("ix_analyses_target", "target_type", "target_id"),
+    )
+
+
+SCALE_KINDS = ("card", "coin", "manual")
+MEASUREMENT_METHODS = ("assisted", "manual")
+
+
+class ScaleReference(Base):
+    """How millimetres were obtained for one photo: the detected card, a coin, or a line of known length."""
+
+    __tablename__ = "scale_references"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    image_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("images.id", ondelete="CASCADE"), nullable=False)
+    kind: Mapped[str] = mapped_column(String(16), nullable=False)
+    reference_mm: Mapped[float | None] = mapped_column(Float)
+    geometry: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False, default=dict)
+    mm_per_px: Mapped[float] = mapped_column(Float, nullable=False)
+    sigma_scale: Mapped[float] = mapped_column(Float, nullable=False)
+    tilt_deg: Mapped[float | None] = mapped_column(Float)
+    analysis_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("analyses.id", ondelete="SET NULL"))
+    created_by: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"))
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
+    deleted_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+
+    __table_args__ = (Index("ix_scale_references_image_id", "image_id"),)
+
+
+class Measurement(Base):
+    """A confirmed measurement of a lesion on one photo, with its uncertainty and its provenance."""
+
+    __tablename__ = "measurements"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    observation_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("observations.id", ondelete="CASCADE"), nullable=False
+    )
+    lesion_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("lesions.id", ondelete="CASCADE"), nullable=False)
+    image_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("images.id", ondelete="CASCADE"), nullable=False)
+    scale_reference_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("scale_references.id", ondelete="RESTRICT"), nullable=False
+    )
+    method: Mapped[str] = mapped_column(String(16), nullable=False)
+    shape: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    longest_mm: Mapped[float] = mapped_column(Float, nullable=False)
+    perpendicular_mm: Mapped[float] = mapped_column(Float, nullable=False)
+    area_mm2: Mapped[float] = mapped_column(Float, nullable=False)
+    sigma_longest_mm: Mapped[float] = mapped_column(Float, nullable=False)
+    sigma_perpendicular_mm: Mapped[float] = mapped_column(Float, nullable=False)
+    sigma_area_mm2: Mapped[float] = mapped_column(Float, nullable=False)
+    tilt_deg: Mapped[float | None] = mapped_column(Float)
+    flags: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
+    details: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False, default=dict)
+    analysis_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("analyses.id", ondelete="SET NULL"))
+    confirmed_by: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"))
+    confirmed_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
+    deleted_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+
+    __table_args__ = (
+        Index("ix_measurements_lesion_id", "lesion_id"),
+        Index("ix_measurements_observation_id", "observation_id"),
     )

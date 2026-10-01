@@ -14,6 +14,7 @@ from nevus.api.bodymap import router as bodymap_router
 from nevus.api.health import router as health_router
 from nevus.api.images import router as images_router
 from nevus.api.lesions import router as lesions_router
+from nevus.api.measurements import router as measurements_router
 from nevus.api.persons import router as persons_router
 from nevus.api.users import router as users_router
 from nevus.auth.ratelimit import LoginRateLimiter
@@ -88,6 +89,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(auth_router)
     app.include_router(users_router)
     app.include_router(persons_router)
+    # Before the images router: its /images/{id}/{kind} would otherwise swallow /images/{id}/scale.
+    app.include_router(measurements_router)
     app.include_router(images_router)
     app.include_router(lesions_router)
     app.include_router(bodymap_router)

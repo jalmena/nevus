@@ -98,6 +98,21 @@ class LesionUpdate(BaseModel):
     _label = field_validator("label")(_strip_label)
 
 
+class MeasurementBrief(BaseModel):
+    longest_mm: float
+    sigma_longest_mm: float
+    perpendicular_mm: float
+    measured_at: datetime
+    flags: list[str]
+
+
+class ChangeBrief(BaseModel):
+    delta_mm: float
+    sigma_mm: float
+    detectable: bool
+    since: datetime
+
+
 class LesionOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -118,6 +133,8 @@ class LesionOut(BaseModel):
     next_due_on: date | None
     due: bool
     latest_image_id: uuid.UUID | None
+    latest_measurement: MeasurementBrief | None = None
+    measurement_change: ChangeBrief | None = None
 
 
 class ObservationIn(BaseModel):
@@ -250,8 +267,28 @@ def _lesion_out(lesion: Lesion, summary: tuple[int, datetime | None, uuid.UUID |
     )
 
 
+def _with_measurements(db: Session, lesion: Lesion, out: LesionOut) -> LesionOut:
+    from nevus.api.measurements import change_between, lesion_series
+
+    series = lesion_series(db, lesion.id)
+    if not series:
+        return out
+    latest, measured_at = series[-1]
+    out.latest_measurement = MeasurementBrief(
+        longest_mm=latest.longest_mm,
+        sigma_longest_mm=latest.sigma_longest_mm,
+        perpendicular_mm=latest.perpendicular_mm,
+        measured_at=measured_at,
+        flags=list(latest.flags or []),
+    )
+    if len(series) > 1:
+        change = change_between(series[-2], series[-1])
+        out.measurement_change = ChangeBrief(**change.model_dump())
+    return out
+
+
 def _one(db: Session, lesion: Lesion) -> LesionOut:
-    return _lesion_out(lesion, _summaries(db, [lesion.id])[lesion.id])
+    return _with_measurements(db, lesion, _lesion_out(lesion, _summaries(db, [lesion.id])[lesion.id]))
 
 
 def _local_date(captured_at: datetime, captured_tz: str | None) -> date:
@@ -295,7 +332,7 @@ def list_lesions(person_id: uuid.UUID, user: CurrentUser, db: DbSession) -> list
         select(Lesion).where(Lesion.person_id == person_id, Lesion.deleted_at.is_(None)).order_by(Lesion.created_at)
     ).all()
     summaries = _summaries(db, [lesion.id for lesion in lesions])
-    return [_lesion_out(lesion, summaries[lesion.id]) for lesion in lesions]
+    return [_with_measurements(db, lesion, _lesion_out(lesion, summaries[lesion.id])) for lesion in lesions]
 
 
 @router.post("/persons/{person_id}/lesions", response_model=LesionOut, status_code=status.HTTP_201_CREATED)

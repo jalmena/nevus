@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 from nevus.auth import service
 from nevus.auth.dependencies import AppSettings, CurrentUser, DbSession, client_ip
 from nevus.config import Settings
-from nevus.cv.pipeline import enqueue_quality, refresh_observation_flags
+from nevus.cv.pipeline import enqueue_analyses, refresh_observation_flags
 from nevus.db.models import (
     ACCESS_MANAGER,
     ACCESS_OWNER,
@@ -158,7 +158,7 @@ async def ingest_upload(
         )
     db.flush()
     db.refresh(image)
-    enqueue_quality(db, image)
+    enqueue_analyses(db, image)
     details = {"person": str(person_id)}
     if observation_id:
         details["observation"] = str(observation_id)
