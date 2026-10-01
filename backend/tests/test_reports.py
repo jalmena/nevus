@@ -220,3 +220,23 @@ def test_report_colours_and_zone_names_match_the_app() -> None:
     for language in i18n.LANGUAGES:
         app = json.loads((FRONTEND / f"src/lib/i18n/locales/{language}.json").read_text())
         assert i18n.zone_names()[language] == app["zones"], language
+
+
+def test_a_report_of_chosen_marks(client: TestClient) -> None:
+    pid, lesion_id, _ = _measured_lesion(client)
+    other = client.post(
+        f"/api/persons/{pid}/lesions", json={"location": {"zone": "2300", "x": 0.5, "y": 0.45}}, headers=SAME_ORIGIN
+    ).json()["id"]
+    assert (
+        client.post(f"/api/persons/{pid}/reports", json={"scope": "selection"}, headers=SAME_ORIGIN).status_code == 422
+    )
+    made = client.post(
+        f"/api/persons/{pid}/reports",
+        json={"scope": "selection", "lesion_ids": [lesion_id, other, lesion_id]},
+        headers=SAME_ORIGIN,
+    )
+    assert made.status_code == 202 and made.json()["lesion_ids"] == [lesion_id, other]
+    client.app.state.jobs.run_until_idle()  # type: ignore[attr-defined]
+    report = client.get(f"/api/reports/{made.json()['id']}").json()
+    data = _attached(client.get(report["download_url"]).content)
+    assert data["scope"] == "selection" and set(data["records"]) == {lesion_id, other}

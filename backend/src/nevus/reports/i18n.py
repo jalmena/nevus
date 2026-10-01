@@ -15,6 +15,8 @@ TEXT: dict[str, dict[str, str]] = {
     "en": {
         "lesion_title": "Skin mark record",
         "visit_report_title": "Prepared for an appointment",
+        "selection_title": "Selected skin marks",
+        "selection_marks": "The marks chosen for this report; their records follow the summary:",
         "appointment_title": "Appointment on {date}",
         "visit_marks": "The marks prepared for this appointment; their records follow the summary:",
         "visit_no_marks": "No mark needed a new photo for this appointment.",
@@ -122,6 +124,8 @@ TEXT: dict[str, dict[str, str]] = {
     "es": {
         "lesion_title": "Registro de una marca de la piel",
         "visit_report_title": "Preparado para una cita",
+        "selection_title": "Marcas de la piel seleccionadas",
+        "selection_marks": "Las marcas elegidas para este informe; su registro sigue al resumen:",
         "appointment_title": "Cita del {date}",
         "visit_marks": "Las marcas preparadas para esta cita; su registro sigue al resumen:",
         "visit_no_marks": "Ninguna marca necesitaba una foto nueva para esta cita.",

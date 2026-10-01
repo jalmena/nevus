@@ -222,7 +222,12 @@ def context(payload: dict[str, Any]) -> dict[str, Any]:
         on = words.day(date.fromisoformat(raw_appointment["date"]))
         appointment = {"title": words("appointment_title", date=on), "notes": raw_appointment.get("notes")}
         first = appointment["title"]
-    titles = {"lesion": "lesion_title", "profile": "profile_title", "visit": "visit_report_title"}
+    titles = {
+        "lesion": "lesion_title",
+        "profile": "profile_title",
+        "visit": "visit_report_title",
+        "selection": "selection_title",
+    }
     wanted = set(payload.get("records") or [])
     return {
         "w": words,

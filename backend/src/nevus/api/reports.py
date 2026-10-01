@@ -9,7 +9,7 @@ from typing import Any, Literal
 
 from fastapi import APIRouter, HTTPException, Request, Response, status
 from fastapi.responses import FileResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -21,8 +21,8 @@ from nevus.reports.jobs import REPORT_KIND
 from nevus.storage.blobs import BlobStore
 
 router = APIRouter(prefix="/api", tags=["reports"])
-Scope = Literal["lesion", "profile", "visit"]
-RequestScope = Literal["lesion", "profile"]
+Scope = Literal["lesion", "profile", "visit", "selection"]
+RequestScope = Literal["lesion", "profile", "selection"]
 Language = Literal["en", "es"]
 Paper = Literal["a4", "letter"]
 
@@ -30,6 +30,7 @@ Paper = Literal["a4", "letter"]
 class ReportIn(BaseModel):
     scope: RequestScope
     lesion_id: uuid.UUID | None = None
+    lesion_ids: list[uuid.UUID] | None = Field(default=None, max_length=60, description="For a selection")
     language: Language | None = None
     paper: Paper = "a4"
 
@@ -135,6 +136,13 @@ def request_report(
         if lesion is None or lesion.person_id != person_id or lesion.deleted_at is not None:
             raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Choose a mark of this person.")
         lesion_ids = [str(lesion.id)]
+    if body.scope == "selection":
+        chosen = [db.get(Lesion, i) for i in dict.fromkeys(body.lesion_ids or [])]
+        if not chosen or any(
+            lesion is None or lesion.person_id != person_id or lesion.deleted_at is not None for lesion in chosen
+        ):
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Choose one or more marks of this person.")
+        lesion_ids = [str(lesion.id) for lesion in chosen if lesion is not None]
     row = create_report(
         db, user, person_id, body.scope, lesion_ids, body.language, body.paper, client_ip(request, settings)
     )
