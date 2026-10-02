@@ -25,6 +25,7 @@ from nevus.api.measurements import router as measurements_router
 from nevus.api.persons import router as persons_router
 from nevus.api.proposals import router as proposals_router
 from nevus.api.reports import router as reports_router
+from nevus.api.sessions import router as sessions_router
 from nevus.api.trash import router as trash_router
 from nevus.api.users import router as users_router
 from nevus.api.webhooks import router as webhooks_router
@@ -118,6 +119,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(webhooks_router)
     app.include_router(calendar_router)
     app.include_router(evaluation_router)
+    app.include_router(sessions_router)
     mount_frontend(app, _static_dir(settings))
     return app
 

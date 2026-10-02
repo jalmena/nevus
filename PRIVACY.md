@@ -5,6 +5,7 @@ neVus is designed so that the only people who can see a household's skin photogr
 ## What neVus stores
 
 - Photographs of skin marks and the images derived from them (previews, thumbnails, masks used for measurement).
+- Photographs taken in full-body sessions, one per region of the body in a fixed order, and the positions of the marks pointed at or confirmed on them. Every region can be skipped, and the two that may show intimate areas say so before the photo is taken.
 - The capture date and time and the orientation of each photograph; all other metadata embedded by the camera, including GPS coordinates, device serial numbers and maker notes, is removed before the file is written and never stored.
 - Body locations, labels, notes and symptom flags written by the person; measurements and their uncertainties; reminder schedules; appointment dates; generated reports.
 - Account data: username, optional email address for notifications, password hash, language and theme preferences, second-factor secret when enabled.
@@ -40,6 +41,7 @@ The only export intended for clinicians is a PDF report that the person generate
 ## Retention and deletion
 
 - Deleting a lesion, an observation or an image moves it to a trash for 30 days, after which it is purged together with its files. Anything in the trash can be restored during that period.
+- Deleting a full-body session removes the session at once and moves its photographs to the same trash; the marks it added to the registry stay, as the person's own records.
 - Deleting a person removes all their data immediately after the user re-authenticates; only identifiers remain in the audit log.
 - The garbage collector removes image files that no record references any more.
 - Backups made before a deletion still contain the deleted data until the backup itself is rotated out; the operator's retention policy applies (default 30 daily and 12 monthly snapshots).
