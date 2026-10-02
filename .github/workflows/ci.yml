@@ -15,6 +15,9 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# The jobs form one chain, cheapest and most likely to fail first: on a single serial runner a failure
+# in one skips the ones after it instead of spending the hour on them. With more runners the chain can
+# be widened again (the expensive three are independent of each other).
 jobs:
   commits:
     name: Conventional commits
@@ -29,6 +32,7 @@ jobs:
         run: uvx --from commitizen cz check --rev-range "origin/${{ github.base_ref }}..HEAD"
 
   backend:
+    needs: frontend
     name: Backend
     runs-on: [self-hosted, nevus]
     defaults:
@@ -92,6 +96,7 @@ jobs:
           uv run alembic check
 
   frontend:
+    needs: security
     name: Frontend
     runs-on: [self-hosted, nevus]
     defaults:
@@ -119,6 +124,7 @@ jobs:
       - run: pnpm build
 
   e2e:
+    needs: image
     name: End to end
     runs-on: [self-hosted, nevus]
     defaults:
@@ -166,6 +172,7 @@ jobs:
           retention-days: 7
 
   image:
+    needs: backend
     name: Container image
     runs-on: [self-hosted, nevus]
     steps:
