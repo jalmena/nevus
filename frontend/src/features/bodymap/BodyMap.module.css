@@ -6,7 +6,7 @@
   display: block;
   width: 100%;
   height: auto;
-  max-height: 70vh;
+  max-height: min(56vh, 640px);
   touch-action: none;
 }
 

@@ -59,6 +59,7 @@
       "viewer": "Observador"
     },
     "profileTitle": "Definições do perfil",
+    "profileHint": "Análise experimental, exportação, espaço e eliminação.",
     "experimental": "Análise experimental",
     "experimentalHint": "Desligada por omissão. Quando ligada, o neVus pode propor contornos e alterações por si próprio; cada proposta vem marcada como experimental e é você quem a confirma ou rejeita."
   },
@@ -87,6 +88,11 @@
   },
   "settings": {
     "title": "Definições",
+    "account": "Conta",
+    "appearance": "Aspeto",
+    "administration": "Administração",
+    "about": "Sobre o neVus",
+    "sections": "Secções",
     "theme": "Tema",
     "themes": {
       "system": "Seguir o aparelho",
@@ -539,6 +545,7 @@
   "reports": {
     "title": "Relatórios",
     "introProfile": "Um resumo em PDF de todas as marcas, com o mapa do corpo e os últimos tamanhos, para levar a uma consulta.",
+    "hint": "Resumos e registos em PDF para o profissional de saúde.",
     "introLesion": "Um registo em PDF desta marca para o profissional de saúde: as suas fotos com escala, as medições com a sua incerteza e as suas notas.",
     "language": "Idioma",
     "paper": "Papel",
@@ -569,6 +576,7 @@
   "appointments": {
     "sectionTitle": "Consultas",
     "intro": "Vai a um profissional de saúde? Introduza a data: o neVus lista as marcas a fotografar antes e cria o relatório para levar.",
+    "hint": "Planeie as fotos antes de uma consulta e leve o relatório.",
     "date": "Data da consulta",
     "notes": "Nota (opcional)",
     "prepare": "Preparar a consulta",
@@ -645,6 +653,7 @@
   "calendar": {
     "title": "Calendário",
     "intro": "Subscreva a partir da sua aplicação de calendário para ver quando cada marca tem foto pendente, e as consultas. O calendário lembra-o no próprio dia; funciona pela sua VPN, sem nenhum serviço de push.",
+    "hint": "As datas pendentes e as consultas na sua aplicação de calendário.",
     "make": "Criar uma ligação de calendário",
     "again": "Criar uma ligação nova",
     "stop": "Desativar a ligação",
@@ -733,6 +742,7 @@
   "sessions": {
     "title": "Sessões de corpo inteiro",
     "intro": "Uma sessão fotografa o corpo inteiro região a região, pela mesma ordem e na mesma pose de cada vez, para que duas sessões se possam comparar zona a zona. Salte qualquer região que prefira não fotografar.",
+    "hint": "O corpo inteiro, região a região, para comparar ao longo do tempo.",
     "start": "Iniciar uma sessão",
     "titleFor": "Sessão de {{date}}",
     "open": "Em curso",
@@ -750,6 +760,7 @@
     "howTo": "Use a mesma luz e distância de cada vez. Alguém pode ajudar com as costas, ou apoie o telemóvel e use o temporizador.",
     "experimentalNote": "A análise experimental está ligada para esta pessoa: depois de cada foto, propõem-se pontos que podem ser marcas para você confirmar ou rejeitar. Nenhum fica registado sem a sua confirmação.",
     "sensitive": "Esta região pode incluir zonas íntimas. Salte-a se preferir; nada mais depende dela.",
+    "pose": "Como se colocar",
     "pending": "Ainda não fotografada",
     "skipped": "Saltada",
     "analysing": "À procura de pontos na foto…",

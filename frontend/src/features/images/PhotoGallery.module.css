@@ -24,6 +24,18 @@
   cursor: pointer;
 }
 
+/* The first photograph is the one to look at: the whole row, whole, never cropped. */
+.hero {
+  grid-column: 1 / -1;
+}
+
+.hero .thumb {
+  aspect-ratio: auto;
+  height: auto;
+  max-height: 60vh;
+  object-fit: contain;
+}
+
 .roleRow {
   display: flex;
   flex-wrap: wrap;

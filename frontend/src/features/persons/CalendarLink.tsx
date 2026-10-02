@@ -6,7 +6,7 @@ import { useCalendarFeed, useNewCalendarFeed, useStopCalendarFeed } from "@/lib/
 import styles from "./persons.module.css";
 
 /** A secret link a calendar app subscribes to: next photo dates and appointments, reminded natively. */
-export function CalendarLink({ personId }: { personId: string }) {
+export function CalendarLink({ personId, embedded = false }: { personId: string; embedded?: boolean }) {
   const { t, i18n } = useTranslation();
   const feed = useCalendarFeed(personId);
   const make = useNewCalendarFeed(personId);
@@ -25,9 +25,10 @@ export function CalendarLink({ personId }: { personId: string }) {
     }
   }
 
+  const Wrapper = embedded ? "div" : "section";
   return (
-    <section className={styles.mapSection} aria-labelledby="calendar-heading">
-      <h2 id="calendar-heading">{t("calendar.title")}</h2>
+    <Wrapper className={styles.mapSection} aria-labelledby={embedded ? undefined : "calendar-heading"}>
+      {!embedded && <h2 id="calendar-heading">{t("calendar.title")}</h2>}
       <p className="text-secondary">{t("calendar.intro")}</p>
       {url ? (
         <div className={styles.calendar}>
@@ -60,6 +61,6 @@ export function CalendarLink({ personId }: { personId: string }) {
         )}
       </div>
       {(make.error || stop.error) && <Notice kind="error">{(make.error ?? stop.error)?.message}</Notice>}
-    </section>
+    </Wrapper>
   );
 }

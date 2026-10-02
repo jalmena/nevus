@@ -32,6 +32,7 @@ export function SessionPage() {
   const data = session.data;
   const sensitive = new Set(protocol.data.filter((zone) => zone.sensitive).map((zone) => zone.id));
   const captured = data.zones.filter((zone) => zone.status === "captured").length;
+  const current = data.zones.find((zone) => zone.status === "pending")?.zone;
   const busy = photo.isPending || skip.isPending;
 
   return (
@@ -49,14 +50,26 @@ export function SessionPage() {
       {(photo.error ?? skip.error) && <Notice kind="error">{(photo.error ?? skip.error)?.message}</Notice>}
       <ol className={styles.zones}>
         {data.zones.map((zone) => (
-          <li key={zone.zone} className={[styles.zone, styles[zone.status]].join(" ")}>
+          <li
+            key={zone.zone}
+            className={[styles.zone, styles[zone.status], zone.zone === current ? styles.current : ""].join(
+              " ",
+            )}
+          >
             <div className={styles.zoneText}>
               <h2>{t(`sessions.zones.${zone.zone}.name`)}</h2>
-              {zone.status === "pending" && (
+              {zone.status === "pending" && zone.zone === current && (
                 <>
                   <p className="text-secondary">{t(`sessions.zones.${zone.zone}.pose`)}</p>
                   {sensitive.has(zone.zone) && <p className="text-secondary">{t("sessions.sensitive")}</p>}
                 </>
+              )}
+              {zone.status === "pending" && zone.zone !== current && (
+                <details className={styles.pose}>
+                  <summary>{t("sessions.pose")}</summary>
+                  <p className="text-secondary">{t(`sessions.zones.${zone.zone}.pose`)}</p>
+                  {sensitive.has(zone.zone) && <p className="text-secondary">{t("sessions.sensitive")}</p>}
+                </details>
               )}
               <p className={styles.status} role={zone.analysing ? "status" : undefined}>
                 {zone.analysing
@@ -83,7 +96,7 @@ export function SessionPage() {
                 {zone.status !== "skipped" && (
                   <FileButton
                     label={zone.status === "captured" ? t("sessions.retake") : t("sessions.takePhoto")}
-                    variant={zone.status === "captured" ? "secondary" : "primary"}
+                    variant={zone.status === "pending" && zone.zone === current ? "primary" : "secondary"}
                     capture="environment"
                     disabled={busy}
                     onFiles={(files) => files[0] && photo.mutate({ zone: zone.zone, file: files[0] })}

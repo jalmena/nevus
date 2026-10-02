@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { measuredVisit, PASSWORD, PHOTO, shot, totpCode } from "./helpers";
+import { measuredVisit, openTool, PASSWORD, PHOTO, shot, totpCode } from "./helpers";
 
 // Every screen of the app, photographed on each device and in both colour schemes, for a look at the
 // design. Not a test of behaviour: the journey is. `pnpm run shots` runs it and makes contact sheets.
@@ -98,6 +98,7 @@ test("every screen, for a look at the design", async ({ page }, info) => {
   await page.getByRole("link", { name: /Ana/ }).click();
   await expect(page.getByRole("heading", { name: "Full-body sessions", exact: true })).toBeVisible();
   await snap("12-person");
+  await openTool(page, "sessions", "Full-body sessions");
   await page.getByRole("button", { name: "Start a session", exact: true }).click();
   await expect(page.getByRole("heading", { level: 1, name: /^Session of/ })).toBeVisible();
   const firstSession = page.url();
@@ -135,6 +136,7 @@ test("every screen, for a look at the design", async ({ page }, info) => {
   await page.getByRole("button", { name: "Finish the session", exact: true }).click();
   await expect(page.getByText(/^Finished/)).toBeVisible();
   await page.getByRole("link", { name: "Back to the person", exact: true }).click();
+  await openTool(page, "sessions", "Full-body sessions");
   await page.getByRole("button", { name: "Start a session", exact: true }).click();
   await expect(page.getByRole("heading", { level: 1, name: /^Session of/ })).toBeVisible();
   await expect(page).not.toHaveURL(firstSession);

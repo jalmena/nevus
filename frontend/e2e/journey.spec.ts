@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { readFileSync } from "node:fs";
-import { accessible, measuredVisit, PASSWORD, PHOTO, shot, signIn, totpCode } from "./helpers";
+import { accessible, measuredVisit, openTool, PASSWORD, PHOTO, shot, signIn, totpCode } from "./helpers";
 
 test("from a fresh instance to a measured mark, accessibly", async ({ page }) => {
   await page.goto("/");
@@ -88,7 +88,7 @@ test("a full-body session: regions photographed or skipped, a mark pointed at, a
     await page.getByRole("button", { name: "Create", exact: true }).click();
   }
   await person.first().click();
-  await expect(page.getByRole("heading", { name: "Full-body sessions", exact: true })).toBeVisible();
+  await openTool(page, "sessions", "Full-body sessions");
   await page.getByRole("button", { name: "Start a session", exact: true }).click();
 
   await expect(page.getByRole("heading", { level: 1, name: /^Session of/ })).toBeVisible();

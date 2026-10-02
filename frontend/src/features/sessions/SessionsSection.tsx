@@ -6,7 +6,16 @@ import { usePersonSessions, useStartSession } from "@/lib/sessions";
 import styles from "./sessions.module.css";
 
 /** On a person's page: the full-body sessions, and starting a new one. */
-export function SessionsSection({ personId, canEdit }: { personId: string; canEdit: boolean }) {
+export function SessionsSection({
+  personId,
+  canEdit,
+  embedded = false,
+}: {
+  personId: string;
+  canEdit: boolean;
+  /** Under a disclosure that carries the heading. */
+  embedded?: boolean;
+}) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const sessions = usePersonSessions(personId);
@@ -15,9 +24,10 @@ export function SessionsSection({ personId, canEdit }: { personId: string; canEd
   const list = sessions.data ?? [];
   const withPhotos = list.filter((session) => session.captured > 0);
   if (!canEdit && list.length === 0) return null;
+  const Wrapper = embedded ? "div" : "section";
   return (
-    <section className={styles.section} aria-labelledby="sessions-heading">
-      <h2 id="sessions-heading">{t("sessions.title")}</h2>
+    <Wrapper className={styles.section} aria-labelledby={embedded ? undefined : "sessions-heading"}>
+      {!embedded && <h2 id="sessions-heading">{t("sessions.title")}</h2>}
       <p className="text-secondary">{t("sessions.intro")}</p>
       {canEdit && (
         <div>
@@ -59,6 +69,6 @@ export function SessionsSection({ personId, canEdit }: { personId: string; canEd
           </Link>
         </p>
       )}
-    </section>
+    </Wrapper>
   );
 }

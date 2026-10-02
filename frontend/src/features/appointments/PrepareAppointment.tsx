@@ -8,7 +8,16 @@ import { daysUntil, useAppointments, useCreateAppointment } from "@/lib/appointm
 import styles from "./appointments.module.css";
 
 /** On a person's page: plan an appointment, and the ones already planned. */
-export function PrepareAppointment({ personId, canEdit }: { personId: string; canEdit: boolean }) {
+export function PrepareAppointment({
+  personId,
+  canEdit,
+  embedded = false,
+}: {
+  personId: string;
+  canEdit: boolean;
+  /** Under a disclosure that carries the heading. */
+  embedded?: boolean;
+}) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const appointments = useAppointments(personId);
@@ -27,9 +36,10 @@ export function PrepareAppointment({ personId, canEdit }: { personId: string; ca
 
   const list = appointments.data ?? [];
   if (!canEdit && list.length === 0) return null;
+  const Wrapper = embedded ? "div" : "section";
   return (
-    <section className={styles.section} aria-labelledby="appointments-heading">
-      <h2 id="appointments-heading">{t("appointments.sectionTitle")}</h2>
+    <Wrapper className={styles.section} aria-labelledby={embedded ? undefined : "appointments-heading"}>
+      {!embedded && <h2 id="appointments-heading">{t("appointments.sectionTitle")}</h2>}
       <p className="text-secondary">{t("appointments.intro")}</p>
       {canEdit && (
         <form className={styles.form} onSubmit={submit}>
@@ -76,7 +86,7 @@ export function PrepareAppointment({ personId, canEdit }: { personId: string; ca
           })}
         </ul>
       )}
-    </section>
+    </Wrapper>
   );
 }
 
