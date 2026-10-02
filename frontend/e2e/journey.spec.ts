@@ -1,81 +1,14 @@
-import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-
-const PHOTO = fileURLToPath(new URL("./fixtures/card-disc-5mm.jpg", import.meta.url));
-
-async function accessible(page: Page, name: string) {
-  const results = await new AxeBuilder({ page })
-    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
-    .analyze();
-  const blocking = results.violations.filter((v) => v.impact === "serious" || v.impact === "critical");
-  const where = (v: (typeof blocking)[number]) => v.nodes.map((n) => n.target.join(" ")).join(", ");
-  expect(blocking.map((v) => `${name}: ${v.id} at ${where(v)}`)).toEqual([]);
-}
-
-/** A visit with a photo of the card, and the 5 mm disc in its window measured. */
-async function measuredVisit(page: Page, first: boolean) {
-  await page.getByRole("button", { name: "New visit", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Photos", exact: true })).toBeVisible();
-  await page.getByLabel("Kind").selectOption("with_reference");
-  await page.getByLabel("Choose a file").setInputFiles(PHOTO);
-  await expect(page.getByRole("button", { name: /Open the photo/ })).toBeVisible();
-  await expect(page.getByText("Checking the photos…")).toHaveCount(0, { timeout: 60_000 });
-  if (first) await accessible(page, "visit");
-
-  await page.getByRole("link", { name: "Measure on the photo", exact: true }).click();
-  await expect(page.getByText(/Reference card found/)).toBeVisible({ timeout: 60_000 });
-  if (first) await accessible(page, "measure");
-  await page.getByRole("button", { name: "Use the reference card", exact: true }).click();
-
-  // Tap the middle of the card's window, where the 5 mm disc is.
-  const scale = await page.evaluate(async () => {
-    const path = window.location.pathname.split("/");
-    const imageId = path[path.length - 1];
-    const response = await fetch(`/api/images/${imageId}/scale`);
-    return (await response.json()) as {
-      upright_width: number;
-      upright_height: number;
-      card: { centre_px: number[] };
-    };
-  });
-  const canvas = page.getByRole("application");
-  const box = await canvas.boundingBox();
-  if (!box) throw new Error("no canvas");
-  const [cx = 0, cy = 0] = scale.card.centre_px;
-  await page.mouse.click(
-    box.x + (cx / scale.upright_width) * box.width,
-    box.y + (cy / scale.upright_height) * box.height,
-  );
-
-  const longest = page.locator("dt", { hasText: "Longest" }).locator("xpath=following-sibling::dd");
-  await expect(longest).toHaveText(/^\d+\.\d ± \d+\.\d mm$/, { timeout: 20_000 });
-  const value = Number((await longest.textContent())?.split(" ")[0]);
-  expect(Math.abs(value - 5.0)).toBeLessThanOrEqual(0.3);
-  await page.getByRole("button", { name: "Save the measurement", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Measurements", exact: true })).toBeVisible();
-}
-
-/** Screenshots for a human look at layout and both themes, only when asked for. */
-async function shot(page: Page, name: string) {
-  const dir = process.env.NEVUS_E2E_SHOTS;
-  if (!dir) return;
-  for (const scheme of ["light", "dark"] as const) {
-    await page.emulateMedia({ colorScheme: scheme });
-    await page.waitForTimeout(400); // let colour transitions finish
-    await page.screenshot({ path: `${dir}/${name}-${scheme}.png`, fullPage: true });
-  }
-  await page.emulateMedia({ colorScheme: "light" });
-}
+import { accessible, measuredVisit, PASSWORD, PHOTO, shot, signIn, totpCode } from "./helpers";
 
 test("from a fresh instance to a measured mark, accessibly", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Claim this instance", exact: true })).toBeVisible();
   await accessible(page, "claim");
   await page.getByLabel("Username").fill("Jose");
-  await page.getByLabel("Password", { exact: true }).fill("correct horse battery");
-  await page.getByLabel("Repeat the password").fill("correct horse battery");
+  await page.getByLabel("Password", { exact: true }).fill(PASSWORD);
+  await page.getByLabel("Repeat the password").fill(PASSWORD);
   await page.getByRole("button", { name: "Create the administrator", exact: true }).click();
 
   await expect(page.getByRole("heading", { name: "Persons", exact: true })).toBeVisible();
@@ -138,22 +71,6 @@ test("from a fresh instance to a measured mark, accessibly", async ({ page }) =>
   await accessible(page, "settings");
 });
 
-/** Signs in as the administrator, claiming the instance when this test runs first. */
-async function signIn(page: Page) {
-  await page.goto("/");
-  const claim = page.getByRole("heading", { name: "Claim this instance", exact: true });
-  await expect(claim.or(page.getByRole("heading", { name: "Sign in", exact: true }))).toBeVisible();
-  await page.getByLabel("Username").fill("Jose");
-  await page.getByLabel("Password", { exact: true }).fill("correct horse battery");
-  if (await claim.isVisible()) {
-    await page.getByLabel("Repeat the password").fill("correct horse battery");
-    await page.getByRole("button", { name: "Create the administrator", exact: true }).click();
-  } else {
-    await page.getByRole("button", { name: "Sign in", exact: true }).click();
-  }
-  await expect(page.getByRole("heading", { name: "Persons", exact: true })).toBeVisible();
-}
-
 test("a full-body session: regions photographed or skipped, a mark pointed at, accessibly", async ({
   page,
 }) => {
@@ -201,4 +118,62 @@ test("a full-body session: regions photographed or skipped, a mark pointed at, a
   await expect(chest.getByText("1 mark", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Finish the session", exact: true }).click();
   await expect(page.getByText(/^Finished/)).toBeVisible();
+});
+
+test("the second factor: set up in the settings, then a sign-in that needs the code", async ({ page }) => {
+  await signIn(page);
+  await page.getByRole("link", { name: "Settings", exact: true }).click();
+  await page.getByRole("button", { name: "Set up a second factor", exact: true }).click();
+  const dialog = page.getByRole("dialog");
+  await dialog.getByLabel("Password").fill(PASSWORD);
+  await dialog.getByRole("button", { name: "Confirm", exact: true }).click();
+  const shown = await page.getByText(/^[A-Z2-7]{4}( [A-Z2-7]{4})+$/).textContent();
+  const secret = (shown ?? "").replace(/\s/g, "");
+  expect(secret.length).toBeGreaterThanOrEqual(32);
+  await accessible(page, "second factor setup");
+  await shot(page, "settings-second-factor");
+  await page.getByLabel("Code the app shows now").fill(totpCode(secret));
+  await page.getByRole("button", { name: "Turn the second factor on", exact: true }).click();
+  const codes = page.getByRole("region", { name: "Recovery codes" });
+  await expect(codes.getByRole("listitem")).toHaveCount(10);
+  const recovery = (await codes.getByRole("listitem").first().textContent()) ?? "";
+  await accessible(page, "recovery codes");
+  await shot(page, "settings-recovery-codes");
+  await codes.getByRole("button", { name: "I have saved them", exact: true }).click();
+  await expect(page.getByText("The second factor is on. 10 recovery codes left.")).toBeVisible();
+
+  // Signing in now needs the code; a wrong one is refused, the next step's accepted.
+  await page.getByRole("button", { name: "Sign out", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Sign in", exact: true })).toBeVisible();
+  await page.getByLabel("Username").fill("Jose");
+  await page.getByLabel("Password", { exact: true }).fill(PASSWORD);
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "One more step", exact: true })).toBeVisible();
+  await accessible(page, "second factor sign-in");
+  await shot(page, "login-code");
+  await page.getByLabel("Code from the authenticator").fill("000000");
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await expect(page.getByRole("alert")).toHaveText("Wrong code.");
+  await page.getByLabel("Code from the authenticator").fill(totpCode(secret, Date.now() + 30_000));
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Persons", exact: true })).toBeVisible();
+
+  // A recovery code opens the door too, once.
+  await page.getByRole("link", { name: "Settings", exact: true }).click();
+  await page.getByRole("button", { name: "Sign out", exact: true }).click();
+  await page.getByLabel("Username").fill("Jose");
+  await page.getByLabel("Password", { exact: true }).fill(PASSWORD);
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await page.getByRole("button", { name: "Use a recovery code instead", exact: true }).click();
+  await page.getByLabel("Recovery code").fill(recovery);
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Persons", exact: true })).toBeVisible();
+
+  // Leave the account as the other tests expect it.
+  await page.getByRole("link", { name: "Settings", exact: true }).click();
+  await expect(page.getByText("The second factor is on. 9 recovery codes left.")).toBeVisible();
+  await page.getByRole("button", { name: "Turn it off", exact: true }).click();
+  await dialog.getByLabel("Password").fill(PASSWORD);
+  await dialog.getByRole("button", { name: "Confirm", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Set up a second factor", exact: true })).toBeVisible();
 });

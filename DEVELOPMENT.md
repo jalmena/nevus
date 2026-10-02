@@ -41,6 +41,16 @@ A fresh instance has no accounts: the first person to open it claims it and beco
 - Frontend: vitest with Testing Library in jsdom.
 - Image: the CI builds the image, asserts the size budget, starts it, checks `/healthz` and that `/` answers 200 without a session, verifies the process runs as uid 1000 and that `PUID`/`PGID` are honoured on a root-owned bind mount.
 
+## Looking at the design
+
+Tests say whether a screen works; they do not say whether it looks right. After a change to the interface, run the screenshot gallery and look at it:
+
+```sh
+pnpm run build && pnpm run shots      # in frontend/
+```
+
+It starts the real backend on a scratch data directory, walks every screen on a phone and on a desktop (Playwright, `e2e/gallery.spec.ts`), saves each in light and dark under `frontend/.screenshots/<device>/`, and makes contact sheets (`contact-<device>-<scheme>.png`) with `tools/screenshots/contact_sheet.py`. Check spacing, wrapping, contrast and wording in both schemes, and fix what looks wrong before the change is done. The journey test (`pnpm run e2e`) saves screenshots of its own pages too when `NEVUS_E2E_SHOTS=<dir>` is set.
+
 ## Conventions
 
 - English everywhere; see [`CONTRIBUTING.md`](CONTRIBUTING.md).
