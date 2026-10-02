@@ -1,3 +1,12 @@
+## v0.3.0 (2026-10-02)
+
+### Feat
+
+- **frontend**: experimental proposals, the labelling tool, chosen-mark reports, detail views
+- **bodymap**: hands and feet detail views
+- **reports**: a report of the marks the person chooses
+- **analysis**: experimental outline proposals, the evaluation set and re-analysis
+
 ## v0.2.0 (2026-10-02)
 
 ### Feat
