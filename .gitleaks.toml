@@ -1,0 +1,14 @@
+# Secrets scan (gitleaks) for the Security job: the default rules, plus what they must not take for a leak.
+title = "neVus"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Documented one-time-code test vectors, not secrets"
+regexes = [
+  # RFC 6238, appendix B: the seed "12345678901234567890" in base32, used by the tests of the second factor.
+  '''GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ''',
+  # The example authenticator secret of the frontend's mock API.
+  '''JBSWY3DPEHPK3PXP''',
+]
