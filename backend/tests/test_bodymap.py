@@ -14,14 +14,14 @@ from nevus.bodymap import body_map, zone_codes
 FRONTEND_COPY = Path(__file__).resolve().parents[2] / "frontend" / "src" / "features" / "bodymap" / "zones.json"
 
 
-def test_both_views_carry_twenty_eight_zones_with_unique_codes() -> None:
+def test_both_views_carry_twenty_eight_zones_with_unique_codes_and_the_head_five() -> None:
     bm = body_map()
-    assert bm.version == "nevus-body-map/1"
-    assert len(bm.zones) == 56
-    assert len(zone_codes()) == 56
-    for view in ("front", "back"):
+    assert bm.version == "nevus-body-map/2"
+    assert len(bm.zones) == 61
+    assert len(zone_codes()) == 61
+    for view, count in (("front", 28), ("back", 28), ("head", 5)):
         codes = [z.code for z in bm.zones if z.view == view]
-        assert len(codes) == 28
+        assert len(codes) == count
         assert bm.views[view].zones == sorted(codes)  # type: ignore[index]
         assert bm.views[view].silhouette.startswith("M")  # type: ignore[index]
 
@@ -59,6 +59,6 @@ def test_the_body_map_is_served(client: TestClient) -> None:
     response = client.get("/api/bodymap")
     assert response.status_code == 200
     payload = response.json()
-    assert payload["version"] == "nevus-body-map/1"
-    assert len(payload["zones"]) == 56
+    assert payload["version"] == "nevus-body-map/2"
+    assert len(payload["zones"]) == 61
     assert "MoleMapper" in payload["attribution"]

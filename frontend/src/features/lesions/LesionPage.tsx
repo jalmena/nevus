@@ -11,6 +11,8 @@ import { INTERVALS, useCreateObservation, useLesion, useObservations, useUpdateL
 import { formatDelta, formatMm } from "@/lib/measurements";
 import { usePerson } from "@/lib/persons";
 import { QuickVisit } from "@/features/capture/QuickVisit";
+import { SizeChart } from "@/features/measure/SizeChart";
+import { Reports } from "@/features/reports/Reports";
 import { SnoozeControls } from "@/features/reminders/SnoozeControls";
 import { DueBadge } from "./LesionList";
 import { lesionTitle, locationLine } from "./lesionName";
@@ -52,6 +54,7 @@ export function LesionPage() {
   if (lesion.error) return <Notice kind="error">{lesion.error.message}</Notice>;
   if (!lesion.data) return <p className="text-secondary">…</p>;
   const data = lesion.data;
+  const photographedVisits = observations.data?.filter((visit) => visit.images.length > 0).length ?? 0;
 
   return (
     <div className={styles.page}>
@@ -143,8 +146,14 @@ export function LesionPage() {
         />
       )}
 
+      <SizeChart lesionId={data.id} />
+      <Reports personId={data.person_id} lesionId={data.id} titleOf={() => lesionTitle(data, t)} />
+
       <section className={styles.section} aria-labelledby="visits-heading">
-        <h2 id="visits-heading">{t("observations.title")}</h2>
+        <div className={styles.sectionHead}>
+          <h2 id="visits-heading">{t("observations.title")}</h2>
+          {photographedVisits >= 2 && <Link to={`/lesions/${data.id}/compare`}>{t("compare.open")}</Link>}
+        </div>
         {observations.data && observations.data.length === 0 && (
           <EmptyState title={t("observations.emptyTitle")} text={t("observations.emptyText")} />
         )}

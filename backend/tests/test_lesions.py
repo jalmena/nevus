@@ -36,7 +36,7 @@ def test_a_lesion_is_a_zone_plus_a_point_and_gets_a_due_date(client: TestClient)
         "zone": "1250",
         "x": 0.4,
         "y": 0.25,
-        "body_map_version": "nevus-body-map/1",
+        "body_map_version": "nevus-body-map/2",
         "view": "front",
         "side": "right",
     }
@@ -46,7 +46,7 @@ def test_a_lesion_is_a_zone_plus_a_point_and_gets_a_due_date(client: TestClient)
     assert [entry["id"] for entry in listed] == [created["id"]]
 
 
-def test_unknown_zones_and_points_outside_the_map_are_refused(client: TestClient) -> None:
+def test_unknown_zones_and_points_outside_the_map_are_refused_but_the_head_view_is_known(client: TestClient) -> None:
     claim(client)
     pid = person(client)
     bad_zone = client.post(
@@ -60,7 +60,8 @@ def test_unknown_zones_and_points_outside_the_map_are_refused(client: TestClient
     head_detail = client.post(
         f"/api/persons/{pid}/lesions", json={"location": {"zone": "3171", "x": 0.5, "y": 0.5}}, headers=SAME_ORIGIN
     )
-    assert head_detail.status_code == 422, "head-detail zones have no silhouette yet"
+    assert head_detail.status_code == 201, "the head detail view has its own zones"
+    assert head_detail.json()["location"]["view"] == "head"
 
 
 def test_editing_moves_relabels_and_closes_a_lesion(client: TestClient) -> None:

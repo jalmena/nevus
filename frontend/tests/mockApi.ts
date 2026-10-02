@@ -23,13 +23,50 @@ export interface MockObservation {
 
 export interface MockState {
   claimed: boolean;
-  session: { username: string; language: string; theme: string; role?: string; email?: string | null } | null;
+  session: {
+    username: string;
+    language: string;
+    theme: string;
+    role?: string;
+    email?: string | null;
+    showUncertainty?: boolean;
+  } | null;
   persons: { id: string; display_name: string }[];
   lesions: MockLesion[];
   observations: MockObservation[];
   /** Image ids whose quality check found a warning. */
   flagged: string[];
-  measurements: { id: string; observation_id: string; image_id: string; longest_mm: number }[];
+  measurements: {
+    id: string;
+    observation_id: string;
+    image_id: string;
+    longest_mm: number;
+    captured_at?: string;
+  }[];
+  /** What aligning two photos gives: lined up (with the card) or refused for a reason. */
+  comparison: { status: "aligned" } | { status: "abstained"; reason: string };
+  appointments: {
+    id: string;
+    person_id: string;
+    date: string;
+    notes: string | null;
+    report_id: string | null;
+    created_at: string;
+  }[];
+  webhooks: { id: string; name: string; preset: string; url: string; enabled: boolean }[];
+  /** "proxy": a reverse proxy signs people in; there are no local passwords. */
+  authMode: "local" | "proxy";
+  calendar: { exists: boolean };
+  /** Reports; a queued one is ready the next time the list is read, unless it is set to fail. */
+  reports: {
+    id: string;
+    scope: string;
+    lesion_ids: string[];
+    language: string;
+    paper: string;
+    status: string;
+    fail?: boolean;
+  }[];
   trash: { kind: string; id: string; label: string; person_id: string; person_name: string }[];
   exports: { id: string; status: string }[];
   sudo: boolean;
@@ -42,6 +79,7 @@ const user = (
   theme = "system",
   role = "admin",
   email: string | null = null,
+  showUncertainty = true,
 ) => ({
   id: "0199a000-0000-7000-8000-000000000001",
   username,
@@ -51,11 +89,13 @@ const user = (
   email_reminders: false,
   language,
   theme,
-  show_uncertainty: true,
+  show_uncertainty: showUncertainty,
   created_at: "2026-09-23T10:00:00Z",
   last_login_at: null,
   disabled_at: null,
 });
+
+const PERSON_ID = "0199a000-0000-7000-8000-000000000002";
 
 export function installMockApi(initial: Partial<MockState> = {}): MockState {
   const state: MockState = {
@@ -70,6 +110,12 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     exports: [],
     sudo: false,
     calls: [],
+    comparison: { status: "aligned" },
+    reports: [],
+    appointments: [],
+    webhooks: [],
+    calendar: { exists: false },
+    authMode: "local",
     ...initial,
   };
   const personOut = (p: { id: string; display_name: string }) => ({
@@ -158,6 +204,7 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     observation_id: string;
     image_id: string;
     longest_mm: number;
+    captured_at?: string;
   }) => ({
     id: m.id,
     observation_id: m.observation_id,
@@ -175,8 +222,8 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     sigma_area_mm2: 1.5,
     tilt_deg: 4,
     flags: [],
-    captured_at: "2026-09-01T10:00:00Z",
-    created_at: "2026-09-01T10:00:00Z",
+    captured_at: m.captured_at ?? "2026-09-01T10:00:00Z",
+    created_at: m.captured_at ?? "2026-09-01T10:00:00Z",
     change: null,
   });
   let counter = 100;
@@ -196,7 +243,14 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
       const body = text ? (JSON.parse(text) as unknown) : undefined;
       state.calls.push({ method, url, body });
       const path = url.replace(/^https?:\/\/[^/]+/, "");
-      if (path === "/api/auth/instance") return json({ claimed: state.claimed, version: "test" });
+      if (path === "/api/auth/instance") {
+        return json({
+          claimed: state.claimed,
+          version: "test",
+          auth_mode: state.authMode,
+          logout_url: state.authMode === "proxy" ? "https://sso.example/out" : null,
+        });
+      }
       if (path === "/api/auth/session") {
         return state.session
           ? json({
@@ -206,6 +260,7 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
                 state.session.theme,
                 state.session.role ?? "admin",
                 state.session.email ?? null,
+                state.session.showUncertainty ?? true,
               ),
               sudo_until: null,
             })
@@ -335,8 +390,9 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
           headers: { "content-type": "application/json", "x-sudo-required": "1" },
         });
       if (path === "/api/auth/sudo" && method === "POST") {
-        const given = body as { password: string };
-        if (given.password !== "correct horse battery") return json({ detail: "Wrong password." }, 401);
+        const given = body as { password?: string };
+        if (state.authMode !== "proxy" && given.password !== "correct horse battery")
+          return json({ detail: "Wrong password." }, 401);
         state.sudo = true;
         return json({ user: user(state.session?.username ?? "jose"), sudo_until: "2026-10-01T10:05:00Z" });
       }
@@ -491,6 +547,217 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
       }
       if (match && method === "GET") {
         return json(state.measurements.filter((m) => m.observation_id === match?.[1]).map(measurementOut));
+      }
+      match = /^\/api\/lesions\/([^/]+)\/measurements$/.exec(path);
+      if (match && method === "GET") {
+        return json(
+          [...state.measurements]
+            .sort((x, y) => (x.captured_at ?? "").localeCompare(y.captured_at ?? ""))
+            .map(measurementOut),
+        );
+      }
+      const reportOut = (r: MockState["reports"][number]) => ({
+        id: r.id,
+        person_id: PERSON_ID,
+        scope: r.scope,
+        lesion_ids: r.lesion_ids,
+        language: r.language,
+        paper: r.paper,
+        status: r.status,
+        bytes: r.status === "ready" ? 32_000 : null,
+        pages: r.status === "ready" ? 2 : null,
+        error: r.status === "failed" ? "The report could not be made." : null,
+        created_at: "2026-10-01T10:00:00Z",
+        finished_at: r.status === "ready" ? "2026-10-01T10:00:03Z" : null,
+        download_url: r.status === "ready" ? `/api/reports/${r.id}/download` : null,
+        can_delete: true,
+      });
+      match = /^\/api\/persons\/([^/]+)\/reports$/.exec(path);
+      if (match && method === "GET") {
+        const listed = state.reports.map(reportOut);
+        for (const r of state.reports) if (r.status === "queued") r.status = r.fail ? "failed" : "ready";
+        return json(listed);
+      }
+      if (match && method === "POST") {
+        const input = body as { scope: string; lesion_id?: string; language?: string; paper?: string };
+        const created = {
+          id: nextId(),
+          scope: input.scope,
+          lesion_ids: input.lesion_id ? [input.lesion_id] : [],
+          language: input.language ?? "en",
+          paper: input.paper ?? "a4",
+          status: "queued",
+        };
+        state.reports.unshift(created);
+        return json(reportOut(created), 202);
+      }
+      match = /^\/api\/reports\/([^/]+)$/.exec(path);
+      if (match && method === "DELETE") {
+        state.reports = state.reports.filter((r) => r.id !== match?.[1]);
+        return new Response(null, { status: 204 });
+      }
+      const appointmentOut = (a: MockState["appointments"][number]) => ({
+        ...a,
+        person_name: state.persons.find((p) => p.id === a.person_id)?.display_name ?? "",
+        can_edit: true,
+        checklist: state.lesions
+          .filter((l) => l.person_id === a.person_id)
+          .map((l) => {
+            const visits = state.observations.filter((o) => o.lesion_id === l.id).map((o) => o.captured_at);
+            const last = visits.sort().at(-1) ?? null;
+            const state_ =
+              last === null ? "never_photographed" : last >= a.created_at ? "photographed" : "to_photograph";
+            return {
+              lesion_id: l.id,
+              label: l.label,
+              zone: l.zone,
+              state: state_,
+              last_observed_at: last,
+              next_due_on: last === null ? null : "2026-10-10",
+            };
+          }),
+      });
+      if (path === "/api/appointments/upcoming") {
+        return json(state.appointments.filter((a) => a.date >= "2026-10-01").map(appointmentOut));
+      }
+      match = /^\/api\/persons\/([^/]+)\/appointments$/.exec(path);
+      if (match && method === "GET") {
+        return json(state.appointments.filter((a) => a.person_id === match?.[1]).map(appointmentOut));
+      }
+      if (match && method === "POST") {
+        const input = body as { date: string; notes: string | null };
+        const created = {
+          id: nextId(),
+          person_id: match[1] ?? "",
+          date: input.date,
+          notes: input.notes,
+          report_id: null,
+          created_at: "2026-10-01T10:00:00Z",
+        };
+        state.appointments.push(created);
+        return json(appointmentOut(created), 201);
+      }
+      match = /^\/api\/appointments\/([^/]+)\/report$/.exec(path);
+      if (match && method === "POST") {
+        const found = state.appointments.find((a) => a.id === match?.[1]);
+        if (!found) return json({ detail: "No such appointment." }, 404);
+        const input = body as { language?: string; paper?: string };
+        const created = {
+          id: nextId(),
+          scope: "visit",
+          lesion_ids: [],
+          language: input.language ?? "en",
+          paper: input.paper ?? "a4",
+          status: "queued",
+        };
+        state.reports.unshift(created);
+        found.report_id = created.id;
+        return json(reportOut(created), 202);
+      }
+      match = /^\/api\/appointments\/([^/]+)$/.exec(path);
+      if (match) {
+        const found = state.appointments.find((a) => a.id === match?.[1]);
+        if (!found) return json({ detail: "No such appointment." }, 404);
+        if (method === "DELETE") {
+          state.appointments = state.appointments.filter((a) => a.id !== found.id);
+          return new Response(null, { status: 204 });
+        }
+        if (method === "PATCH") {
+          const patch = body as { date?: string; notes?: string | null };
+          if (patch.date) found.date = patch.date;
+          if (patch.notes !== undefined) found.notes = patch.notes;
+        }
+        return json(appointmentOut(found));
+      }
+      const hookOut = (h: MockState["webhooks"][number]) => ({
+        id: h.id,
+        name: h.name,
+        preset: h.preset,
+        url_hint: h.url.slice(0, 30),
+        has_secret: false,
+        enabled: h.enabled,
+        last_status: null,
+        last_error: null,
+        last_sent_at: null,
+        created_at: "2026-10-01T10:00:00Z",
+      });
+      if (path === "/api/admin/webhooks" && method === "GET") return json(state.webhooks.map(hookOut));
+      if (path === "/api/admin/webhooks" && method === "POST") {
+        const input = body as { name: string; preset: string; url: string; enabled: boolean };
+        const created = {
+          id: nextId(),
+          name: input.name,
+          preset: input.preset,
+          url: input.url,
+          enabled: input.enabled,
+        };
+        state.webhooks.push(created);
+        return json(hookOut(created), 201);
+      }
+      match = /^\/api\/admin\/webhooks\/([^/]+)\/test$/.exec(path);
+      if (match && method === "POST") return json({ ok: true, detail: null });
+      match = /^\/api\/admin\/webhooks\/([^/]+)$/.exec(path);
+      if (match) {
+        const found = state.webhooks.find((h) => h.id === match?.[1]);
+        if (!found) return json({ detail: "No such webhook." }, 404);
+        if (method === "DELETE") {
+          state.webhooks = state.webhooks.filter((h) => h.id !== found.id);
+          return new Response(null, { status: 204 });
+        }
+        const patch = body as { enabled?: boolean };
+        if (patch.enabled !== undefined) found.enabled = patch.enabled;
+        return json(hookOut(found));
+      }
+      match = /^\/api\/persons\/([^/]+)\/calendar$/.exec(path);
+      if (match) {
+        if (method === "POST") {
+          state.calendar.exists = true;
+          return json(
+            { url: "http://localhost/api/calendar/secret-token-123.ics", created_at: "2026-10-01T10:00:00Z" },
+            201,
+          );
+        }
+        if (method === "DELETE") {
+          state.calendar.exists = false;
+          return new Response(null, { status: 204 });
+        }
+        return json({
+          exists: state.calendar.exists,
+          created_at: state.calendar.exists ? "2026-10-01T10:00:00Z" : null,
+          last_used_at: null,
+        });
+      }
+      if (path === "/api/comparisons" && method === "POST") {
+        const pair = body as { image_a: string; image_b: string };
+        const aligned = state.comparison.status === "aligned";
+        const side = (id: string) => ({
+          image_id: id,
+          upright_width: 640,
+          upright_height: 480,
+          mm_per_px: 0.05,
+          scale_kind: "card",
+        });
+        return json({
+          id: "c1",
+          status: state.comparison.status,
+          reason: state.comparison.status === "abstained" ? state.comparison.reason : null,
+          method: aligned ? "card" : "features",
+          inliers: aligned ? null : 6,
+          inlier_ratio: aligned ? null : 0.1,
+          matrix: aligned
+            ? [
+                [1, 0, 0],
+                [0, 1, 0],
+                [0, 0, 1],
+              ]
+            : null,
+          a: side(pair.image_a),
+          b: side(pair.image_b),
+          overlay_url: aligned ? "/api/comparisons/c1/overlay" : null,
+          heatmap_url: aligned ? "/api/comparisons/c1/heatmap" : null,
+          coverage: aligned ? 0.98 : null,
+          mean_difference: aligned ? 3.1 : null,
+        });
       }
       match = /^\/api\/observations\/([^/]+)\/images$/.exec(path);
       if (match && method === "POST") {

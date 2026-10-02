@@ -98,7 +98,7 @@
   height: 22px;
   border-radius: var(--radius-pill);
   background: var(--color-attention);
-  color: var(--color-ink);
+  color: var(--color-on-attention);
   font-weight: var(--font-weight-emphasis);
   font-size: var(--text-sm);
   line-height: 22px;

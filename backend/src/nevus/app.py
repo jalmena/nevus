@@ -10,8 +10,11 @@ from fastapi import FastAPI
 
 from nevus import __version__
 from nevus.api.admin import router as admin_router
+from nevus.api.appointments import router as appointments_router
 from nevus.api.auth import router as auth_router
 from nevus.api.bodymap import router as bodymap_router
+from nevus.api.calendar import router as calendar_router
+from nevus.api.comparisons import router as comparisons_router
 from nevus.api.due import router as due_router
 from nevus.api.exports import router as exports_router
 from nevus.api.health import router as health_router
@@ -19,8 +22,10 @@ from nevus.api.images import router as images_router
 from nevus.api.lesions import router as lesions_router
 from nevus.api.measurements import router as measurements_router
 from nevus.api.persons import router as persons_router
+from nevus.api.reports import router as reports_router
 from nevus.api.trash import router as trash_router
 from nevus.api.users import router as users_router
+from nevus.api.webhooks import router as webhooks_router
 from nevus.auth.ratelimit import LoginRateLimiter
 from nevus.auth.service import bootstrap_admin
 from nevus.config import Settings, get_settings
@@ -31,6 +36,7 @@ from nevus.logging import configure_logging, get_logger
 from nevus.storage.blobs import BlobStore
 from nevus.web.csrf import CsrfMiddleware
 from nevus.web.security import HostAllowlistMiddleware, SecurityHeadersMiddleware
+from nevus.web.session_cookie import SessionCookieMiddleware
 from nevus.web.static import mount_frontend
 
 log = get_logger(__name__)
@@ -85,6 +91,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.jobs = jobs
     app.state.login_limiter = LoginRateLimiter(settings.login_attempts, settings.login_window_minutes * 60)
 
+    app.add_middleware(SessionCookieMiddleware)
     app.add_middleware(SecurityHeadersMiddleware)
     app.add_middleware(CsrfMiddleware)
     app.add_middleware(HostAllowlistMiddleware, allowed_hosts=settings.allowed_hosts)
@@ -102,6 +109,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(admin_router)
     app.include_router(trash_router)
     app.include_router(exports_router)
+    app.include_router(comparisons_router)
+    app.include_router(reports_router)
+    app.include_router(appointments_router)
+    app.include_router(webhooks_router)
+    app.include_router(calendar_router)
     mount_frontend(app, _static_dir(settings))
     return app
 

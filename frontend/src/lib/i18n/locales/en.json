@@ -31,7 +31,10 @@
     "claimIntro": "Nobody has an account yet. The first account becomes the administrator and creates the others; there is no open registration.",
     "claimAction": "Create the administrator",
     "loginTitle": "Sign in",
-    "loginAction": "Sign in"
+    "loginAction": "Sign in",
+    "proxyTitle": "Sign in through single sign-on",
+    "proxyText": "This neVus signs people in through your single sign-on. Sign in there, then come back here.",
+    "proxyRetry": "I have signed in"
   },
   "persons": {
     "title": "Persons",
@@ -92,7 +95,8 @@
     "view": "View",
     "views": {
       "front": "Front",
-      "back": "Back"
+      "back": "Back",
+      "head": "Head"
     },
     "title": "Body map",
     "hint": "Tap a zone to select it.",
@@ -159,7 +163,12 @@
     "2800": "Left lower forearm",
     "2801": "Right lower forearm",
     "2850": "Left hand",
-    "2851": "Right hand"
+    "2851": "Right hand",
+    "3150": "Left side of the face",
+    "3151": "Right side of the face",
+    "3170": "Top of the head",
+    "3171": "Face",
+    "3172": "Back of the head"
   },
   "lesions": {
     "title": "Marks",
@@ -248,7 +257,7 @@
     "stepMark": "The mark",
     "canvasScale": "Photo. Tap the coin or the ends of a known length.",
     "canvasMark": "Photo. Tap the mark to outline it.",
-    "zoomHint": "Pinch or use the mouse wheel to zoom, drag to move. With a keyboard: + and − zoom, Enter places at the centre.",
+    "zoomHint": "Pinch or use the mouse wheel to zoom, drag to move. With a keyboard: + and − zoom, the arrows move, Enter places at the centre.",
     "cardSearching": "Looking for the reference card…",
     "cardFound": "Reference card found, tilted {{tilt}}°.",
     "cardTilted": "Reference card found, but tilted {{tilt}}° (limit {{limit}}°). If you can, retake the photo holding the phone parallel to the skin.",
@@ -363,7 +372,9 @@
     "intro": "This action needs your password again.",
     "confirm": "Confirm",
     "wrong": "Wrong password.",
-    "cancelled": "Cancelled."
+    "cancelled": "Cancelled.",
+    "introProxy": "This action cannot be undone easily. Confirm that you want to go ahead.",
+    "confirmProxy": "Go ahead"
   },
   "trash": {
     "title": "Trash",
@@ -432,5 +443,164 @@
     "error": "The camera could not start: {{message}}. Use Take a photo instead.",
     "lastTime": "Last time: try to match the distance and the angle.",
     "lastTimeAlt": "Previous close-up"
+  },
+  "compare": {
+    "open": "Compare visits",
+    "back": "Back to the mark",
+    "title": "Compare",
+    "titleFor": "Compare: {{name}}",
+    "needTwo": "Comparing needs photos from two visits, or two photos of one visit.",
+    "earlier": "Earlier",
+    "later": "Later",
+    "samePhoto": "Both sides show the same photo. Choose another one for one of them.",
+    "aligning": "Lining up the photos…",
+    "alignedCard": "Lined up with the reference card in both photos.",
+    "alignedPoints": "Lined up using {{count}} points the two photos have in common.",
+    "abstained": "These photos could not be lined up reliably, so only side by side is offered.",
+    "abstainedHint": "For the other views, take the photos with the reference card, or from a similar distance and angle.",
+    "reasons": {
+      "too_little_detail": "There is too little detail to match.",
+      "too_few_matches": "They have too few points in common.",
+      "no_consistent_alignment": "No single way to line them up fits.",
+      "matches_disagree": "The points in common do not agree with each other.",
+      "mirrored": "One photo would have to be mirrored.",
+      "distance": "They were taken from very different distances.",
+      "angle": "They were taken from very different angles."
+    },
+    "mode": "View",
+    "modes": {
+      "side": "Side by side",
+      "overlay": "On top",
+      "wipe": "Slider",
+      "difference": "Differences"
+    },
+    "canvas": "{{photo}}. Zoom and pan are shared with the other photo.",
+    "canvasLayered": "Both photos lined up ({{mode}}).",
+    "opacity": "How much of the later photo shows",
+    "wipe": "Where the later photo starts",
+    "similar": "Similar",
+    "different": "Different",
+    "differenceNote": "Shaded where the colours differ once the photos are lined up. It shows where to look and measures nothing: light, focus and hair show up here too.",
+    "zoomHint": "Pinch or use the mouse wheel to zoom, drag to move; side by side, both photos follow. With a keyboard: + and − zoom, the arrows move."
+  },
+  "chart": {
+    "title": "Size over time",
+    "subtitle": "At each visit.",
+    "subtitleBand": "At each visit. The shaded band is the measurement uncertainty.",
+    "roleDescription": "chart",
+    "label": "{{metric}} at {{count}} visits. Use the arrow keys to go through them.",
+    "date": "Date",
+    "showTable": "Show as a table",
+    "showChart": "Show as a chart",
+    "csv": "Download as CSV",
+    "metric": "Show",
+    "metrics": {
+      "longest": "Longest diameter",
+      "area": "Area"
+    }
+  },
+  "reports": {
+    "title": "Reports",
+    "introProfile": "A PDF summary of every mark, with the body map and the latest sizes, to take to a consultation.",
+    "introLesion": "A PDF record of this mark for the clinician: its photos with a scale, the measurements with their uncertainty, and your notes.",
+    "language": "Language",
+    "paper": "Paper",
+    "letter": "US Letter",
+    "makeProfile": "Make the summary",
+    "makeLesion": "Make the record of this mark",
+    "profile": "Summary of all marks",
+    "lesion": "Record of {{name}}",
+    "making": "Being made…",
+    "failed": "It could not be made.",
+    "download_one": "Download the PDF (1 page, {{size}})",
+    "download_other": "Download the PDF ({{count}} pages, {{size}})",
+    "delete": "Delete",
+    "deleteNamed": "Delete: {{name}}",
+    "deletedMark": "a mark that is no longer here"
+  },
+  "appointments": {
+    "sectionTitle": "Appointments",
+    "intro": "Planning to see a clinician? Enter the date: neVus lists the marks to photograph before it and makes the report to bring.",
+    "date": "Date of the appointment",
+    "notes": "Note (optional)",
+    "prepare": "Prepare the appointment",
+    "title": "Appointment on {{date}}",
+    "backTo": "Back to {{name}}",
+    "today": "Today",
+    "inDays_one": "Tomorrow",
+    "inDays_other": "In {{count}} days",
+    "daysAgo_one": "Yesterday",
+    "daysAgo_other": "{{count}} days ago",
+    "edit": "Change the date or the note",
+    "delete": "Delete the appointment",
+    "toPhotograph": "To photograph before the appointment",
+    "progress": "{{done}} of {{total}} ready",
+    "allDone": "Every mark on the list has a new photo.",
+    "never": "Never photographed",
+    "dueBy": "Due on {{date}}",
+    "photograph": "Photograph now",
+    "photographed": "Photographed for the appointment",
+    "photographedOn": "Photographed on {{date}}",
+    "reportTitle": "Report for the appointment",
+    "reportIntro": "The summary of every mark, then the record of each mark on the list, to print or send.",
+    "reportMake": "Make the report",
+    "reportAgain": "Make it again",
+    "past": "Past",
+    "ready": "Ready",
+    "left_one": "1 mark to photograph",
+    "left_other": "{{count}} marks to photograph",
+    "upcoming": "Coming appointments"
+  },
+  "webhooks": {
+    "title": "Webhooks",
+    "intro": "Send the daily list of marks due for a photo to Home Assistant, ntfy, Gotify, n8n or any address. Each webhook covers the persons you own or manage, and carries names and dates only, never photos or notes.",
+    "preset": "Kind",
+    "presets": {
+      "home_assistant": "Home Assistant",
+      "ntfy": "ntfy",
+      "gotify": "Gotify",
+      "n8n": "n8n",
+      "generic": "Any address (JSON)"
+    },
+    "name": "Name (optional)",
+    "url": "Address",
+    "urlHints": {
+      "home_assistant": "The webhook address of an automation's trigger, such as https://ha.example/api/webhook/…",
+      "ntfy": "The topic address, such as https://ntfy.example/my-topic",
+      "gotify": "The server address, such as https://gotify.example",
+      "n8n": "The production address of a Webhook node",
+      "generic": "Receives a JSON POST with the list of due marks."
+    },
+    "secret": "Secret or token (optional)",
+    "secretHints": {
+      "home_assistant": "If set, the JSON is signed in the X-Nevus-Signature header (HMAC-SHA256).",
+      "ntfy": "An access token, if the topic is protected.",
+      "gotify": "The application token (required by Gotify).",
+      "n8n": "If set, the JSON is signed in the X-Nevus-Signature header (HMAC-SHA256).",
+      "generic": "If set, the JSON is signed in the X-Nevus-Signature header (HMAC-SHA256)."
+    },
+    "add": "Add the webhook",
+    "enabled": "On",
+    "test": "Send a test",
+    "delete": "Delete",
+    "deleteNamed": "Delete the webhook {{name}}",
+    "arrived": "The test message arrived.",
+    "didNotArrive": "It did not arrive: {{detail}}",
+    "lastSent": "Last sent {{date}}",
+    "lastFailed": "Last attempt failed: {{detail}}",
+    "notYet": "Nothing sent yet",
+    "testNamed": "Send a test to {{name}}"
+  },
+  "calendar": {
+    "title": "Calendar",
+    "intro": "Subscribe from your calendar app to see when each mark is due for a photo, and the appointments. The calendar reminds you on the day; it works over your VPN, with no push service.",
+    "make": "Make a calendar link",
+    "again": "Make a new link",
+    "stop": "Stop the link",
+    "link": "Calendar link",
+    "copy": "Copy the link",
+    "copied": "Copied",
+    "warning": "This link is shown only now. Anyone with it sees the names of the marks and their dates, so keep it private. Making a new link stops this one.",
+    "exists": "A calendar link exists since {{date}}. To see it again, make a new one."
   }
 }

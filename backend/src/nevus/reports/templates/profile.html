@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% from "_summary.html" import summary with context %}
+{% from "_closing.html" import closing with context %}
+{% block content %}
+{{ summary() }}
+{{ closing() }}
+{% endblock %}

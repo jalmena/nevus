@@ -48,6 +48,8 @@ class SessionOut(BaseModel):
 class InstanceStatus(BaseModel):
     claimed: bool
     version: str
+    auth_mode: Literal["local", "proxy"] = "local"
+    logout_url: str | None = None
 
 
 class UserCreate(BaseModel):
@@ -78,7 +80,7 @@ class PasswordReset(BaseModel):
 
 
 class SudoIn(BaseModel):
-    password: str = Field(min_length=1, max_length=1024)
+    password: str | None = Field(default=None, min_length=1, max_length=1024, description="Not used in proxy mode")
 
 
 class PersonIn(BaseModel):

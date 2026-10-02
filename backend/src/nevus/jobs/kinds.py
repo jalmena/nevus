@@ -3,4 +3,6 @@
 
 import nevus.cv.pipeline
 import nevus.maintenance
-import nevus.notify.email  # noqa: F401
+import nevus.notify.email
+import nevus.notify.webhooks
+import nevus.reports.jobs  # noqa: F401

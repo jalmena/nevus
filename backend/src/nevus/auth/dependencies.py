@@ -39,6 +39,12 @@ def current_session(
 ) -> AuthSession:
     token = request.cookies.get(SESSION_COOKIE)
     session = resolve_session(db, token, settings) if token else None
+    if session is not None and session.kind == "emergency_link":
+        session = None  # a link is not a session until it is used
+    if settings.auth_mode == "proxy":
+        from nevus.auth.proxy import session_for
+
+        return session_for(request, db, settings, session)
     if session is None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Sign in to continue.")
     return session

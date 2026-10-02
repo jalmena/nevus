@@ -24,15 +24,20 @@
   --color-accent-2: #ddedea;
   --color-info: #3e6d9c;
   --color-attention: #b9791b;
+  --color-on-attention: #1b1a19; /* text on an attention fill: 4.81:1 */
   --color-danger: #a8402f;
   --color-success: #4e7d3a;
   --color-photo-frame: #e9e3da;
   --color-marker: #2b2a28;
   --color-marker-selected: #1f6f6b;
-  --color-chart-1: #1f6f6b;
-  --color-chart-2: #8a6d3b;
-  --color-chart-3: #3e6d9c;
-  --color-chart-4: #6b5b95;
+
+  /* Data series: validated with the dataviz checks (lightness band, chroma floor, 3:1 on surface). */
+  --color-chart-1: #0b9488;
+
+  /* The comparison difference map is drawn over photos, so it keeps these two in both themes. */
+  --color-diff-low: #0b9488;
+  --color-diff-high: #08463c;
+  --color-diff-backdrop: #e6d5c4; /* the legend shows the ramp over a skin-like neutral, as the map is seen */
 
   /* the brand block is always dark, whatever the theme */
   --color-brand-paper: #17161a;
@@ -89,11 +94,13 @@
     --color-accent-2: #1b3735;
     --color-info: #8db4de;
     --color-attention: #e3b25f;
+    --color-on-attention: #17161a; /* 9.26:1 */
     --color-danger: #e07a67;
     --color-success: #8fbf7a;
     --color-photo-frame: #2e2d33;
     --color-marker: #ede8e0;
     --color-marker-selected: #5fb3ae;
+    --color-chart-1: #1da09a;
     --shadow-1: 0 1px 2px rgb(0 0 0 / 40%), 0 2px 8px rgb(0 0 0 / 30%);
     --shadow-2: 0 6px 24px rgb(0 0 0 / 50%);
   }
@@ -111,11 +118,13 @@
   --color-accent-2: #1b3735;
   --color-info: #8db4de;
   --color-attention: #e3b25f;
+  --color-on-attention: #17161a;
   --color-danger: #e07a67;
   --color-success: #8fbf7a;
   --color-photo-frame: #2e2d33;
   --color-marker: #ede8e0;
   --color-marker-selected: #5fb3ae;
+  --color-chart-1: #1da09a;
   --shadow-1: 0 1px 2px rgb(0 0 0 / 40%), 0 2px 8px rgb(0 0 0 / 30%);
   --shadow-2: 0 6px 24px rgb(0 0 0 / 50%);
 }

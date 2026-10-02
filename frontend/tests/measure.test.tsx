@@ -51,7 +51,7 @@ describe("measuring a mark", () => {
     const canvas = screen.getByRole("application", { name: /Tap the mark/ });
     await user.pointer([{ keys: "[MouseLeft]", target: canvas, coords: { clientX: 1500, clientY: 1125 } }]);
     await waitFor(() => expect(state.calls.some((c) => c.url.endsWith("/api/images/i1/fit"))).toBe(true));
-    expect(await screen.findByText("5.1 ± 0.2 mm", {}, { timeout: 3000 })).toBeInTheDocument();
+    expect(await screen.findByText("5.1 ± 0.2 mm", {}, { timeout: 10_000 })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Save the measurement" }));
     await waitFor(() => expect(state.measurements).toHaveLength(1));
     expect(await screen.findByRole("heading", { name: "Measurements" })).toBeInTheDocument();

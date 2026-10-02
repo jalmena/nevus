@@ -10,7 +10,7 @@ export function ClaimPage() {
   const instance = useInstance();
   const claim = useClaim();
   if (session.data) return <Navigate to="/" replace />;
-  if (instance.data?.claimed) return <Navigate to="/login" replace />;
+  if (instance.data?.claimed || instance.data?.auth_mode === "proxy") return <Navigate to="/login" replace />;
   return (
     <CredentialsForm
       title={t("auth.claimTitle")}

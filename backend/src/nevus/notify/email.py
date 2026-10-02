@@ -19,6 +19,7 @@ from nevus.domain.due import due_for_user
 from nevus.jobs import queue
 from nevus.jobs.registry import JobContext, JobKind, register
 from nevus.logging import get_logger
+from nevus.reports.i18n import Words
 
 log = get_logger(__name__)
 DIGEST_KIND = "notify.email.digest"
@@ -89,8 +90,9 @@ def digest_text(user: User, items: list[Any], public_url: str | None) -> tuple[s
     text = TEXT.get(user.language, TEXT["en"])
     subject = text["subject_one"] if len(items) == 1 else text["subject_other"].format(n=len(items))
     lines = [text["intro"], ""]
+    words = Words(user.language)
     for item in items:
-        label = item.lesion.label or item.lesion.zone_code
+        label = item.lesion.label or words.zone(item.lesion.zone_code)
         lines.append(
             f"- {label} ({item.person.display_name}): {text['due_since'].format(date=item.next_due_on.isoformat())}"
         )

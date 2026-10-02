@@ -6,13 +6,15 @@ import { bodyMap, zoneByCode, zonesForView } from "@/features/bodymap/zones";
 import i18n from "@/lib/i18n";
 
 describe("body map data", () => {
-  it("carries 28 zones per view that tile the same silhouette", () => {
-    expect(bodyMap.version).toBe("nevus-body-map/1");
+  it("carries 28 zones per body view that tile the same silhouette, and a head detail view", () => {
+    expect(bodyMap.version).toBe("nevus-body-map/2");
     expect(zonesForView("front")).toHaveLength(28);
     expect(zonesForView("back")).toHaveLength(28);
     expect(bodyMap.views.front.silhouette).toBe(bodyMap.views.back.silhouette);
     expect(zoneByCode("1250")?.side).toBe("right");
     expect(zoneByCode("2250")?.side).toBe("left");
+    expect(zonesForView("head").map((zone) => zone.code)).toEqual(["3150", "3151", "3170", "3171", "3172"]);
+    expect(zoneByCode("3150")?.side).toBe("left");
   });
 });
 

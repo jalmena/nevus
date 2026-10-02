@@ -1,0 +1,335 @@
+/* neVus reports. Colours come from nevus.reports.tokens (the light theme of the app's tokens); type is Epilogue. */
+
+@font-face {
+  font-family: Epilogue;
+  src: url("../fonts/Epilogue-Regular.ttf");
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: Epilogue;
+  src: url("../fonts/Epilogue-Medium.ttf");
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: Epilogue;
+  src: url("../fonts/Epilogue-SemiBold.ttf");
+  font-weight: 600;
+}
+
+html {
+  font-family: Epilogue, sans-serif;
+  font-weight: 500;
+  font-size: 9pt;
+  line-height: 1.45;
+  color: var(--color-ink);
+}
+
+body {
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+h2 {
+  margin: 16pt 0 6pt;
+  padding-bottom: 3pt;
+  border-bottom: 0.75pt solid var(--color-border);
+  font-size: 12pt;
+  color: var(--color-accent);
+  break-after: avoid;
+}
+
+h3 {
+  margin: 0 0 4pt;
+  font-size: 10pt;
+  break-after: avoid;
+}
+
+p {
+  margin: 0 0 4pt;
+}
+
+.secondary {
+  color: var(--color-ink-2);
+  font-weight: 400;
+}
+
+.small {
+  font-size: 7.5pt;
+}
+
+.numeric,
+table {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* The brand block always sits on the dark paper. */
+.brand {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 0 12pt;
+  padding: 10pt 14pt;
+  border-radius: 6pt;
+  background: var(--color-brand-paper);
+  color: var(--color-brand-ink);
+}
+
+.brand img {
+  height: 26pt;
+}
+
+.brand .title {
+  text-align: right;
+}
+
+.brand h1 {
+  font-size: 13pt;
+}
+
+.brand .title p {
+  margin: 2pt 0 0;
+  font-size: 8pt;
+  font-weight: 400;
+  color: var(--color-brand-ink);
+}
+
+.identity {
+  display: flex;
+  gap: 14pt;
+  align-items: flex-start;
+}
+
+.facts {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6pt 14pt;
+  margin: 0;
+}
+
+.facts div {
+  break-inside: avoid;
+}
+
+.facts dt {
+  font-size: 7.5pt;
+  color: var(--color-ink-2);
+  font-weight: 400;
+}
+
+.facts dd {
+  margin: 0;
+}
+
+.map {
+  flex: none;
+  text-align: center;
+}
+
+.notice {
+  margin: 0 0 12pt;
+  padding: 7pt 10pt;
+  border: 0.75pt solid var(--color-border);
+  border-left: 3pt solid var(--color-accent);
+  border-radius: 4pt;
+  background: var(--color-surface);
+  font-size: 8pt;
+  break-inside: avoid;
+}
+
+.notice strong {
+  display: block;
+  margin-bottom: 2pt;
+  font-weight: 600;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 4pt 0 6pt;
+  font-size: 8pt;
+}
+
+th,
+td {
+  padding: 3pt 5pt;
+  border-bottom: 0.5pt solid var(--color-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  font-weight: 600;
+  color: var(--color-ink-2);
+}
+
+thead {
+  display: table-header-group;
+}
+
+tr {
+  break-inside: avoid;
+}
+
+.change-yes {
+  font-weight: 600;
+}
+
+.chart {
+  margin: 4pt 0 2pt;
+}
+
+.visit {
+  margin: 0 0 10pt;
+  padding: 8pt 0 0;
+  border-top: 0.5pt solid var(--color-border);
+  break-inside: avoid;
+}
+
+.photos {
+  display: flex;
+  gap: 8pt;
+  margin: 4pt 0;
+}
+
+figure {
+  width: 160pt;
+  margin: 0;
+}
+
+.frame {
+  position: relative;
+  width: 160pt;
+  overflow: hidden;
+  border-radius: 3pt;
+  background: var(--color-surface-2);
+}
+
+.frame img,
+.frame svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.scalebar {
+  position: absolute;
+  left: 6pt;
+  bottom: 6pt;
+  height: 2.2pt;
+  background: var(--color-ink);
+  border: 0.8pt solid #ffffff;
+}
+
+.scalebar span {
+  position: absolute;
+  bottom: 4pt;
+  left: -1pt;
+  padding: 0 2pt;
+  border-radius: 2pt;
+  background: #ffffff;
+  font-size: 6.5pt;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+figcaption {
+  margin-top: 2pt;
+  font-size: 7pt;
+  color: var(--color-ink-2);
+}
+
+.parts {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8pt;
+  margin-top: 4pt;
+}
+
+.part h4 {
+  margin: 0 0 2pt;
+  font-size: 7.5pt;
+  font-weight: 600;
+  color: var(--color-ink-2);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.part p,
+.part ul {
+  margin: 0;
+  font-size: 8pt;
+}
+
+.part ul {
+  padding-left: 10pt;
+}
+
+.quote {
+  white-space: pre-wrap;
+}
+
+.clinician {
+  height: 100pt;
+  margin-top: 4pt;
+  border: 0.75pt solid var(--color-border);
+  border-radius: 4pt;
+  background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 17pt, var(--color-surface-2) 17pt, var(--color-surface-2) 18pt);
+  break-inside: avoid;
+}
+
+.bodymaps {
+  display: flex;
+  justify-content: center;
+  gap: 30pt;
+  margin: 6pt 0;
+}
+
+.bodymaps figure {
+  width: auto;
+  text-align: center;
+}
+
+.highlight {
+  margin: 0 0 3pt;
+}
+
+.keep {
+  break-after: avoid;
+}
+
+/* The visit history starts on its own page: photos read better together than split by a page end. */
+h2.visits {
+  break-before: page;
+  margin-top: 0;
+}
+
+.together {
+  break-inside: avoid;
+}
+
+/* In an appointment's report, each mark's record starts on a new page after the summary. */
+.record {
+  break-before: page;
+}
+
+.record h2.visits {
+  break-before: auto;
+}
+
+.appointment ul {
+  margin: 2pt 0 8pt;
+  padding-left: 14pt;
+}

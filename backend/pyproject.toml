@@ -1,6 +1,6 @@
 [project]
 name = "nevus"
-version = "0.1.0"
+version = "0.2.0"
 description = "Self-hosted longitudinal tracking of moles and skin marks. Not a diagnostic tool."
 readme = "README.md"
 license = "AGPL-3.0-only"
@@ -22,6 +22,8 @@ dependencies = [
   "uvicorn>=0.32",
   "httptools>=0.6",
   "cryptography>=44",
+  "weasyprint>=66",
+  "jinja2>=3.1",
 ]
 
 [project.scripts]
@@ -35,6 +37,7 @@ dev = [
   "ruff>=0.9",
   "mypy>=1.14",
   "pyrage>=1.2",
+  "pytest-xdist>=3.6",
 ]
 
 [build-system]
@@ -64,7 +67,7 @@ packages = ["nevus"]
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["argon2.*", "pillow_heif.*", "pebble.*"]
+module = ["argon2.*", "pillow_heif.*", "pebble.*", "weasyprint.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

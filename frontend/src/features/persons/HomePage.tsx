@@ -6,13 +6,16 @@ import { Card } from "@/design-system/components/Card";
 import { EmptyState } from "@/design-system/components/EmptyState";
 import { Notice } from "@/design-system/components/Notice";
 import { TextField } from "@/design-system/components/TextField";
+import { UpcomingAppointments } from "@/features/appointments/PrepareAppointment";
 import { DueList } from "@/features/reminders/DueList";
+import { useUpcomingAppointments } from "@/lib/appointments";
 import { useCreatePerson, usePersons } from "@/lib/persons";
 import styles from "./persons.module.css";
 
 export function HomePage() {
   const { t } = useTranslation();
   const persons = usePersons();
+  const upcoming = useUpcomingAppointments();
   const create = useCreatePerson();
   const [name, setName] = useState("");
   const [adding, setAdding] = useState(false);
@@ -39,6 +42,7 @@ export function HomePage() {
 
   return (
     <div className={styles.page}>
+      <UpcomingAppointments appointments={upcoming.data} />
       <DueList />
       <header className={styles.header}>
         <h1>{t("persons.title")}</h1>

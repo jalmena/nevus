@@ -523,3 +523,55 @@ def delete_measurement(
     row.deleted_at = utcnow()
     service.audit(db, "measurement.delete", user, "measurement", row.id, client_ip(request, settings))
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.get(
+    "/lesions/{lesion_id}/measurements.csv", response_class=Response, responses={200: {"content": {"text/csv": {}}}}
+)
+def lesion_measurements_csv(lesion_id: uuid.UUID, user: CurrentUser, db: DbSession) -> Response:
+    """The series as CSV: one row per visit, millimetres with their standard deviation."""
+    import csv
+    import io
+
+    lesion = db.get(Lesion, lesion_id)
+    if lesion is None or lesion.deleted_at is not None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No such lesion.")
+    _person_access(db, lesion.person_id, user)
+    buffer = io.StringIO()
+    writer = csv.writer(buffer)
+    writer.writerow(
+        [
+            "captured_at",
+            "longest_mm",
+            "sigma_longest_mm",
+            "perpendicular_mm",
+            "sigma_perpendicular_mm",
+            "area_mm2",
+            "sigma_area_mm2",
+            "scale",
+            "method",
+            "tilt_deg",
+            "flags",
+        ]
+    )
+    for row, captured_at in lesion_series(db, lesion.id):
+        reference = db.get(ScaleReference, row.scale_reference_id)
+        writer.writerow(
+            [
+                captured_at.isoformat(),
+                row.longest_mm,
+                row.sigma_longest_mm,
+                row.perpendicular_mm,
+                row.sigma_perpendicular_mm,
+                row.area_mm2,
+                row.sigma_area_mm2,
+                reference.kind if reference else "",
+                row.method,
+                "" if row.tilt_deg is None else row.tilt_deg,
+                " ".join(row.flags or []),
+            ]
+        )
+    name = f"nevus-measurements-{lesion.id}.csv"
+    return Response(
+        buffer.getvalue(), media_type="text/csv", headers={"Content-Disposition": f'attachment; filename="{name}"'}
+    )

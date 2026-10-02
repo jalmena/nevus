@@ -34,6 +34,14 @@ p {
   margin: 0;
 }
 
+/* Form controls use the app's type, not the browser's. */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
 .text-secondary {
   color: var(--color-ink-2);
   font-weight: var(--font-weight-secondary);
@@ -57,7 +65,7 @@ a {
 }
 
 a:hover {
-  color: var(--color-accent-2);
+  text-decoration-thickness: 2px;
 }
 
 a:focus-visible {

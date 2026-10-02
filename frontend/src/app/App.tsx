@@ -1,7 +1,9 @@
 import { BrowserRouter, Route, Routes } from "react-router";
+import { AppointmentPage } from "@/features/appointments/AppointmentPage";
 import { ClaimPage } from "@/features/auth/ClaimPage";
 import { LoginPage } from "@/features/auth/LoginPage";
 import { RequireAuth } from "@/features/auth/RequireAuth";
+import { ComparePage } from "@/features/compare/ComparePage";
 import { LesionPage } from "@/features/lesions/LesionPage";
 import { ObservationPage } from "@/features/lesions/ObservationPage";
 import { MeasurePage } from "@/features/measure/MeasurePage";
@@ -26,8 +28,10 @@ export function AppRoutes() {
         <Route index element={<HomePage />} />
         <Route path="persons/:personId" element={<PersonPage />} />
         <Route path="lesions/:lesionId" element={<LesionPage />} />
+        <Route path="lesions/:lesionId/compare" element={<ComparePage />} />
         <Route path="observations/:observationId" element={<ObservationPage />} />
         <Route path="observations/:observationId/measure/:imageId" element={<MeasurePage />} />
+        <Route path="appointments/:appointmentId" element={<AppointmentPage />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="trash" element={<TrashPage />} />
       </Route>
