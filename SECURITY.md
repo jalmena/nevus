@@ -69,4 +69,4 @@ Logging and audit
 
 ## Threat model review
 
-A structured review (assets, entry points, misuse cases, controls, residual risks) is scheduled for the hardening phase before 1.0.0 and repeated when a release adds an entry point (for example Web Push or a new integration).
+The structured review (assets, entry points, misuse cases, controls, residual risks) for 1.0.0 is in [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md), with what it changed and what it accepts. It is repeated when a release adds an entry point (for example Web Push or a new integration) or a learned model that runs over uploaded photographs.
