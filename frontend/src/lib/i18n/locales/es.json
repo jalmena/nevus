@@ -888,5 +888,36 @@
     "temporaryHint": "Al menos {{count}} caracteres. La persona la cambia tras iniciar sesión.",
     "role": "Rol",
     "add": "Crear la cuenta"
+  },
+  "backups": {
+    "title": "Copias de seguridad (administración)",
+    "off": "Las copias nocturnas están desactivadas. Define NEVUS_BACKUP_PASSPHRASE en el servidor para activarlas; la guía de despliegue explica cómo.",
+    "intro": "Cada noche, después de las {{hour}}:00, se escribe una copia cifrada en la carpeta backups del directorio de datos. Copia esa carpeta a otra máquina: una copia en el mismo disco no sobrevive al disco.",
+    "verifyEvery_one": "Cada día se relee la última copia para demostrar que se podría restaurar.",
+    "verifyEvery_many": "Cada {{count}} días se relee la última copia para demostrar que se podría restaurar.",
+    "verifyEvery_other": "Cada {{count}} días se relee la última copia para demostrar que se podría restaurar.",
+    "verifyNever": "La relectura de copias está desactivada (NEVUS_BACKUP_VERIFY_DAYS es 0).",
+    "latest_one": "{{count}} copia, del {{date}} ({{size}}).",
+    "latest_many": "{{count}} copias, la última del {{date}} ({{size}}).",
+    "latest_other": "{{count}} copias, la última del {{date}} ({{size}}).",
+    "none": "Aún no se ha escrito ninguna copia.",
+    "verifiedOk": "Releída el {{date}}: {{archive}} se podría restaurar ({{count}} ficheros comprobados).",
+    "verifiedBad": "Releída el {{date}}: {{archive}} tiene problemas.",
+    "neverVerified": "Aún no se ha releído ninguna copia.",
+    "backUpNow": "Hacer una copia ahora",
+    "backingUp": "Haciendo la copia…",
+    "verifyNow": "Releer ahora la última copia",
+    "verifying": "Releyéndola…",
+    "problems": {
+      "no_backup": "No hay ninguna copia que leer.",
+      "unreadable": "No se pudo leer el archivo: contraseña incorrecta o fichero dañado.",
+      "no_manifest": "El archivo no tiene manifiesto.",
+      "damaged_blobs": "Algunas fotografías del archivo no coinciden con su suma de comprobación.",
+      "no_secret": "Falta el secreto del servidor en el archivo.",
+      "no_database": "Falta la copia de la base de datos en el archivo.",
+      "database_integrity": "La copia de la base de datos no pasa la comprobación de integridad de SQLite.",
+      "missing_blobs": "Faltan en el archivo fotografías a las que la base de datos se refiere.",
+      "live_store": "Hay ficheros del almacén en uso que faltan o están dañados."
+    }
   }
 }

@@ -124,3 +124,39 @@ export function useResetUserSecondFactor() {
     if (!response.ok) throw new Error(errorMessage(error, "The second factor could not be turned off."));
   });
 }
+
+// --- backups -------------------------------------------------------------------------------------
+
+export type BackupStatus = components["schemas"]["BackupStatusOut"];
+export const backupsKey = ["admin", "backups"] as const;
+
+/** The backups' state; checked again every few seconds while a backup or a verification is queued. */
+export function useBackupStatus(enabled: boolean) {
+  return useQuery({
+    queryKey: backupsKey,
+    queryFn: async () => {
+      const { data, error } = await api.GET("/api/admin/backups");
+      if (!data) throw new Error(errorMessage(error, "The backups could not be checked."));
+      return data;
+    },
+    enabled,
+    refetchInterval: (query) =>
+      query.state.data?.backup_queued || query.state.data?.verification_queued ? 5000 : false,
+  });
+}
+
+function useBackupAction(path: "/api/admin/backups/run" | "/api/admin/backups/verify", failure: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const { response, error } = await api.POST(path);
+      if (!response.ok) throw new Error(errorMessage(error, failure));
+    },
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: backupsKey }),
+  });
+}
+
+export const useBackupNow = () =>
+  useBackupAction("/api/admin/backups/run", "The backup could not be started.");
+export const useVerifyBackupNow = () =>
+  useBackupAction("/api/admin/backups/verify", "The verification could not be started.");

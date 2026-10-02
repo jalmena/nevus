@@ -880,5 +880,34 @@
     "temporaryHint": "At least {{count}} characters. The person changes it after signing in.",
     "role": "Role",
     "add": "Create the account"
+  },
+  "backups": {
+    "title": "Backups (administrator)",
+    "off": "Nightly backups are off. Set NEVUS_BACKUP_PASSPHRASE on the server to turn them on; the deployment guide explains how.",
+    "intro": "An encrypted backup is written every night after {{hour}}:00 into the backups folder of the data directory. Copy that folder to another machine: a backup on the same disk does not survive the disk.",
+    "verifyEvery_one": "Every day the latest backup is read back to prove it would restore.",
+    "verifyEvery_other": "Every {{count}} days the latest backup is read back to prove it would restore.",
+    "verifyNever": "Reading backups back is turned off (NEVUS_BACKUP_VERIFY_DAYS is 0).",
+    "latest_one": "{{count}} backup, from {{date}} ({{size}}).",
+    "latest_other": "{{count}} backups, the latest from {{date}} ({{size}}).",
+    "none": "No backup has been written yet.",
+    "verifiedOk": "Read back on {{date}}: {{archive}} would restore ({{count}} files checked).",
+    "verifiedBad": "Read back on {{date}}: {{archive}} has problems.",
+    "neverVerified": "No backup has been read back yet.",
+    "backUpNow": "Back up now",
+    "backingUp": "Backing up…",
+    "verifyNow": "Read the latest backup back now",
+    "verifying": "Reading it back…",
+    "problems": {
+      "no_backup": "There is no backup to read.",
+      "unreadable": "The archive could not be read: a wrong passphrase or a damaged file.",
+      "no_manifest": "The archive has no manifest.",
+      "damaged_blobs": "Some photographs in the archive do not match their checksums.",
+      "no_secret": "The server secret is missing from the archive.",
+      "no_database": "The database copy is missing from the archive.",
+      "database_integrity": "The database copy fails SQLite's integrity check.",
+      "missing_blobs": "Photographs the database refers to are missing from the archive.",
+      "live_store": "Files in the live store are missing or damaged."
+    }
   }
 }

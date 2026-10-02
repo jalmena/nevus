@@ -13,6 +13,7 @@ import {
   useTestEmail,
 } from "@/lib/admin";
 import { supportedLanguages } from "@/lib/i18n";
+import { BackupSettings } from "./BackupSettings";
 import { WebhookSettings } from "./WebhookSettings";
 import styles from "@/features/settings/settings.module.css";
 
@@ -139,6 +140,7 @@ export function AdminSettings() {
         {test.isSuccess && <Notice kind="success">{t("admin.testSent")}</Notice>}
       </Card>
       <WebhookSettings />
+      <BackupSettings />
       <Card className={styles.group}>
         <Link to="/evaluation">{t("admin.evaluationLink")}</Link>
       </Card>

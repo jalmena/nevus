@@ -33,7 +33,7 @@ def _load_kinds() -> None:
 def default_periodic() -> list[Periodic]:
     """Recurring work: email and webhook digests and the nightly backup (checked every quarter of an hour, queued once
     a day), and the daily housekeeping (trash purge, file collection, expired exports)."""
-    from nevus.maintenance import daily_housekeeping, schedule_backup
+    from nevus.maintenance import daily_housekeeping, schedule_backup, schedule_verification
     from nevus.notify.email import schedule_digests
     from nevus.notify.webhooks import schedule_webhooks
 
@@ -43,6 +43,7 @@ def default_periodic() -> list[Periodic]:
 
     def backups(ctx: JobContext) -> None:
         schedule_backup(ctx)
+        schedule_verification(ctx)
 
     return [
         Periodic("email-digests", 900.0, digests),

@@ -110,6 +110,23 @@ export interface MockState {
   experimental: boolean;
   /** The signed-in account's second factor. The mock accepts the code 123456 and the recovery code aaaaa-bbbbb. */
   totp: { enabled: boolean; settingUp: boolean; codesLeft: number; pending: boolean };
+  /** The backups' state, as the administrator sees it. */
+  backups: {
+    enabled: boolean;
+    backup_hour: number;
+    verify_days: number;
+    count: number;
+    latest: { file: string; bytes: number; created_at: string } | null;
+    verification: {
+      ok: boolean;
+      checked_at: string;
+      archive: string | null;
+      blobs_in_archive: number | null;
+      problems: string[];
+    } | null;
+    backup_queued: boolean;
+    verification_queued: boolean;
+  };
   /** Accounts, for the administrator's list. */
   users: {
     id: string;
@@ -187,6 +204,26 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     bodySessions: [],
     totp: { enabled: false, settingUp: false, codesLeft: 0, pending: false },
     users: [],
+    backups: {
+      enabled: true,
+      backup_hour: 3,
+      verify_days: 7,
+      count: 3,
+      latest: {
+        file: "nevus-backup-20261002T030000Z.tar.age",
+        bytes: 52_000_000,
+        created_at: "2026-10-02T03:00:00Z",
+      },
+      verification: {
+        ok: true,
+        checked_at: "2026-10-02T04:00:00Z",
+        archive: "nevus-backup-20261002T030000Z.tar.age",
+        blobs_in_archive: 412,
+        problems: [],
+      },
+      backup_queued: false,
+      verification_queued: false,
+    },
     ...initial,
   };
   const personOut = (p: { id: string; display_name: string }) => ({
@@ -570,6 +607,17 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
         });
       }
       if (path === "/api/admin/instance" && method === "GET") return json({ default_language: "en" });
+      if (path === "/api/admin/backups" && method === "GET") return json(state.backups);
+      if (path === "/api/admin/backups/run" && method === "POST") {
+        if (!state.backups.enabled) return json({ detail: "Set NEVUS_BACKUP_PASSPHRASE first." }, 409);
+        state.backups.backup_queued = true;
+        return json({ queued: true }, 202);
+      }
+      if (path === "/api/admin/backups/verify" && method === "POST") {
+        if (!state.backups.enabled) return json({ detail: "Set NEVUS_BACKUP_PASSPHRASE first." }, 409);
+        state.backups.verification_queued = true;
+        return json({ queued: true }, 202);
+      }
       if (path.startsWith("/api/evaluation/photos") && method === "GET") {
         const only = new URL(url).searchParams.get("only") ?? "all";
         const all = state.observations.flatMap((o) => o.images);

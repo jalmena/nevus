@@ -4,6 +4,57 @@
  */
 
 export interface paths {
+    "/api/admin/backups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Backup Status */
+        get: operations["backup_status_api_admin_backups_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/backups/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Backup Now */
+        post: operations["backup_now_api_admin_backups_run_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/backups/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Verify Now */
+        post: operations["verify_now_api_admin_backups_verify_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/email": {
         parameters: {
             query?: never;
@@ -1674,6 +1725,35 @@ export interface components {
             /** Notes */
             notes?: string | null;
         };
+        /** BackupFileOut */
+        BackupFileOut: {
+            /** Bytes */
+            bytes: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** File */
+            file: string;
+        };
+        /** BackupStatusOut */
+        BackupStatusOut: {
+            /** Backup Hour */
+            backup_hour: number;
+            /** Backup Queued */
+            backup_queued: boolean;
+            /** Count */
+            count: number;
+            /** Enabled */
+            enabled: boolean;
+            latest: components["schemas"]["BackupFileOut"] | null;
+            verification: components["schemas"]["VerificationOut"] | null;
+            /** Verification Queued */
+            verification_queued: boolean;
+            /** Verify Days */
+            verify_days: number;
+        };
         /** BodyMap */
         BodyMap: {
             /** Attribution */
@@ -2800,6 +2880,11 @@ export interface components {
             /** Sigma Perpendicular Mm */
             sigma_perpendicular_mm: number;
         };
+        /** QueuedOut */
+        QueuedOut: {
+            /** Queued */
+            queued: boolean;
+        };
         /** RecoveryCodesOut */
         RecoveryCodesOut: {
             /** Recovery Codes */
@@ -3233,6 +3318,47 @@ export interface components {
             /** Error Type */
             type: string;
         };
+        /**
+         * VerificationOut
+         * @description What the last read-back of a backup found; see `backup.rehearse`.
+         */
+        VerificationOut: {
+            /** Archive */
+            archive?: string | null;
+            /** Archive Bytes */
+            archive_bytes?: number | null;
+            /** Blobs Damaged */
+            blobs_damaged?: number | null;
+            /** Blobs In Archive */
+            blobs_in_archive?: number | null;
+            /** Blobs Missing From Archive */
+            blobs_missing_from_archive?: number | null;
+            /**
+             * Checked At
+             * Format: date-time
+             */
+            checked_at: string;
+            /** Created At */
+            created_at?: string | null;
+            /** Database */
+            database?: string | null;
+            /** Images */
+            images?: number | null;
+            /** Integrity */
+            integrity?: string | null;
+            /** Live Store */
+            live_store?: {
+                [key: string]: number;
+            } | null;
+            /** Nevus Version */
+            nevus_version?: string | null;
+            /** Ok */
+            ok: boolean;
+            /** Problems */
+            problems: string[];
+            /** Secret Present */
+            secret_present?: boolean | null;
+        };
         /** ViewData */
         ViewData: {
             /** Silhouette */
@@ -3366,6 +3492,66 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    backup_status_api_admin_backups_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BackupStatusOut"];
+                };
+            };
+        };
+    };
+    backup_now_api_admin_backups_run_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QueuedOut"];
+                };
+            };
+        };
+    };
+    verify_now_api_admin_backups_verify_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QueuedOut"];
+                };
+            };
+        };
+    };
     get_email_api_admin_email_get: {
         parameters: {
             query?: never;

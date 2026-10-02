@@ -10,8 +10,10 @@ so copying the database first and the blobs second always yields a consistent pa
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
+import shutil
 import sqlite3
 import tarfile
 import tempfile
@@ -179,3 +181,143 @@ def verify(settings: Settings) -> dict[str, int]:
         elif sha256_hex(path.read_bytes()) != sha:
             counts["corrupt"] += 1
     return counts
+
+
+def newest(backups_dir: Path) -> Path | None:
+    """The most recent backup in the directory, by the time in its name."""
+    if not backups_dir.is_dir():
+        return None
+    files = sorted(path for path in backups_dir.glob("nevus-backup-*.tar.age") if path.is_file())
+    return files[-1] if files else None
+
+
+def rehearse(settings: Settings, passphrase: str, archive: Path | None = None) -> dict[str, Any]:
+    """Prove that a backup (the latest, by default) would restore, without restoring it.
+
+    The archive is decrypted and read through once. Every photograph in it is hashed and must match
+    the name it is stored under: blobs are content-addressed, so the archive carries its own
+    checksums. The database copy is written to a temporary directory and checked with SQLite's
+    integrity check, and every photograph and rendition it refers to must be in the archive. The
+    live store is checked too (`verify`). The report says what was checked and what, if anything,
+    is wrong; `problems` is empty when the backup is good.
+    """
+    report: dict[str, Any] = {
+        "ok": False,
+        "checked_at": datetime.now(tz=UTC).isoformat(),
+        "archive": None,
+        "problems": [],
+    }
+    archive = archive or newest(settings.backups_dir)
+    if archive is None:
+        report["problems"].append("no_backup")
+        return report
+    report.update({"archive": archive.name, "archive_bytes": archive.stat().st_size})
+    manifest: dict[str, Any] | None = None
+    in_archive: set[str] = set()
+    damaged = 0
+    secret_present = False
+    settings.data_dir.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=settings.data_dir) as tmp:
+        database: Path | None = None
+        try:
+            with (
+                open(archive, "rb") as raw,
+                AgeReader(raw, passphrase) as sealed,
+                tarfile.open(fileobj=sealed, mode="r|") as tar,
+            ):
+                for member in tar:
+                    if not _safe_member(member.name) or not (member.isfile() or member.isdir()):
+                        raise RestoreError(f"unexpected entry in the backup: {member.name}")
+                    stream = tar.extractfile(member) if member.isfile() else None
+                    if stream is None:
+                        continue
+                    if member.name == "manifest.json":
+                        manifest = json.loads(stream.read())
+                        if not manifest or manifest.get("format") != FORMAT:
+                            raise RestoreError("not a neVus backup")
+                    elif member.name == "nevus.sqlite3":
+                        database = Path(tmp) / "nevus.sqlite3"
+                        with open(database, "wb") as out:
+                            shutil.copyfileobj(stream, out)
+                    elif member.name == "secret.key":
+                        secret_present = bool(stream.read())
+                    elif member.name.startswith("blobs/"):
+                        digest = hashlib.sha256()
+                        while chunk := stream.read(1 << 20):
+                            digest.update(chunk)
+                        name = PurePosixPath(member.name).name
+                        if digest.hexdigest() != name:
+                            damaged += 1
+                        in_archive.add(name)
+        except Exception as error:  # whatever stops the read is the finding
+            report["problems"].append(f"unreadable: {type(error).__name__}: {error}")
+            return report
+        if manifest is None:
+            report["problems"].append("no_manifest")
+            return report
+        report.update(
+            {
+                "created_at": manifest.get("created_at"),
+                "nevus_version": manifest.get("nevus_version"),
+                "database": manifest.get("database"),
+                "blobs_in_archive": len(in_archive),
+                "blobs_damaged": damaged,
+                "secret_present": secret_present,
+            }
+        )
+        if damaged:
+            report["problems"].append("damaged_blobs")
+        if not secret_present:
+            report["problems"].append("no_secret")
+        if manifest.get("database") == "sqlite":
+            if database is None:
+                report["problems"].append("no_database")
+            else:
+                report.update(_database_report(database, in_archive))
+                if report["integrity"] != "ok":
+                    report["problems"].append("database_integrity")
+                if report["blobs_missing_from_archive"]:
+                    report["problems"].append("missing_blobs")
+    live = verify(settings)
+    report["live_store"] = live
+    if live["missing"] or live["corrupt"]:
+        report["problems"].append("live_store")
+    report["ok"] = not report["problems"]
+    return report
+
+
+def _database_report(database: Path, in_archive: set[str]) -> dict[str, Any]:
+    connection = sqlite3.connect(database)
+    try:
+        integrity = str(connection.execute("PRAGMA integrity_check").fetchone()[0])
+        referenced = {row[0] for row in connection.execute("SELECT sha256 FROM images")}
+        referenced |= {row[0] for row in connection.execute("SELECT sha256 FROM renditions")}
+        images = int(connection.execute("SELECT count(*) FROM images").fetchone()[0])
+    except sqlite3.DatabaseError as error:
+        integrity, referenced, images = f"error: {error}", set(), 0
+    finally:
+        connection.close()
+    return {"integrity": integrity, "images": images, "blobs_missing_from_archive": len(referenced - in_archive)}
+
+
+def describe(report: dict[str, Any]) -> str:
+    """The report in a few lines, for the command line and the warning email."""
+    verdict = "would restore" if report["ok"] else "has problems"
+    lines = [f"Backup {report.get('archive') or '(none)'}: {verdict}"]
+    if report.get("created_at"):
+        size = float(report.get("archive_bytes") or 0) / 1e6
+        lines.append(f"  made {report['created_at']} by neVus {report.get('nevus_version')}, {size:.1f} MB")
+    if "blobs_in_archive" in report:
+        lines.append(
+            f"  {report['blobs_in_archive']} files in the archive, {report.get('blobs_damaged', 0)} damaged, "
+            f"{report.get('blobs_missing_from_archive', 0)} missing"
+        )
+    if report.get("integrity") is not None:
+        lines.append(f"  database copy: {report['integrity']}, {report.get('images', 0)} photographs")
+    live = report.get("live_store")
+    if live:
+        lines.append(
+            f"  live store: {live['checked']} files checked, {live['missing']} missing, {live['corrupt']} damaged"
+        )
+    lines.extend(f"  problem: {problem}" for problem in report["problems"])
+    return "\n".join(lines)
