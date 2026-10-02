@@ -34,7 +34,16 @@
     "loginAction": "Sign in",
     "proxyTitle": "Sign in through single sign-on",
     "proxyText": "This neVus signs people in through your single sign-on. Sign in there, then come back here.",
-    "proxyRetry": "I have signed in"
+    "proxyRetry": "I have signed in",
+    "secondFactorTitle": "One more step",
+    "codeIntro": "Enter the six-digit code from the authenticator app on your phone.",
+    "recoveryIntro": "Enter one of the recovery codes you saved when you set the second factor up. Each works once.",
+    "code": "Code from the authenticator",
+    "recoveryCode": "Recovery code",
+    "continue": "Continue",
+    "useRecovery": "Use a recovery code instead",
+    "useCode": "Use the authenticator instead",
+    "backToPassword": "Back"
   },
   "persons": {
     "title": "Persons",
@@ -827,5 +836,49 @@
         "pose": "Sit or kneel and show both soles to the camera, the heels included."
       }
     }
+  },
+  "secondFactor": {
+    "title": "Second factor",
+    "intro": "With a second factor, signing in needs your password and a code from an authenticator app on your phone, so a password alone opens nothing.",
+    "on_one": "The second factor is on. {{count}} recovery code left.",
+    "on_other": "The second factor is on. {{count}} recovery codes left.",
+    "setUp": "Set up a second factor",
+    "step1": "Open an authenticator app (any that handles time-based codes) and add an account.",
+    "step2": "Scan this code with it, or type the letters below.",
+    "step3": "Enter the six-digit code the app shows, then save the recovery codes it gives you here.",
+    "qrAlt": "QR code for the authenticator app; the same secret is written out below it",
+    "orType": "Or type:",
+    "firstCode": "Code the app shows now",
+    "turnOn": "Turn the second factor on",
+    "turnOff": "Turn it off",
+    "newCodes": "New recovery codes",
+    "codesTitle": "Recovery codes",
+    "codesIntro": "Each of these signs you in once if the phone is lost. Save them somewhere safe now: they are not shown again.",
+    "download": "Save as a file",
+    "codesDone": "I have saved them"
+  },
+  "accounts": {
+    "title": "Accounts (administrator)",
+    "intro": "Who can sign in to this neVus. There is no open registration: you create each account with a temporary password, which the person changes in their settings.",
+    "introProxy": "Who can sign in to this neVus. Accounts come from your single sign-on; here you can only disable one.",
+    "disabled": "disabled",
+    "secondFactorOn": "second factor on",
+    "lastSignIn": "last signed in {{date}}",
+    "enable": "Enable",
+    "disable": "Disable",
+    "enableNamed": "Enable the account {{name}}",
+    "disableNamed": "Disable the account {{name}}",
+    "newPassword": "Set a new password",
+    "newPasswordNamed": "Set a new password for {{name}}",
+    "temporaryPassword": "Temporary password for {{name}}",
+    "resetSecondFactor": "Turn the second factor off",
+    "resetSecondFactorNamed": "Turn the second factor off for {{name}}",
+    "secondFactorReset": "The second factor is off for that account; the password still works.",
+    "passwordSet": "The password is set. Tell the person, and ask them to change it.",
+    "addTitle": "Add an account",
+    "temporaryPasswordNew": "Temporary password",
+    "temporaryHint": "At least {{count}} characters. The person changes it after signing in.",
+    "role": "Role",
+    "add": "Create the account"
   }
 }

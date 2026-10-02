@@ -8,7 +8,7 @@ neVus is designed so that the only people who can see a household's skin photogr
 - Photographs taken in full-body sessions, one per region of the body in a fixed order, and the positions of the marks pointed at or confirmed on them. Every region can be skipped, and the two that may show intimate areas say so before the photo is taken.
 - The capture date and time and the orientation of each photograph; all other metadata embedded by the camera, including GPS coordinates, device serial numbers and maker notes, is removed before the file is written and never stored.
 - Body locations, labels, notes and symptom flags written by the person; measurements and their uncertainties; reminder schedules; appointment dates; generated reports.
-- Account data: username, optional email address for notifications, password hash, language and theme preferences, second-factor secret when enabled.
+- Account data: username, optional email address for notifications, password hash, language and theme preferences, and, when the second factor is on, its secret (encrypted with the server's key) and the hashes of the recovery codes.
 - Optional per-person self-description of skin tone, used only to evaluate image algorithms across skin tones; it is never shown as a health attribute and can be left empty.
 - An audit log of actions with identifiers only, and technical logs that never contain personal content.
 

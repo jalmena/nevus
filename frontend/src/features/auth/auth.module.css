@@ -10,3 +10,9 @@
 .form h1 {
   font-size: var(--text-2xl);
 }
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}

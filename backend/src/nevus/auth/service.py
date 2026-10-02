@@ -8,15 +8,19 @@ import uuid
 from datetime import timedelta
 from typing import Any
 
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
+from nevus import secretbox
+from nevus.auth import totp
 from nevus.auth.passwords import hash_password, needs_rehash, verify_password
 from nevus.config import Settings
-from nevus.db.models import ROLE_ADMIN, AuditLog, AuthSession, User
+from nevus.db.models import ROLE_ADMIN, AuditLog, AuthSession, User, UserRecoveryCode
 from nevus.db.types import utcnow
 
 SESSION_COOKIE = "nevus_session"
+SECOND_FACTOR_KIND = "second_factor"
+SECOND_FACTOR_MINUTES = 5
 
 
 def normalise_username(username: str) -> str:
@@ -53,7 +57,13 @@ def _hash_token(token: str) -> str:
 
 
 def create_session(
-    db: Session, user: User, settings: Settings, user_agent: str | None, ip: str | None, kind: str = "local"
+    db: Session,
+    user: User,
+    settings: Settings,
+    user_agent: str | None,
+    ip: str | None,
+    kind: str = "local",
+    lifetime: timedelta | None = None,
 ) -> str:
     """Create a session and return the raw token for the cookie; only its hash is stored."""
     token = secrets.token_urlsafe(32)
@@ -63,7 +73,7 @@ def create_session(
         user_id=user.id,
         created_at=now,
         last_seen_at=now,
-        expires_at=now + timedelta(days=settings.session_max_days),
+        expires_at=now + (lifetime or timedelta(days=settings.session_max_days)),
         user_agent=(user_agent or "")[:255] or None,
         ip=ip,
         kind=kind,
@@ -138,4 +148,87 @@ def bootstrap_admin(db: Session, settings: Settings) -> None:
         user.password_hash = hash_password(settings.admin_password)
         user.role = ROLE_ADMIN
         user.disabled_at = None
+        disable_totp(db, user)  # the way back in for an administrator who lost the authenticator
         audit(db, "user.bootstrap_reset", None, "user", user.id)
+
+
+# --- the second factor ----------------------------------------------------------------------------
+
+
+def totp_secret_of(user: User, settings: Settings) -> str | None:
+    if not user.totp_secret:
+        return None
+    return secretbox.open_(settings.secret_key(), user.totp_secret, purpose="totp")
+
+
+def start_totp_setup(db: Session, user: User, settings: Settings) -> tuple[str, str]:
+    """A fresh secret for the authenticator; the factor stays off until a first code confirms it."""
+    secret = totp.new_secret()
+    user.totp_secret = secretbox.seal(settings.secret_key(), secret, purpose="totp")
+    user.totp_enabled_at = None
+    user.totp_last_counter = None
+    db.flush()
+    return secret, totp.provisioning_uri(secret, user.username)
+
+
+def enable_totp(db: Session, user: User, settings: Settings, code: str) -> list[str] | None:
+    """Turn the factor on once a code proves the authenticator was set up; returns the recovery codes."""
+    secret = totp_secret_of(user, settings)
+    counter = totp.verify(secret, code) if secret else None
+    if counter is None:
+        return None
+    user.totp_enabled_at = utcnow()
+    user.totp_last_counter = counter
+    return issue_recovery_codes(db, user)
+
+
+def issue_recovery_codes(db: Session, user: User) -> list[str]:
+    """New codes replace whatever was left; they are returned once and stored hashed."""
+    db.execute(delete(UserRecoveryCode).where(UserRecoveryCode.user_id == user.id))
+    codes = totp.new_recovery_codes()
+    for code in codes:
+        db.add(UserRecoveryCode(user_id=user.id, code_hash=totp.hash_recovery_code(code)))
+    db.flush()
+    return codes
+
+
+def recovery_codes_left(db: Session, user: User) -> int:
+    query = (
+        select(func.count())
+        .select_from(UserRecoveryCode)
+        .where(UserRecoveryCode.user_id == user.id, UserRecoveryCode.used_at.is_(None))
+    )
+    return int(db.scalar(query) or 0)
+
+
+def disable_totp(db: Session, user: User) -> None:
+    user.totp_secret = None
+    user.totp_enabled_at = None
+    user.totp_last_counter = None
+    db.execute(delete(UserRecoveryCode).where(UserRecoveryCode.user_id == user.id))
+
+
+def check_second_factor(
+    db: Session, user: User, settings: Settings, code: str | None, recovery_code: str | None
+) -> str | None:
+    """Which factor matched, "totp" or "recovery", or None. Neither kind of code is accepted twice."""
+    if code:
+        secret = totp_secret_of(user, settings)
+        counter = totp.verify(secret, code, user.totp_last_counter) if secret else None
+        if counter is None:
+            return None
+        user.totp_last_counter = counter
+        return "totp"
+    if recovery_code:
+        row = db.scalar(
+            select(UserRecoveryCode).where(
+                UserRecoveryCode.user_id == user.id,
+                UserRecoveryCode.code_hash == totp.hash_recovery_code(recovery_code),
+                UserRecoveryCode.used_at.is_(None),
+            )
+        )
+        if row is None:
+            return None
+        row.used_at = utcnow()
+        return "recovery"
+    return None

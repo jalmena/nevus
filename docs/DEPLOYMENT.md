@@ -50,7 +50,7 @@ Every setting is an environment variable prefixed with `NEVUS_`. The ones an ope
 | --- | --- | --- |
 | `NEVUS_ALLOWED_HOSTS` | empty | Comma-separated public hostnames the server answers to |
 | `NEVUS_DATABASE_URL` | SQLite in the data directory | External PostgreSQL, e.g. `postgresql+psycopg://nevus:secret@db:5432/nevus` |
-| `NEVUS_ADMIN_USER`, `NEVUS_ADMIN_PASSWORD` | unset | Create or reset the administrator at start-up (for recovery; remove afterwards) |
+| `NEVUS_ADMIN_USER`, `NEVUS_ADMIN_PASSWORD` | unset | Create or reset the administrator at start-up, which also turns their second factor off (for recovery; remove afterwards) |
 | `NEVUS_MAX_UPLOAD_BYTES` | 30 MiB | Largest accepted photograph |
 | `NEVUS_MIN_FREE_BYTES` | 2 GiB | Uploads are refused below this free space |
 | `NEVUS_LOG_LEVEL` | `info` | `debug`, `info`, `warning` or `error` |
@@ -145,6 +145,12 @@ Anyone who may see a person can make a calendar link for them on the person's pa
 - Desktop calendars (Thunderbird, Apple Calendar, Outlook): add a calendar from a network address.
 
 The link is shown once; neVus keeps only a hash of it. Making a new link stops the old one, and the link stops when its maker loses access to the person. Treat it like a password: anyone who has it sees the marks' names and dates.
+
+## Second factor
+
+Each account can add a second factor under Settings: an authenticator app (any that handles time-based codes) scans a QR code, and the first code from it turns the factor on. Ten recovery codes are shown once; each signs in once if the phone is lost. Signing in then needs the password and a code. The codes depend on the server's clock being right to within a minute; the container uses the host's clock.
+
+If both the phone and the recovery codes are lost, an administrator turns the factor off for that account under Settings, Accounts; the password stays. If the administrator is the one locked out, set `NEVUS_ADMIN_USER` and `NEVUS_ADMIN_PASSWORD` and restart: the account is reset and its second factor removed. Remove the variables afterwards. With single sign-on through the proxy (below), the second factor is the proxy's business and these settings are hidden.
 
 ## Single sign-on through the reverse proxy
 

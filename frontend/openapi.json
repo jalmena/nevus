@@ -2449,6 +2449,28 @@
         "title": "LocationOut",
         "type": "object"
       },
+      "LoginOut": {
+        "description": "A session, or word that the account's second factor is needed before there is one.",
+        "properties": {
+          "second_factor_required": {
+            "default": false,
+            "title": "Second Factor Required",
+            "type": "boolean"
+          },
+          "session": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SessionOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "LoginOut",
+        "type": "object"
+      },
       "ManualIn": {
         "properties": {
           "kind": {
@@ -3522,6 +3544,22 @@
         "title": "ProposedSize",
         "type": "object"
       },
+      "RecoveryCodesOut": {
+        "properties": {
+          "recovery_codes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Recovery Codes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "recovery_codes"
+        ],
+        "title": "RecoveryCodesOut",
+        "type": "object"
+      },
       "RenditionOut": {
         "properties": {
           "bytes": {
@@ -3831,6 +3869,39 @@
           "created_at"
         ],
         "title": "ScaleReferenceOut",
+        "type": "object"
+      },
+      "SecondFactorIn": {
+        "properties": {
+          "code": {
+            "anyOf": [
+              {
+                "maxLength": 16,
+                "minLength": 6,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "From the authenticator",
+            "title": "Code"
+          },
+          "recovery_code": {
+            "anyOf": [
+              {
+                "maxLength": 16,
+                "minLength": 8,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recovery Code"
+          }
+        },
+        "title": "SecondFactorIn",
         "type": "object"
       },
       "SessionIn": {
@@ -4218,6 +4289,80 @@
         "title": "TestOut",
         "type": "object"
       },
+      "TotpCodeIn": {
+        "properties": {
+          "code": {
+            "maxLength": 16,
+            "minLength": 6,
+            "title": "Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "TotpCodeIn",
+        "type": "object"
+      },
+      "TotpSetupOut": {
+        "properties": {
+          "otpauth_uri": {
+            "title": "Otpauth Uri",
+            "type": "string"
+          },
+          "qr_svg": {
+            "title": "Qr Svg",
+            "type": "string"
+          },
+          "secret": {
+            "title": "Secret",
+            "type": "string"
+          }
+        },
+        "required": [
+          "secret",
+          "otpauth_uri",
+          "qr_svg"
+        ],
+        "title": "TotpSetupOut",
+        "type": "object"
+      },
+      "TotpStatusOut": {
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "enabled_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enabled At"
+          },
+          "recovery_codes_left": {
+            "title": "Recovery Codes Left",
+            "type": "integer"
+          },
+          "setting_up": {
+            "title": "Setting Up",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "enabled",
+          "enabled_at",
+          "setting_up",
+          "recovery_codes_left"
+        ],
+        "title": "TotpStatusOut",
+        "type": "object"
+      },
       "TrashItem": {
         "properties": {
           "deleted_at": {
@@ -4431,6 +4576,11 @@
           "theme": {
             "title": "Theme",
             "type": "string"
+          },
+          "totp_enabled": {
+            "default": false,
+            "title": "Totp Enabled",
+            "type": "boolean"
           },
           "username": {
             "title": "Username",
@@ -5590,7 +5740,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SessionOut"
+                  "$ref": "#/components/schemas/LoginOut"
                 }
               }
             },
@@ -5702,6 +5852,48 @@
         ]
       }
     },
+    "/api/auth/second-factor": {
+      "post": {
+        "description": "The code from the authenticator, or a recovery code, once the password has been accepted.",
+        "operationId": "second_factor_api_auth_second_factor_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SecondFactorIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Second Factor",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/api/auth/session": {
       "get": {
         "operationId": "session_info_api_auth_session_get",
@@ -5760,6 +5952,125 @@
           }
         },
         "summary": "Sudo",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/totp": {
+      "delete": {
+        "operationId": "totp_disable_api_auth_totp_delete",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Totp Disable",
+        "tags": [
+          "auth"
+        ]
+      },
+      "get": {
+        "operationId": "totp_status_api_auth_totp_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TotpStatusOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Totp Status",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/totp/enable": {
+      "post": {
+        "description": "The first code proves the authenticator holds the secret; other sessions end, as after a new password.",
+        "operationId": "totp_enable_api_auth_totp_enable_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TotpCodeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecoveryCodesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Totp Enable",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/totp/recovery-codes": {
+      "post": {
+        "description": "New recovery codes; the ones not yet used stop working.",
+        "operationId": "totp_recovery_codes_api_auth_totp_recovery_codes_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecoveryCodesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Totp Recovery Codes",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/totp/setup": {
+      "post": {
+        "description": "A new secret for an authenticator app; the factor turns on with the first code from it.",
+        "operationId": "totp_setup_api_auth_totp_setup_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TotpSetupOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Totp Setup",
         "tags": [
           "auth"
         ]
@@ -9593,6 +9904,43 @@
           }
         },
         "summary": "Reset Password",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/users/{user_id}/totp": {
+      "delete": {
+        "description": "For a member who lost the authenticator: the factor goes, the password stays, sessions end.",
+        "operationId": "reset_second_factor_api_users__user_id__totp_delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reset Second Factor",
         "tags": [
           "users"
         ]

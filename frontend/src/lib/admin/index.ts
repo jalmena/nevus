@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, errorMessage } from "@/lib/api/client";
 import type { components } from "@/lib/api/schema";
+import { useSudo, withSudo } from "@/lib/sudo/SudoProvider";
 
 export type EmailSettings = components["schemas"]["EmailSettingsOut"];
 export type EmailSettingsIn = components["schemas"]["EmailSettingsIn"];
@@ -59,5 +60,67 @@ export function useSaveInstanceSettings() {
       return data;
     },
     onSuccess: (data) => queryClient.setQueryData(["admin", "instance"], data),
+  });
+}
+
+// --- accounts ------------------------------------------------------------------------------------
+
+export type UserOut = components["schemas"]["UserOut"];
+export const usersKey = ["users"] as const;
+
+export function useUsers() {
+  return useQuery({
+    queryKey: usersKey,
+    queryFn: async () => {
+      const { data, error } = await api.GET("/api/users");
+      if (!data) throw new Error(errorMessage(error, "The accounts could not be loaded."));
+      return data;
+    },
+  });
+}
+
+function useUsersMutation<Input>(run: (input: Input) => Promise<void>) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: run,
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: usersKey }),
+  });
+}
+
+export function useCreateUser() {
+  return useUsersMutation(async (body: components["schemas"]["UserCreate"]) => {
+    const { response, error } = await api.POST("/api/users", { body });
+    if (!response.ok) throw new Error(errorMessage(error, "The account could not be created."));
+  });
+}
+
+export function useSetUserEnabled() {
+  return useUsersMutation(async ({ id, enabled }: { id: string; enabled: boolean }) => {
+    const params = { params: { path: { user_id: id } } };
+    const { response, error } = enabled
+      ? await api.POST("/api/users/{user_id}/enable", params)
+      : await api.POST("/api/users/{user_id}/disable", params);
+    if (!response.ok) throw new Error(errorMessage(error, "The account could not be changed."));
+  });
+}
+
+export function useResetUserPassword() {
+  return useUsersMutation(async ({ id, password }: { id: string; password: string }) => {
+    const { response, error } = await api.POST("/api/users/{user_id}/password", {
+      params: { path: { user_id: id } },
+      body: { new_password: password },
+    });
+    if (!response.ok) throw new Error(errorMessage(error, "The password could not be set."));
+  });
+}
+
+/** For a member who lost the authenticator; asks for the administrator's password again. */
+export function useResetUserSecondFactor() {
+  const ask = useSudo();
+  return useUsersMutation(async (id: string) => {
+    const { response, error } = await withSudo(ask, () =>
+      api.DELETE("/api/users/{user_id}/totp", { params: { path: { user_id: id } } }),
+    );
+    if (!response.ok) throw new Error(errorMessage(error, "The second factor could not be turned off."));
   });
 }

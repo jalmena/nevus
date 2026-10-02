@@ -43,12 +43,21 @@ class User(Base):
     updated_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow, onupdate=utcnow)
     last_login_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
     disabled_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    totp_secret: Mapped[str | None] = mapped_column(String(255))
+    """Sealed (secretbox, purpose "totp"): set while the second factor is being set up and once it is on."""
+    totp_enabled_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    totp_last_counter: Mapped[int | None] = mapped_column(Integer)
+    """The time step of the last accepted code, so no code is accepted twice."""
 
     sessions: Mapped[list[AuthSession]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
     @property
     def is_admin(self) -> bool:
         return self.role == ROLE_ADMIN
+
+    @property
+    def totp_enabled(self) -> bool:
+        return self.totp_enabled_at is not None
 
     @property
     def is_active(self) -> bool:
@@ -73,6 +82,20 @@ class AuthSession(Base):
     user: Mapped[User] = relationship(back_populates="sessions")
 
     __table_args__ = (Index("ix_auth_sessions_user_id", "user_id"),)
+
+
+class UserRecoveryCode(Base):
+    """One-use codes for signing in without the authenticator; only their hashes are kept."""
+
+    __tablename__ = "user_recovery_codes"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    user_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    code_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
+    used_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+
+    __table_args__ = (Index("ix_user_recovery_codes_user_id", "user_id"),)
 
 
 class Person(Base):

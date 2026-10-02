@@ -34,7 +34,16 @@
     "loginAction": "Entrar",
     "proxyTitle": "Inicia sesión con el inicio de sesión único",
     "proxyText": "Este neVus da acceso a través de tu inicio de sesión único. Inicia sesión allí y vuelve aquí.",
-    "proxyRetry": "Ya he iniciado sesión"
+    "proxyRetry": "Ya he iniciado sesión",
+    "secondFactorTitle": "Un paso más",
+    "codeIntro": "Escribe el código de seis dígitos de la aplicación de autenticación de tu teléfono.",
+    "recoveryIntro": "Escribe uno de los códigos de recuperación que guardaste al activar el segundo factor. Cada uno vale una vez.",
+    "code": "Código de la aplicación de autenticación",
+    "recoveryCode": "Código de recuperación",
+    "continue": "Continuar",
+    "useRecovery": "Usar un código de recuperación",
+    "useCode": "Usar la aplicación de autenticación",
+    "backToPassword": "Volver"
   },
   "persons": {
     "title": "Personas",
@@ -834,5 +843,50 @@
         "pose": "Siéntate o arrodíllate y enseña las dos plantas a la cámara, talones incluidos."
       }
     }
+  },
+  "secondFactor": {
+    "title": "Segundo factor",
+    "intro": "Con un segundo factor, iniciar sesión necesita tu contraseña y un código de una aplicación de autenticación en tu teléfono, de modo que la contraseña sola no abre nada.",
+    "on_one": "El segundo factor está activado. Queda {{count}} código de recuperación.",
+    "on_many": "El segundo factor está activado. Quedan {{count}} códigos de recuperación.",
+    "on_other": "El segundo factor está activado. Quedan {{count}} códigos de recuperación.",
+    "setUp": "Activar un segundo factor",
+    "step1": "Abre una aplicación de autenticación (cualquiera que maneje códigos basados en el tiempo) y añade una cuenta.",
+    "step2": "Escanea este código con ella, o escribe las letras de abajo.",
+    "step3": "Escribe el código de seis dígitos que muestra la aplicación y guarda los códigos de recuperación que te daremos aquí.",
+    "qrAlt": "Código QR para la aplicación de autenticación; el mismo secreto está escrito debajo",
+    "orType": "O escribe:",
+    "firstCode": "Código que muestra ahora la aplicación",
+    "turnOn": "Activar el segundo factor",
+    "turnOff": "Desactivarlo",
+    "newCodes": "Nuevos códigos de recuperación",
+    "codesTitle": "Códigos de recuperación",
+    "codesIntro": "Cada uno te permite iniciar sesión una vez si pierdes el teléfono. Guárdalos ahora en un lugar seguro: no se vuelven a mostrar.",
+    "download": "Guardar como fichero",
+    "codesDone": "Ya los he guardado"
+  },
+  "accounts": {
+    "title": "Cuentas (administración)",
+    "intro": "Quién puede iniciar sesión en este neVus. No hay registro abierto: creas cada cuenta con una contraseña temporal, que la persona cambia en sus ajustes.",
+    "introProxy": "Quién puede iniciar sesión en este neVus. Las cuentas vienen de tu inicio de sesión único; aquí solo puedes desactivar una.",
+    "disabled": "desactivada",
+    "secondFactorOn": "segundo factor activado",
+    "lastSignIn": "última sesión el {{date}}",
+    "enable": "Activar",
+    "disable": "Desactivar",
+    "enableNamed": "Activar la cuenta {{name}}",
+    "disableNamed": "Desactivar la cuenta {{name}}",
+    "newPassword": "Poner una contraseña nueva",
+    "newPasswordNamed": "Poner una contraseña nueva a {{name}}",
+    "temporaryPassword": "Contraseña temporal para {{name}}",
+    "resetSecondFactor": "Desactivar el segundo factor",
+    "resetSecondFactorNamed": "Desactivar el segundo factor de {{name}}",
+    "secondFactorReset": "El segundo factor de esa cuenta está desactivado; la contraseña sigue valiendo.",
+    "passwordSet": "La contraseña está puesta. Díselo a la persona y pídele que la cambie.",
+    "addTitle": "Añadir una cuenta",
+    "temporaryPasswordNew": "Contraseña temporal",
+    "temporaryHint": "Al menos {{count}} caracteres. La persona la cambia tras iniciar sesión.",
+    "role": "Rol",
+    "add": "Crear la cuenta"
   }
 }

@@ -24,7 +24,8 @@ Please do not open a public issue for security problems. Use GitHub's private vu
 
 Authentication and sessions
 
-- Passwords hashed with argon2id (parameters tuned to roughly 150 ms on the target hardware); login rate limiting; closed registration with a first-run claim flow; optional TOTP with recovery codes (1.0.0).
+- Passwords hashed with argon2id (parameters tuned to roughly 150 ms on the target hardware); login rate limiting; closed registration with a first-run claim flow.
+- An optional second factor per account: time-based one-time codes (RFC 6238) from an authenticator app, with ten one-use recovery codes. The secret is stored encrypted with the server's key and the recovery codes hashed. A password alone opens no session: the sign-in waits, for five minutes, for the code. Codes are accepted within one time step and never twice; refused codes are rate-limited like passwords, end the pending sign-in when the limit is reached, and are audited. Turning the factor on or off and renewing the codes require sudo mode. An administrator can turn a member's factor off (sudo mode, audited); the administrator's own way back in is the start-up reset with `NEVUS_ADMIN_USER` and `NEVUS_ADMIN_PASSWORD`, which also clears the factor.
 - Server-side sessions with random identifiers stored hashed; cookies `HttpOnly`, `SameSite=Lax`, `Secure` when the request arrives over HTTPS; idle and absolute lifetimes; sign-out everywhere.
 - Re-authentication ("sudo mode") before purging a person, exporting all data, changing security settings or disabling a user.
 - Trusted-header mode for forward authentication is enabled only by explicit configuration and refuses to start without the proxy's addresses. It trusts the header only on connections whose peer address is one of them (the application server does not rewrite peer addresses), and disables local login and password changes while active. A session stays valid only while the proxy keeps vouching for the same user, and sudo mode becomes an explicit confirmation, since there is no local password. For outages of the identity provider, `nevus emergency-login` prints a one-use link valid for 15 minutes that opens a session of at most 12 hours; making and using it are audited.
@@ -61,7 +62,7 @@ Logging and audit
 
 - Keep the server on a private network and reach it remotely through a VPN; do not expose neVus to the public internet.
 - Terminate TLS at a reverse proxy with a certificate the household's devices trust; without HTTPS the browser will not allow live camera capture or installation as an application, and cookies are not marked secure.
-- Set a strong admin password and enable the second factor when available; create one account per person.
+- Set a strong administrator password and turn the second factor on in the settings; create one account per person, and keep the recovery codes somewhere other than the phone.
 - Encrypt the disk or volume that holds the data directory if the server could be stolen; the application does not encrypt files at rest.
 - Keep the encryption passphrase for backups somewhere other than the server; test a restore at least once.
 - Update neVus when releases are published; read the release notes for security-relevant changes.

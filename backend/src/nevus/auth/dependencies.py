@@ -39,8 +39,8 @@ def current_session(
 ) -> AuthSession:
     token = request.cookies.get(SESSION_COOKIE)
     session = resolve_session(db, token, settings) if token else None
-    if session is not None and session.kind == "emergency_link":
-        session = None  # a link is not a session until it is used
+    if session is not None and session.kind in ("emergency_link", "second_factor"):
+        session = None  # a link is not a session until it is used, nor is a sign-in waiting for its code
     if settings.auth_mode == "proxy":
         from nevus.auth.proxy import session_for
 

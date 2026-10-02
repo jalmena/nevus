@@ -10,7 +10,7 @@ from sqlalchemy import select
 from nevus import settings_store
 from nevus.api.schemas import PasswordReset, UserCreate, UserOut
 from nevus.auth import service
-from nevus.auth.dependencies import AdminUser, AppSettings, DbSession, client_ip
+from nevus.auth.dependencies import AdminUser, AppSettings, DbSession, SudoSession, client_ip
 from nevus.auth.passwords import hash_password
 from nevus.db.models import User
 from nevus.db.types import utcnow
@@ -71,4 +71,16 @@ def reset_password(
     user.password_hash = hash_password(body.new_password)
     service.revoke_all_sessions(db, user)
     service.audit(db, "user.password_reset", admin, "user", user.id, client_ip(request, settings))
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.delete("/{user_id}/totp", status_code=status.HTTP_204_NO_CONTENT)
+def reset_second_factor(
+    user_id: uuid.UUID, request: Request, admin: AdminUser, _: SudoSession, db: DbSession, settings: AppSettings
+) -> Response:
+    """For a member who lost the authenticator: the factor goes, the password stays, sessions end."""
+    user = _get_user(db, user_id)
+    service.disable_totp(db, user)
+    service.revoke_all_sessions(db, user)
+    service.audit(db, "user.totp_reset", admin, "user", user.id, client_ip(request, settings))
     return Response(status_code=status.HTTP_204_NO_CONTENT)
