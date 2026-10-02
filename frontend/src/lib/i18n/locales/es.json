@@ -214,6 +214,7 @@
     "days": "{{count}} días",
     "create": "Crear la marca",
     "edit": "Editar datos",
+    "delete": "Mover la marca a la papelera",
     "status": "Estado",
     "statuses": {
       "active": "Activa",

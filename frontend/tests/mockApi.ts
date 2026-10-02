@@ -470,6 +470,11 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
       if (match) {
         const found = state.lesions.find((l) => l.id === match?.[1]);
         if (!found) return json({ detail: "No such lesion." }, 404);
+        if (method === "DELETE") {
+          state.lesions = state.lesions.filter((l) => l.id !== found.id);
+          state.observations = state.observations.filter((o) => o.lesion_id !== found.id);
+          return new Response(null, { status: 204 });
+        }
         if (method === "PATCH") {
           const patch = body as { label?: string | null };
           if (patch.label !== undefined) found.label = patch.label;

@@ -151,6 +151,24 @@ export function useUpdateObservation(observationId: string) {
   });
 }
 
+/** The mark, its visits and their photographs go to the trash together; the trash can bring them back. */
+export function useDeleteLesion(lesionId: string, personId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const { error, response } = await api.DELETE("/api/lesions/{lesion_id}", {
+        params: { path: { lesion_id: lesionId } },
+      });
+      if (!response.ok) throw new Error(errorMessage(error, "The mark could not be deleted."));
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: lesionsKey(personId) });
+      void queryClient.removeQueries({ queryKey: lesionKey(lesionId) });
+      void queryClient.invalidateQueries({ queryKey: ["trash"] });
+    },
+  });
+}
+
 export function useDeleteObservation(observationId: string, lesionId: string) {
   const queryClient = useQueryClient();
   return useMutation({

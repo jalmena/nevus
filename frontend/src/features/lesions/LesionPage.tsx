@@ -7,7 +7,14 @@ import { Notice } from "@/design-system/components/Notice";
 import { TextField } from "@/design-system/components/TextField";
 import { imageUrl } from "@/lib/images";
 import { useSession } from "@/lib/auth/session";
-import { INTERVALS, useCreateObservation, useLesion, useObservations, useUpdateLesion } from "@/lib/lesions";
+import {
+  INTERVALS,
+  useCreateObservation,
+  useDeleteLesion,
+  useLesion,
+  useObservations,
+  useUpdateLesion,
+} from "@/lib/lesions";
 import { formatDelta, formatMm } from "@/lib/measurements";
 import { usePerson } from "@/lib/persons";
 import { QuickVisit } from "@/features/capture/QuickVisit";
@@ -28,6 +35,7 @@ export function LesionPage() {
   const observations = useObservations(lesionId);
   const createVisit = useCreateObservation(lesionId);
   const update = useUpdateLesion(lesionId);
+  const remove = useDeleteLesion(lesionId, lesion.data?.person_id ?? "");
   const [editing, setEditing] = useState(false);
   const [quick, setQuick] = useState(false);
   const canEdit = person.data?.my_role === "owner" || person.data?.my_role === "manager";
@@ -134,9 +142,19 @@ export function LesionPage() {
           <Button variant="secondary" onClick={() => setEditing((value) => !value)}>
             {editing ? t("common.cancel") : t("lesions.edit")}
           </Button>
+          <Button
+            variant="danger"
+            disabled={remove.isPending}
+            onClick={() =>
+              remove.mutate(undefined, { onSuccess: () => void navigate(`/persons/${data.person_id}`) })
+            }
+          >
+            {t("lesions.delete")}
+          </Button>
         </div>
       )}
       {createVisit.error && !quick && <Notice kind="error">{createVisit.error.message}</Notice>}
+      {remove.error && <Notice kind="error">{remove.error.message}</Notice>}
       {quick && <QuickVisit lesionId={data.id} lesionLabel={lesionTitle(data, t)} onDone={() => undefined} />}
       {editing && (
         <EditLesionForm

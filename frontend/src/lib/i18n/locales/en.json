@@ -214,6 +214,7 @@
     "days": "{{count}} days",
     "create": "Create the mark",
     "edit": "Edit details",
+    "delete": "Move the mark to the trash",
     "status": "Status",
     "statuses": {
       "active": "Active",
