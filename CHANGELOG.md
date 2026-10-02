@@ -1,3 +1,16 @@
+## v1.1.0 (2026-10-02)
+
+### Feat
+
+- **design**: one action per screen, tools folded, the photograph first, two panes where there is room
+- **i18n**: Portuguese, and one list of the languages neVus speaks
+- **notify**: push notifications to the device, behind a flag
+- **measure**: the shape and the colour of a mark, described with each measurement
+
+### Fix
+
+- **i18n**: Portuguese calls a dated look an "observação", and names the new mark actions
+
 ## v1.0.0 (2026-10-02)
 
 ### Feat
