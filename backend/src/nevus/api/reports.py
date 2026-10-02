@@ -117,7 +117,7 @@ def create_report(
     db.add(row)
     db.flush()
     queue.enqueue(
-        db, REPORT_KIND, {"report_id": str(row.id)}, dedupe_key=f"report:{row.id}", priority=2, max_attempts=2
+        db, REPORT_KIND, {"report_id": str(row.id)}, dedupe_key=f"report:{row.id}", priority=10, max_attempts=2
     )
     service.audit(db, "report.request", user, "report", row.id, ip, {"scope": scope})
     return row
