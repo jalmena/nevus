@@ -31,7 +31,8 @@ def sheet(folder: Path, scheme: str) -> Path | None:
     for path in shots:
         with Image.open(path) as image:
             resized = image.convert("RGB").resize((width, max(1, round(image.height * width / image.width))))
-        tiles.append((path.stem.removesuffix(f"-{scheme}"), resized.crop((0, 0, width, min(resized.height, MAX_HEIGHT)))))
+        cropped = resized.crop((0, 0, width, min(resized.height, MAX_HEIGHT)))
+        tiles.append((path.stem.removesuffix(f"-{scheme}"), cropped))
     rows = [tiles[i : i + columns] for i in range(0, len(tiles), columns)]
     heights = [max(tile.height for _, tile in row) + LABEL for row in rows]
     canvas = Image.new("RGB", (columns * (width + GAP) + GAP, sum(heights) + GAP * (len(rows) + 1)), "#2a2a2a")

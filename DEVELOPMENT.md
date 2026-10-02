@@ -49,7 +49,7 @@ Tests say whether a screen works; they do not say whether it looks right. After 
 pnpm run build && pnpm run shots      # in frontend/
 ```
 
-It starts the real backend on a scratch data directory, walks every screen on a phone and on a desktop (Playwright, `e2e/gallery.spec.ts`), saves each in light and dark under `frontend/.screenshots/<device>/`, and makes contact sheets (`contact-<device>-<scheme>.png`) with `tools/screenshots/contact_sheet.py`. Check spacing, wrapping, contrast and wording in both schemes, and fix what looks wrong before the change is done. The journey test (`pnpm run e2e`) saves screenshots of its own pages too when `NEVUS_E2E_SHOTS=<dir>` is set.
+It starts the real backend on a scratch data directory, walks every screen on a phone and on a desktop (Playwright, `e2e/gallery.spec.ts`), saves each in light and dark under `frontend/.screenshots/<device>/`, and makes contact sheets (`contact-<device>-<scheme>.png`) with `tools/screenshots/contact_sheet.py`. Check spacing, wrapping, contrast and wording in both schemes, and fix what looks wrong before the change is done. The journey test (`pnpm run e2e`) saves screenshots of its own pages too when `NEVUS_E2E_SHOTS=<dir>` is set. `uv run tools/screenshots/take.py` is a different thing: the three store screenshots, from a seeded instance with plausible photos, for `docs/design/screenshots/`.
 
 ## Conventions
 

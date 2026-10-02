@@ -16,6 +16,7 @@ const SERVERS = [
 export default defineConfig({
   testDir: "e2e",
   testMatch: /gallery\.spec\.ts/,
+  outputDir: "test-results-gallery", // not test-results: a journey run at the same time would be wiped
   timeout: 300_000,
   expect: { timeout: 15_000 },
   fullyParallel: true,

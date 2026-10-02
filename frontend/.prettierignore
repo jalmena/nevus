@@ -8,3 +8,4 @@ src/lib/api/schema.d.ts
 src/features/bodymap/zones.json
 test-results
 playwright-report
+test-results-gallery
