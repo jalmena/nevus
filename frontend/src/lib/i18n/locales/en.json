@@ -18,7 +18,8 @@
   },
   "languages": {
     "en": "English",
-    "es": "Spanish"
+    "es": "Spanish",
+    "pt": "Portuguese"
   },
   "auth": {
     "username": "Username",
@@ -58,6 +59,7 @@
       "viewer": "Viewer"
     },
     "profileTitle": "Profile settings",
+    "profileHint": "Experimental analysis, export, storage and deletion.",
     "experimental": "Experimental analysis",
     "experimentalHint": "Off by default. When on, neVus may propose outlines and changes on its own; each proposal is labelled experimental and you confirm or reject it."
   },
@@ -86,6 +88,11 @@
   },
   "settings": {
     "title": "Settings",
+    "account": "Account",
+    "appearance": "Appearance",
+    "administration": "Administration",
+    "about": "About neVus",
+    "sections": "Sections",
     "theme": "Theme",
     "themes": {
       "system": "Follow the device",
@@ -340,7 +347,11 @@
       "manual": "known length",
       "unknown": "scale"
     },
-    "tiltedShort": "tilted"
+    "tiltedShort": "tilted",
+    "compactness": "Compactness",
+    "contrast": "Colour contrast",
+    "compactnessShort": "compactness {{value}}",
+    "contrastShort": "colour contrast ΔE {{value}}"
   },
   "card": {
     "title": "Reference card",
@@ -518,12 +529,16 @@
     "metric": "Show",
     "metrics": {
       "longest": "Longest diameter",
-      "area": "Area"
-    }
+      "area": "Area",
+      "compactness": "Compactness",
+      "contrast": "Colour contrast with the skin"
+    },
+    "descriptorsNote": "Compactness is 1 for a circle and less for any other outline. The colour contrast (ΔE) is relative to the card's grey patch when the card was in the photo, otherwise as the camera saw it; it describes the photo, not the mark's nature."
   },
   "reports": {
     "title": "Reports",
     "introProfile": "A PDF summary of every mark, with the body map and the latest sizes, to take to a consultation.",
+    "hint": "PDF summaries and records for the clinician.",
     "introLesion": "A PDF record of this mark for the clinician: its photos with a scale, the measurements with their uncertainty, and your notes.",
     "language": "Language",
     "paper": "Paper",
@@ -551,6 +566,7 @@
   "appointments": {
     "sectionTitle": "Appointments",
     "intro": "Planning to see a clinician? Enter the date: neVus lists the marks to photograph before it and makes the report to bring.",
+    "hint": "Plan the photos before a consultation and take the report along.",
     "date": "Date of the appointment",
     "notes": "Note (optional)",
     "prepare": "Prepare the appointment",
@@ -624,6 +640,7 @@
   "calendar": {
     "title": "Calendar",
     "intro": "Subscribe from your calendar app to see when each mark is due for a photo, and the appointments. The calendar reminds you on the day; it works over your VPN, with no push service.",
+    "hint": "The due dates and appointments in your calendar app.",
     "make": "Make a calendar link",
     "again": "Make a new link",
     "stop": "Stop the link",
@@ -712,6 +729,7 @@
   "sessions": {
     "title": "Full-body sessions",
     "intro": "A session photographs the whole body region by region, in the same order and pose each time, so two sessions can be compared zone by zone. Skip any region you prefer not to photograph.",
+    "hint": "The whole body, region by region, to compare over time.",
     "start": "Start a session",
     "titleFor": "Session of {{date}}",
     "open": "In progress",
@@ -727,6 +745,7 @@
     "howTo": "Use the same light and distance each time. Someone can help with the back, or prop the phone up and use its timer.",
     "experimentalNote": "The experimental analysis is on for this person: after each photo, spots that may be marks are proposed for you to confirm or reject. None is recorded unless you confirm it.",
     "sensitive": "This region may include intimate areas. Skip it if you prefer; nothing else depends on it.",
+    "pose": "How to pose",
     "pending": "Not photographed yet",
     "skipped": "Skipped",
     "analysing": "Looking for spots on the photo…",
@@ -918,5 +937,19 @@
       "missing_blobs": "Photographs the database refers to are missing from the archive.",
       "live_store": "Files in the live store are missing or damaged."
     }
+  },
+  "push": {
+    "title": "Notifications on this device (experimental)",
+    "intro": "When marks are due for a photo, this device gets one notification a day, after the reminder hour. The message travels encrypted through your browser's push service, which sees only that something was sent.",
+    "onThisDevice": "This device receives them.",
+    "offThisDevice": "This device does not receive them yet.",
+    "devices_zero": "No device of yours is subscribed yet.",
+    "devices_one": "{{count}} device of yours subscribed.",
+    "devices_other": "{{count}} devices of yours subscribed.",
+    "turnOn": "Turn on for this device",
+    "turnOff": "Turn off for this device",
+    "test": "Send a test notification",
+    "tested": "Sent to {{sent}}, failed for {{failed}}.",
+    "note": "On iPhone and iPad, notifications work only once neVus is installed on the Home Screen and opened from there."
   }
 }

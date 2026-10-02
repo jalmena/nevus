@@ -18,12 +18,13 @@ from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from nevus.api.reports import Language, Paper, ReportOut, _out, create_report
+from nevus.api.reports import Paper, ReportOut, _out, create_report
 from nevus.auth import service
 from nevus.auth.dependencies import AppSettings, CurrentUser, DbSession, client_ip
 from nevus.db.models import ACCESS_MANAGER, ACCESS_OWNER, Appointment, Lesion, Observation, Person, PersonAccess, User
 from nevus.db.types import utcnow
 from nevus.domain import due
+from nevus.languages import Language
 
 router = APIRouter(prefix="/api", tags=["appointments"])
 State = Literal["to_photograph", "never_photographed", "photographed"]

@@ -127,6 +127,8 @@ export interface MockState {
     backup_queued: boolean;
     verification_queued: boolean;
   };
+  /** Push notifications: the server's flag and this user's subscribed devices. */
+  push: { enabled: boolean; public_key: string | null; subscriptions: number };
   /** Accounts, for the administrator's list. */
   users: {
     id: string;
@@ -203,6 +205,7 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     experimental: false,
     bodySessions: [],
     totp: { enabled: false, settingUp: false, codesLeft: 0, pending: false },
+    push: { enabled: false, public_key: null, subscriptions: 0 },
     users: [],
     backups: {
       enabled: true,
@@ -333,6 +336,18 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     captured_at: m.captured_at ?? "2026-09-01T10:00:00Z",
     created_at: m.captured_at ?? "2026-09-01T10:00:00Z",
     change: null,
+    descriptors: {
+      version: "1.0.0",
+      shape: { perimeter_mm: 15.7, compactness: 0.93, aspect: 0.96 },
+      colour: {
+        reference: "card_grey",
+        mark: { L: 35.2, a: 12.1, b: 18.4, hex: "#6b4a3a" },
+        skin: { L: 68.5, a: 14.0, b: 22.3, hex: "#c89a7e" },
+        contrast: 33.4,
+        lightness_spread: 4.2,
+        pixels: 1200,
+      },
+    },
   });
   let counter = 100;
   const nextId = () => `0199a000-0000-7000-8000-${String(counter++).padStart(12, "0")}`;
@@ -612,6 +627,18 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
         });
       }
       if (path === "/api/admin/instance" && method === "GET") return json({ default_language: "en" });
+      if (path === "/api/push" && method === "GET") return json(state.push);
+      if (path === "/api/push/subscriptions" && method === "POST") {
+        if (!state.push.enabled) return json({ detail: "Push notifications are off on this server." }, 404);
+        state.push.subscriptions += 1;
+        return json(state.push, 201);
+      }
+      if (path === "/api/push/subscriptions" && method === "DELETE") {
+        state.push.subscriptions = Math.max(0, state.push.subscriptions - 1);
+        return new Response(null, { status: 204 });
+      }
+      if (path === "/api/push/test" && method === "POST")
+        return json({ sent: state.push.subscriptions, failed: 0 });
       if (path === "/api/admin/backups" && method === "GET") return json(state.backups);
       if (path === "/api/admin/backups/run" && method === "POST") {
         if (!state.backups.enabled) return json({ detail: "Set NEVUS_BACKUP_PASSPHRASE first." }, 409);

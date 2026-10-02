@@ -89,3 +89,38 @@
   font-family: var(--font-ui);
   font-size: var(--text-sm);
 }
+
+/* The person page: the map pane and the detail pane, side by side when there is room. */
+.layout {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.detailPane {
+  display: grid;
+  gap: var(--space-5);
+  align-content: start;
+  min-width: 0;
+}
+
+.mapPane {
+  min-width: 0;
+}
+
+.tools {
+  display: grid;
+  gap: var(--space-2);
+}
+
+@media (width >= 900px) {
+  .layout {
+    grid-template-columns: minmax(0, 11fr) minmax(0, 13fr);
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  .mapPane {
+    position: sticky;
+    top: var(--space-4);
+  }
+}

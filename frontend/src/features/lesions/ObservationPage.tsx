@@ -82,15 +82,15 @@ export function ObservationPage() {
 
       <section className={styles.section} aria-labelledby="photos-heading">
         <h2 id="photos-heading">{t("observations.photos")}</h2>
-        <QualityNotice
-          flags={data.quality_flags}
-          checking={data.images.some((image) => !image.quality_checked_at)}
-        />
         <PhotoGallery
           images={data.images}
           canEdit={canEdit}
           upload={upload}
           previousImageId={previousImageId}
+        />
+        <QualityNotice
+          flags={data.quality_flags}
+          checking={data.images.some((image) => !image.quality_checked_at)}
         />
       </section>
 
@@ -132,18 +132,24 @@ export function ObservationPage() {
             <Button onClick={save} disabled={!dirty || update.isPending}>
               {update.isPending ? t("common.working") : t("common.save")}
             </Button>
-            <Button
-              variant="danger"
-              disabled={remove.isPending}
-              onClick={() =>
-                remove.mutate(undefined, { onSuccess: () => void navigate(`/lesions/${data.lesion_id}`) })
-              }
-            >
-              {t("observations.delete")}
-            </Button>
           </div>
         )}
       </section>
+
+      {canEdit && (
+        <div className={styles.dangerZone}>
+          <Button
+            variant="danger"
+            disabled={remove.isPending}
+            onClick={() =>
+              remove.mutate(undefined, { onSuccess: () => void navigate(`/lesions/${data.lesion_id}`) })
+            }
+          >
+            {t("observations.delete")}
+          </Button>
+          {remove.error && <Notice kind="error">{remove.error.message}</Notice>}
+        </div>
+      )}
     </div>
   );
 }

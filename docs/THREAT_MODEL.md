@@ -24,7 +24,7 @@ Reviewed for 1.0.0 on 2026-10-02 against the code of that release. `SECURITY.md`
 
 1. **The web application**: sign-in (password, second factor, recovery codes), the JSON API, uploads, image and report downloads, the service worker's cache.
 2. **The reverse proxy**: TLS termination and, in proxy mode, the identity headers.
-3. **Background work**: image decoding and analysis (Pillow, OpenCV), report rendering (WeasyPrint), backups and their verification (age, tar), outgoing webhooks (HTTP) and email (SMTP).
+3. **Background work**: image decoding and analysis (Pillow, OpenCV), report rendering (WeasyPrint), backups and their verification (age, tar), outgoing webhooks (HTTP), email (SMTP) and, behind a flag, push messages to the browsers' push services (see the addendum).
 4. **The data directory**: the database, the blob store, the server secret, backups and exports at rest.
 5. **The command line**: `restore`, `emergency-login`, the start-up administrator reset from the environment.
 6. **The supply chain**: dependencies, the container image, the continuous-integration runner.
@@ -70,6 +70,21 @@ Reviewed for 1.0.0 on 2026-10-02 against the code of that release. `SECURITY.md`
 - Webhooks may target any address on the home network.
 - Nothing is encrypted at rest except backups and exports.
 
+## Addendum for 1.1.0: Web Push
+
+Reviewed on 2026-10-02 with the code that adds push notifications behind `NEVUS_WEB_PUSH`.
+
+New entry points: the subscription endpoints of the API (a signed-in user registers or removes a device), the outgoing HTTPS requests to the browsers' push services, and the service worker's `push` handler, which shows what the browser has already decrypted.
+
+| Misuse case | Who | Controls | What remains |
+| --- | --- | --- | --- |
+| The push service, or anyone on the path to it, reads a message | the relay, network observers | each message is encrypted on the server for one device with the key material the browser created (RFC 8291, `aes128gcm`); the plaintext is names and dates, never photographs or notes | The relay learns that a message was sent, to which device and when |
+| A forged message reaches a device | a third party who learns an endpoint | the push services accept only messages signed with the server's key pair (VAPID), which is stored encrypted with the server's key; endpoints are kept with the account that registered them | Nothing: a message without the signature is dropped by the relay |
+| A subscription is planted to make the server call an address of the attacker's choosing | a signed-in user | endpoints must be HTTPS; the server sends nothing but the encrypted message and the signature; a device is forgotten after five failures or when the relay reports it gone | A user may still point the server at a public HTTPS address of their own, which receives messages meant for them and nothing else |
+| The flag is on and the operator did not want the relay | the operator | off by default; the settings page says where the message travels; calendar feeds and webhooks remain the channels that stay on the network | The relay is inherent to the mechanism |
+
+The review changed nothing else: the subscription endpoints follow the same authentication, CSRF and audit rules as the rest of the API, and the digest that is pushed is the one the email channel already sends.
+
 ## Next review
 
-When any of these arrives: Web Push, OpenID Connect or another sign-in method, an integration that accepts data from outside, a learned model that runs over uploaded photographs, or a second worker process.
+When any of these arrives: OpenID Connect or another sign-in method, an integration that accepts data from outside, a learned model that runs over uploaded photographs, or a second worker process.

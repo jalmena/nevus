@@ -16,6 +16,7 @@ from typing import Any
 
 import pytest
 
+from nevus.languages import LANGUAGES
 from nevus.notify import calendar, email, webhooks
 from nevus.reports import i18n
 
@@ -56,6 +57,23 @@ FORBIDDEN = {
         r"consult\w* (?:a|con) (?:un|tu) m[eé]dico",
         r"diagn[oó]stic\w*",
     ],
+    "pt": [
+        r"melanomas?",
+        r"carcinomas?",
+        r"cancros?",
+        r"c[aâ]ncer\w*",
+        r"malign\w*",
+        r"benign\w*",
+        r"tumor\w*",
+        r"neoplasi\w*",
+        r"suspeit\w*",
+        r"perigos\w*",
+        r"riscos?",
+        r"urgente\w*",
+        r"abcde",
+        r"(?:consult\w*|procur\w*|v[áa] a|vai a) (?:o|um|a|uma) (?:seu |sua )?m[eé]dic\w*",
+        r"diagn[oó]stic\w*",
+    ],
 }
 # Statements of what neVus does not do, including the app's intended-use statement word for word.
 ALLOWED = [
@@ -66,6 +84,10 @@ ALLOWED = [
     "no diagnostica",
     "no es una herramienta de diagnóstico",
     "no es una herramienta diagnóstica",
+    "não diagnostica, não rastreia nem avalia o risco de nenhuma doença",
+    "não diagnostica nem avalia",
+    "não diagnostica",
+    "não é uma ferramenta de diagnóstico",
 ]
 
 
@@ -88,7 +110,7 @@ def _offences(text: str, language: str) -> list[str]:
 
 
 def _catalogues() -> Iterator[tuple[str, str, str]]:
-    for language in ("en", "es"):
+    for language in LANGUAGES:
         for name, catalogue in (("email", email.TEXT), ("webhooks", webhooks.TEXT), ("calendar", calendar.TEXT)):
             for text in _strings(catalogue[language]):
                 yield f"{name}/{language}", language, text
@@ -100,7 +122,7 @@ def _catalogues() -> Iterator[tuple[str, str, str]]:
                 yield f"app/{language}", language, text
     for template in files("nevus.reports").joinpath("templates").iterdir():
         text = re.sub(r"\{[{%].*?[%}]\}", " ", template.read_text(encoding="utf-8"), flags=re.S)
-        for language in ("en", "es"):
+        for language in LANGUAGES:
             yield f"template/{template.name}", language, text
 
 
@@ -115,7 +137,15 @@ def test_user_facing_text_is_descriptive() -> None:
 
 @pytest.mark.parametrize(
     ("text", "language"),
-    [("Higher risk", "en"), ("looks suspicious", "en"), ("Posible melanoma", "es"), ("riesgo alto", "es")],
+    [
+        ("Higher risk", "en"),
+        ("looks suspicious", "en"),
+        ("Posible melanoma", "es"),
+        ("riesgo alto", "es"),
+        ("Possível melanoma", "pt"),
+        ("risco elevado", "pt"),
+        ("consulte o seu médico", "pt"),
+    ],
 )
 def test_the_check_would_catch_it(text: str, language: str) -> None:
     assert _offences(text, language)
@@ -124,3 +154,4 @@ def test_the_check_would_catch_it(text: str, language: str) -> None:
 def test_saying_what_nevus_does_not_do_is_fine() -> None:
     assert _offences("It does not diagnose or assess any condition.", "en") == []
     assert _offences("No diagnostica ni evalúa ninguna afección.", "es") == []
+    assert _offences("Não diagnostica nem avalia nenhuma condição.", "pt") == []

@@ -3,7 +3,9 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main, develop, "release/**", "hotfix/**"]
+    # Pull requests cover feature, release and hotfix branches; main is tested as the release branch it
+    # fast-forwards from. One serial runner cannot afford the same tree twice.
+    branches: [develop]
   workflow_dispatch:
 
 permissions:
@@ -13,6 +15,9 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# The jobs form one chain, cheapest and most likely to fail first: on a single serial runner a failure
+# in one skips the ones after it instead of spending the hour on them. With more runners the chain can
+# be widened again (the expensive three are independent of each other).
 jobs:
   commits:
     name: Conventional commits
@@ -27,6 +32,7 @@ jobs:
         run: uvx --from commitizen cz check --rev-range "origin/${{ github.base_ref }}..HEAD"
 
   backend:
+    needs: frontend
     name: Backend
     runs-on: [self-hosted, nevus]
     defaults:
@@ -64,7 +70,7 @@ jobs:
           fi
       - name: Tests on SQLite
         # Two workers for the runner's two cores; every test has its own data directory.
-        run: uv run pytest -n 2 --cov=nevus --cov-report=term-missing
+        run: uv run pytest -n auto --cov=nevus --cov-report=term-missing
       - name: Tests on PostgreSQL
         # One worker: the tests share the service's single database.
         env:
@@ -90,6 +96,7 @@ jobs:
           uv run alembic check
 
   frontend:
+    needs: security
     name: Frontend
     runs-on: [self-hosted, nevus]
     defaults:
@@ -117,6 +124,7 @@ jobs:
       - run: pnpm build
 
   e2e:
+    needs: image
     name: End to end
     runs-on: [self-hosted, nevus]
     defaults:
@@ -164,6 +172,7 @@ jobs:
           retention-days: 7
 
   image:
+    needs: backend
     name: Container image
     runs-on: [self-hosted, nevus]
     steps:

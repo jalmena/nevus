@@ -53,11 +53,11 @@ describe("marks on the body map", () => {
     await user.click(zone); // the same zone again: deselected
     expect(screen.getByRole("status")).toHaveTextContent("Tap a zone to select it.");
     await user.click(zone);
-    await user.click(screen.getByRole("group")); // outside the body: deselected
+    await user.click(screen.getByRole("group", { name: /Body map/ })); // outside the body: deselected
     expect(screen.getByRole("status")).toHaveTextContent("Tap a zone to select it.");
 
     await user.click(zone);
-    const map = screen.getByRole("group");
+    const map = screen.getByRole("group", { name: /Body map/ });
     const before = map.getAttribute("viewBox");
     await user.click(screen.getByRole("button", { name: "Add a mark" }));
     expect(screen.getByRole("status")).toHaveTextContent("Tap the exact spot of the mark in Right pectoral.");

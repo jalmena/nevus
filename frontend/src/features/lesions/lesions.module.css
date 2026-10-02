@@ -209,3 +209,13 @@
   justify-content: space-between;
   gap: var(--space-2) var(--space-4);
 }
+
+/* Destructive actions stand apart from the work, at the end, behind a hairline. */
+.dangerZone {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}

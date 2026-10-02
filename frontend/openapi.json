@@ -992,6 +992,75 @@
         "title": "CoinIn",
         "type": "object"
       },
+      "ColourDescriptorsOut": {
+        "description": "CIELAB of the mark and of the skin around it, and the difference between them (\u0394E).",
+        "properties": {
+          "contrast": {
+            "title": "Contrast",
+            "type": "number"
+          },
+          "lightness_spread": {
+            "title": "Lightness Spread",
+            "type": "number"
+          },
+          "mark": {
+            "$ref": "#/components/schemas/ColourOut"
+          },
+          "pixels": {
+            "title": "Pixels",
+            "type": "integer"
+          },
+          "reference": {
+            "enum": [
+              "card_grey",
+              "camera"
+            ],
+            "title": "Reference",
+            "type": "string"
+          },
+          "skin": {
+            "$ref": "#/components/schemas/ColourOut"
+          }
+        },
+        "required": [
+          "reference",
+          "mark",
+          "skin",
+          "contrast",
+          "lightness_spread",
+          "pixels"
+        ],
+        "title": "ColourDescriptorsOut",
+        "type": "object"
+      },
+      "ColourOut": {
+        "properties": {
+          "L": {
+            "title": "L",
+            "type": "number"
+          },
+          "a": {
+            "title": "A",
+            "type": "number"
+          },
+          "b": {
+            "title": "B",
+            "type": "number"
+          },
+          "hex": {
+            "title": "Hex",
+            "type": "string"
+          }
+        },
+        "required": [
+          "L",
+          "a",
+          "b",
+          "hex"
+        ],
+        "title": "ColourOut",
+        "type": "object"
+      },
       "ComparisonIn": {
         "properties": {
           "image_a": {
@@ -1202,6 +1271,34 @@
           "password"
         ],
         "title": "Credentials",
+        "type": "object"
+      },
+      "DescriptorsOut": {
+        "description": "Descriptive numbers about the mark: its shape from the outline, its colour from the photograph.",
+        "properties": {
+          "colour": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ColourDescriptorsOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "shape": {
+            "$ref": "#/components/schemas/ShapeDescriptorsOut"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "version",
+          "shape"
+        ],
+        "title": "DescriptorsOut",
         "type": "object"
       },
       "DueOut": {
@@ -1435,6 +1532,20 @@
           "ready"
         ],
         "title": "EmailSettingsOut",
+        "type": "object"
+      },
+      "EndpointIn": {
+        "properties": {
+          "endpoint": {
+            "maxLength": 2000,
+            "title": "Endpoint",
+            "type": "string"
+          }
+        },
+        "required": [
+          "endpoint"
+        ],
+        "title": "EndpointIn",
         "type": "object"
       },
       "EvaluationPhoto": {
@@ -2014,7 +2125,8 @@
           "default_language": {
             "enum": [
               "en",
-              "es"
+              "es",
+              "pt"
             ],
             "title": "Default Language",
             "type": "string"
@@ -2062,6 +2174,28 @@
           "version"
         ],
         "title": "InstanceStatus",
+        "type": "object"
+      },
+      "KeysIn": {
+        "properties": {
+          "auth": {
+            "maxLength": 64,
+            "minLength": 16,
+            "title": "Auth",
+            "type": "string"
+          },
+          "p256dh": {
+            "maxLength": 128,
+            "minLength": 80,
+            "title": "P256Dh",
+            "type": "string"
+          }
+        },
+        "required": [
+          "p256dh",
+          "auth"
+        ],
+        "title": "KeysIn",
         "type": "object"
       },
       "LabelIn": {
@@ -2848,6 +2982,16 @@
             "format": "date-time",
             "title": "Created At",
             "type": "string"
+          },
+          "descriptors": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DescriptorsOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "flags": {
             "items": {
@@ -3683,6 +3827,36 @@
         "title": "ProposedSize",
         "type": "object"
       },
+      "PushStatusOut": {
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "public_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Public Key"
+          },
+          "subscriptions": {
+            "title": "Subscriptions",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "enabled",
+          "public_key",
+          "subscriptions"
+        ],
+        "title": "PushStatusOut",
+        "type": "object"
+      },
       "QueuedOut": {
         "properties": {
           "queued": {
@@ -3747,7 +3921,8 @@
               {
                 "enum": [
                   "en",
-                  "es"
+                  "es",
+                  "pt"
                 ],
                 "type": "string"
               },
@@ -3875,7 +4050,8 @@
           "language": {
             "enum": [
               "en",
-              "es"
+              "es",
+              "pt"
             ],
             "title": "Language",
             "type": "string"
@@ -4280,6 +4456,29 @@
         "title": "SessionZoneOut",
         "type": "object"
       },
+      "ShapeDescriptorsOut": {
+        "properties": {
+          "aspect": {
+            "title": "Aspect",
+            "type": "number"
+          },
+          "compactness": {
+            "title": "Compactness",
+            "type": "number"
+          },
+          "perimeter_mm": {
+            "title": "Perimeter Mm",
+            "type": "number"
+          }
+        },
+        "required": [
+          "perimeter_mm",
+          "compactness",
+          "aspect"
+        ],
+        "title": "ShapeDescriptorsOut",
+        "type": "object"
+      },
       "SideOut": {
         "properties": {
           "image_id": {
@@ -4381,6 +4580,26 @@
         "title": "SnoozeIn",
         "type": "object"
       },
+      "SubscriptionIn": {
+        "properties": {
+          "endpoint": {
+            "maxLength": 2000,
+            "minLength": 12,
+            "pattern": "^https?://",
+            "title": "Endpoint",
+            "type": "string"
+          },
+          "keys": {
+            "$ref": "#/components/schemas/KeysIn"
+          }
+        },
+        "required": [
+          "endpoint",
+          "keys"
+        ],
+        "title": "SubscriptionIn",
+        "type": "object"
+      },
       "SudoIn": {
         "properties": {
           "password": {
@@ -4414,31 +4633,6 @@
           "to"
         ],
         "title": "TestEmailIn",
-        "type": "object"
-      },
-      "TestOut": {
-        "properties": {
-          "detail": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Detail"
-          },
-          "ok": {
-            "title": "Ok",
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "ok",
-          "detail"
-        ],
-        "title": "TestOut",
         "type": "object"
       },
       "TotpCodeIn": {
@@ -4800,7 +4994,8 @@
               {
                 "enum": [
                   "en",
-                  "es"
+                  "es",
+                  "pt"
                 ],
                 "type": "string"
               },
@@ -5072,7 +5267,8 @@
               {
                 "enum": [
                   "en",
-                  "es"
+                  "es",
+                  "pt"
                 ],
                 "type": "string"
               },
@@ -5404,6 +5600,49 @@
           "bbox"
         ],
         "title": "Zone",
+        "type": "object"
+      },
+      "nevus__api__push__TestOut": {
+        "properties": {
+          "failed": {
+            "title": "Failed",
+            "type": "integer"
+          },
+          "sent": {
+            "title": "Sent",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "sent",
+          "failed"
+        ],
+        "title": "TestOut",
+        "type": "object"
+      },
+      "nevus__api__webhooks__TestOut": {
+        "properties": {
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok",
+          "detail"
+        ],
+        "title": "TestOut",
         "type": "object"
       }
     }
@@ -5806,7 +6045,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TestOut"
+                  "$ref": "#/components/schemas/nevus__api__webhooks__TestOut"
                 }
               }
             },
@@ -9230,6 +9469,123 @@
         ]
       }
     },
+    "/api/push": {
+      "get": {
+        "operationId": "push_status_api_push_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushStatusOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Push Status",
+        "tags": [
+          "push"
+        ]
+      }
+    },
+    "/api/push/subscriptions": {
+      "delete": {
+        "operationId": "unsubscribe_api_push_subscriptions_delete",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EndpointIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Unsubscribe",
+        "tags": [
+          "push"
+        ]
+      },
+      "post": {
+        "description": "This device's subscription, as the browser gave it; the same endpoint again just refreshes it.",
+        "operationId": "subscribe_api_push_subscriptions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushStatusOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Subscribe",
+        "tags": [
+          "push"
+        ]
+      }
+    },
+    "/api/push/test": {
+      "post": {
+        "description": "A message to every device of the person, now, so they can see it arrive.",
+        "operationId": "test_message_api_push_test_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nevus__api__push__TestOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Test Message",
+        "tags": [
+          "push"
+        ]
+      }
+    },
     "/api/reference-card": {
       "get": {
         "description": "Two window cards, two strips and a 50 mm line to verify the printer did not scale the page.",
@@ -9257,7 +9613,8 @@
               "default": "en",
               "enum": [
                 "en",
-                "es"
+                "es",
+                "pt"
               ],
               "title": "Lang",
               "type": "string"

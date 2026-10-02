@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from nevus import analysis, measure
+from nevus import analysis, descriptors, measure
 from nevus.auth import service
 from nevus.auth.dependencies import AppSettings, CurrentUser, DbSession, client_ip
 from nevus.cv import card_detect, fit
@@ -32,6 +32,7 @@ from nevus.db.models import (
     User,
 )
 from nevus.db.types import utcnow
+from nevus.languages import Language
 from nevus.storage.blobs import BlobStore
 
 router = APIRouter(prefix="/api", tags=["measurements"])
@@ -142,6 +143,38 @@ class ChangeOut(BaseModel):
     since: datetime
 
 
+class ColourOut(BaseModel):
+    L: float
+    a: float
+    b: float
+    hex: str
+
+
+class ColourDescriptorsOut(BaseModel):
+    """CIELAB of the mark and of the skin around it, and the difference between them (ΔE)."""
+
+    reference: Literal["card_grey", "camera"]
+    mark: ColourOut
+    skin: ColourOut
+    contrast: float
+    lightness_spread: float
+    pixels: int
+
+
+class ShapeDescriptorsOut(BaseModel):
+    perimeter_mm: float
+    compactness: float
+    aspect: float
+
+
+class DescriptorsOut(BaseModel):
+    """Descriptive numbers about the mark: its shape from the outline, its colour from the photograph."""
+
+    version: str
+    shape: ShapeDescriptorsOut
+    colour: ColourDescriptorsOut | None = None
+
+
 class MeasurementOut(BaseModel):
     id: uuid.UUID
     observation_id: uuid.UUID
@@ -162,6 +195,7 @@ class MeasurementOut(BaseModel):
     captured_at: datetime
     created_at: datetime
     change: ChangeOut | None = None
+    descriptors: DescriptorsOut | None = None
 
 
 # --- access helpers --------------------------------------------------------------------------------
@@ -221,7 +255,7 @@ def _reference_out(row: ScaleReference) -> ScaleReferenceOut:
 def reference_card(
     user: CurrentUser,
     page: Annotated[Literal["a4", "letter"], Query()] = "a4",
-    lang: Annotated[Literal["en", "es"], Query()] = "en",
+    lang: Annotated[Language, Query()] = "en",
 ) -> Response:
     """Two window cards, two strips and a 50 mm line to verify the printer did not scale the page."""
     pdf = render_sheet(page, lang)
@@ -360,6 +394,9 @@ def _measurement_out(db: Session, row: Measurement, change: ChangeOut | None = N
         captured_at=observation.captured_at if observation else row.created_at,
         created_at=row.created_at,
         change=change,
+        descriptors=DescriptorsOut.model_validate(row.details["descriptors"])
+        if row.details.get("descriptors")
+        else None,
     )
 
 
@@ -431,7 +468,7 @@ def create_measurement(
 ) -> MeasurementOut:
     """Submitting a measurement is the confirmation: nothing proposed is ever stored without it."""
     observation, lesion = _observation(db, observation_id, user, ACCESS_OWNER, ACCESS_MANAGER)
-    row = save_measurement(db, observation, lesion, body, user, body.method)
+    row = save_measurement(db, observation, lesion, body, user, body.method, store=request.app.state.blob_store)
     service.audit(db, "measurement.create", user, "measurement", row.id, client_ip(request, settings))
     return _measurement_out(db, row)
 
@@ -444,9 +481,13 @@ def save_measurement(
     user: User,
     method: str,
     analysis_id: uuid.UUID | None = None,
+    store: BlobStore | None = None,
 ) -> Measurement:
-    """Compute and keep one measurement; `analysis_id` links one that started as an automatic proposal."""
+    """Compute and keep one measurement; `analysis_id` links one that started as an automatic proposal.
+
+    With the blob store, the mark's colour is described from the photograph as well as its shape."""
     image, reference, scale, shape, values, flags = _evaluate(db, observation, body, user, method)
+    described = descriptors.describe(image, reference, shape, values, method, store)
     row = Measurement(
         observation_id=observation.id,
         lesion_id=lesion.id,
@@ -466,6 +507,7 @@ def save_measurement(
             "sigma_scale": values["sigma_scale"],
             "border_mm": values["border_mm"],
             "print_factor": scale.print_factor,
+            "descriptors": described,
         },
         analysis_id=analysis_id,
         confirmed_by=user.id,
@@ -567,10 +609,20 @@ def lesion_measurements_csv(lesion_id: uuid.UUID, user: CurrentUser, db: DbSessi
             "method",
             "tilt_deg",
             "flags",
+            "perimeter_mm",
+            "compactness",
+            "aspect",
+            "colour_reference",
+            "mark_lightness",
+            "skin_lightness",
+            "contrast_delta_e",
         ]
     )
     for row, captured_at in lesion_series(db, lesion.id):
         reference = db.get(ScaleReference, row.scale_reference_id)
+        described = row.details.get("descriptors") or {}
+        shape = described.get("shape") or {}
+        colour = described.get("colour") or {}
         writer.writerow(
             [
                 captured_at.isoformat(),
@@ -584,6 +636,13 @@ def lesion_measurements_csv(lesion_id: uuid.UUID, user: CurrentUser, db: DbSessi
                 row.method,
                 "" if row.tilt_deg is None else row.tilt_deg,
                 " ".join(row.flags or []),
+                shape.get("perimeter_mm", ""),
+                shape.get("compactness", ""),
+                shape.get("aspect", ""),
+                colour.get("reference", ""),
+                colour.get("mark", {}).get("L", ""),
+                colour.get("skin", {}).get("L", ""),
+                colour.get("contrast", ""),
             ]
         )
     name = f"nevus-measurements-{lesion.id}.csv"

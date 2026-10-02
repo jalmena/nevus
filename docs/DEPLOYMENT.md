@@ -54,6 +54,7 @@ Every setting is an environment variable prefixed with `NEVUS_`. The ones an ope
 | `NEVUS_MAX_UPLOAD_BYTES` | 30 MiB | Largest accepted photograph |
 | `NEVUS_MIN_FREE_BYTES` | 2 GiB | Uploads are refused below this free space |
 | `NEVUS_LOG_LEVEL` | `info` | `debug`, `info`, `warning` or `error` |
+| `NEVUS_WEB_PUSH` | `false` | Push notifications to installed apps, relayed by the browsers' push services (below) |
 
 The full list is in `backend/src/nevus/config.py`.
 
@@ -148,6 +149,18 @@ Anyone who may see a person can make a calendar link for them on the person's pa
 - Desktop calendars (Thunderbird, Apple Calendar, Outlook): add a calendar from a network address.
 
 The link is shown once; neVus keeps only a hash of it. Making a new link stops the old one, and the link stops when its maker loses access to the person. Treat it like a password: anyone who has it sees the marks' names and dates.
+
+## Push notifications
+
+Off by default. With `NEVUS_WEB_PUSH: "true"`, each person can turn on, under Settings, notifications to the device they are holding: once a day, after `NEVUS_REMINDER_HOUR` and only when something is due, the device shows how many marks wait for a photo and the first few names. Tapping it opens neVus. Devices turn it off on the same page, and the server forgets a device after five failed deliveries or when the push service reports it gone.
+
+What it needs and what it costs:
+
+- HTTPS, as for the camera. On iPhone and iPad the app must also be installed on the Home Screen and opened from there.
+- A relay. Browsers receive push messages only through their vendor's push service (Apple, Google, Mozilla), so each message leaves your network. It is encrypted on the server for that one device ([RFC 8291](https://www.rfc-editor.org/rfc/rfc8291)); the push service sees the device, the time and the size, never the text. Messages carry names and dates, never photographs or notes. The server signs its messages with a key pair it makes on first use and stores encrypted with the server's key. `NEVUS_WEB_PUSH_SUBJECT` (a `mailto:` or `https:` address, by default the public URL) is the contact the push services may use if the server misbehaves.
+- "Send a test notification" on the settings page delivers a greeting to the person's subscribed devices at once.
+
+Calendar feeds and webhooks do the same job without any relay; prefer them when the phone never leaves the VPN.
 
 ## Second factor
 

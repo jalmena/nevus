@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from nevus import secretbox
 from nevus.config import Settings
 from nevus.db.models import Setting
+from nevus.languages import normalise
 
 EMAIL_KEY = "notify.email"
 INSTANCE_KEY = "instance"
@@ -77,4 +78,4 @@ def save_email_config(db: Session, settings: Settings, values: dict[str, Any], p
 def default_language(db: Session) -> str:
     instance = get(db, INSTANCE_KEY) or {}
     value = instance.get("default_language")
-    return value if value in ("en", "es") else "en"
+    return normalise(value)

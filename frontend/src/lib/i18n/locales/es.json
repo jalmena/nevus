@@ -18,7 +18,8 @@
   },
   "languages": {
     "en": "Inglés",
-    "es": "Español"
+    "es": "Español",
+    "pt": "Portugués"
   },
   "auth": {
     "username": "Usuario",
@@ -58,6 +59,7 @@
       "viewer": "Lector"
     },
     "profileTitle": "Ajustes del perfil",
+    "profileHint": "Análisis experimental, exportación, espacio y eliminación.",
     "experimental": "Análisis experimental",
     "experimentalHint": "Desactivado por defecto. Si lo activas, neVus puede proponer contornos y cambios por su cuenta; cada propuesta se marca como experimental y tú la confirmas o la rechazas."
   },
@@ -86,6 +88,11 @@
   },
   "settings": {
     "title": "Ajustes",
+    "account": "Cuenta",
+    "appearance": "Apariencia",
+    "administration": "Administración",
+    "about": "Acerca de neVus",
+    "sections": "Secciones",
     "theme": "Tema",
     "themes": {
       "system": "Como el dispositivo",
@@ -340,7 +347,11 @@
       "manual": "longitud conocida",
       "unknown": "escala"
     },
-    "tiltedShort": "inclinada"
+    "tiltedShort": "inclinada",
+    "compactness": "Compacidad",
+    "contrast": "Contraste de color",
+    "compactnessShort": "compacidad {{value}}",
+    "contrastShort": "contraste de color ΔE {{value}}"
   },
   "card": {
     "title": "Tarjeta de referencia",
@@ -518,12 +529,16 @@
     "metric": "Mostrar",
     "metrics": {
       "longest": "Diámetro mayor",
-      "area": "Área"
-    }
+      "area": "Área",
+      "compactness": "Compacidad",
+      "contrast": "Contraste de color con la piel"
+    },
+    "descriptorsNote": "La compacidad es 1 para un círculo y menor para cualquier otro contorno. El contraste de color (ΔE) es respecto al parche gris de la tarjeta cuando la tarjeta salía en la foto; si no, tal como lo vio la cámara. Describe la foto, no la naturaleza de la marca."
   },
   "reports": {
     "title": "Informes",
     "introProfile": "Un resumen en PDF de todas las marcas, con el mapa corporal y los últimos tamaños, para llevar a la consulta.",
+    "hint": "Resúmenes y registros en PDF para el profesional sanitario.",
     "introLesion": "Un registro en PDF de esta marca para el profesional sanitario: sus fotos con escala, las medidas con su incertidumbre y tus notas.",
     "language": "Idioma",
     "paper": "Papel",
@@ -553,6 +568,7 @@
   "appointments": {
     "sectionTitle": "Citas",
     "intro": "¿Vas a ver a un profesional sanitario? Indica la fecha: neVus muestra las marcas que fotografiar antes y prepara el informe que llevar.",
+    "hint": "Planifica las fotos antes de una consulta y llévate el informe.",
     "date": "Fecha de la cita",
     "notes": "Nota (opcional)",
     "prepare": "Preparar la cita",
@@ -629,6 +645,7 @@
   "calendar": {
     "title": "Calendario",
     "intro": "Suscríbete desde tu aplicación de calendario para ver cuándo toca fotografiar cada marca, y las citas. El calendario te avisa ese día; funciona a través de tu VPN, sin servicios de notificaciones.",
+    "hint": "Las fechas pendientes y las consultas en tu app de calendario.",
     "make": "Crear un enlace de calendario",
     "again": "Crear un enlace nuevo",
     "stop": "Desactivar el enlace",
@@ -717,6 +734,7 @@
   "sessions": {
     "title": "Sesiones de cuerpo entero",
     "intro": "Una sesión fotografía todo el cuerpo región a región, en el mismo orden y postura cada vez, para poder comparar dos sesiones zona a zona. Salta cualquier región que prefieras no fotografiar.",
+    "hint": "Todo el cuerpo, región a región, para comparar con el tiempo.",
     "start": "Empezar una sesión",
     "titleFor": "Sesión del {{date}}",
     "open": "En curso",
@@ -734,6 +752,7 @@
     "howTo": "Usa la misma luz y la misma distancia cada vez. Alguien puede ayudarte con la espalda, o apoya el teléfono y usa el temporizador.",
     "experimentalNote": "El análisis experimental está activado para esta persona: tras cada foto se proponen manchas que pueden ser marcas, para que las confirmes o las descartes. No se registra ninguna si no la confirmas.",
     "sensitive": "Esta región puede incluir zonas íntimas. Sáltala si lo prefieres; nada más depende de ella.",
+    "pose": "Cómo colocarse",
     "pending": "Aún sin foto",
     "skipped": "Saltada",
     "analysing": "Buscando manchas en la foto…",
@@ -929,5 +948,20 @@
       "missing_blobs": "Faltan en el archivo fotografías a las que la base de datos se refiere.",
       "live_store": "Hay ficheros del almacén en uso que faltan o están dañados."
     }
+  },
+  "push": {
+    "title": "Notificaciones en este dispositivo (experimental)",
+    "intro": "Cuando haya marcas pendientes de foto, este dispositivo recibirá una notificación al día, pasada la hora de los recordatorios. El mensaje viaja cifrado por el servicio de push de tu navegador, que solo ve que se envió algo.",
+    "onThisDevice": "Este dispositivo las recibe.",
+    "offThisDevice": "Este dispositivo aún no las recibe.",
+    "devices_zero": "Ningún dispositivo tuyo está suscrito todavía.",
+    "devices_one": "{{count}} dispositivo tuyo suscrito.",
+    "devices_many": "{{count}} dispositivos tuyos suscritos.",
+    "devices_other": "{{count}} dispositivos tuyos suscritos.",
+    "turnOn": "Activar en este dispositivo",
+    "turnOff": "Desactivar en este dispositivo",
+    "test": "Enviar una notificación de prueba",
+    "tested": "Enviada a {{sent}}, falló en {{failed}}.",
+    "note": "En iPhone y iPad las notificaciones funcionan solo cuando neVus está instalada en la pantalla de inicio y se abre desde ahí."
   }
 }

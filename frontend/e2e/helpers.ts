@@ -18,6 +18,16 @@ export async function accessible(page: Page, name: string) {
 }
 
 /** Signs in as the administrator, claiming the instance when nobody has yet. */
+/** Opens one of the person page's folded tools (by its element id) unless it is open already. */
+export async function openTool(page: Page, id: string, name: string) {
+  const tool = page.locator(`details#${id}`);
+  await expect(tool).toBeVisible();
+  if (!(await tool.evaluate((element) => (element as HTMLDetailsElement).open))) {
+    await tool.getByRole("heading", { name, exact: true }).click();
+  }
+  await expect(tool).toHaveAttribute("open", "");
+}
+
 export async function signIn(page: Page) {
   await page.goto("/");
   const claim = page.getByRole("heading", { name: "Claim this instance", exact: true });

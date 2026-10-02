@@ -35,11 +35,13 @@ def default_periodic() -> list[Periodic]:
     a day), and the daily housekeeping (trash purge, file collection, expired exports)."""
     from nevus.maintenance import daily_housekeeping, schedule_backup, schedule_verification
     from nevus.notify.email import schedule_digests
+    from nevus.notify.push import schedule_push
     from nevus.notify.webhooks import schedule_webhooks
 
     def digests(ctx: JobContext) -> None:
         schedule_digests(ctx)
         schedule_webhooks(ctx)
+        schedule_push(ctx)
 
     def backups(ctx: JobContext) -> None:
         schedule_backup(ctx)

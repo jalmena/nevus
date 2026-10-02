@@ -39,6 +39,41 @@ export function PhotoGallery({ images, canEdit, upload, previousImageId }: Props
 
   return (
     <div className={styles.gallery}>
+      {images.length === 0 ? (
+        <p className="text-secondary">{canEdit ? t("images.emptyTextEdit") : t("images.emptyTextView")}</p>
+      ) : (
+        <ul className={styles.grid}>
+          {images.map((image, index) => (
+            <li key={image.id} className={index === 0 ? styles.hero : undefined}>
+              <button
+                type="button"
+                className={styles.thumbButton}
+                onClick={() => show(image)}
+                aria-label={image.quality_flags.length > 0 ? t("images.openWithWarnings") : t("images.open")}
+              >
+                <img
+                  src={imageUrl(image.id, index === 0 ? "preview" : "thumb")}
+                  alt={t("images.alt", {
+                    role: t(`images.roles.${image.role}`),
+                    date: image.captured_at ? dateFormat.format(new Date(image.captured_at)) : "",
+                  })}
+                  width={image.renditions.find((r) => r.kind === (index === 0 ? "preview" : "thumb"))?.width}
+                  height={
+                    image.renditions.find((r) => r.kind === (index === 0 ? "preview" : "thumb"))?.height
+                  }
+                  loading="lazy"
+                  className={styles.thumb}
+                />
+                {image.quality_flags.length > 0 && (
+                  <span className={styles.warningDot} aria-hidden="true">
+                    !
+                  </span>
+                )}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
       {canEdit && upload && (
         <div className={styles.roleRow}>
           <label>
@@ -85,39 +120,6 @@ export function PhotoGallery({ images, canEdit, upload, previousImageId }: Props
         />
       )}
       {canEdit && upload?.error && <Notice kind="error">{upload.error.message}</Notice>}
-      {images.length === 0 ? (
-        <p className="text-secondary">{canEdit ? t("images.emptyTextEdit") : t("images.emptyTextView")}</p>
-      ) : (
-        <ul className={styles.grid}>
-          {images.map((image) => (
-            <li key={image.id}>
-              <button
-                type="button"
-                className={styles.thumbButton}
-                onClick={() => show(image)}
-                aria-label={image.quality_flags.length > 0 ? t("images.openWithWarnings") : t("images.open")}
-              >
-                <img
-                  src={imageUrl(image.id, "thumb")}
-                  alt={t("images.alt", {
-                    role: t(`images.roles.${image.role}`),
-                    date: image.captured_at ? dateFormat.format(new Date(image.captured_at)) : "",
-                  })}
-                  width={image.renditions.find((r) => r.kind === "thumb")?.width}
-                  height={image.renditions.find((r) => r.kind === "thumb")?.height}
-                  loading="lazy"
-                  className={styles.thumb}
-                />
-                {image.quality_flags.length > 0 && (
-                  <span className={styles.warningDot} aria-hidden="true">
-                    !
-                  </span>
-                )}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
       {canEdit && upload && <p className="text-secondary">{t("images.privacyNote")}</p>}
 
       <dialog ref={dialog} className={styles.preview} onClose={() => setOpen(null)}>

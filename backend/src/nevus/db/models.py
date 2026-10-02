@@ -98,6 +98,24 @@ class UserRecoveryCode(Base):
     __table_args__ = (Index("ix_user_recovery_codes_user_id", "user_id"),)
 
 
+class PushSubscription(Base):
+    """A device that asked for push notifications: the push service's endpoint and the keys that encrypt to it."""
+
+    __tablename__ = "push_subscriptions"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    user_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    endpoint: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
+    p256dh: Mapped[str] = mapped_column(String(128), nullable=False)
+    auth: Mapped[str] = mapped_column(String(64), nullable=False)
+    user_agent: Mapped[str | None] = mapped_column(String(255))
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
+    last_sent_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    failures: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+
+    __table_args__ = (Index("ix_push_subscriptions_user_id", "user_id"),)
+
+
 class Person(Base):
     """Somebody whose skin marks are tracked. Not necessarily a user."""
 

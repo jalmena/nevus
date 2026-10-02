@@ -22,6 +22,7 @@ export function Reports({
   lesionId,
   titleOf,
   marks = [],
+  embedded = false,
 }: {
   personId: string;
   lesionId?: string;
@@ -29,6 +30,8 @@ export function Reports({
   titleOf: (lesionId: string) => string;
   /** On a person's page: the marks that can be chosen for a report of some of them. */
   marks?: { id: string; title: string }[];
+  /** Under a disclosure that carries the heading. */
+  embedded?: boolean;
 }) {
   const { t, i18n } = useTranslation();
   const reports = useReports(personId);
@@ -61,9 +64,11 @@ export function Reports({
     return id ? t("reports.lesion", { name: titleOf(id) }) : t("reports.profile");
   }
 
+  const headingId = lesionId ? "mark-reports" : "person-reports";
+  const Wrapper = embedded ? "div" : "section";
   return (
-    <section className={styles.section} aria-labelledby={lesionId ? "mark-reports" : "person-reports"}>
-      <h2 id={lesionId ? "mark-reports" : "person-reports"}>{t("reports.title")}</h2>
+    <Wrapper className={styles.section} aria-labelledby={embedded ? undefined : headingId}>
+      {!embedded && <h2 id={headingId}>{t("reports.title")}</h2>}
       <p className="text-secondary">{lesionId ? t("reports.introLesion") : t("reports.introProfile")}</p>
       {!lesionId && marks.length > 0 && (
         <fieldset className={styles.choice}>
@@ -179,6 +184,6 @@ export function Reports({
           ))}
         </ul>
       )}
-    </section>
+    </Wrapper>
   );
 }

@@ -41,6 +41,7 @@ export default defineConfig({
       NEVUS_LOG_LEVEL: "warning",
       NEVUS_STATIC_DIR: `${process.cwd()}/dist`,
       NEVUS_JOB_POLL_SECONDS: "0.3",
+      NEVUS_WEB_PUSH: "1",
     },
   })),
 });

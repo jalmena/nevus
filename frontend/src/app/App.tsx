@@ -1,5 +1,6 @@
 import { lazy, type ComponentType } from "react";
 import { BrowserRouter, Route, Routes } from "react-router";
+import { AuthLayout } from "@/features/auth/AuthLayout";
 import { ClaimPage } from "@/features/auth/ClaimPage";
 import { LoginPage } from "@/features/auth/LoginPage";
 import { RequireAuth } from "@/features/auth/RequireAuth";
@@ -31,17 +32,17 @@ export function AppRoutes() {
       <Route
         path="/claim"
         element={
-          <main>
+          <AuthLayout>
             <ClaimPage />
-          </main>
+          </AuthLayout>
         }
       />
       <Route
         path="/login"
         element={
-          <main>
+          <AuthLayout>
             <LoginPage />
-          </main>
+          </AuthLayout>
         }
       />
       <Route

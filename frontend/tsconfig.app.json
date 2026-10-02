@@ -17,9 +17,12 @@
     "resolveJsonModule": true,
     "types": ["vite/client", "vite-plugin-pwa/client", "vitest/globals", "@testing-library/jest-dom"],
     "baseUrl": ".",
-    "paths": { "@/*": ["src/*"] },
+    "paths": {
+      "@/*": ["src/*"]
+    },
     "composite": true,
     "outDir": "node_modules/.tsbuild/app"
   },
-  "include": ["src", "src/**/*.json", "tests"]
+  "include": ["src", "src/**/*.json", "tests"],
+  "exclude": ["src/sw.ts"]
 }

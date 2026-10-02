@@ -142,19 +142,9 @@ export function LesionPage() {
           <Button variant="secondary" onClick={() => setEditing((value) => !value)}>
             {editing ? t("common.cancel") : t("lesions.edit")}
           </Button>
-          <Button
-            variant="danger"
-            disabled={remove.isPending}
-            onClick={() =>
-              remove.mutate(undefined, { onSuccess: () => void navigate(`/persons/${data.person_id}`) })
-            }
-          >
-            {t("lesions.delete")}
-          </Button>
         </div>
       )}
       {createVisit.error && !quick && <Notice kind="error">{createVisit.error.message}</Notice>}
-      {remove.error && <Notice kind="error">{remove.error.message}</Notice>}
       {quick && <QuickVisit lesionId={data.id} lesionLabel={lesionTitle(data, t)} onDone={() => undefined} />}
       {editing && (
         <EditLesionForm
@@ -164,10 +154,6 @@ export function LesionPage() {
           onSubmit={(body) => update.mutate(body, { onSuccess: () => setEditing(false) })}
         />
       )}
-
-      <SizeChart lesionId={data.id} />
-      <Sightings lesionId={data.id} />
-      <Reports personId={data.person_id} lesionId={data.id} titleOf={() => lesionTitle(data, t)} />
 
       <section className={styles.section} aria-labelledby="visits-heading">
         <div className={styles.sectionHead}>
@@ -214,6 +200,25 @@ export function LesionPage() {
           ))}
         </ol>
       </section>
+
+      <SizeChart lesionId={data.id} />
+      <Sightings lesionId={data.id} />
+      <Reports personId={data.person_id} lesionId={data.id} titleOf={() => lesionTitle(data, t)} />
+
+      {canEdit && (
+        <div className={styles.dangerZone}>
+          <Button
+            variant="danger"
+            disabled={remove.isPending}
+            onClick={() =>
+              remove.mutate(undefined, { onSuccess: () => void navigate(`/persons/${data.person_id}`) })
+            }
+          >
+            {t("lesions.delete")}
+          </Button>
+          {remove.error && <Notice kind="error">{remove.error.message}</Notice>}
+        </div>
+      )}
     </div>
   );
 }

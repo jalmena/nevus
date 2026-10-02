@@ -42,6 +42,13 @@ textarea {
   font: inherit;
 }
 
+/* Pages keep a text column inside the shell; a page marked wide lays its panes across the whole shell. */
+main > :not(.page-wide) {
+  width: 100%;
+  max-width: 48rem;
+  margin-inline: auto;
+}
+
 .text-secondary {
   color: var(--color-ink-2);
   font-weight: var(--font-weight-secondary);

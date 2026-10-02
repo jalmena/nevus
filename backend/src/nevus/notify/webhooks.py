@@ -52,6 +52,13 @@ TEXT = {
         "test_title": "neVus: mensaje de prueba",
         "test_body": "Este webhook funciona. Las marcas pendientes llegarán aquí una vez al día.",
     },
+    "pt": {
+        "title_one": "neVus: uma marca tem foto pendente",
+        "title_other": "neVus: {n} marcas têm foto pendente",
+        "line": "{mark} ({person}): pendente desde {date}",
+        "test_title": "neVus: mensagem de teste",
+        "test_body": "Este webhook funciona. As marcas pendentes chegarão aqui uma vez por dia.",
+    },
 }
 
 

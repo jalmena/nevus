@@ -1257,6 +1257,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/push": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Push Status */
+        get: operations["push_status_api_push_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/push/subscriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Subscribe
+         * @description This device's subscription, as the browser gave it; the same endpoint again just refreshes it.
+         */
+        post: operations["subscribe_api_push_subscriptions_post"];
+        /** Unsubscribe */
+        delete: operations["unsubscribe_api_push_subscriptions_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/push/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Test Message
+         * @description A message to every device of the person, now, so they can see it arrive.
+         */
+        post: operations["test_message_api_push_test_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/reference-card": {
         parameters: {
             query?: never;
@@ -2036,6 +2094,36 @@ export interface components {
             /** R */
             r: number;
         };
+        /**
+         * ColourDescriptorsOut
+         * @description CIELAB of the mark and of the skin around it, and the difference between them (ΔE).
+         */
+        ColourDescriptorsOut: {
+            /** Contrast */
+            contrast: number;
+            /** Lightness Spread */
+            lightness_spread: number;
+            mark: components["schemas"]["ColourOut"];
+            /** Pixels */
+            pixels: number;
+            /**
+             * Reference
+             * @enum {string}
+             */
+            reference: "card_grey" | "camera";
+            skin: components["schemas"]["ColourOut"];
+        };
+        /** ColourOut */
+        ColourOut: {
+            /** L */
+            L: number;
+            /** A */
+            a: number;
+            /** B */
+            b: number;
+            /** Hex */
+            hex: string;
+        };
         /** ComparisonIn */
         ComparisonIn: {
             /**
@@ -2096,6 +2184,16 @@ export interface components {
             password: string;
             /** Username */
             username: string;
+        };
+        /**
+         * DescriptorsOut
+         * @description Descriptive numbers about the mark: its shape from the outline, its colour from the photograph.
+         */
+        DescriptorsOut: {
+            colour?: components["schemas"]["ColourDescriptorsOut"] | null;
+            shape: components["schemas"]["ShapeDescriptorsOut"];
+            /** Version */
+            version: string;
         };
         /** DueOut */
         DueOut: {
@@ -2173,6 +2271,11 @@ export interface components {
             sender: string | null;
             /** Username */
             username: string | null;
+        };
+        /** EndpointIn */
+        EndpointIn: {
+            /** Endpoint */
+            endpoint: string;
         };
         /** EvaluationPhoto */
         EvaluationPhoto: {
@@ -2370,7 +2473,7 @@ export interface components {
              * Default Language
              * @enum {string}
              */
-            default_language: "en" | "es";
+            default_language: "en" | "es" | "pt";
         };
         /** InstanceStatus */
         InstanceStatus: {
@@ -2386,6 +2489,13 @@ export interface components {
             logout_url?: string | null;
             /** Version */
             version: string;
+        };
+        /** KeysIn */
+        KeysIn: {
+            /** Auth */
+            auth: string;
+            /** P256Dh */
+            p256dh: string;
         };
         /** LabelIn */
         LabelIn: {
@@ -2628,6 +2738,7 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            descriptors?: components["schemas"]["DescriptorsOut"] | null;
             /** Flags */
             flags: string[];
             /**
@@ -2920,6 +3031,15 @@ export interface components {
             /** Sigma Perpendicular Mm */
             sigma_perpendicular_mm: number;
         };
+        /** PushStatusOut */
+        PushStatusOut: {
+            /** Enabled */
+            enabled: boolean;
+            /** Public Key */
+            public_key: string | null;
+            /** Subscriptions */
+            subscriptions: number;
+        };
         /** QueuedOut */
         QueuedOut: {
             /** Queued */
@@ -2944,7 +3064,7 @@ export interface components {
         /** ReportIn */
         ReportIn: {
             /** Language */
-            language?: ("en" | "es") | null;
+            language?: ("en" | "es" | "pt") | null;
             /** Lesion Id */
             lesion_id?: string | null;
             /**
@@ -2990,7 +3110,7 @@ export interface components {
              * Language
              * @enum {string}
              */
-            language: "en" | "es";
+            language: "en" | "es" | "pt";
             /** Lesion Ids */
             lesion_ids: string[];
             /** Pages */
@@ -3137,6 +3257,15 @@ export interface components {
             /** Zone */
             zone: string;
         };
+        /** ShapeDescriptorsOut */
+        ShapeDescriptorsOut: {
+            /** Aspect */
+            aspect: number;
+            /** Compactness */
+            compactness: number;
+            /** Perimeter Mm */
+            perimeter_mm: number;
+        };
         /** SideOut */
         SideOut: {
             /**
@@ -3183,6 +3312,12 @@ export interface components {
              */
             days: 7 | 30;
         };
+        /** SubscriptionIn */
+        SubscriptionIn: {
+            /** Endpoint */
+            endpoint: string;
+            keys: components["schemas"]["KeysIn"];
+        };
         /** SudoIn */
         SudoIn: {
             /**
@@ -3195,13 +3330,6 @@ export interface components {
         TestEmailIn: {
             /** To */
             to: string;
-        };
-        /** TestOut */
-        TestOut: {
-            /** Detail */
-            detail: string | null;
-            /** Ok */
-            ok: boolean;
         };
         /** TotpCodeIn */
         TotpCodeIn: {
@@ -3339,7 +3467,7 @@ export interface components {
             /** Email Reminders */
             email_reminders?: boolean | null;
             /** Language */
-            language?: ("en" | "es") | null;
+            language?: ("en" | "es" | "pt") | null;
             /** Show Uncertainty */
             show_uncertainty?: boolean | null;
             /** Theme */
@@ -3409,7 +3537,7 @@ export interface components {
         /** VisitReportIn */
         VisitReportIn: {
             /** Language */
-            language?: ("en" | "es") | null;
+            language?: ("en" | "es" | "pt") | null;
             /**
              * Paper
              * @default a4
@@ -3522,6 +3650,20 @@ export interface components {
              * @enum {string}
              */
             view: "front" | "back" | "head" | "hands" | "feet";
+        };
+        /** TestOut */
+        nevus__api__push__TestOut: {
+            /** Failed */
+            failed: number;
+            /** Sent */
+            sent: number;
+        };
+        /** TestOut */
+        nevus__api__webhooks__TestOut: {
+            /** Detail */
+            detail: string | null;
+            /** Ok */
+            ok: boolean;
         };
     };
     responses: never;
@@ -3863,7 +4005,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TestOut"];
+                    "application/json": components["schemas"]["nevus__api__webhooks__TestOut"];
                 };
             };
             /** @description Validation Error */
@@ -6347,11 +6489,115 @@ export interface operations {
             };
         };
     };
+    push_status_api_push_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PushStatusOut"];
+                };
+            };
+        };
+    };
+    subscribe_api_push_subscriptions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubscriptionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PushStatusOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unsubscribe_api_push_subscriptions_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EndpointIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    test_message_api_push_test_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["nevus__api__push__TestOut"];
+                };
+            };
+        };
+    };
     reference_card_api_reference_card_get: {
         parameters: {
             query?: {
                 page?: "a4" | "letter";
-                lang?: "en" | "es";
+                lang?: "en" | "es" | "pt";
             };
             header?: never;
             path?: never;

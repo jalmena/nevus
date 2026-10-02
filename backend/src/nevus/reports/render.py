@@ -93,6 +93,29 @@ def _outline(photo: dict[str, Any]) -> dict[str, Any] | None:
     }
 
 
+def _shape_words(described: dict[str, Any] | None, words: Words) -> str | None:
+    if not described:
+        return None
+    shape = described["shape"]
+    return words(
+        "shape_values", compactness=words.number(shape["compactness"], 2), aspect=words.number(shape["aspect"], 2)
+    )
+
+
+def _colour_words(described: dict[str, Any] | None, words: Words) -> str | None:
+    colour = (described or {}).get("colour")
+    if not colour:
+        return None
+    reference = words("colour_card") if colour["reference"] == "card_grey" else words("colour_camera")
+    return words(
+        "colour_values",
+        lightness=words.number(colour["mark"]["L"], 0),
+        skin=words.number(colour["skin"]["L"], 0),
+        contrast=words.number(colour["contrast"], 0),
+        reference=reference,
+    )
+
+
 def _measurement_row(m: dict[str, Any], words: Words, zone: ZoneInfo) -> dict[str, Any]:
     at = _local(m["captured_at"], zone)
     change = m.get("change")
@@ -102,6 +125,8 @@ def _measurement_row(m: dict[str, Any], words: Words, zone: ZoneInfo) -> dict[st
         "across": words.mm(m["perpendicular_mm"], m["sigma_perpendicular_mm"]),
         "area": words.area(m["area_mm2"], m["sigma_area_mm2"]),
         "scale": words(f"scale_{m['scale_kind']}") if m.get("scale_kind") in ("card", "coin", "manual") else "",
+        "shape": _shape_words(m.get("descriptors"), words),
+        "colour": _colour_words(m.get("descriptors"), words),
         "tilt": "" if m.get("tilt_deg") is None else f"{words.number(m['tilt_deg'], 0)}°",
         "change": None
         if change is None

@@ -187,3 +187,17 @@
   stroke-width: 2px;
   stroke-dasharray: 6 4;
 }
+
+/* The region to photograph next leads the list; the pose of the others waits behind a summary. */
+.zone.current {
+  border-left: 6px solid var(--color-accent);
+}
+
+.pose summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--touch-target);
+  color: var(--color-accent);
+  font-weight: var(--font-weight-emphasis);
+  cursor: pointer;
+}

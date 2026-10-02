@@ -59,6 +59,13 @@ class Settings(BaseSettings):
     timezone: str | None = Field(default=None, description="Instance time zone for daily tasks; falls back to TZ")
     public_url: str | None = Field(default=None, description="Address people use to reach neVus, for links in emails")
     reminder_hour: int = Field(default=8, ge=0, le=23, description="Local hour after which daily reminders go out")
+    web_push: bool = Field(
+        default=False,
+        description="Push notifications to installed apps, relayed encrypted by the browsers' push services",
+    )
+    web_push_subject: str | None = Field(
+        default=None, description="Contact the push services may use, mailto: or https: (default: the public URL)"
+    )
     trash_days: int = Field(default=30, ge=1, le=365, description="Days in the trash before the purge")
     person_quota_bytes: int | None = Field(default=None, ge=0, description="Soft storage quota per person")
     backup_passphrase: str | None = Field(default=None, description="Enables the nightly encrypted backup")

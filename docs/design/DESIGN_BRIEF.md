@@ -78,6 +78,9 @@ Every component documents its states: default, hover, focus-visible, active, dis
 
 ## 8. Layout and navigation
 
+> Revision 2026-10-02: the layout rules learned from building the screens are in [`DESIGN_REVIEW.md`](DESIGN_REVIEW.md): one primary action per screen, destructive actions apart, occasional tools folded, the content's own order, two panes from 900 px. The phone bottom bar sketched below was not built; the person page is the hub and the decision is recorded in the review.
+
+
 - Mobile first: 360 px minimum width; breakpoints at 600 (large phone, small tablet), 900 (tablet, two panes) and 1200 px (desktop).
 - Phone navigation: bottom bar with four destinations: **Map**, **Due**, **Add** (centre, capture), **Visit** (prepare my visit and reports); **Settings** and the person switcher in the top bar.
 - Desktop: two panes, body map on the left, detail on the right; the same components, larger.
