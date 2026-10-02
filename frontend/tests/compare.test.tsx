@@ -97,6 +97,28 @@ describe("size over time", () => {
     expect(chart).toHaveAttribute("aria-valuetext", "Sep 1, 2026: 19.6 ± 1.5 mm²");
   });
 
+  it("offers the shape and the colour as series and columns when the measurements carry them", async () => {
+    install();
+    renderApp("/lesions/l1");
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole("radio", { name: "Compactness" }));
+    expect(screen.getByRole("slider", { name: /Compactness at 2 visits/ })).toHaveAttribute(
+      "aria-valuetext",
+      "Sep 1, 2026: 0.93",
+    );
+    await user.click(screen.getByRole("radio", { name: "Colour contrast with the skin" }));
+    expect(screen.getByRole("slider", { name: /Colour contrast with the skin at 2 visits/ })).toHaveAttribute(
+      "aria-valuetext",
+      "Sep 1, 2026: 33 ΔE",
+    );
+    await user.click(screen.getByRole("button", { name: "Show as a table" }));
+    const table = screen.getByRole("table");
+    expect(within(table).getByRole("columnheader", { name: "Compactness" })).toBeInTheDocument();
+    expect(within(table).getAllByText("0.93")).toHaveLength(2);
+    expect(within(table).getAllByText("33 ΔE")).toHaveLength(2);
+    expect(screen.getByText(/Compactness is 1 for a circle/)).toBeInTheDocument();
+  });
+
   it("offers the same numbers as a table and as a CSV download", async () => {
     install();
     renderApp("/lesions/l1");
