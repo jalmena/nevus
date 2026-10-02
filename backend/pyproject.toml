@@ -1,6 +1,6 @@
 [project]
 name = "nevus"
-version = "0.1.0"
+version = "0.2.0"
 description = "Self-hosted longitudinal tracking of moles and skin marks. Not a diagnostic tool."
 readme = "README.md"
 license = "AGPL-3.0-only"

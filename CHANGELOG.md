@@ -1,3 +1,25 @@
+## v0.2.0 (2026-10-02)
+
+### Feat
+
+- **bodymap**: a head detail view, the first of the detail views
+- **frontend**: signing in, confirming and signing out behind a single sign-on proxy
+- **auth**: single sign-on through the reverse proxy, with an emergency way in
+- **frontend**: webhook settings for administrators, and a calendar link per person
+- **notifications**: webhooks with Home Assistant, ntfy, Gotify and n8n presets, and a calendar feed
+- **frontend**: prepare an appointment from a person's page
+- **appointments**: prepare an appointment, with the marks to photograph and a report to bring
+- **frontend**: make, follow and download reports from a mark or a person
+- **reports**: PDF/A-3 records of a mark and summaries of a person's map, in English and Spanish
+- **jobs**: a job kind can be told when its last attempt has failed
+- **frontend**: compare visits, and size over time with its uncertainty
+- **compare**: line two photos up, or say why not, with an overlay and a difference map
+
+### Fix
+
+- **reports**: a requested report renders before the background analyses
+- **frontend**: readable status badges in both themes, links that stay visible on hover
+
 ## v0.1.0 (2026-10-01)
 
 ### Feat
