@@ -191,6 +191,8 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
+      - name: Clear a download a cancelled run can leave behind on this runner
+        run: rm -f /tmp/gitleaks.tmp
       - name: Secrets
         uses: gitleaks/gitleaks-action@v2
         env:
