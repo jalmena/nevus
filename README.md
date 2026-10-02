@@ -15,7 +15,10 @@ Your dermatologist has hundreds of patients and approximately seven minutes. You
 ## What neVus is
 
 - A personal record on your own server. Photos and measurements never leave the machine you run it on. No cloud, no account with anyone, no telemetry.
-- A body map to register marks, a timeline of observations per mark, side-by-side and overlay comparison, measurements with their uncertainty, reminders, and printable reports to take to an appointment.
+- A body map to register marks, a timeline of observations per mark, side-by-side, overlay and difference comparison, measurements in millimetres with their uncertainty, reminders and a calendar feed, and PDF reports to take to an appointment.
+- Full-body sessions, region by region in a fixed order, so two sessions compare zone by zone; any region can be skipped and any part of a photo blurred afterwards.
+- Optional, experimental analysis per person, off by default: proposed outlines and sizes, spots on a region's photo matched to the marks of the previous session. Every proposal waits for the person's yes or no.
+- Accounts for the household with roles per person, a second factor with recovery codes, nightly encrypted backups that are read back every week, and an audit trail.
 - Built for a phone in front of a bathroom mirror and for a browser on a desk, packaged for CasaOS and for plain Docker Compose.
 
 ## What neVus is not
@@ -41,7 +44,8 @@ neVus is inspired by [MoleMapper](https://github.com/ohsu-molemapper/MoleMapper_
 | 4 — Comparison and reports | 0.2.0 | Side-by-side, overlay and difference views, measurement charts, PDF reports, "prepare my visit" |
 | 5 — Computer vision | 0.3.0 | Assisted segmentation and measurement, framing checks, reproducible analysis records (opt-in, experimental) |
 | 6 — Full-body sessions | 0.4.0 | Guided zone-by-zone capture, matching between sessions, candidate review (opt-in, experimental) |
-| 7 — Hardening | 1.0.0 | Second factor, scheduled encrypted backups, accessibility and threat-model reviews |
+| 7 — Hardening | 1.0.0 | Second factor with recovery codes, accounts administration, weekly read-back of the backups, blurring parts of session photos, zoom-to-zone placement, an accessibility statement and a threat model, pages that load on demand |
+| 8 — Beyond | 1.x | Descriptive shape and colour of a mark over time, push notifications behind a flag, more languages |
 
 ## Documents
 
@@ -52,7 +56,7 @@ neVus is inspired by [MoleMapper](https://github.com/ohsu-molemapper/MoleMapper_
 - Requirements and plans: [product requirements](PRODUCT_REQUIREMENTS.md) · [architecture](ARCHITECTURE.md) · [roadmap](ROADMAP.md)
 - Running it: [development](DEVELOPMENT.md) · [deployment](docs/DEPLOYMENT.md) · [security](SECURITY.md) · [privacy](PRIVACY.md)
 - Design: [design brief](docs/design/DESIGN_BRIEF.md) · [identity](docs/design/brand/identity/README.md) · [body map](docs/design/BODY_MAP.md) · [reference card](docs/design/REFERENCE_CARD_SPEC.md)
-- Coming with the analysis features: `MODEL_CARD.md`
+- Analysis and assurance: [model card of every analyzer](MODEL_CARD.md) · [threat model](docs/THREAT_MODEL.md) · [accessibility](docs/ACCESSIBILITY.md)
 
 ## Contributing
 
