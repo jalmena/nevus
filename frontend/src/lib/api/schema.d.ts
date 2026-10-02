@@ -4,6 +4,57 @@
  */
 
 export interface paths {
+    "/api/admin/backups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Backup Status */
+        get: operations["backup_status_api_admin_backups_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/backups/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Backup Now */
+        post: operations["backup_now_api_admin_backups_run_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/backups/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Verify Now */
+        post: operations["verify_now_api_admin_backups_verify_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/email": {
         parameters: {
             query?: never;
@@ -283,6 +334,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/second-factor": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Second Factor
+         * @description The code from the authenticator, or a recovery code, once the password has been accepted.
+         */
+        post: operations["second_factor_api_auth_second_factor_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/session": {
         parameters: {
             query?: never;
@@ -317,6 +388,84 @@ export interface paths {
          *     explicit confirmation in the interface.
          */
         post: operations["sudo_api_auth_sudo_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/totp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Totp Status */
+        get: operations["totp_status_api_auth_totp_get"];
+        put?: never;
+        post?: never;
+        /** Totp Disable */
+        delete: operations["totp_disable_api_auth_totp_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/totp/enable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Totp Enable
+         * @description The first code proves the authenticator holds the secret; other sessions end, as after a new password.
+         */
+        post: operations["totp_enable_api_auth_totp_enable_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/totp/recovery-codes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Totp Recovery Codes
+         * @description New recovery codes; the ones not yet used stop working.
+         */
+        post: operations["totp_recovery_codes_api_auth_totp_recovery_codes_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/totp/setup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Totp Setup
+         * @description A new secret for an authenticator app; the factor turns on with the first code from it.
+         */
+        post: operations["totp_setup_api_auth_totp_setup_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1279,6 +1428,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/sessions/{session_id}/zones/{zone}/blur": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Blur Zone Photo
+         * @description Make parts of the zone's photo unrecognisable (FR-SES-05). A blurred copy takes the photo's place
+         *     and keeps its marks; the unblurred photo and its renditions are removed at once, not kept in the trash.
+         */
+        post: operations["blur_zone_photo_api_sessions__session_id__zones__zone__blur_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/sessions/{session_id}/zones/{zone}/marks": {
         parameters: {
             query?: never;
@@ -1460,6 +1630,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/users/{user_id}/totp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Reset Second Factor
+         * @description For a member who lost the authenticator: the factor goes, the password stays, sessions end.
+         */
+        delete: operations["reset_second_factor_api_users__user_id__totp_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/healthz": {
         parameters: {
             query?: never;
@@ -1555,6 +1745,54 @@ export interface components {
             date?: string | null;
             /** Notes */
             notes?: string | null;
+        };
+        /** BackupFileOut */
+        BackupFileOut: {
+            /** Bytes */
+            bytes: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** File */
+            file: string;
+        };
+        /** BackupStatusOut */
+        BackupStatusOut: {
+            /** Backup Hour */
+            backup_hour: number;
+            /** Backup Queued */
+            backup_queued: boolean;
+            /** Count */
+            count: number;
+            /** Enabled */
+            enabled: boolean;
+            latest: components["schemas"]["BackupFileOut"] | null;
+            verification: components["schemas"]["VerificationOut"] | null;
+            /** Verification Queued */
+            verification_queued: boolean;
+            /** Verify Days */
+            verify_days: number;
+        };
+        /** BlurIn */
+        BlurIn: {
+            /** Regions */
+            regions: components["schemas"]["BlurRegionIn"][];
+        };
+        /**
+         * BlurRegionIn
+         * @description A rectangle of the upright photo, as fractions of its width and height.
+         */
+        BlurRegionIn: {
+            /** Height */
+            height: number;
+            /** Width */
+            width: number;
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
         };
         /** BodyMap */
         BodyMap: {
@@ -2291,6 +2529,18 @@ export interface components {
             /** Zone */
             zone: string;
         };
+        /**
+         * LoginOut
+         * @description A session, or word that the account's second factor is needed before there is one.
+         */
+        LoginOut: {
+            /**
+             * Second Factor Required
+             * @default false
+             */
+            second_factor_required: boolean;
+            session?: components["schemas"]["SessionOut"] | null;
+        };
         /** ManualIn */
         ManualIn: {
             /**
@@ -2670,6 +2920,16 @@ export interface components {
             /** Sigma Perpendicular Mm */
             sigma_perpendicular_mm: number;
         };
+        /** QueuedOut */
+        QueuedOut: {
+            /** Queued */
+            queued: boolean;
+        };
+        /** RecoveryCodesOut */
+        RecoveryCodesOut: {
+            /** Recovery Codes */
+            recovery_codes: string[];
+        };
         /** RenditionOut */
         RenditionOut: {
             /** Bytes */
@@ -2787,6 +3047,16 @@ export interface components {
             sigma_scale: number;
             /** Tilt Deg */
             tilt_deg: number | null;
+        };
+        /** SecondFactorIn */
+        SecondFactorIn: {
+            /**
+             * Code
+             * @description From the authenticator
+             */
+            code?: string | null;
+            /** Recovery Code */
+            recovery_code?: string | null;
         };
         /** SessionIn */
         SessionIn: {
@@ -2933,6 +3203,31 @@ export interface components {
             /** Ok */
             ok: boolean;
         };
+        /** TotpCodeIn */
+        TotpCodeIn: {
+            /** Code */
+            code: string;
+        };
+        /** TotpSetupOut */
+        TotpSetupOut: {
+            /** Otpauth Uri */
+            otpauth_uri: string;
+            /** Qr Svg */
+            qr_svg: string;
+            /** Secret */
+            secret: string;
+        };
+        /** TotpStatusOut */
+        TotpStatusOut: {
+            /** Enabled */
+            enabled: boolean;
+            /** Enabled At */
+            enabled_at: string | null;
+            /** Recovery Codes Left */
+            recovery_codes_left: number;
+            /** Setting Up */
+            setting_up: boolean;
+        };
         /** TrashItem */
         TrashItem: {
             /**
@@ -3024,6 +3319,11 @@ export interface components {
             show_uncertainty: boolean;
             /** Theme */
             theme: string;
+            /**
+             * Totp Enabled
+             * @default false
+             */
+            totp_enabled: boolean;
             /** Username */
             username: string;
         };
@@ -3057,6 +3357,47 @@ export interface components {
             msg: string;
             /** Error Type */
             type: string;
+        };
+        /**
+         * VerificationOut
+         * @description What the last read-back of a backup found; see `backup.rehearse`.
+         */
+        VerificationOut: {
+            /** Archive */
+            archive?: string | null;
+            /** Archive Bytes */
+            archive_bytes?: number | null;
+            /** Blobs Damaged */
+            blobs_damaged?: number | null;
+            /** Blobs In Archive */
+            blobs_in_archive?: number | null;
+            /** Blobs Missing From Archive */
+            blobs_missing_from_archive?: number | null;
+            /**
+             * Checked At
+             * Format: date-time
+             */
+            checked_at: string;
+            /** Created At */
+            created_at?: string | null;
+            /** Database */
+            database?: string | null;
+            /** Images */
+            images?: number | null;
+            /** Integrity */
+            integrity?: string | null;
+            /** Live Store */
+            live_store?: {
+                [key: string]: number;
+            } | null;
+            /** Nevus Version */
+            nevus_version?: string | null;
+            /** Ok */
+            ok: boolean;
+            /** Problems */
+            problems: string[];
+            /** Secret Present */
+            secret_present?: boolean | null;
         };
         /** ViewData */
         ViewData: {
@@ -3191,6 +3532,66 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    backup_status_api_admin_backups_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BackupStatusOut"];
+                };
+            };
+        };
+    };
+    backup_now_api_admin_backups_run_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QueuedOut"];
+                };
+            };
+        };
+    };
+    verify_now_api_admin_backups_verify_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QueuedOut"];
+                };
+            };
+        };
+    };
     get_email_api_admin_email_get: {
         parameters: {
             query?: never;
@@ -3698,7 +4099,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SessionOut"];
+                    "application/json": components["schemas"]["LoginOut"];
                 };
             };
             /** @description Validation Error */
@@ -3794,6 +4195,39 @@ export interface operations {
             };
         };
     };
+    second_factor_api_auth_second_factor_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SecondFactorIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     session_info_api_auth_session_get: {
         parameters: {
             query?: never;
@@ -3843,6 +4277,117 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    totp_status_api_auth_totp_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TotpStatusOut"];
+                };
+            };
+        };
+    };
+    totp_disable_api_auth_totp_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    totp_enable_api_auth_totp_enable_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TotpCodeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecoveryCodesOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    totp_recovery_codes_api_auth_totp_recovery_codes_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecoveryCodesOut"];
+                };
+            };
+        };
+    };
+    totp_setup_api_auth_totp_setup_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TotpSetupOut"];
                 };
             };
         };
@@ -6161,6 +6706,42 @@ export interface operations {
             };
         };
     };
+    blur_zone_photo_api_sessions__session_id__zones__zone__blur_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+                zone: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BlurIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BodySessionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     add_mark_api_sessions__session_id__zones__zone__marks_post: {
         parameters: {
             query?: never;
@@ -6506,6 +7087,35 @@ export interface operations {
                 "application/json": components["schemas"]["PasswordReset"];
             };
         };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reset_second_factor_api_users__user_id__totp_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             204: {

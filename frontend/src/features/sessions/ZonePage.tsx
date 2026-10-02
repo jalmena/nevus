@@ -1,5 +1,5 @@
-import { useState } from "react";
 import type { TFunction } from "i18next";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router";
 import { Button } from "@/design-system/components/Button";
@@ -12,13 +12,24 @@ import { useLesions, type LesionOut } from "@/lib/lesions";
 import type { Point } from "@/lib/measurements";
 import {
   useAddMark,
+  useBlurZone,
+  useBodySession,
   useDeleteMark,
   useProtocol,
-  useBodySession,
   useUpdateMark,
   type MarkOut,
 } from "@/lib/sessions";
 import styles from "./sessions.module.css";
+
+/** A rectangle of the photo to blur, as fractions of its width and height. */
+interface Region {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 
 /** One zone photo of a session: the marks on it, placed by the person or proposed, linked to the registry. */
 export function ZonePage() {
@@ -30,8 +41,12 @@ export function ZonePage() {
   const add = useAddMark(sessionId, zoneId);
   const update = useUpdateMark();
   const remove = useDeleteMark();
+  const blur = useBlurZone(sessionId, zoneId);
   const [draft, setDraft] = useState<Point | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
+  const [blurring, setBlurring] = useState(false);
+  const [corner, setCorner] = useState<Point | null>(null);
+  const [regions, setRegions] = useState<Region[]>([]);
 
   if (session.error) return <Notice kind="error">{session.error.message}</Notice>;
   const zone = session.data?.zones.find((item) => item.zone === zoneId);
@@ -51,20 +66,57 @@ export function ZonePage() {
   const height = zone.upright_height ?? 1;
   const mark = zone.marks.find((item) => item.id === selected) ?? null;
   const canEdit = session.data.can_edit;
+  const regionName = t(`sessions.zones.${zoneId}.name`);
 
   function place(point: Point) {
     if (!canEdit) return;
+    const at = { x: clamp01(point.x / width), y: clamp01(point.y / height) };
+    if (blurring) {
+      if (!corner) {
+        setCorner(at);
+        return;
+      }
+      const region = {
+        x: Math.min(corner.x, at.x),
+        y: Math.min(corner.y, at.y),
+        width: Math.abs(at.x - corner.x),
+        height: Math.abs(at.y - corner.y),
+      };
+      setCorner(null);
+      if (region.width >= 0.01 && region.height >= 0.01) setRegions((current) => [...current, region]);
+      return;
+    }
     setSelected(null);
-    setDraft({ x: Math.min(1, Math.max(0, point.x / width)), y: Math.min(1, Math.max(0, point.y / height)) });
+    setDraft(at);
   }
+
+  function startBlurring() {
+    setBlurring(true);
+    setDraft(null);
+    setSelected(null);
+    setCorner(null);
+    setRegions([]);
+  }
+
+  function stopBlurring() {
+    setBlurring(false);
+    setCorner(null);
+    setRegions([]);
+  }
+
+  const hint = blurring
+    ? t("sessions.blurHint")
+    : canEdit
+      ? t("sessions.markHint")
+      : t("sessions.markHintView");
 
   return (
     <div className={styles.page}>
       <p>
         <Link to={`/sessions/${sessionId}`}>{t("sessions.backToSession")}</Link>
       </p>
-      <h1>{t(`sessions.zones.${zoneId}.name`)}</h1>
-      <p className="text-secondary">{canEdit ? t("sessions.markHint") : t("sessions.markHintView")}</p>
+      <h1>{regionName}</h1>
+      <p className="text-secondary">{hint}</p>
       {zone.analysing && (
         <p className="text-secondary" role="status">
           {t("sessions.analysing")}
@@ -75,9 +127,19 @@ export function ZonePage() {
           src={imageUrl(zone.image_id, "full")}
           width={width}
           height={height}
-          label={t("sessions.canvas", { zone: t(`sessions.zones.${zoneId}.name`) })}
+          label={t("sessions.canvas", { zone: regionName })}
           onTap={place}
         >
+          {regions.map((region, index) => (
+            <rect
+              key={index}
+              x={region.x * width}
+              y={region.y * height}
+              width={region.width * width}
+              height={region.height * height}
+              className={styles.blurRegion}
+            />
+          ))}
           {zone.marks.map((item, index) => (
             <Dot
               key={item.id}
@@ -89,12 +151,47 @@ export function ZonePage() {
             />
           ))}
           {draft && <Dot index={0} x={draft.x * width} y={draft.y * height} selected />}
+          {corner && <Dot index={0} x={corner.x * width} y={corner.y * height} selected />}
         </PhotoCanvas>
       ) : (
         <Notice kind="info">{t("sessions.noPhoto")}</Notice>
       )}
 
-      {draft && canEdit && (
+      {canEdit && zone.image_id && !blurring && !draft && (
+        <div>
+          <Button variant="quiet" onClick={startBlurring}>
+            {t("sessions.blur")}
+          </Button>
+        </div>
+      )}
+
+      {blurring && (
+        <section className={styles.panel} aria-labelledby="blur-heading">
+          <h2 id="blur-heading">{t("sessions.blurTitle")}</h2>
+          <p className="text-secondary">{t("sessions.blurNote")}</p>
+          <div className={styles.row}>
+            <Button
+              onClick={() => blur.mutate({ regions }, { onSuccess: stopBlurring })}
+              disabled={regions.length === 0 || blur.isPending}
+            >
+              {t("sessions.blurApply", { count: regions.length })}
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => setRegions((current) => current.slice(0, -1))}
+              disabled={regions.length === 0}
+            >
+              {t("sessions.blurUndo")}
+            </Button>
+            <Button variant="quiet" onClick={stopBlurring}>
+              {t("common.cancel")}
+            </Button>
+          </div>
+          {blur.error && <Notice kind="error">{blur.error.message}</Notice>}
+        </section>
+      )}
+
+      {draft && canEdit && !blurring && (
         <NewMarkForm
           covers={covers}
           lesions={here}

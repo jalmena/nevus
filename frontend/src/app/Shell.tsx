@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { NavLink, Outlet } from "react-router";
 import { useTranslation } from "react-i18next";
 import { OutboxBar } from "@/features/capture/OutboxBar";
@@ -25,7 +26,9 @@ export function Shell() {
       <OutboxBar />
       <main className={styles.main}>
         <SudoProvider>
-          <Outlet />
+          <Suspense fallback={<p className="text-secondary">…</p>}>
+            <Outlet />
+          </Suspense>
         </SudoProvider>
       </main>
     </div>

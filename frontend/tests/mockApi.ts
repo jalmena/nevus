@@ -108,6 +108,34 @@ export interface MockState {
   authMode: "local" | "proxy";
   /** Whether the experimental analysis is on for every person. */
   experimental: boolean;
+  /** The signed-in account's second factor. The mock accepts the code 123456 and the recovery code aaaaa-bbbbb. */
+  totp: { enabled: boolean; settingUp: boolean; codesLeft: number; pending: boolean };
+  /** The backups' state, as the administrator sees it. */
+  backups: {
+    enabled: boolean;
+    backup_hour: number;
+    verify_days: number;
+    count: number;
+    latest: { file: string; bytes: number; created_at: string } | null;
+    verification: {
+      ok: boolean;
+      checked_at: string;
+      archive: string | null;
+      blobs_in_archive: number | null;
+      problems: string[];
+    } | null;
+    backup_queued: boolean;
+    verification_queued: boolean;
+  };
+  /** Accounts, for the administrator's list. */
+  users: {
+    id: string;
+    username: string;
+    role: string;
+    disabled_at: string | null;
+    totp_enabled: boolean;
+    last_login_at: string | null;
+  }[];
   /** Full-body sessions; with the experimental analysis on, a zone photo gets one proposed spot. */
   bodySessions: MockBodySession[];
   calendar: { exists: boolean };
@@ -174,6 +202,28 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     labels: {},
     experimental: false,
     bodySessions: [],
+    totp: { enabled: false, settingUp: false, codesLeft: 0, pending: false },
+    users: [],
+    backups: {
+      enabled: true,
+      backup_hour: 3,
+      verify_days: 7,
+      count: 3,
+      latest: {
+        file: "nevus-backup-20261002T030000Z.tar.age",
+        bytes: 52_000_000,
+        created_at: "2026-10-02T03:00:00Z",
+      },
+      verification: {
+        ok: true,
+        checked_at: "2026-10-02T04:00:00Z",
+        archive: "nevus-backup-20261002T030000Z.tar.age",
+        blobs_in_archive: 412,
+        problems: [],
+      },
+      backup_queued: false,
+      verification_queued: false,
+    },
     ...initial,
   };
   const personOut = (p: { id: string; display_name: string }) => ({
@@ -312,14 +362,17 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
       if (path === "/api/auth/session") {
         return state.session
           ? json({
-              user: user(
-                state.session.username,
-                state.session.language,
-                state.session.theme,
-                state.session.role ?? "admin",
-                state.session.email ?? null,
-                state.session.showUncertainty ?? true,
-              ),
+              user: {
+                ...user(
+                  state.session.username,
+                  state.session.language,
+                  state.session.theme,
+                  state.session.role ?? "admin",
+                  state.session.email ?? null,
+                  state.session.showUncertainty ?? true,
+                ),
+                totp_enabled: state.totp.enabled,
+              },
               sudo_until: null,
             })
           : json({ detail: "Sign in to continue." }, 401);
@@ -334,8 +387,25 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
         const creds = body as { username: string; password: string };
         if (creds.password !== "correct horse battery")
           return json({ detail: "Wrong username or password." }, 401);
+        if (state.totp.enabled) {
+          state.totp.pending = true;
+          return json({ session: null, second_factor_required: true });
+        }
         state.session = { username: creds.username.toLowerCase(), language: "en", theme: "system" };
-        return json({ user: user(state.session.username), sudo_until: null });
+        return json({
+          session: { user: user(state.session.username), sudo_until: null },
+          second_factor_required: false,
+        });
+      }
+      if (path === "/api/auth/second-factor" && method === "POST") {
+        const input = body as { code?: string | null; recovery_code?: string | null };
+        if (!state.totp.pending) return json({ detail: "Sign in with your password first." }, 401);
+        const recovery = (input.recovery_code ?? "").replace(/[\s-]/g, "").toLowerCase();
+        if (input.code !== "123456" && recovery !== "aaaaabbbbb") return json({ detail: "Wrong code." }, 401);
+        if (recovery) state.totp.codesLeft = Math.max(0, state.totp.codesLeft - 1);
+        state.totp.pending = false;
+        state.session = { username: "jose", language: "en", theme: "system" };
+        return json({ user: { ...user("jose"), totp_enabled: true }, sudo_until: null });
       }
       if (path === "/api/auth/logout") {
         state.session = null;
@@ -400,6 +470,11 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
       if (match) {
         const found = state.lesions.find((l) => l.id === match?.[1]);
         if (!found) return json({ detail: "No such lesion." }, 404);
+        if (method === "DELETE") {
+          state.lesions = state.lesions.filter((l) => l.id !== found.id);
+          state.observations = state.observations.filter((o) => o.lesion_id !== found.id);
+          return new Response(null, { status: 204 });
+        }
         if (method === "PATCH") {
           const patch = body as { label?: string | null };
           if (patch.label !== undefined) found.label = patch.label;
@@ -537,6 +612,17 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
         });
       }
       if (path === "/api/admin/instance" && method === "GET") return json({ default_language: "en" });
+      if (path === "/api/admin/backups" && method === "GET") return json(state.backups);
+      if (path === "/api/admin/backups/run" && method === "POST") {
+        if (!state.backups.enabled) return json({ detail: "Set NEVUS_BACKUP_PASSPHRASE first." }, 409);
+        state.backups.backup_queued = true;
+        return json({ queued: true }, 202);
+      }
+      if (path === "/api/admin/backups/verify" && method === "POST") {
+        if (!state.backups.enabled) return json({ detail: "Set NEVUS_BACKUP_PASSPHRASE first." }, 409);
+        state.backups.verification_queued = true;
+        return json({ queued: true }, 202);
+      }
       if (path.startsWith("/api/evaluation/photos") && method === "GET") {
         const only = new URL(url).searchParams.get("only") ?? "all";
         const all = state.observations.flatMap((o) => o.images);
@@ -1033,7 +1119,9 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
           })),
         );
       }
-      match = /^\/api\/sessions\/([^/]+)(?:\/(finish)|\/zones\/([^/]+)\/(photo|skip|marks))?$/.exec(path);
+      match = /^\/api\/sessions\/([^/]+)(?:\/(finish)|\/zones\/([^/]+)\/(photo|skip|marks|blur))?$/.exec(
+        path,
+      );
       if (match) {
         const row = state.bodySessions.find((item) => item.id === match?.[1]);
         if (!row) return json({ detail: "No such session." }, 404);
@@ -1050,6 +1138,11 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
           return json(sessionOut(row));
         }
         const zone = (row.zones[zoneId ?? ""] ??= { status: "pending", image_id: null, marks: [] });
+        if (action === "blur") {
+          if (!zone.image_id) return json({ detail: "Take the zone's photo first." }, 409);
+          zone.image_id = nextId();
+          return json(sessionOut(row));
+        }
         if (action === "photo") {
           const file = form?.get("file");
           if (!(file instanceof File) || file.size === 0)
@@ -1130,6 +1223,91 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
             ),
           ),
         );
+      }
+      const RECOVERY = [
+        "aaaaa-bbbbb",
+        "ccccc-ddddd",
+        "eeeee-fffff",
+        "ggggg-hhhhh",
+        "jjjjj-kkkkk",
+        "mmmmm-nnnnn",
+        "ppppp-qqqqq",
+        "rrrrr-sssss",
+        "ttttt-uuuuu",
+        "vvvvv-wwwww",
+      ];
+      if (path === "/api/auth/totp" && method === "GET") {
+        return json({
+          enabled: state.totp.enabled,
+          enabled_at: state.totp.enabled ? "2026-10-01T10:00:00Z" : null,
+          setting_up: state.totp.settingUp,
+          recovery_codes_left: state.totp.codesLeft,
+        });
+      }
+      if (path === "/api/auth/totp" && method === "DELETE") {
+        if (!state.sudo) return needSudo();
+        state.totp = { enabled: false, settingUp: false, codesLeft: 0, pending: false };
+        return new Response(null, { status: 204 });
+      }
+      if (path === "/api/auth/totp/setup" && method === "POST") {
+        if (!state.sudo) return needSudo();
+        state.totp.settingUp = true;
+        return json({
+          secret: "JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP",
+          otpauth_uri: "otpauth://totp/neVus:jose?secret=JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP&issuer=neVus",
+          qr_svg: "<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10'></svg>",
+        });
+      }
+      if (path === "/api/auth/totp/enable" && method === "POST") {
+        if (!state.sudo) return needSudo();
+        if ((body as { code: string }).code !== "123456")
+          return json(
+            { detail: "That code does not match. Check the time on the phone and try the next one." },
+            400,
+          );
+        state.totp = { enabled: true, settingUp: false, codesLeft: 10, pending: false };
+        return json({ recovery_codes: RECOVERY });
+      }
+      if (path === "/api/auth/totp/recovery-codes" && method === "POST") {
+        if (!state.sudo) return needSudo();
+        state.totp.codesLeft = 10;
+        return json({ recovery_codes: RECOVERY });
+      }
+      const userOut = (account: MockState["users"][number]) => ({
+        ...user(account.username, "en", "system", account.role),
+        id: account.id,
+        disabled_at: account.disabled_at,
+        totp_enabled: account.totp_enabled,
+        last_login_at: account.last_login_at,
+      });
+      if (path === "/api/users" && method === "GET") return json(state.users.map(userOut));
+      if (path === "/api/users" && method === "POST") {
+        const input = body as { username: string; password: string; role: string };
+        if (state.users.some((account) => account.username === input.username.toLowerCase()))
+          return json({ detail: "That username is taken." }, 409);
+        const created = {
+          id: nextId(),
+          username: input.username.toLowerCase(),
+          role: input.role,
+          disabled_at: null,
+          totp_enabled: false,
+          last_login_at: null,
+        };
+        state.users.push(created);
+        return json(userOut(created), 201);
+      }
+      match = /^\/api\/users\/([^/]+)\/(enable|disable|password|totp)$/.exec(path);
+      if (match) {
+        const account = state.users.find((item) => item.id === match?.[1]);
+        if (!account) return json({ detail: "No such user." }, 404);
+        if (match[2] === "totp") {
+          if (!state.sudo) return needSudo();
+          account.totp_enabled = false;
+          return new Response(null, { status: 204 });
+        }
+        if (match[2] === "password") return new Response(null, { status: 204 });
+        account.disabled_at = match[2] === "disable" ? "2026-10-02T10:00:00Z" : null;
+        return json(userOut(account));
       }
       match = /^\/api\/observations\/([^/]+)\/images$/.exec(path);
       if (match && method === "POST") {

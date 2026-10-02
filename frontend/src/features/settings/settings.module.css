@@ -89,3 +89,69 @@
   align-items: center;
   gap: var(--space-2);
 }
+
+.steps {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding-left: var(--space-4);
+}
+
+.qr {
+  display: block;
+  width: 11rem;
+  height: 11rem;
+  border-radius: var(--radius-control);
+}
+
+.secret {
+  font-size: var(--text-lg);
+  letter-spacing: 0.08em;
+  overflow-wrap: anywhere;
+}
+
+.codes {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.codes h3 {
+  font-size: var(--text-md);
+}
+
+.codeList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-lg);
+}
+
+.users {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.user {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+}
+
+.userWhat {
+  display: grid;
+  gap: 2px;
+}
+
+.userActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}

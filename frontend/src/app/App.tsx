@@ -1,28 +1,49 @@
+import { lazy, type ComponentType } from "react";
 import { BrowserRouter, Route, Routes } from "react-router";
-import { AppointmentPage } from "@/features/appointments/AppointmentPage";
 import { ClaimPage } from "@/features/auth/ClaimPage";
-import { EvaluationPage } from "@/features/evaluation/EvaluationPage";
-import { LabelPage } from "@/features/evaluation/LabelPage";
 import { LoginPage } from "@/features/auth/LoginPage";
 import { RequireAuth } from "@/features/auth/RequireAuth";
-import { ComparePage } from "@/features/compare/ComparePage";
-import { LesionPage } from "@/features/lesions/LesionPage";
-import { ObservationPage } from "@/features/lesions/ObservationPage";
-import { MeasurePage } from "@/features/measure/MeasurePage";
 import { HomePage } from "@/features/persons/HomePage";
-import { PersonPage } from "@/features/persons/PersonPage";
-import { SessionComparePage } from "@/features/sessions/SessionComparePage";
-import { SessionPage } from "@/features/sessions/SessionPage";
-import { ZonePage } from "@/features/sessions/ZonePage";
-import { SettingsPage } from "@/features/settings/SettingsPage";
-import { TrashPage } from "@/features/trash/TrashPage";
 import { Shell } from "./Shell";
+
+/** A page that loads when it is first opened, so the first paint carries only the home page. */
+function page<Name extends string>(load: () => Promise<Record<Name, ComponentType>>, name: Name) {
+  return lazy(() => load().then((module) => ({ default: module[name] })));
+}
+
+const PersonPage = page(() => import("@/features/persons/PersonPage"), "PersonPage");
+const LesionPage = page(() => import("@/features/lesions/LesionPage"), "LesionPage");
+const ObservationPage = page(() => import("@/features/lesions/ObservationPage"), "ObservationPage");
+const ComparePage = page(() => import("@/features/compare/ComparePage"), "ComparePage");
+const MeasurePage = page(() => import("@/features/measure/MeasurePage"), "MeasurePage");
+const AppointmentPage = page(() => import("@/features/appointments/AppointmentPage"), "AppointmentPage");
+const SessionPage = page(() => import("@/features/sessions/SessionPage"), "SessionPage");
+const ZonePage = page(() => import("@/features/sessions/ZonePage"), "ZonePage");
+const SessionComparePage = page(() => import("@/features/sessions/SessionComparePage"), "SessionComparePage");
+const EvaluationPage = page(() => import("@/features/evaluation/EvaluationPage"), "EvaluationPage");
+const LabelPage = page(() => import("@/features/evaluation/LabelPage"), "LabelPage");
+const SettingsPage = page(() => import("@/features/settings/SettingsPage"), "SettingsPage");
+const TrashPage = page(() => import("@/features/trash/TrashPage"), "TrashPage");
 
 export function AppRoutes() {
   return (
     <Routes>
-      <Route path="/claim" element={<ClaimPage />} />
-      <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="/claim"
+        element={
+          <main>
+            <ClaimPage />
+          </main>
+        }
+      />
+      <Route
+        path="/login"
+        element={
+          <main>
+            <LoginPage />
+          </main>
+        }
+      />
       <Route
         element={
           <RequireAuth>

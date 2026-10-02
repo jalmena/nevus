@@ -25,7 +25,16 @@ def main(argv: list[str] | None = None) -> int:
     back.add_argument("file")
     back.add_argument("--passphrase-file")
     back.add_argument("--force", action="store_true", help="restore over a data directory that is not empty")
-    sub.add_parser("verify", help="check that every stored photo is present and intact")
+    check = sub.add_parser("verify", help="check that every stored photo is present and intact")
+    check.add_argument(
+        "--backup",
+        nargs="?",
+        const="latest",
+        metavar="FILE",
+        help="instead, read a backup back and report whether it would restore (default: the latest)",
+    )
+    check.add_argument("--passphrase-file", help="file holding the passphrase (default: NEVUS_BACKUP_PASSPHRASE)")
+    check.add_argument("--json", action="store_true", help="print the report as JSON")
     sub.add_parser("housekeeping", help="purge the trash and remove unreferenced files now")
     emergency = sub.add_parser(
         "emergency-login", help="print a one-use sign-in link, for when single sign-on is unavailable"
@@ -52,7 +61,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "restore":
         return _restore(args.file, args.passphrase_file, args.force)
     if args.command == "verify":
-        return _verify()
+        return _verify(args.backup, args.passphrase_file, args.json)
     if args.command == "housekeeping":
         return _housekeeping()
     if args.command == "reanalyze":
@@ -114,13 +123,22 @@ def _restore(file: str, passphrase_file: str | None, force: bool) -> int:
     return 0
 
 
-def _verify() -> int:
+def _verify(which: str | None, passphrase_file: str | None, as_json: bool) -> int:
+    import json
+    from pathlib import Path
+
     from nevus import backup
     from nevus.config import get_settings
 
-    counts = backup.verify(get_settings())
-    print(f"{counts['checked']} files checked, {counts['missing']} missing, {counts['corrupt']} damaged.")
-    return 0 if counts["missing"] == 0 and counts["corrupt"] == 0 else 1
+    settings = get_settings()
+    if which is None:
+        counts = backup.verify(settings)
+        print(f"{counts['checked']} files checked, {counts['missing']} missing, {counts['corrupt']} damaged.")
+        return 0 if counts["missing"] == 0 and counts["corrupt"] == 0 else 1
+    archive = None if which == "latest" else Path(which)
+    report = backup.rehearse(settings, _passphrase(passphrase_file, confirm=False), archive)
+    print(json.dumps(report, indent=2) if as_json else backup.describe(report))
+    return 0 if report["ok"] else 1
 
 
 def _housekeeping() -> int:

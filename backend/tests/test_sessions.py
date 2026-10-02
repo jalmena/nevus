@@ -13,6 +13,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import select
 
 from nevus.cv import candidates
+from nevus.cv.imageio import decode
 from nevus.db.models import Analysis, BodySession, Image
 from nevus.domain import purge
 from nevus.sessions import PROTOCOL
@@ -265,3 +266,45 @@ def test_every_capture_zone_covers_known_body_zones(zone: str) -> None:
     from nevus.sessions import BY_ID
 
     assert set(BY_ID[zone].covers) <= zone_codes()
+
+
+def test_blurring_part_of_a_zone_photo_replaces_it_for_good(client: TestClient) -> None:
+    """FR-SES-05: the blurred area is unrecognisable, the rest is untouched, the marks stay, the original is gone."""
+    claim(client)
+    pid = _person(client)
+    session = client.post(f"/api/persons/{pid}/sessions", json={}, headers=SAME_ORIGIN).json()["id"]
+    zones = _upload(client, session, "chest", zone_photo(1, SPOTS))["zones"]
+    old = next(z for z in zones if z["zone"] == "chest")["image_id"]
+    body = {"x": 0.25, "y": 0.28, "new_mark": {"zone_code": "1250", "label": "Kept"}}
+    assert client.post(f"/api/sessions/{session}/zones/chest/marks", json=body, headers=SAME_ORIGIN).status_code == 201
+    before = decode(client.get(f"/api/images/{old}/full").content)
+    store = client.app.state.blob_store  # type: ignore[attr-defined]
+    with client.app.state.session_factory() as db:  # type: ignore[attr-defined]
+        row = db.get(Image, uuid.UUID(old))
+        assert row is not None
+        files = [store.path(row.sha256)] + [store.path(r.sha256, derived=True) for r in row.renditions]
+    assert all(path.is_file() for path in files)
+
+    bad = client.post(f"/api/sessions/{session}/zones/chest/blur", json={"regions": []}, headers=SAME_ORIGIN)
+    assert bad.status_code == 422
+    region = {"x": 0.6, "y": 0.6, "width": 0.3, "height": 0.3}  # holds the spot at (0.75, 0.72)
+    nothing = client.post(f"/api/sessions/{session}/zones/face/blur", json={"regions": [region]}, headers=SAME_ORIGIN)
+    assert nothing.status_code == 409
+    response = client.post(f"/api/sessions/{session}/zones/chest/blur", json={"regions": [region]}, headers=SAME_ORIGIN)
+    assert response.status_code == 200, response.text
+    chest = next(z for z in response.json()["zones"] if z["zone"] == "chest")
+    new = chest["image_id"]
+    assert new != old and chest["status"] == "captured"
+    assert [m["x"] for m in chest["marks"]] == [0.25], "the mark stays with the zone"
+    assert client.get(f"/api/images/{old}/full").status_code == 404, "the unblurred photo is gone, not in the trash"
+    assert not any(path.exists() for path in files), "and so are its files"
+
+    after = decode(client.get(f"/api/images/{new}/full").content)
+    assert after.shape == before.shape
+    h, w = after.shape[:2]
+    y, x = int(0.722 * h), int(0.75 * w)
+    spot_before = before[y - 3 : y + 4, x - 3 : x + 4].mean()
+    spot_after = after[y - 3 : y + 4, x - 3 : x + 4].mean()
+    assert spot_after - spot_before > 20, "the dark spot inside the area is smeared into the skin"
+    outside = (slice(int(0.1 * h), int(0.4 * h)), slice(int(0.1 * w), int(0.4 * w)))
+    assert np.abs(before[outside].astype(int) - after[outside].astype(int)).mean() < 4, "the rest is as it was"

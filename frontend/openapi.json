@@ -186,6 +186,145 @@
         "title": "AppointmentUpdate",
         "type": "object"
       },
+      "BackupFileOut": {
+        "properties": {
+          "bytes": {
+            "title": "Bytes",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "file": {
+            "title": "File",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file",
+          "bytes",
+          "created_at"
+        ],
+        "title": "BackupFileOut",
+        "type": "object"
+      },
+      "BackupStatusOut": {
+        "properties": {
+          "backup_hour": {
+            "title": "Backup Hour",
+            "type": "integer"
+          },
+          "backup_queued": {
+            "title": "Backup Queued",
+            "type": "boolean"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "latest": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BackupFileOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "verification": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VerificationOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "verification_queued": {
+            "title": "Verification Queued",
+            "type": "boolean"
+          },
+          "verify_days": {
+            "title": "Verify Days",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "enabled",
+          "backup_hour",
+          "verify_days",
+          "count",
+          "latest",
+          "verification",
+          "backup_queued",
+          "verification_queued"
+        ],
+        "title": "BackupStatusOut",
+        "type": "object"
+      },
+      "BlurIn": {
+        "properties": {
+          "regions": {
+            "items": {
+              "$ref": "#/components/schemas/BlurRegionIn"
+            },
+            "maxItems": 12,
+            "minItems": 1,
+            "title": "Regions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "regions"
+        ],
+        "title": "BlurIn",
+        "type": "object"
+      },
+      "BlurRegionIn": {
+        "description": "A rectangle of the upright photo, as fractions of its width and height.",
+        "properties": {
+          "height": {
+            "exclusiveMinimum": 0.0,
+            "maximum": 1.0,
+            "title": "Height",
+            "type": "number"
+          },
+          "width": {
+            "exclusiveMinimum": 0.0,
+            "maximum": 1.0,
+            "title": "Width",
+            "type": "number"
+          },
+          "x": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Y",
+            "type": "number"
+          }
+        },
+        "required": [
+          "x",
+          "y",
+          "width",
+          "height"
+        ],
+        "title": "BlurRegionIn",
+        "type": "object"
+      },
       "BodyMap": {
         "properties": {
           "attribution": {
@@ -2449,6 +2588,28 @@
         "title": "LocationOut",
         "type": "object"
       },
+      "LoginOut": {
+        "description": "A session, or word that the account's second factor is needed before there is one.",
+        "properties": {
+          "second_factor_required": {
+            "default": false,
+            "title": "Second Factor Required",
+            "type": "boolean"
+          },
+          "session": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SessionOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "LoginOut",
+        "type": "object"
+      },
       "ManualIn": {
         "properties": {
           "kind": {
@@ -3522,6 +3683,35 @@
         "title": "ProposedSize",
         "type": "object"
       },
+      "QueuedOut": {
+        "properties": {
+          "queued": {
+            "title": "Queued",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "queued"
+        ],
+        "title": "QueuedOut",
+        "type": "object"
+      },
+      "RecoveryCodesOut": {
+        "properties": {
+          "recovery_codes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Recovery Codes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "recovery_codes"
+        ],
+        "title": "RecoveryCodesOut",
+        "type": "object"
+      },
       "RenditionOut": {
         "properties": {
           "bytes": {
@@ -3831,6 +4021,39 @@
           "created_at"
         ],
         "title": "ScaleReferenceOut",
+        "type": "object"
+      },
+      "SecondFactorIn": {
+        "properties": {
+          "code": {
+            "anyOf": [
+              {
+                "maxLength": 16,
+                "minLength": 6,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "From the authenticator",
+            "title": "Code"
+          },
+          "recovery_code": {
+            "anyOf": [
+              {
+                "maxLength": 16,
+                "minLength": 8,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recovery Code"
+          }
+        },
+        "title": "SecondFactorIn",
         "type": "object"
       },
       "SessionIn": {
@@ -4218,6 +4441,80 @@
         "title": "TestOut",
         "type": "object"
       },
+      "TotpCodeIn": {
+        "properties": {
+          "code": {
+            "maxLength": 16,
+            "minLength": 6,
+            "title": "Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "TotpCodeIn",
+        "type": "object"
+      },
+      "TotpSetupOut": {
+        "properties": {
+          "otpauth_uri": {
+            "title": "Otpauth Uri",
+            "type": "string"
+          },
+          "qr_svg": {
+            "title": "Qr Svg",
+            "type": "string"
+          },
+          "secret": {
+            "title": "Secret",
+            "type": "string"
+          }
+        },
+        "required": [
+          "secret",
+          "otpauth_uri",
+          "qr_svg"
+        ],
+        "title": "TotpSetupOut",
+        "type": "object"
+      },
+      "TotpStatusOut": {
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "enabled_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enabled At"
+          },
+          "recovery_codes_left": {
+            "title": "Recovery Codes Left",
+            "type": "integer"
+          },
+          "setting_up": {
+            "title": "Setting Up",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "enabled",
+          "enabled_at",
+          "setting_up",
+          "recovery_codes_left"
+        ],
+        "title": "TotpStatusOut",
+        "type": "object"
+      },
       "TrashItem": {
         "properties": {
           "deleted_at": {
@@ -4432,6 +4729,11 @@
             "title": "Theme",
             "type": "string"
           },
+          "totp_enabled": {
+            "default": false,
+            "title": "Totp Enabled",
+            "type": "boolean"
+          },
           "username": {
             "title": "Username",
             "type": "string"
@@ -4577,6 +4879,169 @@
           "type"
         ],
         "title": "ValidationError",
+        "type": "object"
+      },
+      "VerificationOut": {
+        "description": "What the last read-back of a backup found; see `backup.rehearse`.",
+        "properties": {
+          "archive": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Archive"
+          },
+          "archive_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Archive Bytes"
+          },
+          "blobs_damaged": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blobs Damaged"
+          },
+          "blobs_in_archive": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blobs In Archive"
+          },
+          "blobs_missing_from_archive": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blobs Missing From Archive"
+          },
+          "checked_at": {
+            "format": "date-time",
+            "title": "Checked At",
+            "type": "string"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "database": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Database"
+          },
+          "images": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Images"
+          },
+          "integrity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Integrity"
+          },
+          "live_store": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Live Store"
+          },
+          "nevus_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nevus Version"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "problems": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Problems",
+            "type": "array"
+          },
+          "secret_present": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Secret Present"
+          }
+        },
+        "required": [
+          "ok",
+          "checked_at",
+          "problems"
+        ],
+        "title": "VerificationOut",
         "type": "object"
       },
       "ViewData": {
@@ -4950,6 +5415,69 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/admin/backups": {
+      "get": {
+        "operationId": "backup_status_api_admin_backups_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackupStatusOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Backup Status",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/admin/backups/run": {
+      "post": {
+        "operationId": "backup_now_api_admin_backups_run_post",
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueuedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Backup Now",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/admin/backups/verify": {
+      "post": {
+        "operationId": "verify_now_api_admin_backups_verify_post",
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueuedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Verify Now",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
     "/api/admin/email": {
       "get": {
         "operationId": "get_email_api_admin_email_get",
@@ -5590,7 +6118,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SessionOut"
+                  "$ref": "#/components/schemas/LoginOut"
                 }
               }
             },
@@ -5702,6 +6230,48 @@
         ]
       }
     },
+    "/api/auth/second-factor": {
+      "post": {
+        "description": "The code from the authenticator, or a recovery code, once the password has been accepted.",
+        "operationId": "second_factor_api_auth_second_factor_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SecondFactorIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Second Factor",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/api/auth/session": {
       "get": {
         "operationId": "session_info_api_auth_session_get",
@@ -5760,6 +6330,125 @@
           }
         },
         "summary": "Sudo",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/totp": {
+      "delete": {
+        "operationId": "totp_disable_api_auth_totp_delete",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Totp Disable",
+        "tags": [
+          "auth"
+        ]
+      },
+      "get": {
+        "operationId": "totp_status_api_auth_totp_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TotpStatusOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Totp Status",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/totp/enable": {
+      "post": {
+        "description": "The first code proves the authenticator holds the secret; other sessions end, as after a new password.",
+        "operationId": "totp_enable_api_auth_totp_enable_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TotpCodeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecoveryCodesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Totp Enable",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/totp/recovery-codes": {
+      "post": {
+        "description": "New recovery codes; the ones not yet used stop working.",
+        "operationId": "totp_recovery_codes_api_auth_totp_recovery_codes_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecoveryCodesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Totp Recovery Codes",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/auth/totp/setup": {
+      "post": {
+        "description": "A new secret for an authenticator app; the factor turns on with the first code from it.",
+        "operationId": "totp_setup_api_auth_totp_setup_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TotpSetupOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Totp Setup",
         "tags": [
           "auth"
         ]
@@ -9046,6 +9735,69 @@
         ]
       }
     },
+    "/api/sessions/{session_id}/zones/{zone}/blur": {
+      "post": {
+        "description": "Make parts of the zone's photo unrecognisable (FR-SES-05). A blurred copy takes the photo's place\nand keeps its marks; the unblurred photo and its renditions are removed at once, not kept in the trash.",
+        "operationId": "blur_zone_photo_api_sessions__session_id__zones__zone__blur_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "zone",
+            "required": true,
+            "schema": {
+              "title": "Zone",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlurIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BodySessionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Blur Zone Photo",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
     "/api/sessions/{session_id}/zones/{zone}/marks": {
       "post": {
         "description": "A mark the person points at on the zone photo, linked to a known mark or recorded as a new one.",
@@ -9593,6 +10345,43 @@
           }
         },
         "summary": "Reset Password",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/users/{user_id}/totp": {
+      "delete": {
+        "description": "For a member who lost the authenticator: the factor goes, the password stays, sessions end.",
+        "operationId": "reset_second_factor_api_users__user_id__totp_delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reset Second Factor",
         "tags": [
           "users"
         ]

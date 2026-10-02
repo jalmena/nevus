@@ -9,15 +9,17 @@ import zipfile
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
+from zoneinfo import ZoneInfo
 
 import pyrage
 from fastapi.testclient import TestClient
 from sqlalchemy import select
 
 from nevus import backup
+from nevus.config import Settings
 from nevus.db.models import Image, Lesion
 from nevus.jobs.registry import JobContext
-from nevus.maintenance import daily_housekeeping, schedule_backup
+from nevus.maintenance import daily_housekeeping, schedule_backup, schedule_verification
 from tests.synthetic import jpeg, skin
 from tests.test_accounts import ADMIN, claim
 
@@ -207,3 +209,75 @@ def test_usage_reports_the_soft_quota(client: TestClient, settings: Any) -> None
     ids = _setup(client)
     usage = client.get(f"/api/persons/{ids['person']}/usage").json()
     assert usage["images"] == 1 and usage["bytes"] > 0 and usage["quota_bytes"] is None and usage["over_quota"] is False
+
+
+def test_the_latest_backup_is_read_back_and_damage_is_found(client: TestClient, settings: Any, tmp_path: Path) -> None:
+    _setup(client)
+    archive = backup.create(settings, "backup passphrase 1", work_factor=10)
+    report = backup.rehearse(settings, "backup passphrase 1")
+    assert report["ok"] is True and report["problems"] == [], report
+    assert report["archive"] == archive.name and report["blobs_in_archive"] == 4 and report["blobs_damaged"] == 0
+    assert report["secret_present"] is True
+    if settings.is_sqlite:
+        # The archive holds a copy of the database: it is opened, checked, and read for what it refers to.
+        assert report["database"] == "sqlite" and report["integrity"] == "ok"
+        assert report["images"] == 1 and report["blobs_missing_from_archive"] == 0
+    else:
+        # PostgreSQL is backed up by its own tools; the archive carries the photographs and the secret.
+        assert report["database"] == "postgresql" and report.get("integrity") is None
+    assert report["live_store"] == {"checked": 4, "missing": 0, "corrupt": 0}
+    assert "would restore" in backup.describe(report)
+
+    # A photograph damaged on disk goes into the next backup damaged, and both are reported.
+    with client.app.state.session_factory() as db:  # type: ignore[attr-defined]
+        sha = db.scalar(select(Image.sha256))
+    assert sha is not None
+    (settings.blobs_dir / "originals" / sha[:2] / sha[2:4] / sha).write_bytes(b"not the photograph any more")
+    later = backup.create(
+        settings, "backup passphrase 1", work_factor=10, now=datetime.now(tz=UTC) + timedelta(seconds=1)
+    )
+    report = backup.rehearse(settings, "backup passphrase 1")
+    assert report["archive"] == later.name and report["ok"] is False
+    assert report["blobs_damaged"] == 1 and "damaged_blobs" in report["problems"] and "live_store" in report["problems"]
+    assert "problem: damaged_blobs" in backup.describe(report)
+
+    wrong = backup.rehearse(settings, "wrong passphrase")
+    assert wrong["ok"] is False and wrong["problems"][0].startswith("unreadable:")
+    none = backup.rehearse(Settings(data_dir=tmp_path / "elsewhere", log_level="warning"), "any")
+    assert none["problems"] == ["no_backup"]
+
+
+def test_the_backup_is_verified_weekly_and_on_demand(client: TestClient, settings: Any) -> None:
+    _setup(client)
+    settings.backup_passphrase = "backup passphrase 1"  # the app and its runner hold this same object
+    backup.create(settings, "backup passphrase 1", work_factor=10)
+    factory, store = _ctx(client, settings)
+    zone = ZoneInfo(settings.effective_timezone)
+    early = datetime(2026, 10, 4, settings.backup_hour, 30, tzinfo=zone)
+    later = early.replace(hour=settings.backup_hour + 2)
+    with factory() as db:
+        ctx = JobContext(db, store, settings)
+        assert schedule_verification(ctx, early) is False, "the night's backup may still be running"
+        assert schedule_verification(ctx, later) is True
+        assert schedule_verification(ctx, later) is False, "once a day"
+        db.commit()
+    client.app.state.jobs.run_until_idle()  # type: ignore[attr-defined]
+
+    status = client.get("/api/admin/backups").json()
+    assert status["enabled"] is True and status["count"] == 1 and status["latest"]["file"].startswith("nevus-backup-")
+    assert status["verification"]["ok"] is True and status["verification"]["problems"] == []
+    assert status["backup_queued"] is False and status["verification_queued"] is False
+    with factory() as db:
+        ctx = JobContext(db, store, settings)
+        assert schedule_verification(ctx, later + timedelta(days=1)) is False, "checked less than a week ago"
+        assert schedule_verification(ctx, later + timedelta(days=8)) is True
+        db.rollback()
+
+    assert client.post("/api/admin/backups/verify", headers=SAME_ORIGIN).status_code == 202
+    assert client.post("/api/admin/backups/run", headers=SAME_ORIGIN).status_code == 202
+    status = client.get("/api/admin/backups").json()
+    assert status["backup_queued"] is True and status["verification_queued"] is True
+
+    settings.backup_passphrase = None
+    assert client.post("/api/admin/backups/verify", headers=SAME_ORIGIN).status_code == 409
+    assert client.get("/api/admin/backups").json()["enabled"] is False

@@ -1,7 +1,7 @@
 {
   "name": "nevus-frontend",
   "private": true,
-  "version": "0.4.0",
+  "version": "1.0.0",
   "type": "module",
   "license": "AGPL-3.0-only",
   "scripts": {
@@ -15,7 +15,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "openapi": "openapi-typescript openapi.json -o src/lib/api/schema.d.ts",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "shots": "playwright test -c playwright.gallery.config.ts && uv run --project ../backend python ../tools/screenshots/contact_sheet.py .screenshots"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.0",

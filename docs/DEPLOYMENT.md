@@ -50,7 +50,7 @@ Every setting is an environment variable prefixed with `NEVUS_`. The ones an ope
 | --- | --- | --- |
 | `NEVUS_ALLOWED_HOSTS` | empty | Comma-separated public hostnames the server answers to |
 | `NEVUS_DATABASE_URL` | SQLite in the data directory | External PostgreSQL, e.g. `postgresql+psycopg://nevus:secret@db:5432/nevus` |
-| `NEVUS_ADMIN_USER`, `NEVUS_ADMIN_PASSWORD` | unset | Create or reset the administrator at start-up (for recovery; remove afterwards) |
+| `NEVUS_ADMIN_USER`, `NEVUS_ADMIN_PASSWORD` | unset | Create or reset the administrator at start-up, which also turns their second factor off (for recovery; remove afterwards) |
 | `NEVUS_MAX_UPLOAD_BYTES` | 30 MiB | Largest accepted photograph |
 | `NEVUS_MIN_FREE_BYTES` | 2 GiB | Uploads are refused below this free space |
 | `NEVUS_LOG_LEVEL` | `info` | `debug`, `info`, `warning` or `error` |
@@ -77,12 +77,15 @@ By hand, and to restore:
 ```sh
 docker exec -it nevus nevus backup            # asks for a passphrase, or reads NEVUS_BACKUP_PASSPHRASE
 docker exec -it nevus nevus verify            # every stored photo present and intact?
+docker exec -it nevus nevus verify --backup   # would the latest backup restore?
 # Restore into a fresh, empty data directory (stop the old container first):
 docker run --rm -it -v /DATA/AppData/nevus/data:/data ghcr.io/jalmena/nevus:<version> \
        nevus restore /data/backups/nevus-backup-20261001T030000Z.tar.age
 ```
 
 `nevus restore` refuses a data directory that is not empty unless you pass `--force`. The database is copied with SQLite's online backup API, so a backup taken while neVus runs is consistent.
+
+A backup that was never read back is a hope, not a backup. Once a week (`NEVUS_BACKUP_VERIFY_DAYS`, default 7; 0 disables) neVus reads the latest one back: it decrypts it, checks every photograph in it against the checksum it is named after, opens the database copy and runs SQLite's integrity check, and makes sure everything the database refers to is in the archive; the live store is checked at the same time. The result is on the settings page for administrators, who can also start a backup or a verification there; administrators with an email address are warned when a verification fails, once the mail server is set up. `nevus verify --backup [FILE]` does the same by hand. Keep a copy of `/data/backups/` elsewhere all the same.
 
 **With an external PostgreSQL** the backup holds the photographs and the server secret only; back the database up yourself, for example nightly with `pg_dump -Fc -d nevus -f /backups/nevus-$(date +%F).dump`, and restore both together.
 
@@ -145,6 +148,12 @@ Anyone who may see a person can make a calendar link for them on the person's pa
 - Desktop calendars (Thunderbird, Apple Calendar, Outlook): add a calendar from a network address.
 
 The link is shown once; neVus keeps only a hash of it. Making a new link stops the old one, and the link stops when its maker loses access to the person. Treat it like a password: anyone who has it sees the marks' names and dates.
+
+## Second factor
+
+Each account can add a second factor under Settings: an authenticator app (any that handles time-based codes) scans a QR code, and the first code from it turns the factor on. Ten recovery codes are shown once; each signs in once if the phone is lost. Signing in then needs the password and a code. The codes depend on the server's clock being right to within a minute; the container uses the host's clock.
+
+If both the phone and the recovery codes are lost, an administrator turns the factor off for that account under Settings, Accounts; the password stays. If the administrator is the one locked out, set `NEVUS_ADMIN_USER` and `NEVUS_ADMIN_PASSWORD` and restart: the account is reset and its second factor removed. Remove the variables afterwards. With single sign-on through the proxy (below), the second factor is the proxy's business and these settings are hidden.
 
 ## Single sign-on through the reverse proxy
 

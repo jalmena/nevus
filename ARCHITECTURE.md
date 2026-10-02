@@ -134,13 +134,15 @@ Jinja2 templates in English and Spanish, styled with the same design tokens as t
 ## 5. Frontend
 
 - React 19 with TypeScript, built by Vite, served by the backend with a single-page fallback; hashed assets immutable, `index.html` and the service worker never cached.
-- React Aria Components for accessible primitives (dialogs, sliders, tabs, menus, calendars); CSS Modules per component; design tokens as CSS custom properties in one file shared with the report templates ([`docs/design/DESIGN_BRIEF.md`](docs/design/DESIGN_BRIEF.md)).
-- TanStack Query for server state; Dexie for the offline outbox of pending observations, drained on `online`, focus and visibility events; UUIDv7 minted client-side for idempotent uploads.
-- `react-i18next` with JSON catalogues for English and Spanish; the language comes from the user's account and is mirrored locally for the login page; dates and numbers formatted with `Intl` per locale; millimetres everywhere.
-- Camera: `<input type="file" accept="image/*" capture="environment">` always; `getUserMedia` guided capture with framing and marker overlays when `isSecureContext` and the platform allows it (disabled in iOS standalone mode because of known limitations).
-- Body map: SVG silhouettes with zone paths, pointer and keyboard interaction, pinch-zoom via a gesture library, markers as SVG groups; the zone geometry is generated from the ported polygon data.
-- Comparison: canvas-based side-by-side, overlay and slider views fed by the server's alignment result; charts with an SVG charting library.
-- Service worker (`vite-plugin-pwa`, inject-manifest): precache the shell, network-first for API reads, cache-first for content-addressed renditions, purge on logout.
+- Components of its own on a small design system (button, text field, notice, card, segmented control, file button, dialog), CSS Modules per component, and design tokens as CSS custom properties in one file that the report templates share ([`docs/design/DESIGN_BRIEF.md`](docs/design/DESIGN_BRIEF.md)). Colour contrast is annotated in the token file where it is close to the limit; `docs/ACCESSIBILITY.md` states what is checked and how.
+- TanStack Query for server state; an IndexedDB outbox for visits captured without a connection, drained on `online`, focus and visibility events; UUIDv7 minted client-side for idempotent uploads.
+- `react-i18next` with JSON catalogues for English and Spanish; the language comes from the user's account and is mirrored locally for the sign-in page; the document language follows it; dates and numbers formatted with `Intl` per locale; millimetres everywhere.
+- Camera: `<input type="file" accept="image/*" capture="environment">` always; `getUserMedia` guided capture when the context is secure and the platform allows it.
+- Body map: SVG silhouettes with zone paths from the generated geometry, pointer and keyboard interaction, pinch and drag handled with pointer events, markers clustered when they would overlap; while a mark is placed, a tap on a zone zooms in on it before the second tap places the mark.
+- Photo canvas: one SVG component shared by measuring, comparing and the session zones, with zoom and pan by wheel, pinch, drag and keyboard, and a view that two photos can share.
+- Comparison: side-by-side, overlay, wipe and difference views over the server's alignment result (WebP overlays and heatmaps); charts are hand-made SVG with a table and a CSV beside them.
+- Service worker (`vite-plugin-pwa`): precache of the shell, network-first for API reads, cache-first for content-addressed renditions, purged on sign-out.
+- Loading: the home page, the sign-in pages and the shell come first (about 180 kB compressed with React, the query client and the catalogues in chunks of their own); every other page loads when it is first opened, so the body map's geometry (about 60 kB compressed) travels only to the person page. Measured on 1.0.0; `pnpm run build` prints the chunks.
 
 ## 6. Security architecture (summary)
 
@@ -152,7 +154,7 @@ Debian-slim base with `uv`-installed dependencies, `setpriv` to drop to PUID/PGI
 
 ## 8. Observability
 
-Structured JSON logs without personal data (identifiers only), request identifiers, job outcomes with durations, a `/healthz` endpoint reporting database, storage and worker state, and an optional Prometheus endpoint behind a setting.
+Structured JSON logs without personal data (identifiers only), job outcomes with durations, an append-only audit log of who did what to which record, and a `/healthz` endpoint reporting the version and readiness. There is no metrics endpoint and no telemetry; the administrator's settings page shows the state of the backups and their last verification.
 
 ## 9. Testing
 

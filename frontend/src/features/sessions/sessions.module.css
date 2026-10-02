@@ -52,11 +52,15 @@
 }
 
 .zone.skipped {
-  opacity: 0.75;
+  background: var(--color-surface-2);
 }
 
 .zone h2 {
   font-size: var(--text-md);
+}
+
+.zone.skipped h2 {
+  color: var(--color-ink-2);
 }
 
 .zoneText {
@@ -174,4 +178,12 @@
   font-size: var(--text-xs);
   font-weight: var(--font-weight-emphasis);
   vertical-align: middle;
+}
+
+.blurRegion {
+  fill: var(--color-ink);
+  fill-opacity: 0.45;
+  stroke: var(--color-paper);
+  stroke-width: 2px;
+  stroke-dasharray: 6 4;
 }

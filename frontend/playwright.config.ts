@@ -7,6 +7,7 @@ const dataDir = process.env.NEVUS_E2E_DATA ?? `/tmp/nevus-e2e-${Date.now()}`;
 
 export default defineConfig({
   testDir: "e2e",
+  testIgnore: /gallery\.spec\.ts/,
   timeout: 90_000,
   expect: { timeout: 15_000 },
   fullyParallel: false,

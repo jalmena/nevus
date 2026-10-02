@@ -63,6 +63,9 @@ class Settings(BaseSettings):
     person_quota_bytes: int | None = Field(default=None, ge=0, description="Soft storage quota per person")
     backup_passphrase: str | None = Field(default=None, description="Enables the nightly encrypted backup")
     backup_hour: int = Field(default=3, ge=0, le=23, description="Local hour after which the nightly backup runs")
+    backup_verify_days: int = Field(
+        default=7, ge=0, le=365, description="Days between checks that the latest backup would restore; 0 disables"
+    )
     export_days: int = Field(default=7, ge=1, le=60, description="Days an export stays downloadable")
     smtp_host: str | None = None
     smtp_port: int = Field(default=587, ge=1, le=65535)

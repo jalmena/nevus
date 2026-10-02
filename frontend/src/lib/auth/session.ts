@@ -8,6 +8,8 @@ export type SessionInfo = components["schemas"]["SessionOut"];
 export type UserOut = components["schemas"]["UserOut"];
 export type Credentials = components["schemas"]["Credentials"];
 export type InstanceStatus = components["schemas"]["InstanceStatus"];
+export type LoginOut = components["schemas"]["LoginOut"];
+export type SecondFactorIn = components["schemas"]["SecondFactorIn"];
 
 export const sessionKey = ["session"] as const;
 export const instanceKey = ["instance"] as const;
@@ -45,7 +47,7 @@ export function useSession() {
   });
 }
 
-function useSessionMutation(request: (credentials: Credentials) => Promise<SessionInfo>) {
+function useSessionMutation<Input>(request: (input: Input) => Promise<SessionInfo>) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: request,
@@ -57,16 +59,35 @@ function useSessionMutation(request: (credentials: Credentials) => Promise<Sessi
   });
 }
 
+/** The password; when the account has a second factor, the answer asks for its code next. */
 export function useLogin() {
-  return useSessionMutation(async (credentials) => {
-    const { data, error } = await api.POST("/api/auth/login", { body: credentials });
-    if (!data) throw new Error(errorMessage(error, "Wrong username or password."));
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (credentials: Credentials): Promise<LoginOut> => {
+      const { data, error } = await api.POST("/api/auth/login", { body: credentials });
+      if (!data) throw new Error(errorMessage(error, "Wrong username or password."));
+      return data;
+    },
+    onSuccess: (data) => {
+      if (!data.session) return;
+      applyUserPreferences(data.session.user);
+      queryClient.setQueryData(sessionKey, data.session);
+      void queryClient.invalidateQueries({ queryKey: instanceKey });
+    },
+  });
+}
+
+/** The code from the authenticator, or a recovery code, after the password was accepted. */
+export function useSecondFactor() {
+  return useSessionMutation(async (body: SecondFactorIn) => {
+    const { data, error } = await api.POST("/api/auth/second-factor", { body });
+    if (!data) throw new Error(errorMessage(error, "Wrong code."));
     return data;
   });
 }
 
 export function useClaim() {
-  return useSessionMutation(async (credentials) => {
+  return useSessionMutation(async (credentials: Credentials) => {
     const { data, error } = await api.POST("/api/auth/claim", { body: credentials });
     if (!data) throw new Error(errorMessage(error, "The instance could not be claimed."));
     return data;

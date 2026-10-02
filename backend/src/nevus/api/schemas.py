@@ -37,12 +37,46 @@ class UserOut(BaseModel):
     created_at: datetime
     last_login_at: datetime | None
     disabled_at: datetime | None
+    totp_enabled: bool = False
 
 
 class SessionOut(BaseModel):
     user: UserOut
     sudo_until: datetime | None
     instance_claimed: bool = True
+
+
+class LoginOut(BaseModel):
+    """A session, or word that the account's second factor is needed before there is one."""
+
+    session: SessionOut | None = None
+    second_factor_required: bool = False
+
+
+class SecondFactorIn(BaseModel):
+    code: str | None = Field(default=None, min_length=6, max_length=16, description="From the authenticator")
+    recovery_code: str | None = Field(default=None, min_length=8, max_length=16)
+
+
+class TotpCodeIn(BaseModel):
+    code: str = Field(min_length=6, max_length=16)
+
+
+class TotpSetupOut(BaseModel):
+    secret: str
+    otpauth_uri: str
+    qr_svg: str
+
+
+class TotpStatusOut(BaseModel):
+    enabled: bool
+    enabled_at: datetime | None
+    setting_up: bool
+    recovery_codes_left: int
+
+
+class RecoveryCodesOut(BaseModel):
+    recovery_codes: list[str]
 
 
 class InstanceStatus(BaseModel):

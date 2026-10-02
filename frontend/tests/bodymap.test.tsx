@@ -4,6 +4,8 @@ import { describe, expect, it, vi } from "vitest";
 import { BodyMap } from "@/features/bodymap/BodyMap";
 import { bodyMap, zoneByCode, zonesForView } from "@/features/bodymap/zones";
 import i18n from "@/lib/i18n";
+import en from "@/lib/i18n/locales/en.json";
+import es from "@/lib/i18n/locales/es.json";
 
 describe("body map data", () => {
   it("carries 28 zones per body view that tile the same silhouette, and the detail views", () => {
@@ -17,6 +19,20 @@ describe("body map data", () => {
     expect(zoneByCode("3150")?.side).toBe("left");
     expect(zonesForView("hands")).toHaveLength(4);
     expect(zonesForView("feet").map((zone) => zone.side)).toEqual(["right", "left", "right", "left"]);
+  });
+});
+
+describe("zone names", () => {
+  it("exist in both catalogues for every zone of every view, so lists need no map geometry", () => {
+    const codes = Object.keys(bodyMap.views).flatMap((view) =>
+      zonesForView(view as never).map((zone) => zone.code),
+    );
+    expect(codes.length).toBeGreaterThan(60);
+    const missing = codes.filter(
+      (code) =>
+        !(code in (en.zones as Record<string, string>)) || !(code in (es.zones as Record<string, string>)),
+    );
+    expect(missing).toEqual([]);
   });
 });
 
@@ -40,6 +56,40 @@ describe("<BodyMap>", () => {
     expect(point.x * 216).toBeLessThanOrEqual(right);
     expect(point.y * 404).toBeGreaterThanOrEqual(top);
     expect(point.y * 404).toBeLessThanOrEqual(bottom);
+  });
+
+  it("reports a tap on the selected zone or on the background as no selection", async () => {
+    await i18n.changeLanguage("en");
+    const onSelectZone = vi.fn();
+    render(<BodyMap view="front" selectedZone="1250" onSelectZone={onSelectZone} />);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "Right pectoral" }));
+    expect(onSelectZone).toHaveBeenLastCalledWith(null);
+    await user.click(screen.getByRole("button", { name: "Left pectoral" }));
+    expect(onSelectZone).toHaveBeenLastCalledWith(expect.objectContaining({ code: "1251" }));
+    await user.click(screen.getByRole("group"));
+    expect(onSelectZone).toHaveBeenLastCalledWith(null);
+  });
+
+  it("while a mark is placed, the first tap zooms in on the zone and the second places the mark", async () => {
+    await i18n.changeLanguage("en");
+    const onPlace = vi.fn();
+    const onSelectZone = vi.fn();
+    render(<BodyMap view="front" placing onSelectZone={onSelectZone} onPlace={onPlace} />);
+    const map = screen.getByRole("group");
+    const before = map.getAttribute("viewBox");
+    const user = userEvent.setup();
+    const zone = screen.getByRole("button", { name: "Right pectoral" });
+    await user.click(zone);
+    expect(onSelectZone).toHaveBeenCalledTimes(1);
+    expect(onPlace).not.toHaveBeenCalled();
+    expect(map.getAttribute("viewBox")).not.toBe(before);
+    expect(screen.getByRole("button", { name: "Show the whole body" })).toBeInTheDocument();
+    await user.click(zone);
+    expect(onPlace).toHaveBeenCalledTimes(1);
+    expect((onPlace.mock.calls[0]?.[0] as { zone: string }).zone).toBe("1250");
+    await user.click(screen.getByRole("button", { name: "Show the whole body" }));
+    expect(map.getAttribute("viewBox")).toBe(before);
   });
 
   it("names zones in the account language and marks the selected one", async () => {

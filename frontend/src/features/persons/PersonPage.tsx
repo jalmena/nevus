@@ -84,13 +84,16 @@ export function PersonPage() {
           selectedZone={placing ? (point?.zone ?? zone?.code) : zone?.code}
           onSelectZone={setZone}
           onPlace={onPlace}
+          placing={placing}
           onSelectMarker={(id) => void navigate(`/lesions/${id}`)}
         />
         <p className="text-secondary" role="status">
           {placing
             ? point
               ? t("lesions.placed")
-              : t("lesions.placingHint")
+              : zone
+                ? t("lesions.placingSpot", { zone: t(`zones.${zone.code}`, { defaultValue: zone.name }) })
+                : t("lesions.placingHint")
             : zone
               ? t("bodymap.selected", {
                   zone: t(`zones.${zone.code}`, { defaultValue: zone.name }),

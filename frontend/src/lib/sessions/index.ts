@@ -91,6 +91,20 @@ export function useZonePhoto(sessionId: string) {
   });
 }
 
+/** FR-SES-05: parts of the zone's photo made unrecognisable; a blurred copy takes its place. */
+export function useBlurZone(sessionId: string, zone: string) {
+  return useSessionMutation(
+    async (body: { regions: { x: number; y: number; width: number; height: number }[] }) => {
+      const { data, error } = await api.POST("/api/sessions/{session_id}/zones/{zone}/blur", {
+        params: { path: { session_id: sessionId, zone } },
+        body,
+      });
+      if (!data) throw new Error(errorMessage(error, "The photo could not be blurred."));
+      return data;
+    },
+  );
+}
+
 export function useSkipZone(sessionId: string) {
   return useSessionMutation(async ({ zone, skip }: { zone: string; skip: boolean }) => {
     const path = { params: { path: { session_id: sessionId, zone } } };
