@@ -77,7 +77,7 @@ def test_a_featureless_photo_abstains() -> None:
     ],
 )
 def test_implausible_transforms_are_refused(matrix: list[list[float]], reason: str) -> None:
-    assert align._plausible(np.asarray(matrix, np.float64), align.PARAMS) == reason
+    assert align.plausible(np.asarray(matrix, np.float64), align.PARAMS) == reason
 
 
 def test_two_photos_with_the_card_align_through_it() -> None:
