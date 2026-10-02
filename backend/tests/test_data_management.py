@@ -216,11 +216,15 @@ def test_the_latest_backup_is_read_back_and_damage_is_found(client: TestClient, 
     archive = backup.create(settings, "backup passphrase 1", work_factor=10)
     report = backup.rehearse(settings, "backup passphrase 1")
     assert report["ok"] is True and report["problems"] == [], report
-    assert report["archive"] == archive.name and report["database"] == "sqlite" and report["integrity"] == "ok"
-    assert (
-        report["blobs_in_archive"] == 4 and report["blobs_damaged"] == 0 and report["blobs_missing_from_archive"] == 0
-    )
-    assert report["images"] == 1 and report["secret_present"] is True
+    assert report["archive"] == archive.name and report["blobs_in_archive"] == 4 and report["blobs_damaged"] == 0
+    assert report["secret_present"] is True
+    if settings.is_sqlite:
+        # The archive holds a copy of the database: it is opened, checked, and read for what it refers to.
+        assert report["database"] == "sqlite" and report["integrity"] == "ok"
+        assert report["images"] == 1 and report["blobs_missing_from_archive"] == 0
+    else:
+        # PostgreSQL is backed up by its own tools; the archive carries the photographs and the secret.
+        assert report["database"] == "postgresql" and report["integrity"] is None
     assert report["live_store"] == {"checked": 4, "missing": 0, "corrupt": 0}
     assert "would restore" in backup.describe(report)
 
