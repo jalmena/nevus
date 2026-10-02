@@ -192,7 +192,7 @@
   "lesions": {
     "title": "Marks",
     "add": "Add a mark",
-    "placingHint": "Tap the place on the map where the mark is.",
+    "placingHint": "Tap the zone where the mark is: the map zooms in on it. Then tap the exact spot.",
     "placed": "Now describe the mark below.",
     "newTitle": "New mark",
     "label": "Name",

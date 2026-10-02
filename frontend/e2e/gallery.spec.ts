@@ -31,7 +31,9 @@ test("every screen, for a look at the design", async ({ page }, info) => {
   await snap("04-person-empty");
   await page.getByRole("button", { name: "Add a mark", exact: true }).click();
   await snap("05-person-placing");
-  await page.getByRole("button", { name: "Right pectoral", exact: true }).click();
+  await page.getByRole("button", { name: "Right pectoral", exact: true }).click(); // zooms in on the zone
+  await snap("05b-person-zoomed");
+  await page.getByRole("button", { name: "Right pectoral", exact: true }).click(); // places the mark
   await page.getByLabel("Name", { exact: true }).fill("Chest mark");
   await page.getByRole("button", { name: "Create the mark", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Chest mark", exact: true })).toBeVisible();

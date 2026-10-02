@@ -27,6 +27,8 @@ interface Props {
   onSelectZone?: (zone: Zone) => void;
   /** When set, a tap inside a zone also yields the tapped point; the keyboard places at the zone's anchor. */
   onPlace?: (point: MapPoint) => void;
+  /** While a mark is being placed, the first tap on a zone zooms in on it and the second places the mark. */
+  placing?: boolean;
   onSelectMarker?: (id: string) => void;
 }
 
@@ -78,10 +80,19 @@ function clamp(vb: ViewBox): ViewBox {
 }
 
 /** Flat silhouette divided into named zones, with zoom, pan and clustered markers. */
-export function BodyMap({ view, markers = [], selectedZone, onSelectZone, onPlace, onSelectMarker }: Props) {
+export function BodyMap({
+  view,
+  markers = [],
+  selectedZone,
+  onSelectZone,
+  onPlace,
+  placing = false,
+  onSelectMarker,
+}: Props) {
   const { t } = useTranslation();
   const svg = useRef<SVGSVGElement>(null);
   const [vb, setVb] = useState<ViewBox>(FULL);
+  const [focused, setFocused] = useState<string | null>(null);
   const [screenWidth, setScreenWidth] = useState(400);
   const pointers = useRef(new Map<number, { x: number; y: number }>());
   const pinch = useRef<{ dist: number; vb: ViewBox } | null>(null);
@@ -89,7 +100,10 @@ export function BodyMap({ view, markers = [], selectedZone, onSelectZone, onPlac
   const zones = zonesForView(view);
   const zoneName = (zone: Zone) => t(`zones.${zone.code}`, { defaultValue: zone.name });
 
-  useEffect(() => setVb(FULL), [view]);
+  useEffect(() => {
+    setVb(FULL);
+    setFocused(null);
+  }, [view]);
   useEffect(() => {
     const element = svg.current;
     if (!element || typeof ResizeObserver === "undefined") return;
@@ -129,18 +143,46 @@ export function BodyMap({ view, markers = [], selectedZone, onSelectZone, onPlac
     return { zone: zone.code, x: round(p.x / MAP_WIDTH), y: round(p.y / MAP_HEIGHT) };
   }
 
+  /** The view that shows one zone large, with room around it, so the next tap lands where the mark is. */
+  function zoomToZone(zone: Zone) {
+    const [left, top, right, bottom] = zone.bbox;
+    const room = 1.3;
+    const w = Math.max(
+      (right - left) * room,
+      ((bottom - top) * room * MAP_WIDTH) / MAP_HEIGHT,
+      MAP_WIDTH / MAX_ZOOM,
+    );
+    const h = (w * MAP_HEIGHT) / MAP_WIDTH;
+    setVb(clamp({ x: (left + right) / 2 - w / 2, y: (top + bottom) / 2 - h / 2, w, h }));
+    setFocused(zone.code);
+  }
+
+  /** Whether the zone already takes a good part of the view, so a tap on it is precise enough. */
+  function closeEnough(zone: Zone): boolean {
+    const [left, top, right, bottom] = zone.bbox;
+    return Math.max((right - left) / vb.w, (bottom - top) / vb.h) >= 0.4;
+  }
+
   function activate(zone: Zone, point: MapPoint) {
     if (moved.current) return; // that was a drag, not a tap
     onSelectZone?.(zone);
+    if (placing && focused !== zone.code && !closeEnough(zone)) {
+      zoomToZone(zone);
+      return;
+    }
     onPlace?.(point);
   }
 
   function onKey(event: KeyboardEvent<SVGPathElement>, zone: Zone) {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      onSelectZone?.(zone);
-      onPlace?.(anchorPoint(zone));
+      activate(zone, anchorPoint(zone));
     }
+  }
+
+  function showAll() {
+    setVb(FULL);
+    setFocused(null);
   }
 
   function onWheel(event: WheelEvent<SVGSVGElement>) {
@@ -323,7 +365,7 @@ export function BodyMap({ view, markers = [], selectedZone, onSelectZone, onPlac
           −
         </button>
         {vb.w < MAP_WIDTH && (
-          <button type="button" onClick={() => setVb(FULL)} aria-label={t("bodymap.zoomReset")}>
+          <button type="button" onClick={showAll} aria-label={t("bodymap.zoomReset")}>
             ⤢
           </button>
         )}

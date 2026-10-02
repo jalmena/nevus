@@ -192,7 +192,7 @@
   "lesions": {
     "title": "Marcas",
     "add": "Añadir una marca",
-    "placingHint": "Toca en el mapa el lugar donde está la marca.",
+    "placingHint": "Toca la zona donde está la marca: el mapa la amplía. Después toca el punto exacto.",
     "placed": "Ahora describe la marca aquí abajo.",
     "newTitle": "Nueva marca",
     "label": "Nombre",

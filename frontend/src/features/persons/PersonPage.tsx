@@ -84,6 +84,7 @@ export function PersonPage() {
           selectedZone={placing ? (point?.zone ?? zone?.code) : zone?.code}
           onSelectZone={setZone}
           onPlace={onPlace}
+          placing={placing}
           onSelectMarker={(id) => void navigate(`/lesions/${id}`)}
         />
         <p className="text-secondary" role="status">

@@ -30,8 +30,9 @@ describe("marks on the body map", () => {
     renderApp(`/persons/${PERSON.id}`);
     const user = userEvent.setup();
     await user.click(await screen.findByRole("button", { name: "Add a mark" }));
-    expect(screen.getByRole("status")).toHaveTextContent("Tap the place on the map");
-    await user.click(screen.getByRole("button", { name: "Right pectoral" }));
+    expect(screen.getByRole("status")).toHaveTextContent("Tap the zone where the mark is");
+    await user.click(screen.getByRole("button", { name: "Right pectoral" })); // zooms in on the zone
+    await user.click(screen.getByRole("button", { name: "Right pectoral" })); // places the mark
     await user.type(screen.getByLabelText("Name"), "Chest mark");
     await user.click(screen.getByRole("button", { name: "Create the mark" }));
     expect(await screen.findByRole("heading", { name: "Chest mark" })).toBeInTheDocument();

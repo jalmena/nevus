@@ -42,6 +42,27 @@ describe("<BodyMap>", () => {
     expect(point.y * 404).toBeLessThanOrEqual(bottom);
   });
 
+  it("while a mark is placed, the first tap zooms in on the zone and the second places the mark", async () => {
+    await i18n.changeLanguage("en");
+    const onPlace = vi.fn();
+    const onSelectZone = vi.fn();
+    render(<BodyMap view="front" placing onSelectZone={onSelectZone} onPlace={onPlace} />);
+    const map = screen.getByRole("group");
+    const before = map.getAttribute("viewBox");
+    const user = userEvent.setup();
+    const zone = screen.getByRole("button", { name: "Right pectoral" });
+    await user.click(zone);
+    expect(onSelectZone).toHaveBeenCalledTimes(1);
+    expect(onPlace).not.toHaveBeenCalled();
+    expect(map.getAttribute("viewBox")).not.toBe(before);
+    expect(screen.getByRole("button", { name: "Show the whole body" })).toBeInTheDocument();
+    await user.click(zone);
+    expect(onPlace).toHaveBeenCalledTimes(1);
+    expect((onPlace.mock.calls[0]?.[0] as { zone: string }).zone).toBe("1250");
+    await user.click(screen.getByRole("button", { name: "Show the whole body" }));
+    expect(map.getAttribute("viewBox")).toBe(before);
+  });
+
   it("names zones in the account language and marks the selected one", async () => {
     await i18n.changeLanguage("es");
     render(<BodyMap view="back" selectedZone="2350" />);
