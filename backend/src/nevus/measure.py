@@ -118,6 +118,7 @@ def measure(shape: dict[str, Any], scale: Scale, border_px_value: float) -> dict
         "sigma_area_mm2": round(math.hypot(2 * area * s, perimeter * border_mm), 3),
         "sigma_scale": round(s, 5),
         "border_mm": round(border_mm, 4),
+        "perimeter_mm": round(perimeter, 3),
     }
 
 

@@ -73,6 +73,7 @@ def _measurements(db: Session, lesion: Lesion) -> list[dict[str, Any]]:
                 "tilt_deg": row.tilt_deg,
                 "flags": list(row.flags or []),
                 "shape": row.shape,
+                "descriptors": row.details.get("descriptors"),
                 "change": None
                 if change is None
                 else {"delta_mm": change.delta_mm, "sigma_mm": change.sigma_mm, "detectable": change.detectable},

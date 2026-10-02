@@ -44,7 +44,7 @@ def main(argv: list[str] | None = None) -> int:
     again = sub.add_parser(
         "reanalyze", help="queue the current analyzers for stored photos again; earlier results are kept"
     )
-    again.add_argument("--analyzer", choices=["quality", "card", "segment", "all"], default="all")
+    again.add_argument("--analyzer", choices=["quality", "card", "segment", "descriptors", "all"], default="all")
     again.add_argument("--person", help="only the photos of this person (id)")
     again.add_argument("--now", action="store_true", help="run the queue here rather than leave it to the server")
     judge = sub.add_parser("evaluate", help="measure the outline analyzer on the labelled evaluation photos")
@@ -163,6 +163,7 @@ def _reanalyze(which: str, person: str | None, now: bool) -> int:
 
     from sqlalchemy import select
 
+    from nevus import descriptors
     from nevus.config import get_settings
     from nevus.cv import card_detect, quality
     from nevus.cv.pipeline import CARD_KIND, QUALITY_KIND, enqueue_proposal
@@ -174,8 +175,11 @@ def _reanalyze(which: str, person: str | None, now: bool) -> int:
 
     settings = get_settings()
     factory = make_session_factory(make_engine(settings.effective_database_url))
-    counts = {"quality": 0, "card": 0, "segment": 0}
+    counts = {"quality": 0, "card": 0, "segment": 0, "descriptors": 0}
+    store = BlobStore(settings.blobs_dir, settings.min_free_bytes)
     with factory() as db:
+        if which in ("descriptors", "all"):
+            counts["descriptors"] = descriptors.backfill(db, store)
         query = select(Image).where(Image.deleted_at.is_(None))
         if person:
             query = query.where(Image.person_id == uuid.UUID(person))
@@ -197,10 +201,11 @@ def _reanalyze(which: str, person: str | None, now: bool) -> int:
         db.commit()
     print(
         f"Queued {counts['quality']} quality, {counts['card']} card and {counts['segment']} outline analyses; "
-        "photos already analysed by the current versions are skipped."
+        f"photos already analysed by the current versions are skipped. Described {counts['descriptors']} "
+        "measurements that had no shape and colour descriptors."
     )
     if now:
-        runner = JobRunner(factory, BlobStore(settings.blobs_dir, settings.min_free_bytes), settings)
+        runner = JobRunner(factory, store, settings)
         print(f"Ran {runner.run_until_idle()} jobs here.")
     return 0
 

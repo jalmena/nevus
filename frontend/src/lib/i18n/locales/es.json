@@ -340,7 +340,11 @@
       "manual": "longitud conocida",
       "unknown": "escala"
     },
-    "tiltedShort": "inclinada"
+    "tiltedShort": "inclinada",
+    "compactness": "Compacidad",
+    "contrast": "Contraste de color",
+    "compactnessShort": "compacidad {{value}}",
+    "contrastShort": "contraste de color ΔE {{value}}"
   },
   "card": {
     "title": "Tarjeta de referencia",
@@ -518,8 +522,11 @@
     "metric": "Mostrar",
     "metrics": {
       "longest": "Diámetro mayor",
-      "area": "Área"
-    }
+      "area": "Área",
+      "compactness": "Compacidad",
+      "contrast": "Contraste de color con la piel"
+    },
+    "descriptorsNote": "La compacidad es 1 para un círculo y menor para cualquier otro contorno. El contraste de color (ΔE) es respecto al parche gris de la tarjeta cuando la tarjeta salía en la foto; si no, tal como lo vio la cámara. Describe la foto, no la naturaleza de la marca."
   },
   "reports": {
     "title": "Informes",

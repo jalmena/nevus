@@ -9,15 +9,26 @@ import styles from "./SizeChart.module.css";
 const HEIGHT = 220;
 const MARGIN = { top: 30, right: 16, bottom: 28, left: 40 };
 const STEPS = [0.1, 0.2, 0.25, 0.5, 1, 2, 2.5, 5, 10, 20];
-type Metric = "longest" | "area";
+type Metric = "longest" | "area" | "compactness" | "contrast";
+const ALL_METRICS: readonly Metric[] = ["longest", "area", "compactness", "contrast"];
 
-/** What each series plots. The span floor keeps measurement noise from looking like a slope. */
+/**
+ * What each series plots. The span floor keeps measurement noise from looking like a slope. The
+ * descriptors exist only for measurements saved since they do, so their series may be shorter.
+ */
 const METRICS: Record<
   Metric,
-  { value: (m: Measurement) => number; sigma: (m: Measurement) => number; floor: number }
+  { value: (m: Measurement) => number | null; sigma: (m: Measurement) => number; floor: number; unit: string }
 > = {
-  longest: { value: (m) => m.longest_mm, sigma: (m) => m.sigma_longest_mm, floor: 2 },
-  area: { value: (m) => m.area_mm2, sigma: (m) => m.sigma_area_mm2, floor: 8 },
+  longest: { value: (m) => m.longest_mm, sigma: (m) => m.sigma_longest_mm, floor: 2, unit: "mm" },
+  area: { value: (m) => m.area_mm2, sigma: (m) => m.sigma_area_mm2, floor: 8, unit: "mm²" },
+  compactness: {
+    value: (m) => m.descriptors?.shape.compactness ?? null,
+    sigma: () => 0,
+    floor: 0.2,
+    unit: "",
+  },
+  contrast: { value: (m) => m.descriptors?.colour?.contrast ?? null, sigma: () => 0, floor: 10, unit: "ΔE" },
 };
 
 /**
@@ -78,11 +89,17 @@ export function SizeChart({ lesionId }: { lesionId: string }) {
   const showUncertainty = session.data?.user.show_uncertainty ?? true;
   const locale = i18n.resolvedLanguage ?? "en";
   const [asTable, setAsTable] = useState(false);
-  const [metric, setMetric] = useState<Metric>("longest");
+  const [chosen, setMetric] = useState<Metric>("longest");
   const [active, setActive] = useState<number | null>(null);
   const wrapper = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(600);
   const series: Measurement[] = measurements.data ?? [];
+  const available = ALL_METRICS.filter(
+    (key) => series.filter((m) => METRICS[key].value(m) !== null).length >= 2,
+  );
+  const metric: Metric = available.includes(chosen) ? chosen : "longest";
+  const plotted = METRICS[metric];
+  const shown = series.filter((m) => plotted.value(m) !== null);
   const drawn = series.length >= 2 && !asTable;
 
   useEffect(() => {
@@ -96,7 +113,9 @@ export function SizeChart({ lesionId }: { lesionId: string }) {
   if (series.length < 2) return null; // one visit: the latest size above already says it all
 
   const longDate = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
-  const times = series.map((m) => new Date(m.captured_at).getTime());
+  const two = new Intl.NumberFormat(locale, { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+  const whole = new Intl.NumberFormat(locale, { maximumFractionDigits: 0 });
+  const times = shown.map((m) => new Date(m.captured_at).getTime());
   const t0 = Math.min(...times);
   const t1 = Math.max(...times);
   const shortDate = new Intl.DateTimeFormat(
@@ -108,21 +127,22 @@ export function SizeChart({ lesionId }: { lesionId: string }) {
   const pad = Math.min(24, plotW * 0.05);
   const x = (time: number) =>
     MARGIN.left + pad + (t1 === t0 ? (plotW - 2 * pad) / 2 : ((time - t0) / (t1 - t0)) * (plotW - 2 * pad));
-  const plotted = METRICS[metric];
-  const valueOf = plotted.value;
+  const valueOf = (m: Measurement) => plotted.value(m) ?? 0;
   const sigmaOf = (m: Measurement) => (showUncertainty ? plotted.sigma(m) : 0);
-  const unit = metric === "area" ? "mm²" : "mm";
-  const format = (m: Measurement) =>
-    metric === "area"
-      ? formatArea(m.area_mm2, m.sigma_area_mm2, locale, showUncertainty)
-      : formatMm(m.longest_mm, m.sigma_longest_mm, locale, showUncertainty);
+  const unit = plotted.unit;
+  const format = (m: Measurement) => {
+    if (metric === "area") return formatArea(m.area_mm2, m.sigma_area_mm2, locale, showUncertainty);
+    if (metric === "longest") return formatMm(m.longest_mm, m.sigma_longest_mm, locale, showUncertainty);
+    const number = metric === "compactness" ? two.format(valueOf(m)) : whole.format(valueOf(m));
+    return unit ? `${number} ${unit}` : number;
+  };
   const [lo0, hi0] = yDomain(
-    series.map((m) => ({ value: valueOf(m), sigma: sigmaOf(m) })),
+    shown.map((m) => ({ value: valueOf(m), sigma: sigmaOf(m) })),
     plotted.floor,
   );
   const { ticks, lo, hi } = niceTicks(lo0, hi0);
   const y = (value: number) => MARGIN.top + plotH - ((value - lo) / (hi - lo)) * plotH;
-  const points = series.map((m, index) => ({
+  const points = shown.map((m, index) => ({
     m,
     x: x(times[index] ?? t0),
     y: y(valueOf(m)),
@@ -151,7 +171,7 @@ export function SizeChart({ lesionId }: { lesionId: string }) {
   const tickFormat = new Intl.NumberFormat(locale, { maximumFractionDigits: 2 });
   const describe = (m: Measurement) => `${longDate.format(new Date(m.captured_at))}: ${format(m)}`;
   const current = active === null ? null : points[active];
-  const focused = series[active ?? series.length - 1];
+  const focused = shown[active ?? shown.length - 1];
 
   function nearest(event: PointerEvent<SVGSVGElement>): number {
     const left = event.currentTarget.getBoundingClientRect().left;
@@ -185,7 +205,7 @@ export function SizeChart({ lesionId }: { lesionId: string }) {
       {!asTable && (
         <Segmented
           label={t("chart.metric")}
-          options={(["longest", "area"] as const).map((value) => ({
+          options={available.map((value) => ({
             value,
             label: t(`chart.metrics.${value}`),
           }))}
@@ -202,6 +222,8 @@ export function SizeChart({ lesionId }: { lesionId: string }) {
                 <th scope="col">{t("measure.longest")}</th>
                 <th scope="col">{t("measure.across")}</th>
                 <th scope="col">{t("measure.area")}</th>
+                <th scope="col">{t("measure.compactness")}</th>
+                <th scope="col">{t("measure.contrast")}</th>
               </tr>
             </thead>
             <tbody>
@@ -217,10 +239,19 @@ export function SizeChart({ lesionId }: { lesionId: string }) {
                   <td className="numeric">
                     {formatArea(m.area_mm2, m.sigma_area_mm2, locale, showUncertainty)}
                   </td>
+                  <td className="numeric">
+                    {m.descriptors ? two.format(m.descriptors.shape.compactness) : "—"}
+                  </td>
+                  <td className="numeric">
+                    {m.descriptors?.colour ? `${whole.format(m.descriptors.colour.contrast)} ΔE` : "—"}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          {series.some((m) => m.descriptors) && (
+            <p className="text-secondary">{t("chart.descriptorsNote")}</p>
+          )}
         </div>
       ) : (
         <div
@@ -228,7 +259,7 @@ export function SizeChart({ lesionId }: { lesionId: string }) {
           className={styles.chart}
           role="slider"
           aria-roledescription={t("chart.roleDescription")}
-          aria-label={t("chart.label", { metric: t(`chart.metrics.${metric}`), count: series.length })}
+          aria-label={t("chart.label", { metric: t(`chart.metrics.${metric}`), count: shown.length })}
           aria-valuemin={1}
           aria-valuemax={points.length}
           aria-valuenow={(active ?? points.length - 1) + 1}

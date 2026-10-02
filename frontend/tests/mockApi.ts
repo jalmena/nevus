@@ -333,6 +333,18 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     captured_at: m.captured_at ?? "2026-09-01T10:00:00Z",
     created_at: m.captured_at ?? "2026-09-01T10:00:00Z",
     change: null,
+    descriptors: {
+      version: "1.0.0",
+      shape: { perimeter_mm: 15.7, compactness: 0.93, aspect: 0.96 },
+      colour: {
+        reference: "card_grey",
+        mark: { L: 35.2, a: 12.1, b: 18.4, hex: "#6b4a3a" },
+        skin: { L: 68.5, a: 14.0, b: 22.3, hex: "#c89a7e" },
+        contrast: 33.4,
+        lightness_spread: 4.2,
+        pixels: 1200,
+      },
+    },
   });
   let counter = 100;
   const nextId = () => `0199a000-0000-7000-8000-${String(counter++).padStart(12, "0")}`;

@@ -992,6 +992,75 @@
         "title": "CoinIn",
         "type": "object"
       },
+      "ColourDescriptorsOut": {
+        "description": "CIELAB of the mark and of the skin around it, and the difference between them (\u0394E).",
+        "properties": {
+          "contrast": {
+            "title": "Contrast",
+            "type": "number"
+          },
+          "lightness_spread": {
+            "title": "Lightness Spread",
+            "type": "number"
+          },
+          "mark": {
+            "$ref": "#/components/schemas/ColourOut"
+          },
+          "pixels": {
+            "title": "Pixels",
+            "type": "integer"
+          },
+          "reference": {
+            "enum": [
+              "card_grey",
+              "camera"
+            ],
+            "title": "Reference",
+            "type": "string"
+          },
+          "skin": {
+            "$ref": "#/components/schemas/ColourOut"
+          }
+        },
+        "required": [
+          "reference",
+          "mark",
+          "skin",
+          "contrast",
+          "lightness_spread",
+          "pixels"
+        ],
+        "title": "ColourDescriptorsOut",
+        "type": "object"
+      },
+      "ColourOut": {
+        "properties": {
+          "L": {
+            "title": "L",
+            "type": "number"
+          },
+          "a": {
+            "title": "A",
+            "type": "number"
+          },
+          "b": {
+            "title": "B",
+            "type": "number"
+          },
+          "hex": {
+            "title": "Hex",
+            "type": "string"
+          }
+        },
+        "required": [
+          "L",
+          "a",
+          "b",
+          "hex"
+        ],
+        "title": "ColourOut",
+        "type": "object"
+      },
       "ComparisonIn": {
         "properties": {
           "image_a": {
@@ -1202,6 +1271,34 @@
           "password"
         ],
         "title": "Credentials",
+        "type": "object"
+      },
+      "DescriptorsOut": {
+        "description": "Descriptive numbers about the mark: its shape from the outline, its colour from the photograph.",
+        "properties": {
+          "colour": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ColourDescriptorsOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "shape": {
+            "$ref": "#/components/schemas/ShapeDescriptorsOut"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "version",
+          "shape"
+        ],
+        "title": "DescriptorsOut",
         "type": "object"
       },
       "DueOut": {
@@ -2849,6 +2946,16 @@
             "title": "Created At",
             "type": "string"
           },
+          "descriptors": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DescriptorsOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "flags": {
             "items": {
               "type": "string"
@@ -4278,6 +4385,29 @@
           "analysing"
         ],
         "title": "SessionZoneOut",
+        "type": "object"
+      },
+      "ShapeDescriptorsOut": {
+        "properties": {
+          "aspect": {
+            "title": "Aspect",
+            "type": "number"
+          },
+          "compactness": {
+            "title": "Compactness",
+            "type": "number"
+          },
+          "perimeter_mm": {
+            "title": "Perimeter Mm",
+            "type": "number"
+          }
+        },
+        "required": [
+          "perimeter_mm",
+          "compactness",
+          "aspect"
+        ],
+        "title": "ShapeDescriptorsOut",
         "type": "object"
       },
       "SideOut": {

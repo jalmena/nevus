@@ -340,7 +340,11 @@
       "manual": "known length",
       "unknown": "scale"
     },
-    "tiltedShort": "tilted"
+    "tiltedShort": "tilted",
+    "compactness": "Compactness",
+    "contrast": "Colour contrast",
+    "compactnessShort": "compactness {{value}}",
+    "contrastShort": "colour contrast ΔE {{value}}"
   },
   "card": {
     "title": "Reference card",
@@ -518,8 +522,11 @@
     "metric": "Show",
     "metrics": {
       "longest": "Longest diameter",
-      "area": "Area"
-    }
+      "area": "Area",
+      "compactness": "Compactness",
+      "contrast": "Colour contrast with the skin"
+    },
+    "descriptorsNote": "Compactness is 1 for a circle and less for any other outline. The colour contrast (ΔE) is relative to the card's grey patch when the card was in the photo, otherwise as the camera saw it; it describes the photo, not the mark's nature."
   },
   "reports": {
     "title": "Reports",

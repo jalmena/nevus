@@ -42,6 +42,10 @@ test("from a fresh instance to a measured mark, accessibly", async ({ page }) =>
   await chart.focus();
   await page.keyboard.press("ArrowLeft");
   await expect(chart).toHaveAttribute("aria-valuenow", "1");
+  // Both measurements carry shape and colour descriptors, so the chart offers them too.
+  await page.getByRole("radio", { name: "Compactness", exact: true }).click();
+  await expect(page.getByRole("slider", { name: /Compactness at 2 visits/ })).toBeVisible();
+  await page.getByRole("radio", { name: "Longest diameter", exact: true }).click();
   await shot(page, "mark");
   await page.getByRole("link", { name: "Compare visits", exact: true }).click();
   await expect(page.getByText("Lined up with the reference card in both photos.")).toBeVisible({

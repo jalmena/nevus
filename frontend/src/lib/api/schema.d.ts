@@ -2036,6 +2036,36 @@ export interface components {
             /** R */
             r: number;
         };
+        /**
+         * ColourDescriptorsOut
+         * @description CIELAB of the mark and of the skin around it, and the difference between them (ΔE).
+         */
+        ColourDescriptorsOut: {
+            /** Contrast */
+            contrast: number;
+            /** Lightness Spread */
+            lightness_spread: number;
+            mark: components["schemas"]["ColourOut"];
+            /** Pixels */
+            pixels: number;
+            /**
+             * Reference
+             * @enum {string}
+             */
+            reference: "card_grey" | "camera";
+            skin: components["schemas"]["ColourOut"];
+        };
+        /** ColourOut */
+        ColourOut: {
+            /** L */
+            L: number;
+            /** A */
+            a: number;
+            /** B */
+            b: number;
+            /** Hex */
+            hex: string;
+        };
         /** ComparisonIn */
         ComparisonIn: {
             /**
@@ -2096,6 +2126,16 @@ export interface components {
             password: string;
             /** Username */
             username: string;
+        };
+        /**
+         * DescriptorsOut
+         * @description Descriptive numbers about the mark: its shape from the outline, its colour from the photograph.
+         */
+        DescriptorsOut: {
+            colour?: components["schemas"]["ColourDescriptorsOut"] | null;
+            shape: components["schemas"]["ShapeDescriptorsOut"];
+            /** Version */
+            version: string;
         };
         /** DueOut */
         DueOut: {
@@ -2628,6 +2668,7 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            descriptors?: components["schemas"]["DescriptorsOut"] | null;
             /** Flags */
             flags: string[];
             /**
@@ -3136,6 +3177,15 @@ export interface components {
             upright_width: number | null;
             /** Zone */
             zone: string;
+        };
+        /** ShapeDescriptorsOut */
+        ShapeDescriptorsOut: {
+            /** Aspect */
+            aspect: number;
+            /** Compactness */
+            compactness: number;
+            /** Perimeter Mm */
+            perimeter_mm: number;
         };
         /** SideOut */
         SideOut: {

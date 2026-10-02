@@ -199,7 +199,9 @@ def confirm_proposal(
         method="assisted",
         shape={"type": "outline", "points": row.outputs["outline"]},
     )
-    measurement = save_measurement(db, observation, lesion, request_body, user, "automatic", analysis_id=row.id)
+    measurement = save_measurement(
+        db, observation, lesion, request_body, user, "automatic", analysis_id=row.id, store=request.app.state.blob_store
+    )
     row.decision, row.decided_by, row.decided_at = "confirmed", user.id, utcnow()
     service.audit(db, "proposal.confirm", user, "analysis", row.id, client_ip(request, settings))
     return _measurement_out(db, measurement)

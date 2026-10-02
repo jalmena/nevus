@@ -9,16 +9,19 @@ beyond it.
 from __future__ import annotations
 
 import math
+import re
+import uuid
 
 import cv2
 import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
-from nevus import measure
+from nevus import descriptors, measure
 from nevus.cv import card_detect, fit
 from nevus.cv.card import STRIP, WINDOW, marker_cells
 from nevus.cv.card_sheet import render_sheet
+from nevus.db.models import Measurement
 from tests.scene import photograph
 from tests.synthetic import jpeg, skin
 from tests.test_accounts import claim
@@ -243,3 +246,29 @@ def test_the_reference_card_downloads(client: TestClient) -> None:
     response = client.get("/api/reference-card?page=letter&lang=es")
     assert response.status_code == 200 and response.headers["content-type"] == "application/pdf"
     assert response.content.startswith(b"%PDF")
+
+
+def test_a_measurement_describes_shape_and_colour_and_old_ones_can_be_described_later(client: TestClient) -> None:
+    claim(client)
+    _, visit, image = _visit_with_card_photo(client)
+    created = _measure_disc(client, visit, image)
+    described = created["descriptors"]
+    assert described["version"] == descriptors.VERSION
+    shape = described["shape"]
+    assert shape["compactness"] > 0.9 and shape["aspect"] > 0.9, shape
+    assert abs(shape["perimeter_mm"] - math.pi * 5.0) < 0.9, shape
+    colour = described["colour"]
+    assert colour is not None and colour["reference"] == "card_grey", colour
+    assert colour["mark"]["L"] < colour["skin"]["L"] - 10 and colour["contrast"] > 15, colour
+    assert re.fullmatch(r"#[0-9a-f]{6}", colour["mark"]["hex"]) and colour["pixels"] >= descriptors.MIN_PIXELS
+
+    # Measurements saved before descriptors existed are described on demand, the same way.
+    with client.app.state.session_factory() as db:  # type: ignore[attr-defined]
+        row = db.get(Measurement, uuid.UUID(created["id"]))
+        assert row is not None
+        row.details = {k: v for k, v in row.details.items() if k != "descriptors"}
+        db.commit()
+        assert descriptors.backfill(db, client.app.state.blob_store) == 1  # type: ignore[attr-defined]
+        db.commit()
+    again = client.get(f"/api/observations/{visit}/measurements").json()[0]["descriptors"]
+    assert again["shape"] == shape and again["colour"]["reference"] == "card_grey"

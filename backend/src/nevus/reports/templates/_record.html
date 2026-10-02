@@ -74,7 +74,7 @@
     <div class="part">
       <h4>{{ w("measured_title") }}</h4>
       {% if visit.measured %}
-      <p>{{ w("longest") }} {{ visit.measured.longest }}<br>{{ w("across") }} {{ visit.measured.across }}<br>{{ w("area") }} {{ visit.measured.area }}</p>
+      <p>{{ w("longest") }} {{ visit.measured.longest }}<br>{{ w("across") }} {{ visit.measured.across }}<br>{{ w("area") }} {{ visit.measured.area }}{% if visit.measured.shape %}<br><span class="secondary small">{{ visit.measured.shape }}</span>{% endif %}{% if visit.measured.colour %}<br><span class="secondary small">{{ visit.measured.colour }}</span>{% endif %}</p>
       {% else %}<p class="secondary">—</p>{% endif %}
     </div>
     <div class="part">
