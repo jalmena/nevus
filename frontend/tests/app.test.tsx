@@ -90,3 +90,12 @@ describe("persons", () => {
     expect(document.documentElement.dataset.theme).toBe("dark");
   });
 });
+
+describe("the document language", () => {
+  it("follows the interface language, for assistive technology", async () => {
+    await i18n.changeLanguage("es");
+    expect(document.documentElement.lang).toBe("es");
+    await i18n.changeLanguage("en");
+    expect(document.documentElement.lang).toBe("en");
+  });
+});

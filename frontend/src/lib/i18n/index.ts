@@ -22,4 +22,11 @@ void i18n
     },
   });
 
+// Assistive technology reads the page in the document's language: keep it the interface's.
+function announce(language: string) {
+  if (typeof document !== "undefined") document.documentElement.lang = language;
+}
+i18n.on("languageChanged", announce);
+if (i18n.resolvedLanguage) announce(i18n.resolvedLanguage);
+
 export default i18n;

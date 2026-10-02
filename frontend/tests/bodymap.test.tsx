@@ -4,6 +4,8 @@ import { describe, expect, it, vi } from "vitest";
 import { BodyMap } from "@/features/bodymap/BodyMap";
 import { bodyMap, zoneByCode, zonesForView } from "@/features/bodymap/zones";
 import i18n from "@/lib/i18n";
+import en from "@/lib/i18n/locales/en.json";
+import es from "@/lib/i18n/locales/es.json";
 
 describe("body map data", () => {
   it("carries 28 zones per body view that tile the same silhouette, and the detail views", () => {
@@ -17,6 +19,20 @@ describe("body map data", () => {
     expect(zoneByCode("3150")?.side).toBe("left");
     expect(zonesForView("hands")).toHaveLength(4);
     expect(zonesForView("feet").map((zone) => zone.side)).toEqual(["right", "left", "right", "left"]);
+  });
+});
+
+describe("zone names", () => {
+  it("exist in both catalogues for every zone of every view, so lists need no map geometry", () => {
+    const codes = Object.keys(bodyMap.views).flatMap((view) =>
+      zonesForView(view as never).map((zone) => zone.code),
+    );
+    expect(codes.length).toBeGreaterThan(60);
+    const missing = codes.filter(
+      (code) =>
+        !(code in (en.zones as Record<string, string>)) || !(code in (es.zones as Record<string, string>)),
+    );
+    expect(missing).toEqual([]);
   });
 });
 
