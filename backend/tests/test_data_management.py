@@ -224,7 +224,7 @@ def test_the_latest_backup_is_read_back_and_damage_is_found(client: TestClient, 
         assert report["images"] == 1 and report["blobs_missing_from_archive"] == 0
     else:
         # PostgreSQL is backed up by its own tools; the archive carries the photographs and the secret.
-        assert report["database"] == "postgresql" and report["integrity"] is None
+        assert report["database"] == "postgresql" and report.get("integrity") is None
     assert report["live_store"] == {"checked": 4, "missing": 0, "corrupt": 0}
     assert "would restore" in backup.describe(report)
 
