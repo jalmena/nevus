@@ -162,7 +162,7 @@ TEXT: dict[str, dict[str, str]] = {
         "measured_intro": "Tamaños medidos sobre las fotografías, cada uno con su incertidumbre típica (±). Una "
         "diferencia se llama cambio medido solo cuando supera el doble de la incertidumbre combinada de las dos "
         "medidas; si no, se indica como sin cambio detectable.",
-        "chart_title": "Diámetro mayor en cada visita",
+        "chart_title": "Diámetro mayor en cada vistazo",
         "chart_band": "La banda sombreada es ± una incertidumbre típica.",
         "date": "Fecha",
         "longest": "Mayor",
@@ -180,9 +180,9 @@ TEXT: dict[str, dict[str, str]] = {
         "flag_tilted": "foto inclinada más allá del límite",
         "flag_unverified_card": "tamaño de impresión de la tarjeta sin verificar",
         "flag_tilt_unknown": "inclinación desconocida",
-        "visits_title": "Visitas",
+        "visits_title": "Vistazos",
         "no_visits": "Todavía no hay ninguna foto de esta marca.",
-        "visit": "Visita del {date}",
+        "visit": "Vistazo del {date}",
         "photos": "Fotografías",
         "role_close_up": "primer plano",
         "role_with_reference": "con la tarjeta de referencia",
@@ -196,7 +196,7 @@ TEXT: dict[str, dict[str, str]] = {
         "symptom_bleeding": "sangrado",
         "symptom_pain": "dolor",
         "symptom_looks_different": "le parece distinta",
-        "no_notes": "Sin notas en esta visita.",
+        "no_notes": "Sin notas en este vistazo.",
         "checks_title": "Comprobaciones automáticas de las fotos",
         "checks_intro": "Comprobaciones de las propias fotografías (enfoque, luz, tarjeta de referencia), hechas "
         "por el programa al guardar cada foto. Describen la foto, no la piel.",

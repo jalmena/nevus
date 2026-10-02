@@ -225,8 +225,8 @@
     "nextDue": "Próxima revisión",
     "dueNow": "Toca revisar",
     "dueIn": "En {{count}} días",
-    "lastVisit": "última visita {{date}}",
-    "noVisits": "sin visitas todavía",
+    "lastVisit": "último vistazo {{date}}",
+    "noVisits": "sin vistazos todavía",
     "emptyTitle": "Todavía no hay marcas",
     "emptyTextEdit": "Añade una marca tocando su lugar en el mapa corporal.",
     "emptyTextView": "Nadie ha añadido marcas de esta persona todavía.",
@@ -238,10 +238,10 @@
     "suggestName": "Sugerir un nombre"
   },
   "observations": {
-    "title": "Visitas",
-    "new": "Nueva visita",
-    "emptyTitle": "Todavía no hay visitas",
-    "emptyText": "Una visita es un vistazo con fecha a la marca: fotos, tus notas y lo que hayas notado.",
+    "title": "Vistazos",
+    "new": "Nuevo vistazo",
+    "emptyTitle": "Todavía no hay vistazos",
+    "emptyText": "Un vistazo es una mirada con fecha a la marca: fotos, tus notas y lo que hayas notado.",
     "photoCount_one": "{{count}} foto",
     "photoCount_other": "{{count}} fotos",
     "photos": "Fotos",
@@ -255,13 +255,13 @@
       "looks_different": "Me parece distinta"
     },
     "backTo": "Volver a {{lesion}}",
-    "delete": "Mover la visita a la papelera"
+    "delete": "Mover el vistazo a la papelera"
   },
   "quality": {
     "title": "Guardada con avisos de calidad",
     "short": "Avisos de calidad",
     "checking": "Revisando las fotos…",
-    "hint": "La visita se guarda tal cual. Si puedes, repite la foto.",
+    "hint": "El vistazo se guarda tal cual. Si puedes, repite la foto.",
     "flags": {
       "blurry": "Borrosa: sujeta el móvil firme y toca la marca para enfocar.",
       "too_dark": "Demasiado oscura: añade luz o acércate a una ventana.",
@@ -271,7 +271,7 @@
     }
   },
   "measure": {
-    "back": "Volver a la visita",
+    "back": "Volver al vistazo",
     "title": "Medir",
     "stepsLabel": "Pasos",
     "stepScale": "Escala",
@@ -329,7 +329,7 @@
     "changeScale": "Cambiar la escala",
     "disclaimer": "Una medida describe el tamaño. No dice nada sobre qué es la marca.",
     "visitTitle": "Medidas",
-    "noneYet": "Todavía no hay medidas en esta visita.",
+    "noneYet": "Todavía no hay medidas en este vistazo.",
     "needPhoto": "Añade una foto para medir la marca.",
     "measurePhoto": "Medir en la foto",
     "measurePhotoN": "Medir en la foto {{n}}",
@@ -400,13 +400,13 @@
   },
   "trash": {
     "title": "Papelera",
-    "intro": "Las marcas, visitas y fotos borradas se quedan aquí 30 días y luego se eliminan para siempre.",
+    "intro": "Las marcas, vistazos y fotos borrados se quedan aquí 30 días y luego se eliminan para siempre.",
     "emptyTitle": "La papelera está vacía",
     "emptyText": "Lo que borras se queda aquí un tiempo por si cambias de idea.",
     "kinds": {
       "person": "Persona",
       "lesion": "Marca",
-      "observation": "Visita",
+      "observation": "Vistazo",
       "image": "Foto"
     },
     "goesOn": "se elimina para siempre el {{date}}",
@@ -437,22 +437,22 @@
     "usage_other": "{{count}} fotos, {{size}}",
     "overQuota": "Las fotos de esta persona ocupan más del límite que fijó la administración. No se rechaza nada; quizá convenga quitar duplicados antiguos.",
     "purgeTitle": "Borrar esta persona para siempre",
-    "purgeIntro": "Todas las marcas, visitas, medidas y fotos de {{name}} se eliminarán ahora, sin pasar por la papelera. Exporta antes si quieres conservar una copia.",
+    "purgeIntro": "Todas las marcas, vistazos, medidas y fotos de {{name}} se eliminarán ahora, sin pasar por la papelera. Exporta antes si quieres conservar una copia.",
     "typeName": "Escribe {{name}} para confirmar",
     "purgeAction": "Borrar para siempre"
   },
   "offline": {
     "offline": "Sin conexión.",
-    "waiting_one": "Una visita espera para subirse.",
-    "waiting_other": "{{count}} visitas esperan para subirse.",
-    "uploading": "Subiendo las visitas guardadas…",
+    "waiting_one": "Un vistazo espera para subirse.",
+    "waiting_other": "{{count}} vistazos esperan para subirse.",
+    "uploading": "Subiendo los vistazos guardados…",
     "failed_one": "una no se ha podido subir todavía",
     "failed_other": "{{count}} no se han podido subir todavía",
     "uploadNow": "Subir ahora",
-    "quickIntro": "Sin conexión. Haz las fotos ahora: la visita se guarda en este dispositivo y se sube sola cuando vuelvas a tener conexión.",
+    "quickIntro": "Sin conexión. Haz las fotos ahora: el vistazo se guarda en este dispositivo y se sube solo cuando vuelvas a tener conexión.",
     "photosReady_one": "Una foto lista.",
     "photosReady_other": "{{count}} fotos listas.",
-    "keep": "Guardar esta visita",
+    "keep": "Guardar este vistazo",
     "saved": "Guardada en este dispositivo. Se subirá cuando vuelva la conexión."
   },
   "capture": {
@@ -467,11 +467,11 @@
     "lastTimeAlt": "Primer plano anterior"
   },
   "compare": {
-    "open": "Comparar visitas",
+    "open": "Comparar vistazos",
     "back": "Volver a la marca",
     "title": "Comparar",
     "titleFor": "Comparar: {{name}}",
-    "needTwo": "Para comparar hacen falta fotos de dos visitas, o dos fotos de una misma visita.",
+    "needTwo": "Para comparar hacen falta fotos de dos vistazos, o dos fotos de un mismo vistazo.",
     "earlier": "Antes",
     "later": "Después",
     "samePhoto": "Los dos lados muestran la misma foto. Elige otra para uno de ellos.",
@@ -507,10 +507,10 @@
   },
   "chart": {
     "title": "Tamaño a lo largo del tiempo",
-    "subtitle": "En cada visita.",
-    "subtitleBand": "En cada visita. La banda sombreada es la incertidumbre de la medida.",
+    "subtitle": "En cada vistazo.",
+    "subtitleBand": "En cada vistazo. La banda sombreada es la incertidumbre de la medida.",
     "roleDescription": "gráfica",
-    "label": "{{metric}} en {{count}} visitas. Usa las flechas para recorrerlas.",
+    "label": "{{metric}} en {{count}} vistazos. Usa las flechas para recorrerlos.",
     "date": "Fecha",
     "showTable": "Ver como tabla",
     "showChart": "Ver como gráfica",
