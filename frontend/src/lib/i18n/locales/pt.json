@@ -195,6 +195,7 @@
     "title": "Marcas",
     "add": "Adicionar uma marca",
     "placingHint": "Toque na zona onde está a marca: o mapa amplia-a. Depois toque no ponto exato.",
+    "placingSpot": "Toque no ponto exato da marca em {{zone}}.",
     "placed": "Agora descreva a marca abaixo.",
     "newTitle": "Nova marca",
     "label": "Nome",
@@ -215,6 +216,7 @@
     "days": "{{count}} dias",
     "create": "Criar a marca",
     "edit": "Editar os detalhes",
+    "delete": "Mover a marca para o lixo",
     "status": "Estado",
     "statuses": {
       "active": "Ativa",
@@ -225,8 +227,8 @@
     "nextDue": "Próxima verificação",
     "dueNow": "Pendente",
     "dueIn": "Dentro de {{count}} dias",
-    "lastVisit": "última visita {{date}}",
-    "noVisits": "ainda sem visitas",
+    "lastVisit": "última observação {{date}}",
+    "noVisits": "ainda sem observações",
     "emptyTitle": "Ainda não há marcas",
     "emptyTextEdit": "Adicione uma marca tocando no seu lugar no mapa do corpo.",
     "emptyTextView": "Ainda ninguém adicionou marcas desta pessoa.",
@@ -238,10 +240,10 @@
     "suggestName": "Sugerir um nome"
   },
   "observations": {
-    "title": "Visitas",
-    "new": "Nova visita",
-    "emptyTitle": "Ainda não há visitas",
-    "emptyText": "Uma visita é um olhar datado sobre a marca: fotos, as suas notas e o que reparou.",
+    "title": "Observações",
+    "new": "Nova observação",
+    "emptyTitle": "Ainda não há observações",
+    "emptyText": "Uma observação é um olhar datado sobre a marca: fotos, as suas notas e o que reparou.",
     "photoCount_one": "{{count}} foto",
     "photoCount_many": "{{count}} fotos",
     "photoCount_other": "{{count}} fotos",
@@ -256,13 +258,13 @@
       "looks_different": "Parece-me diferente"
     },
     "backTo": "Voltar a {{lesion}}",
-    "delete": "Mover a visita para o lixo"
+    "delete": "Mover a observação para o lixo"
   },
   "quality": {
     "title": "Guardada com avisos de qualidade",
     "short": "Avisos de qualidade",
     "checking": "A verificar as fotos…",
-    "hint": "A visita fica como está. Se puder, tire a foto outra vez.",
+    "hint": "A observação fica como está. Se puder, tire a foto outra vez.",
     "flags": {
       "blurry": "Desfocada: segure o telemóvel com firmeza e toque na marca para focar.",
       "too_dark": "Demasiado escura: acrescente luz ou aproxime-se de uma janela.",
@@ -272,7 +274,7 @@
     }
   },
   "measure": {
-    "back": "Voltar à visita",
+    "back": "Voltar à observação",
     "title": "Medir",
     "stepsLabel": "Passos",
     "stepScale": "Escala",
@@ -331,7 +333,7 @@
     "changeScale": "Mudar a escala",
     "disclaimer": "Uma medição descreve o tamanho. Nada diz sobre o que a marca é.",
     "visitTitle": "Medições",
-    "noneYet": "Ainda não há medições nesta visita.",
+    "noneYet": "Ainda não há medições nesta observação.",
     "needPhoto": "Adicione uma foto para medir a marca.",
     "measurePhoto": "Medir na foto",
     "measurePhotoN": "Medir na foto {{n}}",
@@ -406,13 +408,13 @@
   },
   "trash": {
     "title": "Lixo",
-    "intro": "As marcas, visitas e fotos eliminadas ficam aqui 30 dias e depois desaparecem de vez.",
+    "intro": "As marcas, observações e fotos eliminadas ficam aqui 30 dias e depois desaparecem de vez.",
     "emptyTitle": "O lixo está vazio",
     "emptyText": "O que elimina fica aqui durante algum tempo, caso mude de ideias.",
     "kinds": {
       "person": "Pessoa",
       "lesion": "Marca",
-      "observation": "Visita",
+      "observation": "Observação",
       "image": "Foto"
     },
     "goesOn": "removido de vez em {{date}}",
@@ -444,25 +446,25 @@
     "usage_other": "{{count}} fotos, {{size}}",
     "overQuota": "As fotos desta pessoa ocupam mais espaço do que o limite definido pelo administrador. Nada é recusado; pondere remover duplicados antigos.",
     "purgeTitle": "Eliminar esta pessoa de vez",
-    "purgeIntro": "Todas as marcas, visitas, medições e fotos de {{name}} serão removidas agora, sem passar pelo lixo. Exporte primeiro se quiser guardar uma cópia.",
+    "purgeIntro": "Todas as marcas, observações, medições e fotos de {{name}} serão removidas agora, sem passar pelo lixo. Exporte primeiro se quiser guardar uma cópia.",
     "typeName": "Escreva {{name}} para confirmar",
     "purgeAction": "Eliminar de vez"
   },
   "offline": {
     "offline": "Sem ligação.",
-    "waiting_one": "Uma visita espera para ser enviada.",
-    "waiting_many": "{{count}} visitas esperam para ser enviadas.",
-    "waiting_other": "{{count}} visitas esperam para ser enviadas.",
-    "uploading": "A enviar as visitas guardadas…",
+    "waiting_one": "Uma observação espera para ser enviada.",
+    "waiting_many": "{{count}} observações esperam para ser enviadas.",
+    "waiting_other": "{{count}} observações esperam para ser enviadas.",
+    "uploading": "A enviar as observações guardadas…",
     "failed_one": "uma ainda não pôde ser enviada",
     "failed_many": "{{count}} ainda não puderam ser enviadas",
     "failed_other": "{{count}} ainda não puderam ser enviadas",
     "uploadNow": "Enviar agora",
-    "quickIntro": "Sem ligação. Tire as fotos agora: a visita fica guardada neste aparelho e é enviada sozinha quando voltar a estar ligado.",
+    "quickIntro": "Sem ligação. Tire as fotos agora: a observação fica guardada neste aparelho e é enviada sozinha quando voltar a estar ligado.",
     "photosReady_one": "Uma foto pronta.",
     "photosReady_many": "{{count}} fotos prontas.",
     "photosReady_other": "{{count}} fotos prontas.",
-    "keep": "Guardar esta visita",
+    "keep": "Guardar esta observação",
     "saved": "Guardada neste aparelho. Será enviada quando a ligação voltar."
   },
   "capture": {
@@ -477,11 +479,11 @@
     "lastTimeAlt": "Grande plano anterior"
   },
   "compare": {
-    "open": "Comparar visitas",
+    "open": "Comparar observações",
     "back": "Voltar à marca",
     "title": "Comparar",
     "titleFor": "Comparar: {{name}}",
-    "needTwo": "Comparar precisa de fotos de duas visitas, ou de duas fotos de uma visita.",
+    "needTwo": "Comparar precisa de fotos de duas observações, ou de duas fotos de uma observação.",
     "earlier": "Anterior",
     "later": "Posterior",
     "samePhoto": "Os dois lados mostram a mesma foto. Escolha outra para um deles.",
@@ -517,10 +519,10 @@
   },
   "chart": {
     "title": "Tamanho ao longo do tempo",
-    "subtitle": "Em cada visita.",
-    "subtitleBand": "Em cada visita. A faixa sombreada é a incerteza da medição.",
+    "subtitle": "Em cada observação.",
+    "subtitleBand": "Em cada observação. A faixa sombreada é a incerteza da medição.",
     "roleDescription": "gráfico",
-    "label": "{{metric}} em {{count}} visitas. Use as setas para as percorrer.",
+    "label": "{{metric}} em {{count}} observações. Use as setas para as percorrer.",
     "date": "Data",
     "showTable": "Mostrar como tabela",
     "showChart": "Mostrar como gráfico",
