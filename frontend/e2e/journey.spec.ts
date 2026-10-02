@@ -162,6 +162,8 @@ test("the second factor: set up in the settings, then a sign-in that needs the c
   // A recovery code opens the door too, once.
   await page.getByRole("link", { name: "Settings", exact: true }).click();
   await page.getByRole("button", { name: "Sign out", exact: true }).click();
+  // The settings page has a "Username" field of its own (new accounts): wait for the sign-in page.
+  await expect(page.getByRole("heading", { name: "Sign in", exact: true })).toBeVisible();
   await page.getByLabel("Username").fill("Jose");
   await page.getByLabel("Password", { exact: true }).fill(PASSWORD);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
