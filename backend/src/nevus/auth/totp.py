@@ -12,6 +12,7 @@ from __future__ import annotations
 import base64
 import hashlib
 import hmac
+import io
 import secrets
 import struct
 import time
@@ -70,8 +71,13 @@ def provisioning_uri(secret: str, username: str, issuer: str = "neVus") -> str:
 
 
 def qr_svg(uri: str) -> str:
-    """The provisioning URI as an SVG to scan from the screen, on its own white ground."""
-    return str(segno.make(uri, error="m").svg_inline(scale=4, border=2, dark="#000000", light="#ffffff"))
+    """The provisioning URI as a standalone SVG (with its namespace, so it works as a data URI in an
+    image), on its own white ground, to scan from the screen."""
+    buffer = io.BytesIO()
+    segno.make(uri, error="m").save(
+        buffer, kind="svg", xmldecl=False, svgns=True, scale=4, border=2, dark="#000000", light="#ffffff"
+    )
+    return buffer.getvalue().decode()
 
 
 def new_recovery_codes(count: int = RECOVERY_CODES) -> list[str]:

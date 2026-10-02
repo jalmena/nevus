@@ -25,7 +25,7 @@ def _enable(client: TestClient, password: str) -> tuple[str, list[str]]:
     assert setup.status_code == 200, setup.text
     body = setup.json()
     assert body["otpauth_uri"].startswith("otpauth://totp/neVus:") and "issuer=neVus" in body["otpauth_uri"]
-    assert body["qr_svg"].startswith("<svg")
+    assert body["qr_svg"].startswith("<svg") and 'xmlns="http://www.w3.org/2000/svg"' in body["qr_svg"]
     assert client.get("/api/auth/totp").json()["setting_up"] is True
     code = totp.code_for(body["secret"], totp.current_counter())
     enabled = client.post("/api/auth/totp/enable", json={"code": code}, headers=SAME_ORIGIN)
