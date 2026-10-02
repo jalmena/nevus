@@ -9,10 +9,11 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from nevus.auth.passwords import MIN_PASSWORD_LENGTH
+from nevus.languages import Language
 
 Username = Field(min_length=2, max_length=64, pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 Password = Field(min_length=MIN_PASSWORD_LENGTH, max_length=1024)
-Language = Literal["en", "es"]
+
 Theme = Literal["system", "light", "dark"]
 AccessRole = Literal["owner", "manager", "viewer"]
 

@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-"""Report wording in English and Spanish, and the number and date formats of each language."""
+"""Report wording in every language neVus speaks, and the number and date formats of each language."""
 
 from __future__ import annotations
 
@@ -8,8 +8,10 @@ from datetime import date, datetime
 from functools import cache
 from importlib.resources import files
 
-LANGUAGES = ("en", "es")
+from nevus.languages import normalise
+
 NBSP = "\u00a0"
+DECIMAL_COMMA = ("es", "pt")
 
 TEXT: dict[str, dict[str, str]] = {
     "en": {
@@ -242,6 +244,122 @@ TEXT: dict[str, dict[str, str]] = {
         "no_marks": "No hay marcas registradas para esta persona.",
         "data_attached": "Los datos de este informe van adjuntos al PDF como nevus-report-data.json.",
     },
+    "pt": {
+        "lesion_title": "Registo de marca na pele",
+        "visit_report_title": "Preparado para uma consulta",
+        "selection_title": "Marcas na pele selecionadas",
+        "selection_marks": "As marcas escolhidas para este relatório; os seus registos seguem-se ao resumo:",
+        "appointment_title": "Consulta em {date}",
+        "visit_marks": "As marcas preparadas para esta consulta; os seus registos seguem-se ao resumo:",
+        "visit_no_marks": "Nenhuma marca precisou de foto nova para esta consulta.",
+        "profile_title": "Marcas na pele: resumo",
+        "person": "Pessoa",
+        "born": "ano de nascimento {year}",
+        "generated": "Gerado em {date}",
+        "page": "Página {page} de {pages}",
+        "intended_use_title": "Sobre este documento",
+        "intended_use": "Um registo pessoal de fotografias e medições, feito pela pessoa ou pela sua família com "
+        "o neVus. Documenta o que foi fotografado e medido, e quando. Não diagnostica nem avalia "
+        "nenhuma condição, e nada do que contém é uma recomendação: a interpretação cabe ao "
+        "profissional de saúde.",
+        "mark": "Marca",
+        "location": "Localização",
+        "type": "Tipo",
+        "type_mole": "Sinal",
+        "type_other": "Outra marca",
+        "status": "Estado",
+        "status_active": "Ativa",
+        "status_removed": "Removida",
+        "status_resolved": "Resolvida",
+        "first_noticed": "Notada pela primeira vez",
+        "interval": "Fotografada a cada",
+        "days": "{n} dias",
+        "front": "frente",
+        "back": "costas",
+        "head": "cabeça",
+        "hands": "mãos",
+        "feet": "pés",
+        "unknown": "não registado",
+        "measured_title": "Valores medidos",
+        "measured_intro": "Tamanhos medidos nas fotografias, cada um com a sua incerteza padrão (±). Uma diferença "
+        "só se chama alteração medida quando supera o dobro da incerteza combinada das duas "
+        "medições; caso contrário, indica-se como sem alteração detetável.",
+        "chart_title": "Maior diâmetro em cada visita",
+        "chart_band": "A faixa sombreada é ± uma incerteza padrão.",
+        "date": "Data",
+        "longest": "Maior",
+        "across": "Transversal",
+        "area": "Área",
+        "scale": "Escala",
+        "tilt": "Inclinação",
+        "change": "Alteração",
+        "measured_change": "alteração medida",
+        "no_detectable_change": "sem alteração detetável",
+        "shape_values": "Compacidade {compactness} (um círculo é 1), razão entre os dois diâmetros {aspect}",
+        "colour_values": "Cor: luminosidade {lightness} face à pele a {skin}, contraste ΔE {contrast}, {reference}",
+        "colour_card": "relativa à mancha cinzenta do cartão",
+        "colour_camera": "tal como a câmara a viu",
+        "no_measurements": "Não se fizeram medições nestas fotografias.",
+        "scale_card": "cartão de referência",
+        "scale_coin": "moeda",
+        "scale_manual": "comprimento conhecido",
+        "flag_tilted": "foto inclinada além do limite",
+        "flag_unverified_card": "tamanho de impressão do cartão não verificado",
+        "flag_tilt_unknown": "inclinação desconhecida",
+        "visits_title": "Visitas",
+        "no_visits": "Ainda não foi tirada nenhuma foto desta marca.",
+        "visit": "Visita de {date}",
+        "photos": "Fotografias",
+        "role_close_up": "grande plano",
+        "role_with_reference": "com o cartão de referência",
+        "role_overview": "vista geral",
+        "role_other": "outra",
+        "scale_bar": "{n} mm",
+        "measured_outline": "O contorno desenhado na fotografia é o que foi medido.",
+        "person_notes": "Notas da pessoa",
+        "symptoms": "Referido pela pessoa",
+        "symptom_itching": "comichão",
+        "symptom_bleeding": "sangramento",
+        "symptom_pain": "dor",
+        "symptom_looks_different": "parece-lhe diferente",
+        "no_notes": "Sem notas nesta visita.",
+        "checks_title": "Verificações automáticas da foto",
+        "checks_intro": "Verificações das próprias fotografias (focagem, luz, cartão de referência), feitas pelo "
+        "software ao guardar cada foto. Descrevem a foto, não a pele.",
+        "check_blurry": "desfocada",
+        "check_too_dark": "demasiado escura",
+        "check_too_bright": "sobre-exposta",
+        "check_glare": "reflexos",
+        "check_low_resolution": "baixa resolução",
+        "check_tilted": "cartão inclinado",
+        "check_card_small": "cartão longe",
+        "checks_none": "Nenhuma foto foi assinalada.",
+        "methods_title": "Métodos",
+        "methods_scale": "Escala a partir de: {kinds}.",
+        "methods_uncertainty": "Cada incerteza combina o erro da escala usada (ajuste à referência, verificação do "
+        "tamanho de impressão, inclinação da câmara) com a incerteza do contorno traçado, "
+        "propagada aos diâmetros e à área.",
+        "methods_analyzers": "Software: neVus {version}; analisadores {analyzers}.",
+        "clinician_title": "Para o profissional de saúde",
+        "clinician_hint": "Espaço para as suas notas.",
+        "summary_marks": "Marcas seguidas",
+        "summary_number": "N.º",
+        "summary_last_visit": "Última foto",
+        "summary_next": "Próxima foto",
+        "summary_latest": "Último tamanho",
+        "due_now": "pendente",
+        "overdue": "atrasada",
+        "snoozed": "adiada",
+        "not_followed": "não seguida",
+        "highlights_title": "Alterações medidas",
+        "highlights_intro": "Marcas cujas duas últimas medições diferem em mais do dobro da sua incerteza combinada. "
+        "É uma afirmação apenas sobre as medições.",
+        "highlights_none": "Nenhuma alteração medida entre as duas últimas medições de qualquer marca.",
+        "since": "desde {date}",
+        "map_title": "Mapa do corpo",
+        "no_marks": "Não há marcas registadas para esta pessoa.",
+        "data_attached": "Os dados deste relatório vêm anexados ao PDF como nevus-report-data.json.",
+    },
 }
 
 MONTHS = {
@@ -273,6 +391,20 @@ MONTHS = {
         "noviembre",
         "diciembre",
     ],
+    "pt": [
+        "janeiro",
+        "fevereiro",
+        "março",
+        "abril",
+        "maio",
+        "junho",
+        "julho",
+        "agosto",
+        "setembro",
+        "outubro",
+        "novembro",
+        "dezembro",
+    ],
 }
 
 
@@ -280,7 +412,7 @@ class Words:
     """The catalogue and formats of one language, as handed to the templates."""
 
     def __init__(self, language: str) -> None:
-        self.language = language if language in LANGUAGES else "en"
+        self.language = normalise(language)
         self.text = TEXT[self.language]
 
     def __call__(self, key: str, **values: object) -> str:
@@ -290,7 +422,7 @@ class Words:
         text = f"{value:+.{digits}f}" if sign else f"{value:.{digits}f}"
         if text.startswith("-"):
             text = "\u2212" + text[1:]  # a real minus sign
-        return text.replace(".", ",") if self.language == "es" else text
+        return text.replace(".", ",") if self.language in DECIMAL_COMMA else text
 
     def mm(self, value: float, sigma: float | None = None, sign: bool = False) -> str:
         if sigma is None:
@@ -309,7 +441,7 @@ class Words:
         if value is None:
             return self("unknown")
         month = MONTHS[self.language][value.month - 1]
-        if self.language == "es":
+        if self.language in ("es", "pt"):
             return f"{value.day} de {month} de {value.year}"
         return f"{value.day} {month} {value.year}"
 

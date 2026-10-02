@@ -10,7 +10,7 @@ neVus is a self-hosted application for keeping a longitudinal photographic recor
 
 Your dermatologist has hundreds of patients and approximately seven minutes. Your mole does not care. When the question "has this changed since last time?" comes up, neVus exists so that the answer is a dated series of measured photographs rather than "I think it was a little smaller".
 
-> **Status: stable, 1.0.0.** neVus installs from the personal app store or from a compose file (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)). It does what the [roadmap](#roadmap) lists up to 1.0.0: accounts with a second factor, persons, the body map, marks and dated visits with scrubbed photographs, measurement with uncertainty, comparison views, reports for the clinician, reminders through several channels, full-body sessions, and encrypted backups that are read back; in English and Spanish. Minor versions keep the data and migrate it when they must; the release notes say when something changes for the operator.
+> **Status: stable, 1.x.** neVus installs from the personal app store or from a compose file (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)). It does what the [roadmap](#roadmap) lists up to 1.0.0: accounts with a second factor, persons, the body map, marks and dated visits with scrubbed photographs, measurement with uncertainty, comparison views, reports for the clinician, reminders through several channels, full-body sessions, and encrypted backups that are read back; in English, Spanish and Portuguese. Minor versions keep the data and migrate it when they must; the release notes say when something changes for the operator.
 
 ## What neVus is
 

@@ -2473,7 +2473,7 @@ export interface components {
              * Default Language
              * @enum {string}
              */
-            default_language: "en" | "es";
+            default_language: "en" | "es" | "pt";
         };
         /** InstanceStatus */
         InstanceStatus: {
@@ -3064,7 +3064,7 @@ export interface components {
         /** ReportIn */
         ReportIn: {
             /** Language */
-            language?: ("en" | "es") | null;
+            language?: ("en" | "es" | "pt") | null;
             /** Lesion Id */
             lesion_id?: string | null;
             /**
@@ -3110,7 +3110,7 @@ export interface components {
              * Language
              * @enum {string}
              */
-            language: "en" | "es";
+            language: "en" | "es" | "pt";
             /** Lesion Ids */
             lesion_ids: string[];
             /** Pages */
@@ -3467,7 +3467,7 @@ export interface components {
             /** Email Reminders */
             email_reminders?: boolean | null;
             /** Language */
-            language?: ("en" | "es") | null;
+            language?: ("en" | "es" | "pt") | null;
             /** Show Uncertainty */
             show_uncertainty?: boolean | null;
             /** Theme */
@@ -3537,7 +3537,7 @@ export interface components {
         /** VisitReportIn */
         VisitReportIn: {
             /** Language */
-            language?: ("en" | "es") | null;
+            language?: ("en" | "es" | "pt") | null;
             /**
              * Paper
              * @default a4
@@ -6597,7 +6597,7 @@ export interface operations {
         parameters: {
             query?: {
                 page?: "a4" | "letter";
-                lang?: "en" | "es";
+                lang?: "en" | "es" | "pt";
             };
             header?: never;
             path?: never;

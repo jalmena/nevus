@@ -12,7 +12,7 @@ import { PushSettings } from "./PushSettings";
 import { ReminderSettings } from "./ReminderSettings";
 import { SecondFactorSettings } from "./SecondFactorSettings";
 import { useInstance, useLogout, useSession, useUpdateMe } from "@/lib/auth/session";
-import { supportedLanguages } from "@/lib/i18n";
+import { supportedLanguages, type Language } from "@/lib/i18n";
 import styles from "./settings.module.css";
 
 const THEMES = ["system", "light", "dark"] as const;
@@ -33,7 +33,7 @@ export function SettingsPage() {
           <span>{t("shell.language")}</span>
           <select
             value={user.language}
-            onChange={(e) => update.mutate({ language: e.target.value as "en" | "es" })}
+            onChange={(e) => update.mutate({ language: e.target.value as Language })}
           >
             {supportedLanguages.map((code) => (
               <option key={code} value={code}>

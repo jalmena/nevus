@@ -6,6 +6,7 @@ import { bodyMap, zoneByCode, zonesForView } from "@/features/bodymap/zones";
 import i18n from "@/lib/i18n";
 import en from "@/lib/i18n/locales/en.json";
 import es from "@/lib/i18n/locales/es.json";
+import pt from "@/lib/i18n/locales/pt.json";
 
 describe("body map data", () => {
   it("carries 28 zones per body view that tile the same silhouette, and the detail views", () => {
@@ -30,7 +31,9 @@ describe("zone names", () => {
     expect(codes.length).toBeGreaterThan(60);
     const missing = codes.filter(
       (code) =>
-        !(code in (en.zones as Record<string, string>)) || !(code in (es.zones as Record<string, string>)),
+        !(code in (en.zones as Record<string, string>)) ||
+        !(code in (es.zones as Record<string, string>)) ||
+        !(code in (pt.zones as Record<string, string>)),
     );
     expect(missing).toEqual([]);
   });

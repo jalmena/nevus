@@ -21,6 +21,7 @@ router = APIRouter(prefix="/api/push", tags=["push"])
 GREETING = {
     "en": ("neVus can reach this device", "Reminders about marks due for a photo will arrive here."),
     "es": ("neVus llega a este dispositivo", "Los recordatorios de marcas pendientes de foto llegarán aquí."),
+    "pt": ("O neVus chega a este aparelho", "Os lembretes de marcas com foto pendente chegarão aqui."),
 }
 
 

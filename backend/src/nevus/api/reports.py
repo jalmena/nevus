@@ -17,13 +17,14 @@ from nevus.auth import service
 from nevus.auth.dependencies import AppSettings, CurrentUser, DbSession, client_ip
 from nevus.db.models import ACCESS_MANAGER, ACCESS_OWNER, Lesion, Person, PersonAccess, Report, User
 from nevus.jobs import queue
+from nevus.languages import Language, normalise
 from nevus.reports.jobs import REPORT_KIND
 from nevus.storage.blobs import BlobStore
 
 router = APIRouter(prefix="/api", tags=["reports"])
 Scope = Literal["lesion", "profile", "visit", "selection"]
 RequestScope = Literal["lesion", "profile", "selection"]
-Language = Literal["en", "es"]
+
 Paper = Literal["a4", "letter"]
 
 
@@ -111,7 +112,7 @@ def create_report(
         requested_by=user.id,
         scope=scope,
         lesion_ids=lesion_ids,
-        language=language or (user.language if user.language in ("en", "es") else "en"),
+        language=language or normalise(user.language),
         paper=paper,
         options=options or {},
     )

@@ -20,6 +20,7 @@ from nevus.db.models import Job, Report
 from nevus.db.types import utcnow
 from nevus.domain import purge
 from nevus.jobs.registry import KINDS
+from nevus.languages import LANGUAGES
 from nevus.reports import i18n
 from nevus.reports.jobs import REPORT_KIND
 from nevus.reports.render import _fetcher, css_string
@@ -190,6 +191,10 @@ def test_spanish_numbers_dates_and_signs() -> None:
     assert en.area(19.6, 1.46) == "19.6\u00a0±\u00a01.5\u00a0mm²"
     assert es.day(date(2026, 3, 2)) == "2 de marzo de 2026" and en.day(date(2026, 3, 2)) == "2 March 2026"
     assert es.zone("1250") == "Pectoral derecho"
+    pt = i18n.Words("pt")
+    assert pt.mm(5.12, 0.21) == "5,1\u00a0±\u00a00,2\u00a0mm"
+    assert pt.day(date(2026, 3, 2)) == "2 de março de 2026" and pt.short_day(date(2026, 3, 2)) == "2\u00a0mar\u00a02026"
+    assert pt.zone("1250") == "Peitoral direito" and i18n.Words("xx").language == "en"
 
 
 def test_user_text_cannot_break_out_of_the_page_footer() -> None:
@@ -217,7 +222,7 @@ def test_report_colours_and_zone_names_match_the_app() -> None:
     light = css[: css.index("@media")]
     for name, value in COLOURS.items():
         assert re.search(rf"--color-{re.escape(name)}:\s*{re.escape(value)};", light), name
-    for language in i18n.LANGUAGES:
+    for language in LANGUAGES:
         app = json.loads((FRONTEND / f"src/lib/i18n/locales/{language}.json").read_text())
         assert i18n.zone_names()[language] == app["zones"], language
 

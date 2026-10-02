@@ -12,7 +12,7 @@ import {
   useSaveInstanceSettings,
   useTestEmail,
 } from "@/lib/admin";
-import { supportedLanguages } from "@/lib/i18n";
+import { supportedLanguages, type Language } from "@/lib/i18n";
 import { BackupSettings } from "./BackupSettings";
 import { WebhookSettings } from "./WebhookSettings";
 import styles from "@/features/settings/settings.module.css";
@@ -150,7 +150,7 @@ export function AdminSettings() {
           <span>{t("admin.defaultLanguage")}</span>
           <select
             value={instance.data?.default_language ?? "en"}
-            onChange={(e) => saveInstance.mutate({ default_language: e.target.value as "en" | "es" })}
+            onChange={(e) => saveInstance.mutate({ default_language: e.target.value as Language })}
           >
             {supportedLanguages.map((code) => (
               <option key={code} value={code}>

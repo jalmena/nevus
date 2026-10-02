@@ -18,7 +18,8 @@
   },
   "languages": {
     "en": "English",
-    "es": "Spanish"
+    "es": "Spanish",
+    "pt": "Portuguese"
   },
   "auth": {
     "username": "Username",

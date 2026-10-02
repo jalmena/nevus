@@ -32,6 +32,7 @@ from nevus.db.models import (
     User,
 )
 from nevus.db.types import utcnow
+from nevus.languages import Language
 from nevus.storage.blobs import BlobStore
 
 router = APIRouter(prefix="/api", tags=["measurements"])
@@ -254,7 +255,7 @@ def _reference_out(row: ScaleReference) -> ScaleReferenceOut:
 def reference_card(
     user: CurrentUser,
     page: Annotated[Literal["a4", "letter"], Query()] = "a4",
-    lang: Annotated[Literal["en", "es"], Query()] = "en",
+    lang: Annotated[Language, Query()] = "en",
 ) -> Response:
     """Two window cards, two strips and a 50 mm line to verify the printer did not scale the page."""
     pdf = render_sheet(page, lang)

@@ -15,6 +15,7 @@ from nevus.auth import service
 from nevus.auth.dependencies import AdminUser, AppSettings, DbSession, client_ip
 from nevus.db.models import JOB_QUEUED, JOB_RUNNING, Job
 from nevus.jobs import queue
+from nevus.languages import Language
 from nevus.maintenance import BACKUP_KIND, VERIFICATION_KEY, VERIFY_KIND
 from nevus.notify import email
 
@@ -50,7 +51,7 @@ class TestEmailIn(BaseModel):
 
 
 class InstanceOut(BaseModel):
-    default_language: Literal["en", "es"]
+    default_language: Language
 
 
 class BackupFileOut(BaseModel):

@@ -31,6 +31,13 @@ TEXT = {
         "prepare": "Prepara la cita en neVus",
         "photograph": "Fotografía la marca en neVus",
     },
+    "pt": {
+        "calendar": "neVus · {person}",
+        "due": "Foto pendente: {mark} ({person})",
+        "appointment": "Consulta: {person}",
+        "prepare": "Preparar a consulta no neVus",
+        "photograph": "Fotografar a marca no neVus",
+    },
 }
 
 

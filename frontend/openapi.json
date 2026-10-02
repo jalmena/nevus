@@ -2125,7 +2125,8 @@
           "default_language": {
             "enum": [
               "en",
-              "es"
+              "es",
+              "pt"
             ],
             "title": "Default Language",
             "type": "string"
@@ -3920,7 +3921,8 @@
               {
                 "enum": [
                   "en",
-                  "es"
+                  "es",
+                  "pt"
                 ],
                 "type": "string"
               },
@@ -4048,7 +4050,8 @@
           "language": {
             "enum": [
               "en",
-              "es"
+              "es",
+              "pt"
             ],
             "title": "Language",
             "type": "string"
@@ -4991,7 +4994,8 @@
               {
                 "enum": [
                   "en",
-                  "es"
+                  "es",
+                  "pt"
                 ],
                 "type": "string"
               },
@@ -5263,7 +5267,8 @@
               {
                 "enum": [
                   "en",
-                  "es"
+                  "es",
+                  "pt"
                 ],
                 "type": "string"
               },
@@ -9608,7 +9613,8 @@
               "default": "en",
               "enum": [
                 "en",
-                "es"
+                "es",
+                "pt"
               ],
               "title": "Lang",
               "type": "string"

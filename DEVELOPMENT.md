@@ -67,6 +67,18 @@ It starts the real backend on a scratch data directory, walks every screen on a 
 
 The silhouette and the zone geometry are generated, not drawn by hand. `uv run tools/bodymap/build.py --preview docs/design/bodymap` rebuilds `zones.json` in both the backend and the frontend (the two copies must stay identical; CI checks it) and refreshes the labelled previews in `docs/design/bodymap/`. The zone identifiers, names and hit polygons come from MoleMapper (see `THIRD_PARTY_NOTICES.md`); the silhouette is neVus artwork built in `tools/bodymap/build.py`. Design notes: `docs/design/BODY_MAP.md`.
 
+## Adding a language
+
+The languages neVus speaks are listed once, in `backend/src/nevus/languages.py`; the API types, the stored preferences and the reports read that list. To add one:
+
+1. Add its code to `Language` there. The interface, the emails and the reports use the same two-letter code.
+2. Frontend: copy `src/lib/i18n/locales/en.json` to `<code>.json` and translate every string, keeping the `{{placeholders}}`; give the plural forms the language needs (`_one`, `_other`, and `_many` or `_zero` where the language has them, as `es.json` and `pt.json` do); name the new language under `languages` in every catalogue; add it to `supportedLanguages` and `resources` in `src/lib/i18n/index.ts`. `tests/i18n.test.ts` checks that every catalogue has the same keys and placeholders as the English one.
+3. Backend: add the language to `TEXT` and `MONTHS` in `reports/i18n.py` (and to `DECIMAL_COMMA` if it writes 5,1 rather than 5.1; the `day` format has a branch per convention), to `TEXT` in `notify/email.py`, `notify/calendar.py` and `notify/webhooks.py`, and to `GREETING` in `api/push.py`; copy the `zones` block of the new catalogue into `reports/zone_names.json`. `tests/test_languages.py` checks the parity, and `tests/test_reports.py` that the reports' zone names equal the app's.
+4. Lint: give `tests/test_language.py` the language's disease, risk and prompting words in `FORBIDDEN`, and in `ALLOWED` the exact sentences that say what neVus does not do (the intended-use statement among them). Nothing user-facing ships without passing that check.
+5. Regenerate the API types (`nevus openapi`, then `pnpm run openapi`) and mention the language in the README and in `PRODUCT_REQUIREMENTS.md`.
+
+Translations are reviewed by a speaker before a release; machine output is a draft, not a catalogue.
+
 ## Releasing
 
 One release is one pull request into `main` plus what the release workflow does with it.

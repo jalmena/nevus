@@ -47,6 +47,18 @@ TEXT = {
         "test_subject": "neVus: mensaje de prueba",
         "test_body": "Este es un mensaje de prueba de neVus. Los recordatorios por correo llegarán a esta dirección.",
     },
+    "pt": {
+        "subject_one": "neVus: uma marca tem foto pendente",
+        "subject_other": "neVus: {n} marcas têm foto pendente",
+        "intro": "Estas marcas têm uma foto nova pendente:",
+        "due_since": "pendente desde {date}",
+        "open": "Abrir o neVus: {url}",
+        "footer": "Recebe esta mensagem porque os lembretes por e-mail estão ligados nas suas definições "
+        "do neVus. O neVus é um auxiliar pessoal de documentação; não diagnostica nem avalia "
+        "nenhuma doença.",
+        "test_subject": "neVus: mensagem de teste",
+        "test_body": "Esta é uma mensagem de teste do neVus. Os lembretes por e-mail chegarão a este endereço.",
+    },
 }
 
 
