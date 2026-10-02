@@ -143,6 +143,27 @@ describe("full-body sessions", () => {
     );
   });
 
+  it("blurs areas of the zone photo marked with two taps each, and the photo is replaced", async () => {
+    const state = install({
+      bodySessions: [
+        session("s1", "2026-10-01T10:00:00Z", { chest: { status: "captured", image_id: "img1", marks: [] } }),
+      ],
+    });
+    renderApp("/sessions/s1/zones/chest");
+    const user = userEvent.setup();
+    const canvas = await screen.findByRole("application", { name: "Photo of Chest and shoulders" });
+    await user.click(screen.getByRole("button", { name: "Blur a part of the photo" }));
+    expect(screen.getByRole("button", { name: "Blur 0 areas" })).toBeDisabled();
+    await user.pointer([{ keys: "[MouseLeft]", target: canvas, coords: { clientX: 64, clientY: 48 } }]);
+    await user.pointer([{ keys: "[MouseLeft]", target: canvas, coords: { clientX: 320, clientY: 240 } }]);
+    expect(screen.getByRole("button", { name: "Blur 1 area" })).toBeEnabled();
+    await user.click(screen.getByRole("button", { name: "Blur 1 area" }));
+    await waitFor(() => expect(state.bodySessions[0]?.zones.chest?.image_id).not.toBe("img1"));
+    const sent = state.calls.find((c) => c.method === "POST" && c.url.endsWith("/zones/chest/blur"));
+    expect(sent?.body).toEqual({ regions: [{ x: 0.1, y: 0.1, width: 0.4, height: 0.4 }] });
+    expect(screen.queryByRole("heading", { name: "Blur part of the photo" })).not.toBeInTheDocument();
+  });
+
   it("hides proposed spots when the experimental analysis is off", async () => {
     install({
       bodySessions: [

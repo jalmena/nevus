@@ -835,7 +835,14 @@
         "name": "Soles",
         "pose": "Sit or kneel and show both soles to the camera, the heels included."
       }
-    }
+    },
+    "blur": "Blur a part of the photo",
+    "blurTitle": "Blur part of the photo",
+    "blurHint": "Tap two opposite corners of the area to blur. Add as many areas as you need, then apply.",
+    "blurNote": "The blurred photo takes this one's place. The original is removed at once, not kept in the trash, and cannot be brought back; the marks on the photo stay.",
+    "blurApply_one": "Blur {{count}} area",
+    "blurApply_other": "Blur {{count}} areas",
+    "blurUndo": "Remove the last area"
   },
   "secondFactor": {
     "title": "Second factor",

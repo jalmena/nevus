@@ -270,6 +270,61 @@
         "title": "BackupStatusOut",
         "type": "object"
       },
+      "BlurIn": {
+        "properties": {
+          "regions": {
+            "items": {
+              "$ref": "#/components/schemas/BlurRegionIn"
+            },
+            "maxItems": 12,
+            "minItems": 1,
+            "title": "Regions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "regions"
+        ],
+        "title": "BlurIn",
+        "type": "object"
+      },
+      "BlurRegionIn": {
+        "description": "A rectangle of the upright photo, as fractions of its width and height.",
+        "properties": {
+          "height": {
+            "exclusiveMinimum": 0.0,
+            "maximum": 1.0,
+            "title": "Height",
+            "type": "number"
+          },
+          "width": {
+            "exclusiveMinimum": 0.0,
+            "maximum": 1.0,
+            "title": "Width",
+            "type": "number"
+          },
+          "x": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Y",
+            "type": "number"
+          }
+        },
+        "required": [
+          "x",
+          "y",
+          "width",
+          "height"
+        ],
+        "title": "BlurRegionIn",
+        "type": "object"
+      },
       "BodyMap": {
         "properties": {
           "attribution": {
@@ -9675,6 +9730,69 @@
           }
         },
         "summary": "Finish Session",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/api/sessions/{session_id}/zones/{zone}/blur": {
+      "post": {
+        "description": "Make parts of the zone's photo unrecognisable (FR-SES-05). A blurred copy takes the photo's place\nand keeps its marks; the unblurred photo and its renditions are removed at once, not kept in the trash.",
+        "operationId": "blur_zone_photo_api_sessions__session_id__zones__zone__blur_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "zone",
+            "required": true,
+            "schema": {
+              "title": "Zone",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlurIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BodySessionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Blur Zone Photo",
         "tags": [
           "sessions"
         ]

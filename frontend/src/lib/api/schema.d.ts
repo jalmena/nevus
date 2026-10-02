@@ -1428,6 +1428,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/sessions/{session_id}/zones/{zone}/blur": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Blur Zone Photo
+         * @description Make parts of the zone's photo unrecognisable (FR-SES-05). A blurred copy takes the photo's place
+         *     and keeps its marks; the unblurred photo and its renditions are removed at once, not kept in the trash.
+         */
+        post: operations["blur_zone_photo_api_sessions__session_id__zones__zone__blur_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/sessions/{session_id}/zones/{zone}/marks": {
         parameters: {
             query?: never;
@@ -1753,6 +1774,25 @@ export interface components {
             verification_queued: boolean;
             /** Verify Days */
             verify_days: number;
+        };
+        /** BlurIn */
+        BlurIn: {
+            /** Regions */
+            regions: components["schemas"]["BlurRegionIn"][];
+        };
+        /**
+         * BlurRegionIn
+         * @description A rectangle of the upright photo, as fractions of its width and height.
+         */
+        BlurRegionIn: {
+            /** Height */
+            height: number;
+            /** Width */
+            width: number;
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
         };
         /** BodyMap */
         BodyMap: {
@@ -6645,6 +6685,42 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BodySessionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    blur_zone_photo_api_sessions__session_id__zones__zone__blur_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+                zone: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BlurIn"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {

@@ -19,6 +19,7 @@ from nevus.auth import service
 from nevus.auth.dependencies import AppSettings, CurrentUser, DbSession, client_ip
 from nevus.bodymap import body_map
 from nevus.cv.imageio import decode
+from nevus.cv.pipeline import enqueue_analyses
 from nevus.db.models import (
     ACCESS_MANAGER,
     ACCESS_OWNER,
@@ -33,9 +34,11 @@ from nevus.db.models import (
     User,
 )
 from nevus.db.types import utcnow
-from nevus.sessions import BY_ID, PROTOCOL, PROTOCOL_VERSION
+from nevus.domain import purge
+from nevus.sessions import BY_ID, PROTOCOL, PROTOCOL_VERSION, blur
 from nevus.sessions.jobs import analysing, enqueue_candidates
-from nevus.storage.blobs import BlobStore
+from nevus.storage.blobs import BlobStore, InsufficientStorageError
+from nevus.storage.renditions import make_renditions
 
 router = APIRouter(prefix="/api", tags=["sessions"])
 ZoneStatus = Literal["pending", "captured", "skipped"]
@@ -114,6 +117,19 @@ class MarkUpdate(BaseModel):
     state: Literal["confirmed", "rejected"] | None = None
     lesion_id: uuid.UUID | None = None
     new_mark: NewMark | None = None
+
+
+class BlurRegionIn(BaseModel):
+    """A rectangle of the upright photo, as fractions of its width and height."""
+
+    x: float = Field(ge=0, le=1)
+    y: float = Field(ge=0, le=1)
+    width: float = Field(gt=0, le=1)
+    height: float = Field(gt=0, le=1)
+
+
+class BlurIn(BaseModel):
+    regions: list[BlurRegionIn] = Field(min_length=1, max_length=12)
 
 
 class Sighting(BaseModel):
@@ -318,6 +334,81 @@ async def zone_photo(
     db.flush()
     enqueue_candidates(db, target, image)
     return _out(db, row, person, access)
+
+
+@router.post("/sessions/{session_id}/zones/{zone}/blur", response_model=BodySessionOut)
+def blur_zone_photo(
+    session_id: uuid.UUID,
+    zone: str,
+    body: BlurIn,
+    request: Request,
+    user: CurrentUser,
+    db: DbSession,
+    settings: AppSettings,
+) -> BodySessionOut:
+    """Make parts of the zone's photo unrecognisable (FR-SES-05). A blurred copy takes the photo's place
+    and keeps its marks; the unblurred photo and its renditions are removed at once, not kept in the trash."""
+    row, person, access = _session(db, session_id, user, ACCESS_OWNER, ACCESS_MANAGER)
+    target = _zone(db, row, zone)
+    old = db.get(Image, target.image_id) if target.image_id else None
+    if old is None or old.deleted_at is not None:
+        raise HTTPException(status.HTTP_409_CONFLICT, "Take the zone's photo first.")
+    store: BlobStore = request.app.state.blob_store
+    regions = [blur.Region(r.x, r.y, min(r.width, 1 - r.x), min(r.height, 1 - r.y)) for r in body.regions]
+    data, width, height = blur.blurred(store.path(old.sha256).read_bytes(), old.orientation, regions)
+    try:
+        digest = store.put(data)
+        stored = [(r, store.put(r.data, derived=True)) for r in make_renditions(data, 1)]
+    except InsufficientStorageError as error:
+        raise HTTPException(status.HTTP_507_INSUFFICIENT_STORAGE, "The data volume is nearly full.") from error
+    fresh = Image(
+        person_id=person.id,
+        role=old.role,
+        modality=old.modality,
+        sha256=digest,
+        bytes=len(data),
+        mime="image/jpeg",
+        width=width,
+        height=height,
+        orientation=1,
+        source_format="JPEG",
+        re_encoded=True,
+        captured_at=old.captured_at,
+        captured_tz=old.captured_tz,
+        created_by=user.id,
+    )
+    db.add(fresh)
+    db.flush()
+    for rendition, rendition_digest in stored:
+        db.add(
+            Rendition(
+                image_id=fresh.id,
+                kind=rendition.kind,
+                sha256=rendition_digest,
+                bytes=len(rendition.data),
+                mime=rendition.mime,
+                width=rendition.width,
+                height=rendition.height,
+            )
+        )
+    target.image_id = fresh.id
+    db.flush()
+    enqueue_analyses(db, fresh)
+    _remove_for_good(db, store, old)
+    details = {"replaced": str(old.id), "regions": len(regions), "zone": zone}
+    service.audit(db, "image.blur", user, "image", fresh.id, client_ip(request, settings), details)
+    return _out(db, row, person, access)
+
+
+def _remove_for_good(db: Session, store: BlobStore, image: Image) -> None:
+    """The unblurred photo must not linger: its rows go now, and its files unless another photo shares them."""
+    shas = [(image.sha256, False)] + [(r.sha256, True) for r in image.renditions]
+    purge.purge_image(db, image.id)
+    db.flush()
+    for sha, derived in shas:
+        model = Rendition if derived else Image
+        if db.scalar(select(model.id).where(model.sha256 == sha).limit(1)) is None:
+            store.delete(sha, derived=derived)
 
 
 @router.post("/sessions/{session_id}/zones/{zone}/skip", response_model=BodySessionOut)

@@ -1114,7 +1114,9 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
           })),
         );
       }
-      match = /^\/api\/sessions\/([^/]+)(?:\/(finish)|\/zones\/([^/]+)\/(photo|skip|marks))?$/.exec(path);
+      match = /^\/api\/sessions\/([^/]+)(?:\/(finish)|\/zones\/([^/]+)\/(photo|skip|marks|blur))?$/.exec(
+        path,
+      );
       if (match) {
         const row = state.bodySessions.find((item) => item.id === match?.[1]);
         if (!row) return json({ detail: "No such session." }, 404);
@@ -1131,6 +1133,11 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
           return json(sessionOut(row));
         }
         const zone = (row.zones[zoneId ?? ""] ??= { status: "pending", image_id: null, marks: [] });
+        if (action === "blur") {
+          if (!zone.image_id) return json({ detail: "Take the zone's photo first." }, 409);
+          zone.image_id = nextId();
+          return json(sessionOut(row));
+        }
         if (action === "photo") {
           const file = form?.get("file");
           if (!(file instanceof File) || file.size === 0)

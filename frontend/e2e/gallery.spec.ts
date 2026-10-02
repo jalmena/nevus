@@ -87,6 +87,14 @@ test("every screen, for a look at the design", async ({ page }, info) => {
   await expect(page.getByRole("button", { name: /1\. Chest mark/ })).toBeVisible();
   await page.getByRole("button", { name: /1\. Chest mark/ }).click();
   await snap("15-session-zone");
+  await page.getByRole("button", { name: "Blur a part of the photo", exact: true }).click();
+  const area = await canvas.boundingBox(); // the page may have scrolled since the box above was measured
+  if (!area) throw new Error("no canvas");
+  await page.mouse.click(area.x + area.width * 0.55, area.y + area.height * 0.55);
+  await page.mouse.click(area.x + area.width * 0.9, area.y + area.height * 0.9);
+  await expect(page.getByRole("button", { name: "Blur 1 area", exact: true })).toBeEnabled();
+  await snap("15b-session-zone-blur");
+  await page.getByRole("button", { name: "Cancel", exact: true }).click();
   await page.getByRole("link", { name: "Back to the session", exact: true }).click();
   await page.getByRole("button", { name: "Finish the session", exact: true }).click();
   await expect(page.getByText(/^Finished/)).toBeVisible();

@@ -842,7 +842,15 @@
         "name": "Plantas de los pies",
         "pose": "Siéntate o arrodíllate y enseña las dos plantas a la cámara, talones incluidos."
       }
-    }
+    },
+    "blur": "Difuminar una parte de la foto",
+    "blurTitle": "Difuminar parte de la foto",
+    "blurHint": "Toca dos esquinas opuestas del área que quieres difuminar. Añade las áreas que necesites y después aplica.",
+    "blurNote": "La foto difuminada sustituye a esta. La original se elimina de inmediato, sin pasar por la papelera, y no se puede recuperar; las marcas de la foto se conservan.",
+    "blurApply_one": "Difuminar {{count}} área",
+    "blurApply_many": "Difuminar {{count}} áreas",
+    "blurApply_other": "Difuminar {{count}} áreas",
+    "blurUndo": "Quitar la última área"
   },
   "secondFactor": {
     "title": "Segundo factor",
