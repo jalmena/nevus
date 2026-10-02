@@ -21,6 +21,49 @@ export interface MockObservation {
   images: string[];
 }
 
+export interface MockSessionMark {
+  id: string;
+  x: number;
+  y: number;
+  lesion_id: string | null;
+  source: "person" | "candidate";
+  state: "pending" | "confirmed" | "rejected";
+  match: "matched" | "new" | "uncertain" | null;
+}
+
+export interface MockBodySession {
+  id: string;
+  person_id: string;
+  status: "open" | "finished";
+  started_at: string;
+  zones: Record<
+    string,
+    { status: "pending" | "captured" | "skipped"; image_id: string | null; marks: MockSessionMark[] }
+  >;
+}
+
+/** The capture protocol, as the server describes it. */
+export const PROTOCOL = [
+  { id: "face", covers: ["1100", "3150", "3151", "3171"], sensitive: false },
+  { id: "scalp", covers: ["2100", "3170", "3172"], sensitive: false },
+  { id: "chest", covers: ["1200", "1250", "1251", "1650", "1651"], sensitive: false },
+  { id: "abdomen", covers: ["1300", "1301", "1350", "1351"], sensitive: true },
+  { id: "upper-back", covers: ["2200", "2250", "2251", "2650", "2651"], sensitive: false },
+  { id: "lower-back", covers: ["2300", "2301", "2350", "2351"], sensitive: true },
+  { id: "right-arm-front", covers: ["1700", "1750", "1800"], sensitive: false },
+  { id: "left-arm-front", covers: ["1701", "1751", "1801"], sensitive: false },
+  { id: "right-arm-back", covers: ["2701", "2751", "2801"], sensitive: false },
+  { id: "left-arm-back", covers: ["2700", "2750", "2800"], sensitive: false },
+  { id: "palms", covers: ["1850", "1851", "3210", "3211"], sensitive: false },
+  { id: "backs-of-hands", covers: ["2850", "2851", "3220", "3221"], sensitive: false },
+  { id: "right-leg-front", covers: ["1400", "1450", "1500", "1550"], sensitive: false },
+  { id: "left-leg-front", covers: ["1401", "1451", "1501", "1551"], sensitive: false },
+  { id: "right-leg-back", covers: ["2401", "2451", "2501", "2551"], sensitive: false },
+  { id: "left-leg-back", covers: ["2400", "2450", "2500", "2550"], sensitive: false },
+  { id: "tops-of-feet", covers: ["1600", "1601", "3320", "3321"], sensitive: false },
+  { id: "soles", covers: ["2600", "2601", "3310", "3311"], sensitive: false },
+];
+
 export interface MockState {
   claimed: boolean;
   session: {
@@ -63,6 +106,10 @@ export interface MockState {
   labels: Record<string, { outline: number[][] | null; quality: string | null }>;
   /** "proxy": a reverse proxy signs people in; there are no local passwords. */
   authMode: "local" | "proxy";
+  /** Whether the experimental analysis is on for every person. */
+  experimental: boolean;
+  /** Full-body sessions; with the experimental analysis on, a zone photo gets one proposed spot. */
+  bodySessions: MockBodySession[];
   calendar: { exists: boolean };
   /** Reports; a queued one is ready the next time the list is read, unless it is set to fail. */
   reports: {
@@ -125,6 +172,8 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     authMode: "local",
     proposals: {},
     labels: {},
+    experimental: false,
+    bodySessions: [],
     ...initial,
   };
   const personOut = (p: { id: string; display_name: string }) => ({
@@ -132,7 +181,7 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     birth_year: null,
     skin_tone: null,
     owner_user_id: "0199a000-0000-7000-8000-000000000001",
-    experimental_analysis: false,
+    experimental_analysis: state.experimental,
     created_at: "2026-09-23T10:00:00Z",
     updated_at: "2026-09-23T10:00:00Z",
     my_role: "owner",
@@ -885,6 +934,202 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
           coverage: aligned ? 0.98 : null,
           mean_difference: aligned ? 3.1 : null,
         });
+      }
+      if (path === "/api/sessions/protocol") return json(PROTOCOL);
+      const markOut = (m: MockSessionMark) => ({ ...m, crop_url: `/api/session-marks/${m.id}/crop` });
+      const sessionOut = (row: MockBodySession) => ({
+        id: row.id,
+        person_id: row.person_id,
+        protocol: "nevus-session-protocol/1",
+        status: row.status,
+        notes: null,
+        started_at: row.started_at,
+        finished_at: row.status === "finished" ? row.started_at : null,
+        zones: PROTOCOL.map((capture) => {
+          const zone = row.zones[capture.id] ?? { status: "pending", image_id: null, marks: [] };
+          return {
+            zone: capture.id,
+            status: zone.status,
+            image_id: zone.image_id,
+            upright_width: zone.image_id ? 640 : null,
+            upright_height: zone.image_id ? 480 : null,
+            marks: zone.marks
+              .filter((m) => m.state !== "rejected" && (m.source === "person" || state.experimental))
+              .map(markOut),
+            analysing: false,
+          };
+        }),
+        can_edit: true,
+        experimental: state.experimental,
+      });
+      const findMark = (id: string) => {
+        for (const row of state.bodySessions)
+          for (const zone of Object.values(row.zones)) {
+            const mark = zone.marks.find((m) => m.id === id);
+            if (mark) return { row, zone, mark };
+          }
+        return null;
+      };
+      const linkTo = (
+        input: { lesion_id?: string | null; new_mark?: { zone_code: string; label: string | null } | null },
+        personId: string,
+      ) => {
+        if (input.lesion_id) return input.lesion_id;
+        if (!input.new_mark) return null;
+        const id = nextId();
+        state.lesions.push({
+          id,
+          person_id: personId,
+          label: input.new_mark.label,
+          zone: input.new_mark.zone_code,
+          x: 0.5,
+          y: 0.3,
+          due: false,
+        });
+        return id;
+      };
+      match = /^\/api\/persons\/([^/]+)\/sessions$/.exec(path);
+      if (match && method === "POST") {
+        const row: MockBodySession = {
+          id: nextId(),
+          person_id: match[1] ?? "",
+          status: "open",
+          started_at: "2026-10-01T10:00:00Z",
+          zones: {},
+        };
+        state.bodySessions.unshift(row);
+        return json(sessionOut(row), 201);
+      }
+      if (match && method === "GET") {
+        return json(
+          state.bodySessions
+            .filter((row) => row.person_id === match?.[1])
+            .map((row) => {
+              const zones = PROTOCOL.map((capture) => row.zones[capture.id]?.status ?? "pending");
+              return {
+                id: row.id,
+                status: row.status,
+                started_at: row.started_at,
+                finished_at: null,
+                captured: zones.filter((z) => z === "captured").length,
+                skipped: zones.filter((z) => z === "skipped").length,
+                pending: zones.filter((z) => z === "pending").length,
+                marks: Object.values(row.zones).flatMap((z) => z.marks.filter((m) => m.state === "confirmed"))
+                  .length,
+              };
+            }),
+        );
+      }
+      match = /^\/api\/sessions\/([^/]+)\/compare\/([^/]+)$/.exec(path);
+      if (match) {
+        const [one, two] = [match[1], match[2]].map((id) => state.bodySessions.find((row) => row.id === id));
+        if (!one || !two) return json({ detail: "No such session." }, 404);
+        const [earlier, later] = [one, two].sort((a, b) => a.started_at.localeCompare(b.started_at));
+        return json(
+          PROTOCOL.filter((c) => earlier?.zones[c.id]?.image_id && later?.zones[c.id]?.image_id).map((c) => ({
+            zone: c.id,
+            earlier_image_id: earlier?.zones[c.id]?.image_id,
+            later_image_id: later?.zones[c.id]?.image_id,
+          })),
+        );
+      }
+      match = /^\/api\/sessions\/([^/]+)(?:\/(finish)|\/zones\/([^/]+)\/(photo|skip|marks))?$/.exec(path);
+      if (match) {
+        const row = state.bodySessions.find((item) => item.id === match?.[1]);
+        if (!row) return json({ detail: "No such session." }, 404);
+        const [, , finish, zoneId, action] = match;
+        if (!finish && !action) {
+          if (method === "DELETE") {
+            state.bodySessions = state.bodySessions.filter((item) => item !== row);
+            return new Response(null, { status: 204 });
+          }
+          return json(sessionOut(row));
+        }
+        if (finish) {
+          row.status = "finished";
+          return json(sessionOut(row));
+        }
+        const zone = (row.zones[zoneId ?? ""] ??= { status: "pending", image_id: null, marks: [] });
+        if (action === "photo") {
+          const file = form?.get("file");
+          if (!(file instanceof File) || file.size === 0)
+            return json({ detail: "The upload is empty." }, 400);
+          zone.status = "captured";
+          zone.image_id = nextId();
+          zone.marks = state.experimental
+            ? [
+                {
+                  id: nextId(),
+                  x: 0.4,
+                  y: 0.5,
+                  lesion_id: null,
+                  source: "candidate",
+                  state: "pending",
+                  match: "new",
+                },
+              ]
+            : [];
+          return json(sessionOut(row));
+        }
+        if (action === "skip") {
+          if (method === "POST" && zone.status === "captured")
+            return json({ detail: "This zone already has a photo." }, 409);
+          zone.status = method === "POST" ? "skipped" : zone.status === "skipped" ? "pending" : zone.status;
+          return json(sessionOut(row));
+        }
+        const input = body as {
+          x: number;
+          y: number;
+          lesion_id?: string | null;
+          new_mark?: { zone_code: string; label: string | null } | null;
+        };
+        const mark: MockSessionMark = {
+          id: nextId(),
+          x: input.x,
+          y: input.y,
+          lesion_id: linkTo(input, row.person_id),
+          source: "person",
+          state: "confirmed",
+          match: null,
+        };
+        zone.marks.push(mark);
+        return json(markOut(mark), 201);
+      }
+      match = /^\/api\/session-marks\/([^/]+)$/.exec(path);
+      if (match) {
+        const found = findMark(match[1] ?? "");
+        if (!found) return json({ detail: "No such mark." }, 404);
+        if (method === "DELETE") {
+          found.zone.marks = found.zone.marks.filter((m) => m !== found.mark);
+          return new Response(null, { status: 204 });
+        }
+        const input = body as {
+          state?: "confirmed" | "rejected" | null;
+          lesion_id?: string | null;
+          new_mark?: { zone_code: string; label: string | null } | null;
+        };
+        const linked = linkTo(input, found.row.person_id);
+        if (linked) found.mark.lesion_id = linked;
+        found.mark.state = input.state ?? (linked ? "confirmed" : found.mark.state);
+        return json(markOut(found.mark));
+      }
+      match = /^\/api\/lesions\/([^/]+)\/sightings$/.exec(path);
+      if (match) {
+        return json(
+          state.bodySessions.flatMap((row) =>
+            Object.entries(row.zones).flatMap(([zone, item]) =>
+              item.marks
+                .filter((m) => m.lesion_id === match?.[1] && m.state === "confirmed")
+                .map((m) => ({
+                  mark_id: m.id,
+                  session_id: row.id,
+                  zone,
+                  started_at: row.started_at,
+                  crop_url: `/api/session-marks/${m.id}/crop`,
+                })),
+            ),
+          ),
+        );
       }
       match = /^\/api\/observations\/([^/]+)\/images$/.exec(path);
       if (match && method === "POST") {

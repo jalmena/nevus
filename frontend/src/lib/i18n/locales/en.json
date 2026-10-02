@@ -697,5 +697,135 @@
     "save": "Save the label",
     "removeLabel": "Remove the label",
     "saved": "Label saved."
+  },
+  "sessions": {
+    "title": "Full-body sessions",
+    "intro": "A session photographs the whole body region by region, in the same order and pose each time, so two sessions can be compared zone by zone. Skip any region you prefer not to photograph.",
+    "start": "Start a session",
+    "titleFor": "Session of {{date}}",
+    "open": "In progress",
+    "finished": "Finished",
+    "progress": "{{captured}} of {{total}} regions photographed",
+    "skippedCount_one": "{{count}} skipped",
+    "skippedCount_other": "{{count}} skipped",
+    "marksCount_one": "{{count}} mark",
+    "marksCount_other": "{{count}} marks",
+    "compareLatest": "Compare the last two sessions",
+    "back": "Back to the person",
+    "backToSession": "Back to the session",
+    "howTo": "Use the same light and distance each time. Someone can help with the back, or prop the phone up and use its timer.",
+    "experimentalNote": "The experimental analysis is on for this person: after each photo, spots that may be marks are proposed for you to confirm or reject. None is recorded unless you confirm it.",
+    "sensitive": "This region may include intimate areas. Skip it if you prefer; nothing else depends on it.",
+    "pending": "Not photographed yet",
+    "skipped": "Skipped",
+    "analysing": "Looking for spots on the photo…",
+    "openZone": "Open the photo of {{zone}}",
+    "takePhoto": "Take the photo",
+    "retake": "Take it again",
+    "skip": "Skip",
+    "unskip": "Photograph it after all",
+    "finish": "Finish the session",
+    "delete": "Delete the session",
+    "deleteConfirm": "Delete this session? Its photos go to the trash and the marks found on them are removed from it. The marks themselves stay in the registry.",
+    "markHint": "Tap the photo where a mark is, then link it to a mark you already follow or record it as a new one.",
+    "markHintView": "The marks seen on this photo.",
+    "canvas": "Photo of {{zone}}",
+    "noPhoto": "This region has no photo in this session.",
+    "marksTitle": "Marks on this photo",
+    "proposedMatched": "Proposed: {{name}}, found again",
+    "proposedUncertain": "Proposed: {{name}} should be here, but no clear spot was found",
+    "proposedNew": "Proposed: a spot not linked to any mark",
+    "unlinked": "Not linked to a mark",
+    "newMarkTitle": "The mark you tapped",
+    "knownMark": "A mark you follow",
+    "linkKnown": "Link to it",
+    "newMarkZone": "Or record a new mark in",
+    "newMarkName": "Name (optional)",
+    "recordNew": "Record a new mark",
+    "proposalTitle": "Proposed spot",
+    "markTitle": "Mark",
+    "cropAlt": "The mark and the skin around it",
+    "confirmMatch": "Yes, it is that mark",
+    "rejectProposal": "Not a mark",
+    "removeMark": "Remove from this photo",
+    "compareTitle": "Two sessions, region by region",
+    "compareDates": "{{earlier}} and {{later}}",
+    "compareNone": "The two sessions have no region photographed in both.",
+    "compareZone": "Region",
+    "sightings": "Seen in full-body sessions",
+    "zones": {
+      "face": {
+        "name": "Face",
+        "pose": "Face the camera with your hair held back, so the whole face, the ears and the neck are in the frame."
+      },
+      "scalp": {
+        "name": "Scalp",
+        "pose": "Bow your head while someone parts the hair, and photograph the top and the back of the head."
+      },
+      "chest": {
+        "name": "Chest and shoulders",
+        "pose": "Stand facing the camera, arms relaxed at your sides. Frame from the chin to the bottom of the ribs."
+      },
+      "abdomen": {
+        "name": "Abdomen and pelvis",
+        "pose": "Stand facing the camera. Frame from the bottom of the ribs to the top of the thighs."
+      },
+      "upper-back": {
+        "name": "Upper back",
+        "pose": "Stand with your back to the camera, arms relaxed. Frame from the neck to the bottom of the shoulder blades."
+      },
+      "lower-back": {
+        "name": "Lower back and buttocks",
+        "pose": "Stand with your back to the camera. Frame from the bottom of the shoulder blades to the top of the thighs."
+      },
+      "right-arm-front": {
+        "name": "Right arm, front",
+        "pose": "Hold the right arm out to the side, palm forward. Frame from the shoulder to the wrist."
+      },
+      "left-arm-front": {
+        "name": "Left arm, front",
+        "pose": "Hold the left arm out to the side, palm forward. Frame from the shoulder to the wrist."
+      },
+      "right-arm-back": {
+        "name": "Right arm, back",
+        "pose": "Hold the right arm out to the side, palm back. Frame from the shoulder to the wrist, the elbow included."
+      },
+      "left-arm-back": {
+        "name": "Left arm, back",
+        "pose": "Hold the left arm out to the side, palm back. Frame from the shoulder to the wrist, the elbow included."
+      },
+      "palms": {
+        "name": "Palms",
+        "pose": "Lay both hands side by side, palms up, fingers apart."
+      },
+      "backs-of-hands": {
+        "name": "Backs of the hands",
+        "pose": "Lay both hands side by side, palms down, fingers apart."
+      },
+      "right-leg-front": {
+        "name": "Right leg, front",
+        "pose": "Stand facing the camera. Frame the right leg from the hip to the ankle."
+      },
+      "left-leg-front": {
+        "name": "Left leg, front",
+        "pose": "Stand facing the camera. Frame the left leg from the hip to the ankle."
+      },
+      "right-leg-back": {
+        "name": "Right leg, back",
+        "pose": "Stand with your back to the camera. Frame the right leg from the buttock to the heel."
+      },
+      "left-leg-back": {
+        "name": "Left leg, back",
+        "pose": "Stand with your back to the camera. Frame the left leg from the buttock to the heel."
+      },
+      "tops-of-feet": {
+        "name": "Tops of the feet",
+        "pose": "Stand with the feet slightly apart and photograph them from above, the ankles included."
+      },
+      "soles": {
+        "name": "Soles",
+        "pose": "Sit or kneel and show both soles to the camera, the heels included."
+      }
+    }
   }
 }

@@ -702,5 +702,137 @@
     "save": "Guardar la etiqueta",
     "removeLabel": "Quitar la etiqueta",
     "saved": "Etiqueta guardada."
+  },
+  "sessions": {
+    "title": "Sesiones de cuerpo entero",
+    "intro": "Una sesión fotografía todo el cuerpo región a región, en el mismo orden y postura cada vez, para poder comparar dos sesiones zona a zona. Salta cualquier región que prefieras no fotografiar.",
+    "start": "Empezar una sesión",
+    "titleFor": "Sesión del {{date}}",
+    "open": "En curso",
+    "finished": "Terminada",
+    "progress": "{{captured}} de {{total}} regiones fotografiadas",
+    "skippedCount_one": "{{count}} saltada",
+    "skippedCount_many": "{{count}} saltadas",
+    "skippedCount_other": "{{count}} saltadas",
+    "marksCount_one": "{{count}} marca",
+    "marksCount_many": "{{count}} marcas",
+    "marksCount_other": "{{count}} marcas",
+    "compareLatest": "Comparar las dos últimas sesiones",
+    "back": "Volver a la persona",
+    "backToSession": "Volver a la sesión",
+    "howTo": "Usa la misma luz y la misma distancia cada vez. Alguien puede ayudarte con la espalda, o apoya el teléfono y usa el temporizador.",
+    "experimentalNote": "El análisis experimental está activado para esta persona: tras cada foto se proponen manchas que pueden ser marcas, para que las confirmes o las descartes. No se registra ninguna si no la confirmas.",
+    "sensitive": "Esta región puede incluir zonas íntimas. Sáltala si lo prefieres; nada más depende de ella.",
+    "pending": "Aún sin foto",
+    "skipped": "Saltada",
+    "analysing": "Buscando manchas en la foto…",
+    "openZone": "Abrir la foto de {{zone}}",
+    "takePhoto": "Hacer la foto",
+    "retake": "Repetirla",
+    "skip": "Saltar",
+    "unskip": "Incluirla de nuevo",
+    "finish": "Terminar la sesión",
+    "delete": "Borrar la sesión",
+    "deleteConfirm": "¿Borrar esta sesión? Sus fotos van a la papelera y las marcas vistas en ellas se quitan de la sesión. Las marcas siguen en el registro.",
+    "markHint": "Toca la foto donde haya una marca y vincúlala a una marca que ya sigues o regístrala como nueva.",
+    "markHintView": "Las marcas vistas en esta foto.",
+    "canvas": "Foto de {{zone}}",
+    "noPhoto": "Esta región no tiene foto en esta sesión.",
+    "marksTitle": "Marcas en esta foto",
+    "proposedMatched": "Propuesta: {{name}}, encontrada de nuevo",
+    "proposedUncertain": "Propuesta: {{name}} debería estar aquí, pero no se ha encontrado una mancha clara",
+    "proposedNew": "Propuesta: una mancha sin vincular a ninguna marca",
+    "unlinked": "Sin vincular a una marca",
+    "newMarkTitle": "La marca que has tocado",
+    "knownMark": "Una marca que sigues",
+    "linkKnown": "Vincular",
+    "newMarkZone": "O registrar una marca nueva en",
+    "newMarkName": "Nombre (opcional)",
+    "recordNew": "Registrar una marca nueva",
+    "proposalTitle": "Mancha propuesta",
+    "markTitle": "Marca",
+    "cropAlt": "La marca y la piel de alrededor",
+    "confirmMatch": "Sí, es esa marca",
+    "rejectProposal": "No es una marca",
+    "removeMark": "Quitar de esta foto",
+    "compareTitle": "Dos sesiones, región a región",
+    "compareDates": "{{earlier}} y {{later}}",
+    "compareNone": "Las dos sesiones no tienen ninguna región fotografiada en ambas.",
+    "compareZone": "Región",
+    "sightings": "Vista en sesiones de cuerpo entero",
+    "zones": {
+      "face": {
+        "name": "Cara",
+        "pose": "Mira a la cámara con el pelo recogido, de modo que la cara entera, las orejas y el cuello queden en el encuadre."
+      },
+      "scalp": {
+        "name": "Cuero cabelludo",
+        "pose": "Inclina la cabeza mientras alguien aparta el pelo, y fotografía la parte de arriba y la de atrás de la cabeza."
+      },
+      "chest": {
+        "name": "Pecho y hombros",
+        "pose": "De pie, de frente a la cámara, con los brazos relajados a los lados. Encuadra desde la barbilla hasta el final de las costillas."
+      },
+      "abdomen": {
+        "name": "Abdomen y pelvis",
+        "pose": "De pie, de frente a la cámara. Encuadra desde el final de las costillas hasta el comienzo de los muslos."
+      },
+      "upper-back": {
+        "name": "Parte alta de la espalda",
+        "pose": "De pie, de espaldas a la cámara, con los brazos relajados. Encuadra desde el cuello hasta el final de los omóplatos."
+      },
+      "lower-back": {
+        "name": "Zona lumbar y glúteos",
+        "pose": "De pie, de espaldas a la cámara. Encuadra desde el final de los omóplatos hasta el comienzo de los muslos."
+      },
+      "right-arm-front": {
+        "name": "Brazo derecho, por delante",
+        "pose": "Separa el brazo derecho del cuerpo, con la palma hacia delante. Encuadra desde el hombro hasta la muñeca."
+      },
+      "left-arm-front": {
+        "name": "Brazo izquierdo, por delante",
+        "pose": "Separa el brazo izquierdo del cuerpo, con la palma hacia delante. Encuadra desde el hombro hasta la muñeca."
+      },
+      "right-arm-back": {
+        "name": "Brazo derecho, por detrás",
+        "pose": "Separa el brazo derecho del cuerpo, con la palma hacia atrás. Encuadra desde el hombro hasta la muñeca, codo incluido."
+      },
+      "left-arm-back": {
+        "name": "Brazo izquierdo, por detrás",
+        "pose": "Separa el brazo izquierdo del cuerpo, con la palma hacia atrás. Encuadra desde el hombro hasta la muñeca, codo incluido."
+      },
+      "palms": {
+        "name": "Palmas",
+        "pose": "Apoya las dos manos una junto a otra, con las palmas hacia arriba y los dedos separados."
+      },
+      "backs-of-hands": {
+        "name": "Dorso de las manos",
+        "pose": "Apoya las dos manos una junto a otra, con las palmas hacia abajo y los dedos separados."
+      },
+      "right-leg-front": {
+        "name": "Pierna derecha, por delante",
+        "pose": "De pie, de frente a la cámara. Encuadra la pierna derecha desde la cadera hasta el tobillo."
+      },
+      "left-leg-front": {
+        "name": "Pierna izquierda, por delante",
+        "pose": "De pie, de frente a la cámara. Encuadra la pierna izquierda desde la cadera hasta el tobillo."
+      },
+      "right-leg-back": {
+        "name": "Pierna derecha, por detrás",
+        "pose": "De pie, de espaldas a la cámara. Encuadra la pierna derecha desde el glúteo hasta el talón."
+      },
+      "left-leg-back": {
+        "name": "Pierna izquierda, por detrás",
+        "pose": "De pie, de espaldas a la cámara. Encuadra la pierna izquierda desde el glúteo hasta el talón."
+      },
+      "tops-of-feet": {
+        "name": "Empeines",
+        "pose": "De pie, con los pies algo separados, fotografíalos desde arriba, tobillos incluidos."
+      },
+      "soles": {
+        "name": "Plantas de los pies",
+        "pose": "Siéntate o arrodíllate y enseña las dos plantas a la cámara, talones incluidos."
+      }
+    }
   }
 }

@@ -250,6 +250,151 @@
         "title": "BodyMap",
         "type": "object"
       },
+      "BodySessionOut": {
+        "properties": {
+          "can_edit": {
+            "title": "Can Edit",
+            "type": "boolean"
+          },
+          "experimental": {
+            "title": "Experimental",
+            "type": "boolean"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "person_id": {
+            "format": "uuid",
+            "title": "Person Id",
+            "type": "string"
+          },
+          "protocol": {
+            "title": "Protocol",
+            "type": "string"
+          },
+          "started_at": {
+            "format": "date-time",
+            "title": "Started At",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "open",
+              "finished"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "zones": {
+            "items": {
+              "$ref": "#/components/schemas/SessionZoneOut"
+            },
+            "title": "Zones",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "person_id",
+          "protocol",
+          "status",
+          "notes",
+          "started_at",
+          "finished_at",
+          "zones",
+          "can_edit",
+          "experimental"
+        ],
+        "title": "BodySessionOut",
+        "type": "object"
+      },
+      "BodySessionSummary": {
+        "properties": {
+          "captured": {
+            "title": "Captured",
+            "type": "integer"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "marks": {
+            "title": "Marks",
+            "type": "integer"
+          },
+          "pending": {
+            "title": "Pending",
+            "type": "integer"
+          },
+          "skipped": {
+            "title": "Skipped",
+            "type": "integer"
+          },
+          "started_at": {
+            "format": "date-time",
+            "title": "Started At",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "open",
+              "finished"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "started_at",
+          "finished_at",
+          "captured",
+          "skipped",
+          "pending",
+          "marks"
+        ],
+        "title": "BodySessionSummary",
+        "type": "object"
+      },
       "Body_upload_image_api_persons__person_id__images_post": {
         "properties": {
           "captured_at": {
@@ -376,6 +521,58 @@
           "file"
         ],
         "title": "Body_upload_observation_image_api_observations__observation_id__images_post",
+        "type": "object"
+      },
+      "Body_zone_photo_api_sessions__session_id__zones__zone__photo_post": {
+        "properties": {
+          "captured_tz": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captured Tz"
+          },
+          "file": {
+            "contentMediaType": "application/octet-stream",
+            "title": "File",
+            "type": "string"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "title": "Body_zone_photo_api_sessions__session_id__zones__zone__photo_post",
+        "type": "object"
+      },
+      "CaptureZoneOut": {
+        "properties": {
+          "covers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Covers",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "sensitive": {
+            "title": "Sensitive",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "covers",
+          "sensitive"
+        ],
+        "title": "CaptureZoneOut",
         "type": "object"
       },
       "CardOut": {
@@ -2293,6 +2490,93 @@
         "title": "ManualIn",
         "type": "object"
       },
+      "MarkIn": {
+        "properties": {
+          "lesion_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lesion Id"
+          },
+          "new_mark": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NewMark"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "x": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Y",
+            "type": "number"
+          }
+        },
+        "required": [
+          "x",
+          "y"
+        ],
+        "title": "MarkIn",
+        "type": "object"
+      },
+      "MarkUpdate": {
+        "properties": {
+          "lesion_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lesion Id"
+          },
+          "new_mark": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NewMark"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "state": {
+            "anyOf": [
+              {
+                "enum": [
+                  "confirmed",
+                  "rejected"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State"
+          }
+        },
+        "title": "MarkUpdate",
+        "type": "object"
+      },
       "MeasurementBrief": {
         "properties": {
           "flags": {
@@ -2579,6 +2863,31 @@
           "created_at"
         ],
         "title": "NewFeedOut",
+        "type": "object"
+      },
+      "NewMark": {
+        "properties": {
+          "label": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "zone_code": {
+            "title": "Zone Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "zone_code"
+        ],
+        "title": "NewMark",
         "type": "object"
       },
       "ObservationIn": {
@@ -3524,6 +3833,102 @@
         "title": "ScaleReferenceOut",
         "type": "object"
       },
+      "SessionIn": {
+        "properties": {
+          "notes": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          }
+        },
+        "title": "SessionIn",
+        "type": "object"
+      },
+      "SessionMarkOut": {
+        "properties": {
+          "crop_url": {
+            "title": "Crop Url",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "lesion_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lesion Id"
+          },
+          "match": {
+            "anyOf": [
+              {
+                "enum": [
+                  "matched",
+                  "new",
+                  "uncertain"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Match"
+          },
+          "source": {
+            "enum": [
+              "person",
+              "candidate"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "pending",
+              "confirmed",
+              "rejected"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "x": {
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "title": "Y",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "x",
+          "y",
+          "lesion_id",
+          "source",
+          "state",
+          "match",
+          "crop_url"
+        ],
+        "title": "SessionMarkOut",
+        "type": "object"
+      },
       "SessionOut": {
         "properties": {
           "instance_claimed": {
@@ -3552,6 +3957,104 @@
           "sudo_until"
         ],
         "title": "SessionOut",
+        "type": "object"
+      },
+      "SessionPairOut": {
+        "properties": {
+          "earlier_image_id": {
+            "format": "uuid",
+            "title": "Earlier Image Id",
+            "type": "string"
+          },
+          "later_image_id": {
+            "format": "uuid",
+            "title": "Later Image Id",
+            "type": "string"
+          },
+          "zone": {
+            "title": "Zone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "zone",
+          "earlier_image_id",
+          "later_image_id"
+        ],
+        "title": "SessionPairOut",
+        "type": "object"
+      },
+      "SessionZoneOut": {
+        "properties": {
+          "analysing": {
+            "title": "Analysing",
+            "type": "boolean"
+          },
+          "image_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Id"
+          },
+          "marks": {
+            "items": {
+              "$ref": "#/components/schemas/SessionMarkOut"
+            },
+            "title": "Marks",
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "captured",
+              "skipped"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "upright_height": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Upright Height"
+          },
+          "upright_width": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Upright Width"
+          },
+          "zone": {
+            "title": "Zone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "zone",
+          "status",
+          "image_id",
+          "upright_width",
+          "upright_height",
+          "marks",
+          "analysing"
+        ],
+        "title": "SessionZoneOut",
         "type": "object"
       },
       "SideOut": {
@@ -3600,6 +4103,42 @@
           "scale_kind"
         ],
         "title": "SideOut",
+        "type": "object"
+      },
+      "Sighting": {
+        "properties": {
+          "crop_url": {
+            "title": "Crop Url",
+            "type": "string"
+          },
+          "mark_id": {
+            "format": "uuid",
+            "title": "Mark Id",
+            "type": "string"
+          },
+          "session_id": {
+            "format": "uuid",
+            "title": "Session Id",
+            "type": "string"
+          },
+          "started_at": {
+            "format": "date-time",
+            "title": "Started At",
+            "type": "string"
+          },
+          "zone": {
+            "title": "Zone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "mark_id",
+          "session_id",
+          "zone",
+          "started_at",
+          "crop_url"
+        ],
+        "title": "Sighting",
         "type": "object"
       },
       "SnoozeIn": {
@@ -6316,6 +6855,54 @@
         ]
       }
     },
+    "/api/lesions/{lesion_id}/sightings": {
+      "get": {
+        "description": "Where a mark was seen in full-body sessions, newest first.",
+        "operationId": "sightings_api_lesions__lesion_id__sightings_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lesion_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Lesion Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Sighting"
+                  },
+                  "title": "Response Sightings Api Lesions  Lesion Id  Sightings Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Sightings",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
     "/api/lesions/{lesion_id}/snooze": {
       "delete": {
         "operationId": "unsnooze_api_lesions__lesion_id__snooze_delete",
@@ -7715,6 +8302,104 @@
         ]
       }
     },
+    "/api/persons/{person_id}/sessions": {
+      "get": {
+        "operationId": "list_sessions_api_persons__person_id__sessions_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "person_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Person Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BodySessionSummary"
+                  },
+                  "title": "Response List Sessions Api Persons  Person Id  Sessions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Sessions",
+        "tags": [
+          "sessions"
+        ]
+      },
+      "post": {
+        "operationId": "start_session_api_persons__person_id__sessions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "person_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Person Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BodySessionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Start Session",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
     "/api/persons/{person_id}/usage": {
       "get": {
         "description": "Storage used by one person's photographs, against the operator's soft quota.",
@@ -8024,6 +8709,567 @@
         "summary": "Download Report",
         "tags": [
           "reports"
+        ]
+      }
+    },
+    "/api/session-marks/{mark_id}": {
+      "delete": {
+        "operationId": "delete_mark_api_session_marks__mark_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "mark_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Mark Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Mark",
+        "tags": [
+          "sessions"
+        ]
+      },
+      "patch": {
+        "description": "Confirm or reject a proposed mark, or link a mark to a known one or to a new one.",
+        "operationId": "update_mark_api_session_marks__mark_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "mark_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Mark Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionMarkOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Mark",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/api/session-marks/{mark_id}/crop": {
+      "get": {
+        "description": "The mark and its surroundings, cut from the zone photo's full rendition.",
+        "operationId": "mark_crop_api_session_marks__mark_id__crop_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "mark_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Mark Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Mark Crop",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/api/sessions/protocol": {
+      "get": {
+        "operationId": "protocol_api_sessions_protocol_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CaptureZoneOut"
+                  },
+                  "title": "Response Protocol Api Sessions Protocol Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Protocol",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/api/sessions/{session_id}": {
+      "delete": {
+        "description": "The session goes; its photos go to the trash, from where the purge removes them.",
+        "operationId": "delete_session_api_sessions__session_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Session",
+        "tags": [
+          "sessions"
+        ]
+      },
+      "get": {
+        "operationId": "get_session_api_sessions__session_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BodySessionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Session",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/api/sessions/{session_id}/compare/{other_id}": {
+      "get": {
+        "description": "FR-SES-04: the zones both sessions photographed, earlier and later, for the comparison view.",
+        "operationId": "compare_sessions_api_sessions__session_id__compare__other_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "other_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Other Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SessionPairOut"
+                  },
+                  "title": "Response Compare Sessions Api Sessions  Session Id  Compare  Other Id  Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Compare Sessions",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/api/sessions/{session_id}/finish": {
+      "post": {
+        "operationId": "finish_session_api_sessions__session_id__finish_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BodySessionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Finish Session",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/api/sessions/{session_id}/zones/{zone}/marks": {
+      "post": {
+        "description": "A mark the person points at on the zone photo, linked to a known mark or recorded as a new one.",
+        "operationId": "add_mark_api_sessions__session_id__zones__zone__marks_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "zone",
+            "required": true,
+            "schema": {
+              "title": "Zone",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionMarkOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add Mark",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/api/sessions/{session_id}/zones/{zone}/photo": {
+      "post": {
+        "operationId": "zone_photo_api_sessions__session_id__zones__zone__photo_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "zone",
+            "required": true,
+            "schema": {
+              "title": "Zone",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_zone_photo_api_sessions__session_id__zones__zone__photo_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BodySessionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Zone Photo",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/api/sessions/{session_id}/zones/{zone}/skip": {
+      "delete": {
+        "operationId": "unskip_zone_api_sessions__session_id__zones__zone__skip_delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "zone",
+            "required": true,
+            "schema": {
+              "title": "Zone",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BodySessionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Unskip Zone",
+        "tags": [
+          "sessions"
+        ]
+      },
+      "post": {
+        "operationId": "skip_zone_api_sessions__session_id__zones__zone__skip_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Session Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "zone",
+            "required": true,
+            "schema": {
+              "title": "Zone",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BodySessionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Skip Zone",
+        "tags": [
+          "sessions"
         ]
       }
     },

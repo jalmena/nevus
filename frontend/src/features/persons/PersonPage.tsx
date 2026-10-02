@@ -15,6 +15,7 @@ import { ExportForm } from "@/features/data/ExportForm";
 import { PurgePerson } from "@/features/data/PurgePerson";
 import { PrepareAppointment } from "@/features/appointments/PrepareAppointment";
 import { Reports } from "@/features/reports/Reports";
+import { SessionsSection } from "@/features/sessions/SessionsSection";
 import { CalendarLink } from "./CalendarLink";
 import { formatBytes, useUsage } from "@/lib/data";
 import { usePerson, useUpdatePerson } from "@/lib/persons";
@@ -141,6 +142,8 @@ export function PersonPage() {
       </section>
 
       {person.data && <PrepareAppointment personId={personId} canEdit={canEdit} />}
+
+      {person.data && <SessionsSection personId={personId} canEdit={canEdit} />}
 
       {person.data && <CalendarLink personId={personId} />}
 
