@@ -44,7 +44,10 @@
       "owner": "Propietario",
       "manager": "Gestor",
       "viewer": "Lector"
-    }
+    },
+    "profileTitle": "Ajustes del perfil",
+    "experimental": "Análisis experimental",
+    "experimentalHint": "Desactivado por defecto. Si lo activas, neVus puede proponer contornos y cambios por su cuenta; cada propuesta se marca como experimental y tú la confirmas o la rechazas."
   },
   "images": {
     "addPhoto": "Añadir una foto",
@@ -66,7 +69,8 @@
     "open": "Abrir la foto",
     "alt": "{{role}}, {{date}}",
     "noDate": "Sin fecha de captura",
-    "delete": "Mover a la papelera"
+    "delete": "Mover a la papelera",
+    "openWithWarnings": "Abrir la foto (tiene avisos de calidad)"
   },
   "settings": {
     "title": "Ajustes",
@@ -92,7 +96,12 @@
     },
     "title": "Mapa corporal",
     "hint": "Toca una zona para seleccionarla.",
-    "selected": "{{zone}} · {{view}}"
+    "selected": "{{zone}} · {{view}}",
+    "cluster_one": "Una marca aquí",
+    "cluster_other": "{{count}} marcas aquí: ampliar",
+    "zoomIn": "Ampliar",
+    "zoomOut": "Reducir",
+    "zoomReset": "Ver el cuerpo entero"
   },
   "zones": {
     "1100": "Cabeza",
@@ -191,7 +200,12 @@
     "emptyTitle": "Todavía no hay marcas",
     "emptyTextEdit": "Añade una marca tocando su lugar en el mapa corporal.",
     "emptyTextView": "Nadie ha añadido marcas de esta persona todavía.",
-    "backToPerson": "Volver a la persona"
+    "backToPerson": "Volver a la persona",
+    "latestSize": "Último tamaño",
+    "sinceDate": "Desde el {{date}}",
+    "measuredChange": "cambio medido",
+    "noDetectableChange": "sin cambio detectable",
+    "suggestName": "Sugerir un nombre"
   },
   "observations": {
     "title": "Visitas",
@@ -212,5 +226,211 @@
     },
     "backTo": "Volver a {{lesion}}",
     "delete": "Mover la visita a la papelera"
+  },
+  "quality": {
+    "title": "Guardada con avisos de calidad",
+    "short": "Avisos de calidad",
+    "checking": "Revisando las fotos…",
+    "hint": "La visita se guarda tal cual. Si puedes, repite la foto.",
+    "flags": {
+      "blurry": "Borrosa: sujeta el móvil firme y toca la marca para enfocar.",
+      "too_dark": "Demasiado oscura: añade luz o acércate a una ventana.",
+      "too_bright": "Sobreexpuesta: evita el sol directo y el flash.",
+      "glare": "Brillos: inclina un poco el móvil para que los reflejos salgan de la marca.",
+      "low_resolution": "Poca resolución: usa la cámara a tamaño completo, no una captura ni una copia reenviada."
+    }
+  },
+  "measure": {
+    "back": "Volver a la visita",
+    "title": "Medir",
+    "stepsLabel": "Pasos",
+    "stepScale": "Escala",
+    "stepMark": "La marca",
+    "canvasScale": "Foto. Toca la moneda o los extremos de una longitud conocida.",
+    "canvasMark": "Foto. Toca la marca para contornearla.",
+    "zoomHint": "Pellizca o usa la rueda del ratón para ampliar y arrastra para moverte. Con teclado: + y − amplían, Intro marca el centro.",
+    "cardSearching": "Buscando la tarjeta de referencia…",
+    "cardFound": "Tarjeta de referencia encontrada, inclinada {{tilt}}°.",
+    "cardTilted": "Tarjeta encontrada, pero inclinada {{tilt}}° (límite {{limit}}°). Si puedes, repite la foto con el móvil paralelo a la piel.",
+    "cardSmall": "La tarjeta se ve pequeña: acércate la próxima vez.",
+    "cardNotFound": "No hay tarjeta de referencia en esta foto. Usa una moneda o una longitud conocida.",
+    "useCard": "Usar la tarjeta de referencia",
+    "withCoin": "Usar una moneda",
+    "withLine": "Usar una longitud conocida",
+    "coin": "moneda",
+    "coinTap": "Toca la moneda.",
+    "coinAdjust": "Arrastra los tiradores hasta que el círculo siga el borde de la moneda.",
+    "denomination": "Moneda",
+    "coins": {
+      "1c": "1 céntimo",
+      "2c": "2 céntimos",
+      "5c": "5 céntimos",
+      "10c": "10 céntimos",
+      "20c": "20 céntimos",
+      "50c": "50 céntimos",
+      "1e": "1 euro",
+      "2e": "2 euros"
+    },
+    "coinTiltNote": "Una moneda no muestra si el móvil estaba inclinado, así que la incertidumbre es mayor que con la tarjeta.",
+    "useThisCoin": "Usar esta moneda",
+    "lineTap_one": "Toca el otro extremo de la longitud.",
+    "lineTap_other": "Toca los dos extremos de algo cuya longitud conozcas.",
+    "lineAdjust": "Arrastra los extremos si hace falta y escribe la longitud.",
+    "lengthMm": "Longitud en milímetros",
+    "useThisLine": "Usar esta longitud",
+    "clearLine": "Empezar de nuevo",
+    "lineEnd": "Extremo {{n}} de la longitud",
+    "mark": "marca",
+    "markTap": "Toca la marca.",
+    "markAdjust": "Revisa el contorno. Cámbialo a círculo para ajustarlo a mano.",
+    "moveHandle": "Mover la {{what}}",
+    "sizeHandle": "Cambiar el tamaño de la {{what}}",
+    "longest": "Mayor",
+    "across": "Transversal",
+    "area": "Área",
+    "flags": {
+      "tilted": "La foto está inclinada más de {{limit}}°: la medida se guarda, pero señalada.",
+      "unverified_card": "El tamaño de impresión de la tarjeta no está verificado (Ajustes, Tarjeta de referencia), así que la incertidumbre es mayor.",
+      "tilt_unknown": "Con una moneda o una longitud no se sabe la inclinación; sujeta el móvil paralelo a la piel."
+    },
+    "save": "Guardar la medida",
+    "asCircle": "Ajustar como círculo",
+    "again": "Contornear de nuevo",
+    "changeScale": "Cambiar la escala",
+    "disclaimer": "Una medida describe el tamaño. No dice nada sobre qué es la marca.",
+    "visitTitle": "Medidas",
+    "noneYet": "Todavía no hay medidas en esta visita.",
+    "needPhoto": "Añade una foto para medir la marca.",
+    "measurePhoto": "Medir en la foto",
+    "measurePhotoN": "Medir en la foto {{n}}",
+    "delete": "Borrar",
+    "scaleKinds": {
+      "card": "tarjeta",
+      "coin": "moneda",
+      "manual": "longitud conocida",
+      "unknown": "escala"
+    },
+    "tiltedShort": "inclinada"
+  },
+  "card": {
+    "title": "Tarjeta de referencia",
+    "intro": "Imprímela, recórtala y pon su ventana sobre la marca al hacer la foto: neVus lee de ella la escala y la inclinación.",
+    "downloadA4": "Descargar para papel A4",
+    "downloadLetter": "Descargar para papel Carta (EE. UU.)",
+    "lineLabel": "Longitud medida de la línea de 50 mm",
+    "lineHint": "Después de imprimir, mide la línea con una regla y escribe lo que leas (por ejemplo 49,6).",
+    "verified": "Impresión verificada: la línea midió {{mm}} mm.",
+    "unverified": "Sin verificar todavía: las medidas con la tarjeta llevan una incertidumbre mayor."
+  },
+  "reminders": {
+    "title": "Toca hacer foto",
+    "nothing": "Ahora mismo no toca ninguna.",
+    "dueToday": "toca hoy",
+    "dueSince": "pendiente desde el {{date}}",
+    "snoozedUntil": "Recordatorio pospuesto hasta el {{date}}.",
+    "unsnooze": "Recordármelo de nuevo",
+    "notNow": "Ahora no:",
+    "snoozeWeek": "Dentro de una semana",
+    "snoozeMonth": "Dentro de un mes",
+    "settingsTitle": "Recordatorios",
+    "settingsIntro": "Las marcas a las que toca foto aparecen en la página de inicio. También puedes recibir un correo al día cuando toque alguna; lleva nombres y fechas, nunca fotos.",
+    "email": "Dirección de correo",
+    "emailReminders": "Enviarme un correo diario cuando toque fotografiar marcas",
+    "needEmail": "Añade una dirección de correo para activar los recordatorios por correo."
+  },
+  "admin": {
+    "emailTitle": "Envío de correo (administración)",
+    "emailIntro": "El servidor de correo que usa neVus para los recordatorios. No se envía nada hasta que esto esté completo y la gente active los recordatorios.",
+    "host": "Servidor",
+    "port": "Puerto",
+    "security": "Seguridad",
+    "securityNone": "Ninguna (solo en una red de confianza)",
+    "username": "Usuario",
+    "password": "Contraseña",
+    "passwordKept": "Hay una contraseña guardada. Déjalo vacío para conservarla.",
+    "sender": "Dirección del remitente",
+    "publicUrl": "Dirección de este neVus",
+    "publicUrlHint": "Se usa para el enlace de los correos, por ejemplo https://nevus.example.home",
+    "saved": "Guardado.",
+    "testTo": "Enviar un mensaje de prueba a",
+    "sendTest": "Enviar una prueba",
+    "testSent": "Enviado. Revisa la bandeja de entrada.",
+    "instanceTitle": "Instancia (administración)",
+    "defaultLanguage": "Idioma de las cuentas nuevas"
+  },
+  "sudo": {
+    "title": "Confirma que eres tú",
+    "intro": "Esta acción necesita tu contraseña otra vez.",
+    "confirm": "Confirmar",
+    "wrong": "Contraseña incorrecta.",
+    "cancelled": "Cancelado."
+  },
+  "trash": {
+    "title": "Papelera",
+    "intro": "Las marcas, visitas y fotos borradas se quedan aquí 30 días y luego se eliminan para siempre.",
+    "emptyTitle": "La papelera está vacía",
+    "emptyText": "Lo que borras se queda aquí un tiempo por si cambias de idea.",
+    "kinds": {
+      "person": "Persona",
+      "lesion": "Marca",
+      "observation": "Visita",
+      "image": "Foto"
+    },
+    "goesOn": "se elimina para siempre el {{date}}",
+    "restore": "Restaurar",
+    "deleteNow": "Borrar ya",
+    "open": "Abrir la papelera",
+    "backToSettings": "Volver a ajustes"
+  },
+  "data": {
+    "title": "Tus datos",
+    "intro": "Llévate todo en un solo archivo cifrado, o recupera lo que borraste.",
+    "exportPerson": "Exportar esta persona",
+    "exportAll": "Exportar toda la instancia (administración)",
+    "exportIntro": "Elige una frase de paso. La necesitarás para abrir el archivo; neVus no la guarda, así que sin ella nadie puede recuperarlo. Se abre con la herramienta estándar age.",
+    "passphrase": "Frase de paso",
+    "passphraseAgain": "Repite la frase de paso",
+    "startExport": "Empezar la exportación",
+    "exportStarted": "Se está preparando la exportación. Aparecerá en Ajustes, Tus datos.",
+    "status": {
+      "queued": "En espera",
+      "building": "Preparándose…",
+      "ready": "Lista",
+      "failed": "Ha fallado"
+    },
+    "expires": "descargable hasta el {{date}}",
+    "remove": "Quitar",
+    "usage_one": "{{count}} foto, {{size}}",
+    "usage_other": "{{count}} fotos, {{size}}",
+    "overQuota": "Las fotos de esta persona ocupan más del límite que fijó la administración. No se rechaza nada; quizá convenga quitar duplicados antiguos.",
+    "purgeTitle": "Borrar esta persona para siempre",
+    "purgeIntro": "Todas las marcas, visitas, medidas y fotos de {{name}} se eliminarán ahora, sin pasar por la papelera. Exporta antes si quieres conservar una copia.",
+    "typeName": "Escribe {{name}} para confirmar",
+    "purgeAction": "Borrar para siempre"
+  },
+  "offline": {
+    "offline": "Sin conexión.",
+    "waiting_one": "Una visita espera para subirse.",
+    "waiting_other": "{{count}} visitas esperan para subirse.",
+    "uploading": "Subiendo las visitas guardadas…",
+    "failed_one": "una no se ha podido subir todavía",
+    "failed_other": "{{count}} no se han podido subir todavía",
+    "uploadNow": "Subir ahora",
+    "quickIntro": "Sin conexión. Haz las fotos ahora: la visita se guarda en este dispositivo y se sube sola cuando vuelvas a tener conexión.",
+    "photosReady_one": "Una foto lista.",
+    "photosReady_other": "{{count}} fotos listas.",
+    "keep": "Guardar esta visita",
+    "saved": "Guardada en este dispositivo. Se subirá cuando vuelva la conexión."
+  },
+  "capture": {
+    "open": "Cámara en directo",
+    "title": "Cámara en directo",
+    "preview": "Vista de la cámara",
+    "ghost": "Foto anterior",
+    "torch": "Linterna",
+    "shutter": "Hacer la foto",
+    "error": "La cámara no ha podido arrancar: {{message}}. Usa Hacer una foto.",
+    "lastTime": "La última vez: intenta repetir la distancia y el ángulo.",
+    "lastTimeAlt": "Primer plano anterior"
   }
 }

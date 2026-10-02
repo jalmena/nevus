@@ -1,7 +1,7 @@
 {
   "name": "nevus-frontend",
   "private": true,
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0",
   "type": "module",
   "license": "AGPL-3.0-only",
   "scripts": {
@@ -14,10 +14,12 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "openapi": "openapi-typescript openapi.json -o src/lib/api/schema.d.ts"
+    "openapi": "openapi-typescript openapi.json -o src/lib/api/schema.d.ts",
+    "e2e": "playwright test"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.0",
+    "dexie": "^4.4.6",
     "i18next": "^25.5.0",
     "i18next-browser-languagedetector": "^8.2.0",
     "openapi-fetch": "^0.14.0",
@@ -27,7 +29,9 @@
     "react-router": "^7.9.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^9.36.0",
+    "@playwright/test": "^1.63.0",
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.0",
@@ -38,6 +42,7 @@
     "eslint": "^9.36.0",
     "eslint-plugin-jsx-a11y": "^6.10.0",
     "eslint-plugin-react-hooks": "^6.1.0",
+    "fake-indexeddb": "^6.2.5",
     "globals": "^16.4.0",
     "jsdom": "^27.0.0",
     "openapi-typescript": "^7.9.0",

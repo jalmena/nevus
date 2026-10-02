@@ -1,3 +1,23 @@
+## v0.1.0 (2026-10-01)
+
+### Feat
+
+- **frontend**: offline visits, guided live camera, map zoom and marker clusters
+- **api**: client-minted identifiers make visit and photo uploads idempotent
+- **frontend**: trash, exports, profile deletion and password re-confirmation
+- **data**: trash and purge, encrypted exports, backups with restore
+- **frontend**: due list, snoozing, reminder and administrator settings
+- **reminders**: due list, snoozing and a daily email digest
+- **frontend**: measuring tool, sizes on visits and marks, reference card settings
+- **measure**: reference card, coins, known lengths and measurements with uncertainty
+- **frontend**: quality warnings on visits, photos and the timeline
+- **jobs**: background job queue and photo quality checks
+
+### Fix
+
+- **jobs**: stopping the supervisor cancels running pool work instead of hanging
+- **deploy**: stop re-owning /app on every start
+
 ## v0.1.0-alpha.1 (2026-09-28)
 
 ### Feat

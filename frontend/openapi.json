@@ -200,6 +200,18 @@
             ],
             "title": "Captured Tz"
           },
+          "client_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Id"
+          },
           "file": {
             "contentMediaType": "application/octet-stream",
             "title": "File",
@@ -232,6 +244,217 @@
         "title": "Body_upload_observation_image_api_observations__observation_id__images_post",
         "type": "object"
       },
+      "CardOut": {
+        "properties": {
+          "card": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Card"
+          },
+          "centre_px": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Centre Px"
+          },
+          "flags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Flags",
+            "type": "array"
+          },
+          "found": {
+            "title": "Found",
+            "type": "boolean"
+          },
+          "marker_px": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Marker Px"
+          },
+          "mm_per_px": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mm Per Px"
+          },
+          "tilt_deg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tilt Deg"
+          }
+        },
+        "required": [
+          "found"
+        ],
+        "title": "CardOut",
+        "type": "object"
+      },
+      "ChangeBrief": {
+        "properties": {
+          "delta_mm": {
+            "title": "Delta Mm",
+            "type": "number"
+          },
+          "detectable": {
+            "title": "Detectable",
+            "type": "boolean"
+          },
+          "sigma_mm": {
+            "title": "Sigma Mm",
+            "type": "number"
+          },
+          "since": {
+            "format": "date-time",
+            "title": "Since",
+            "type": "string"
+          }
+        },
+        "required": [
+          "delta_mm",
+          "sigma_mm",
+          "detectable",
+          "since"
+        ],
+        "title": "ChangeBrief",
+        "type": "object"
+      },
+      "ChangeOut": {
+        "properties": {
+          "delta_mm": {
+            "title": "Delta Mm",
+            "type": "number"
+          },
+          "detectable": {
+            "title": "Detectable",
+            "type": "boolean"
+          },
+          "sigma_mm": {
+            "title": "Sigma Mm",
+            "type": "number"
+          },
+          "since": {
+            "format": "date-time",
+            "title": "Since",
+            "type": "string"
+          }
+        },
+        "required": [
+          "delta_mm",
+          "sigma_mm",
+          "detectable",
+          "since"
+        ],
+        "title": "ChangeOut",
+        "type": "object"
+      },
+      "CircleShape": {
+        "properties": {
+          "cx": {
+            "title": "Cx",
+            "type": "number"
+          },
+          "cy": {
+            "title": "Cy",
+            "type": "number"
+          },
+          "r": {
+            "exclusiveMinimum": 0.5,
+            "title": "R",
+            "type": "number"
+          },
+          "type": {
+            "const": "circle",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "cx",
+          "cy",
+          "r"
+        ],
+        "title": "CircleShape",
+        "type": "object"
+      },
+      "CoinIn": {
+        "properties": {
+          "cx": {
+            "title": "Cx",
+            "type": "number"
+          },
+          "cy": {
+            "title": "Cy",
+            "type": "number"
+          },
+          "denomination": {
+            "enum": [
+              "1c",
+              "2c",
+              "5c",
+              "10c",
+              "20c",
+              "50c",
+              "1e",
+              "2e"
+            ],
+            "title": "Denomination",
+            "type": "string"
+          },
+          "kind": {
+            "const": "coin",
+            "title": "Kind",
+            "type": "string"
+          },
+          "r": {
+            "exclusiveMinimum": 2.0,
+            "title": "R",
+            "type": "number"
+          }
+        },
+        "required": [
+          "kind",
+          "cx",
+          "cy",
+          "r",
+          "denomination"
+        ],
+        "title": "CoinIn",
+        "type": "object"
+      },
       "Credentials": {
         "properties": {
           "password": {
@@ -253,6 +476,429 @@
           "password"
         ],
         "title": "Credentials",
+        "type": "object"
+      },
+      "DueOut": {
+        "properties": {
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "last_observed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Observed At"
+          },
+          "lesion_id": {
+            "format": "uuid",
+            "title": "Lesion Id",
+            "type": "string"
+          },
+          "next_due_on": {
+            "format": "date",
+            "title": "Next Due On",
+            "type": "string"
+          },
+          "overdue_days": {
+            "title": "Overdue Days",
+            "type": "integer"
+          },
+          "person_id": {
+            "format": "uuid",
+            "title": "Person Id",
+            "type": "string"
+          },
+          "person_name": {
+            "title": "Person Name",
+            "type": "string"
+          },
+          "zone": {
+            "title": "Zone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "lesion_id",
+          "label",
+          "zone",
+          "person_id",
+          "person_name",
+          "next_due_on",
+          "overdue_days",
+          "last_observed_at"
+        ],
+        "title": "DueOut",
+        "type": "object"
+      },
+      "EmailSettingsIn": {
+        "properties": {
+          "host": {
+            "anyOf": [
+              {
+                "maxLength": 253,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Host"
+          },
+          "password": {
+            "anyOf": [
+              {
+                "maxLength": 1024,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Omit to keep, empty to remove",
+            "title": "Password"
+          },
+          "port": {
+            "default": 587,
+            "maximum": 65535.0,
+            "minimum": 1.0,
+            "title": "Port",
+            "type": "integer"
+          },
+          "public_url": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "pattern": "^https?://",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Public Url"
+          },
+          "security": {
+            "default": "starttls",
+            "enum": [
+              "starttls",
+              "ssl",
+              "none"
+            ],
+            "title": "Security",
+            "type": "string"
+          },
+          "sender": {
+            "anyOf": [
+              {
+                "maxLength": 254,
+                "pattern": "^[^@\\s]+@[^@\\s]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sender"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "maxLength": 254,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          }
+        },
+        "title": "EmailSettingsIn",
+        "type": "object"
+      },
+      "EmailSettingsOut": {
+        "properties": {
+          "has_password": {
+            "title": "Has Password",
+            "type": "boolean"
+          },
+          "host": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Host"
+          },
+          "port": {
+            "title": "Port",
+            "type": "integer"
+          },
+          "public_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Public Url"
+          },
+          "ready": {
+            "title": "Ready",
+            "type": "boolean"
+          },
+          "security": {
+            "enum": [
+              "starttls",
+              "ssl",
+              "none"
+            ],
+            "title": "Security",
+            "type": "string"
+          },
+          "sender": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sender"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          }
+        },
+        "required": [
+          "host",
+          "port",
+          "security",
+          "username",
+          "has_password",
+          "sender",
+          "public_url",
+          "ready"
+        ],
+        "title": "EmailSettingsOut",
+        "type": "object"
+      },
+      "ExportIn": {
+        "properties": {
+          "passphrase": {
+            "maxLength": 1024,
+            "minLength": 10,
+            "title": "Passphrase",
+            "type": "string"
+          },
+          "person_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "None exports every person (administrators only)",
+            "title": "Person Id"
+          }
+        },
+        "required": [
+          "passphrase"
+        ],
+        "title": "ExportIn",
+        "type": "object"
+      },
+      "ExportOut": {
+        "properties": {
+          "bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bytes"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "file_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Name"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "person_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Person Id"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "person_id",
+          "status",
+          "file_name",
+          "bytes",
+          "error",
+          "created_at",
+          "expires_at"
+        ],
+        "title": "ExportOut",
+        "type": "object"
+      },
+      "FitIn": {
+        "properties": {
+          "target": {
+            "enum": [
+              "coin",
+              "lesion"
+            ],
+            "title": "Target",
+            "type": "string"
+          },
+          "x": {
+            "minimum": 0.0,
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "minimum": 0.0,
+            "title": "Y",
+            "type": "number"
+          }
+        },
+        "required": [
+          "x",
+          "y",
+          "target"
+        ],
+        "title": "FitIn",
+        "type": "object"
+      },
+      "FitOut": {
+        "properties": {
+          "cx": {
+            "title": "Cx",
+            "type": "number"
+          },
+          "cy": {
+            "title": "Cy",
+            "type": "number"
+          },
+          "method": {
+            "title": "Method",
+            "type": "string"
+          },
+          "outline": {
+            "anyOf": [
+              {
+                "items": {
+                  "items": {
+                    "type": "number"
+                  },
+                  "type": "array"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outline"
+          },
+          "r": {
+            "title": "R",
+            "type": "number"
+          }
+        },
+        "required": [
+          "cx",
+          "cy",
+          "r",
+          "outline",
+          "method"
+        ],
+        "title": "FitOut",
         "type": "object"
       },
       "HTTPValidationError": {
@@ -369,6 +1015,25 @@
             "title": "Person Id",
             "type": "string"
           },
+          "quality_checked_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quality Checked At"
+          },
+          "quality_flags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Quality Flags",
+            "type": "array"
+          },
           "re_encoded": {
             "title": "Re Encoded",
             "type": "boolean"
@@ -411,11 +1076,83 @@
           "orientation",
           "source_format",
           "re_encoded",
+          "quality_flags",
+          "quality_checked_at",
           "captured_at",
           "created_at",
           "renditions"
         ],
         "title": "ImageOut",
+        "type": "object"
+      },
+      "ImageScaleOut": {
+        "properties": {
+          "card": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CardOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "card_checked": {
+            "title": "Card Checked",
+            "type": "boolean"
+          },
+          "image_id": {
+            "format": "uuid",
+            "title": "Image Id",
+            "type": "string"
+          },
+          "references": {
+            "items": {
+              "$ref": "#/components/schemas/ScaleReferenceOut"
+            },
+            "title": "References",
+            "type": "array"
+          },
+          "tilt_limit_deg": {
+            "title": "Tilt Limit Deg",
+            "type": "number"
+          },
+          "upright_height": {
+            "title": "Upright Height",
+            "type": "integer"
+          },
+          "upright_width": {
+            "title": "Upright Width",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "image_id",
+          "upright_width",
+          "upright_height",
+          "card_checked",
+          "card",
+          "references",
+          "tilt_limit_deg"
+        ],
+        "title": "ImageScaleOut",
+        "type": "object"
+      },
+      "InstanceOut": {
+        "properties": {
+          "default_language": {
+            "enum": [
+              "en",
+              "es"
+            ],
+            "title": "Default Language",
+            "type": "string"
+          }
+        },
+        "required": [
+          "default_language"
+        ],
+        "title": "InstanceOut",
         "type": "object"
       },
       "InstanceStatus": {
@@ -585,8 +1322,28 @@
             ],
             "title": "Latest Image Id"
           },
+          "latest_measurement": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MeasurementBrief"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "location": {
             "$ref": "#/components/schemas/LocationOut"
+          },
+          "measurement_change": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ChangeBrief"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "next_due_on": {
             "anyOf": [
@@ -619,6 +1376,18 @@
             "format": "uuid",
             "title": "Person Id",
             "type": "string"
+          },
+          "snoozed_until": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Snoozed Until"
           },
           "status": {
             "title": "Status",
@@ -840,6 +1609,316 @@
         "title": "LocationOut",
         "type": "object"
       },
+      "ManualIn": {
+        "properties": {
+          "kind": {
+            "const": "manual",
+            "title": "Kind",
+            "type": "string"
+          },
+          "length_mm": {
+            "exclusiveMinimum": 0.5,
+            "maximum": 500.0,
+            "title": "Length Mm",
+            "type": "number"
+          },
+          "x1": {
+            "title": "X1",
+            "type": "number"
+          },
+          "x2": {
+            "title": "X2",
+            "type": "number"
+          },
+          "y1": {
+            "title": "Y1",
+            "type": "number"
+          },
+          "y2": {
+            "title": "Y2",
+            "type": "number"
+          }
+        },
+        "required": [
+          "kind",
+          "x1",
+          "y1",
+          "x2",
+          "y2",
+          "length_mm"
+        ],
+        "title": "ManualIn",
+        "type": "object"
+      },
+      "MeasurementBrief": {
+        "properties": {
+          "flags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Flags",
+            "type": "array"
+          },
+          "longest_mm": {
+            "title": "Longest Mm",
+            "type": "number"
+          },
+          "measured_at": {
+            "format": "date-time",
+            "title": "Measured At",
+            "type": "string"
+          },
+          "perpendicular_mm": {
+            "title": "Perpendicular Mm",
+            "type": "number"
+          },
+          "sigma_longest_mm": {
+            "title": "Sigma Longest Mm",
+            "type": "number"
+          }
+        },
+        "required": [
+          "longest_mm",
+          "sigma_longest_mm",
+          "perpendicular_mm",
+          "measured_at",
+          "flags"
+        ],
+        "title": "MeasurementBrief",
+        "type": "object"
+      },
+      "MeasurementIn": {
+        "properties": {
+          "image_id": {
+            "format": "uuid",
+            "title": "Image Id",
+            "type": "string"
+          },
+          "method": {
+            "enum": [
+              "assisted",
+              "manual"
+            ],
+            "title": "Method",
+            "type": "string"
+          },
+          "scale_reference_id": {
+            "format": "uuid",
+            "title": "Scale Reference Id",
+            "type": "string"
+          },
+          "shape": {
+            "discriminator": {
+              "mapping": {
+                "circle": "#/components/schemas/CircleShape",
+                "outline": "#/components/schemas/OutlineShape"
+              },
+              "propertyName": "type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CircleShape"
+              },
+              {
+                "$ref": "#/components/schemas/OutlineShape"
+              }
+            ],
+            "title": "Shape"
+          }
+        },
+        "required": [
+          "image_id",
+          "scale_reference_id",
+          "method",
+          "shape"
+        ],
+        "title": "MeasurementIn",
+        "type": "object"
+      },
+      "MeasurementOut": {
+        "properties": {
+          "area_mm2": {
+            "title": "Area Mm2",
+            "type": "number"
+          },
+          "captured_at": {
+            "format": "date-time",
+            "title": "Captured At",
+            "type": "string"
+          },
+          "change": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ChangeOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "flags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Flags",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "image_id": {
+            "format": "uuid",
+            "title": "Image Id",
+            "type": "string"
+          },
+          "lesion_id": {
+            "format": "uuid",
+            "title": "Lesion Id",
+            "type": "string"
+          },
+          "longest_mm": {
+            "title": "Longest Mm",
+            "type": "number"
+          },
+          "method": {
+            "title": "Method",
+            "type": "string"
+          },
+          "observation_id": {
+            "format": "uuid",
+            "title": "Observation Id",
+            "type": "string"
+          },
+          "perpendicular_mm": {
+            "title": "Perpendicular Mm",
+            "type": "number"
+          },
+          "scale_kind": {
+            "title": "Scale Kind",
+            "type": "string"
+          },
+          "scale_reference_id": {
+            "format": "uuid",
+            "title": "Scale Reference Id",
+            "type": "string"
+          },
+          "shape": {
+            "additionalProperties": true,
+            "title": "Shape",
+            "type": "object"
+          },
+          "sigma_area_mm2": {
+            "title": "Sigma Area Mm2",
+            "type": "number"
+          },
+          "sigma_longest_mm": {
+            "title": "Sigma Longest Mm",
+            "type": "number"
+          },
+          "sigma_perpendicular_mm": {
+            "title": "Sigma Perpendicular Mm",
+            "type": "number"
+          },
+          "tilt_deg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tilt Deg"
+          }
+        },
+        "required": [
+          "id",
+          "observation_id",
+          "lesion_id",
+          "image_id",
+          "scale_reference_id",
+          "scale_kind",
+          "method",
+          "shape",
+          "longest_mm",
+          "perpendicular_mm",
+          "area_mm2",
+          "sigma_longest_mm",
+          "sigma_perpendicular_mm",
+          "sigma_area_mm2",
+          "tilt_deg",
+          "flags",
+          "captured_at",
+          "created_at"
+        ],
+        "title": "MeasurementOut",
+        "type": "object"
+      },
+      "MeasurementPreview": {
+        "properties": {
+          "area_mm2": {
+            "title": "Area Mm2",
+            "type": "number"
+          },
+          "flags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Flags",
+            "type": "array"
+          },
+          "longest_mm": {
+            "title": "Longest Mm",
+            "type": "number"
+          },
+          "perpendicular_mm": {
+            "title": "Perpendicular Mm",
+            "type": "number"
+          },
+          "sigma_area_mm2": {
+            "title": "Sigma Area Mm2",
+            "type": "number"
+          },
+          "sigma_longest_mm": {
+            "title": "Sigma Longest Mm",
+            "type": "number"
+          },
+          "sigma_perpendicular_mm": {
+            "title": "Sigma Perpendicular Mm",
+            "type": "number"
+          },
+          "tilt_deg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tilt Deg"
+          }
+        },
+        "required": [
+          "longest_mm",
+          "perpendicular_mm",
+          "area_mm2",
+          "sigma_longest_mm",
+          "sigma_perpendicular_mm",
+          "sigma_area_mm2",
+          "tilt_deg",
+          "flags"
+        ],
+        "title": "MeasurementPreview",
+        "type": "object"
+      },
       "ObservationIn": {
         "properties": {
           "captured_at": {
@@ -865,6 +1944,19 @@
               }
             ],
             "title": "Captured Tz"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Minted by the client (UUIDv7) so a retried upload from the offline queue is a no-op",
+            "title": "Id"
           },
           "notes": {
             "anyOf": [
@@ -1047,6 +2139,33 @@
           }
         },
         "title": "ObservationUpdate",
+        "type": "object"
+      },
+      "OutlineShape": {
+        "properties": {
+          "points": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "maxItems": 400,
+            "minItems": 3,
+            "title": "Points",
+            "type": "array"
+          },
+          "type": {
+            "const": "outline",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "points"
+        ],
+        "title": "OutlineShape",
         "type": "object"
       },
       "PasswordChange": {
@@ -1285,6 +2404,77 @@
         "title": "RenditionOut",
         "type": "object"
       },
+      "ScaleReferenceOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "geometry": {
+            "additionalProperties": true,
+            "title": "Geometry",
+            "type": "object"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "image_id": {
+            "format": "uuid",
+            "title": "Image Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "mm_per_px": {
+            "title": "Mm Per Px",
+            "type": "number"
+          },
+          "reference_mm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference Mm"
+          },
+          "sigma_scale": {
+            "title": "Sigma Scale",
+            "type": "number"
+          },
+          "tilt_deg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tilt Deg"
+          }
+        },
+        "required": [
+          "id",
+          "image_id",
+          "kind",
+          "reference_mm",
+          "mm_per_px",
+          "sigma_scale",
+          "tilt_deg",
+          "geometry",
+          "created_at"
+        ],
+        "title": "ScaleReferenceOut",
+        "type": "object"
+      },
       "SessionOut": {
         "properties": {
           "instance_claimed": {
@@ -1315,6 +2505,23 @@
         "title": "SessionOut",
         "type": "object"
       },
+      "SnoozeIn": {
+        "properties": {
+          "days": {
+            "enum": [
+              7,
+              30
+            ],
+            "title": "Days",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "days"
+        ],
+        "title": "SnoozeIn",
+        "type": "object"
+      },
       "SudoIn": {
         "properties": {
           "password": {
@@ -1328,6 +2535,109 @@
           "password"
         ],
         "title": "SudoIn",
+        "type": "object"
+      },
+      "TestEmailIn": {
+        "properties": {
+          "to": {
+            "maxLength": 254,
+            "pattern": "^[^@\\s]+@[^@\\s]+$",
+            "title": "To",
+            "type": "string"
+          }
+        },
+        "required": [
+          "to"
+        ],
+        "title": "TestEmailIn",
+        "type": "object"
+      },
+      "TrashItem": {
+        "properties": {
+          "deleted_at": {
+            "format": "date-time",
+            "title": "Deleted At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "person",
+              "lesion",
+              "observation",
+              "image"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "person_id": {
+            "format": "uuid",
+            "title": "Person Id",
+            "type": "string"
+          },
+          "person_name": {
+            "title": "Person Name",
+            "type": "string"
+          },
+          "purge_after": {
+            "format": "date-time",
+            "title": "Purge After",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "label",
+          "person_id",
+          "person_name",
+          "deleted_at",
+          "purge_after"
+        ],
+        "title": "TrashItem",
+        "type": "object"
+      },
+      "UsageOut": {
+        "properties": {
+          "bytes": {
+            "title": "Bytes",
+            "type": "integer"
+          },
+          "images": {
+            "title": "Images",
+            "type": "integer"
+          },
+          "over_quota": {
+            "title": "Over Quota",
+            "type": "boolean"
+          },
+          "quota_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quota Bytes"
+          }
+        },
+        "required": [
+          "images",
+          "bytes",
+          "quota_bytes",
+          "over_quota"
+        ],
+        "title": "UsageOut",
         "type": "object"
       },
       "UserCreate": {
@@ -1376,6 +2686,17 @@
       },
       "UserOut": {
         "properties": {
+          "card_line_mm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Card Line Mm"
+          },
           "created_at": {
             "format": "date-time",
             "title": "Created At",
@@ -1403,6 +2724,10 @@
               }
             ],
             "title": "Email"
+          },
+          "email_reminders": {
+            "title": "Email Reminders",
+            "type": "boolean"
           },
           "id": {
             "format": "uuid",
@@ -1454,6 +2779,8 @@
           "language",
           "theme",
           "show_uncertainty",
+          "card_line_mm",
+          "email_reminders",
           "created_at",
           "last_login_at",
           "disabled_at"
@@ -1463,6 +2790,20 @@
       },
       "UserUpdateMe": {
         "properties": {
+          "card_line_mm": {
+            "anyOf": [
+              {
+                "maximum": 55.0,
+                "minimum": 45.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Measured length of the printed card's 50 mm line",
+            "title": "Card Line Mm"
+          },
           "email": {
             "anyOf": [
               {
@@ -1474,6 +2815,17 @@
               }
             ],
             "title": "Email"
+          },
+          "email_reminders": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email Reminders"
           },
           "language": {
             "anyOf": [
@@ -1685,6 +3037,161 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/admin/email": {
+      "get": {
+        "operationId": "get_email_api_admin_email_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailSettingsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Email",
+        "tags": [
+          "admin"
+        ]
+      },
+      "put": {
+        "operationId": "put_email_api_admin_email_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailSettingsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailSettingsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Email",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/admin/email/test": {
+      "post": {
+        "description": "Send one message now and say plainly what went wrong if it did not go.",
+        "operationId": "test_email_api_admin_email_test_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestEmailIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Test Email",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
+    "/api/admin/instance": {
+      "get": {
+        "operationId": "get_instance_api_admin_instance_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstanceOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Instance",
+        "tags": [
+          "admin"
+        ]
+      },
+      "put": {
+        "operationId": "put_instance_api_admin_instance_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InstanceOut"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstanceOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Instance",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
     "/api/auth/claim": {
       "post": {
         "description": "The first person in claims the instance and becomes its administrator. Refused once anybody exists.",
@@ -1962,6 +3469,168 @@
         ]
       }
     },
+    "/api/due": {
+      "get": {
+        "operationId": "due_list_api_due_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/DueOut"
+                  },
+                  "title": "Response Due List Api Due Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Due List",
+        "tags": [
+          "reminders"
+        ]
+      }
+    },
+    "/api/exports": {
+      "get": {
+        "operationId": "list_exports_api_exports_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ExportOut"
+                  },
+                  "title": "Response List Exports Api Exports Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Exports",
+        "tags": [
+          "exports"
+        ]
+      },
+      "post": {
+        "description": "Exporting everything is sensitive, so it needs the password again (sudo mode).",
+        "operationId": "request_export_api_exports_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExportOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Request Export",
+        "tags": [
+          "exports"
+        ]
+      }
+    },
+    "/api/exports/{export_id}": {
+      "delete": {
+        "operationId": "remove_export_api_exports__export_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "export_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Export Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Remove Export",
+        "tags": [
+          "exports"
+        ]
+      }
+    },
+    "/api/exports/{export_id}/download": {
+      "get": {
+        "operationId": "download_api_exports__export_id__download_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "export_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Export Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Download",
+        "tags": [
+          "exports"
+        ]
+      }
+    },
     "/api/images/{image_id}": {
       "delete": {
         "description": "Moves the image to the trash; the purge and the garbage collection of blobs arrive with data management.",
@@ -2037,6 +3706,171 @@
         "summary": "Get Image",
         "tags": [
           "images"
+        ]
+      }
+    },
+    "/api/images/{image_id}/fit": {
+      "post": {
+        "description": "A proposal around a tap, in the photo's upright pixels. Nothing is stored.",
+        "operationId": "propose_fit_api_images__image_id__fit_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "image_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Image Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FitIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FitOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Propose Fit",
+        "tags": [
+          "measurements"
+        ]
+      }
+    },
+    "/api/images/{image_id}/scale": {
+      "get": {
+        "operationId": "image_scale_api_images__image_id__scale_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "image_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Image Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageScaleOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Image Scale",
+        "tags": [
+          "measurements"
+        ]
+      }
+    },
+    "/api/images/{image_id}/scale-references": {
+      "post": {
+        "operationId": "add_scale_reference_api_images__image_id__scale_references_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "image_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Image Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "discriminator": {
+                  "mapping": {
+                    "coin": "#/components/schemas/CoinIn",
+                    "manual": "#/components/schemas/ManualIn"
+                  },
+                  "propertyName": "kind"
+                },
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/CoinIn"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ManualIn"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScaleReferenceOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add Scale Reference",
+        "tags": [
+          "measurements"
         ]
       }
     },
@@ -2221,6 +4055,53 @@
         ]
       }
     },
+    "/api/lesions/{lesion_id}/measurements": {
+      "get": {
+        "operationId": "lesion_measurements_api_lesions__lesion_id__measurements_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lesion_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Lesion Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MeasurementOut"
+                  },
+                  "title": "Response Lesion Measurements Api Lesions  Lesion Id  Measurements Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Lesion Measurements",
+        "tags": [
+          "measurements"
+        ]
+      }
+    },
     "/api/lesions/{lesion_id}/observations": {
       "get": {
         "operationId": "list_observations_api_lesions__lesion_id__observations_get",
@@ -2316,6 +4197,137 @@
         "summary": "Create Observation",
         "tags": [
           "lesions"
+        ]
+      }
+    },
+    "/api/lesions/{lesion_id}/snooze": {
+      "delete": {
+        "operationId": "unsnooze_api_lesions__lesion_id__snooze_delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lesion_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Lesion Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LesionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Unsnooze",
+        "tags": [
+          "lesions"
+        ]
+      },
+      "post": {
+        "description": "Not now: the mark leaves the due list for a week or a month. A new visit ends the snooze.",
+        "operationId": "snooze_api_lesions__lesion_id__snooze_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "lesion_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Lesion Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SnoozeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LesionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Snooze",
+        "tags": [
+          "lesions"
+        ]
+      }
+    },
+    "/api/measurements/{measurement_id}": {
+      "delete": {
+        "operationId": "delete_measurement_api_measurements__measurement_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "measurement_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Measurement Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Measurement",
+        "tags": [
+          "measurements"
         ]
       }
     },
@@ -2543,6 +4555,159 @@
         "summary": "Upload Observation Image",
         "tags": [
           "lesions"
+        ]
+      }
+    },
+    "/api/observations/{observation_id}/measurements": {
+      "get": {
+        "operationId": "observation_measurements_api_observations__observation_id__measurements_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "observation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Observation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MeasurementOut"
+                  },
+                  "title": "Response Observation Measurements Api Observations  Observation Id  Measurements Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Observation Measurements",
+        "tags": [
+          "measurements"
+        ]
+      },
+      "post": {
+        "description": "Submitting a measurement is the confirmation: nothing proposed is ever stored without it.",
+        "operationId": "create_measurement_api_observations__observation_id__measurements_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "observation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Observation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MeasurementIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeasurementOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Measurement",
+        "tags": [
+          "measurements"
+        ]
+      }
+    },
+    "/api/observations/{observation_id}/measurements/preview": {
+      "post": {
+        "description": "The same computation as saving, without saving: the interface shows it while the outline moves.",
+        "operationId": "preview_measurement_api_observations__observation_id__measurements_preview_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "observation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Observation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MeasurementIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeasurementPreview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Preview Measurement",
+        "tags": [
+          "measurements"
         ]
       }
     },
@@ -3077,6 +5242,274 @@
         "summary": "Create Lesion",
         "tags": [
           "lesions"
+        ]
+      }
+    },
+    "/api/persons/{person_id}/purge": {
+      "delete": {
+        "description": "Delete a person and everything about them for good, now. Owner only, password again.",
+        "operationId": "purge_person_api_persons__person_id__purge_delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "person_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Person Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Purge Person",
+        "tags": [
+          "persons"
+        ]
+      }
+    },
+    "/api/persons/{person_id}/usage": {
+      "get": {
+        "description": "Storage used by one person's photographs, against the operator's soft quota.",
+        "operationId": "usage_api_persons__person_id__usage_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "person_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Person Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Usage",
+        "tags": [
+          "persons"
+        ]
+      }
+    },
+    "/api/reference-card": {
+      "get": {
+        "description": "Two window cards, two strips and a 50 mm line to verify the printer did not scale the page.",
+        "operationId": "reference_card_api_reference_card_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": "a4",
+              "enum": [
+                "a4",
+                "letter"
+              ],
+              "title": "Page",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "lang",
+            "required": false,
+            "schema": {
+              "default": "en",
+              "enum": [
+                "en",
+                "es"
+              ],
+              "title": "Lang",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/pdf": {}
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reference Card",
+        "tags": [
+          "measurements"
+        ]
+      }
+    },
+    "/api/trash": {
+      "get": {
+        "description": "Top-level deletions only: a visit deleted together with its mark comes back with the mark.",
+        "operationId": "list_trash_api_trash_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TrashItem"
+                  },
+                  "title": "Response List Trash Api Trash Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Trash",
+        "tags": [
+          "trash"
+        ]
+      }
+    },
+    "/api/trash/{kind}/{item_id}": {
+      "delete": {
+        "description": "Remove for good, without waiting for the purge. Needs the password again.",
+        "operationId": "purge_now_api_trash__kind___item_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "enum": [
+                "person",
+                "lesion",
+                "observation",
+                "image"
+              ],
+              "title": "Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "item_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Item Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Purge Now",
+        "tags": [
+          "trash"
+        ]
+      }
+    },
+    "/api/trash/{kind}/{item_id}/restore": {
+      "post": {
+        "operationId": "restore_api_trash__kind___item_id__restore_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "enum": [
+                "person",
+                "lesion",
+                "observation",
+                "image"
+              ],
+              "title": "Kind",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "item_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Item Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Restore",
+        "tags": [
+          "trash"
         ]
       }
     },

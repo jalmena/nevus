@@ -19,7 +19,7 @@
   --color-border: #d9d1c5;
   --color-ink: #2b2a28;
   --color-ink-2: #5e5a54;
-  --color-ink-3: #8b857c;
+  --color-ink-3: #706a63; /* 4.75:1 on paper, 5.22:1 on surface */
   --color-accent: #1f6f6b;
   --color-accent-2: #ddedea;
   --color-info: #3e6d9c;
@@ -84,7 +84,7 @@
     --color-border: #3a393f;
     --color-ink: #ede8e0;
     --color-ink-2: #b9b3aa;
-    --color-ink-3: #8a857d;
+    --color-ink-3: #918d85; /* 5.45:1 on paper, 5.01:1 on surface */
     --color-accent: #5fb3ae;
     --color-accent-2: #1b3735;
     --color-info: #8db4de;
@@ -106,7 +106,7 @@
   --color-border: #3a393f;
   --color-ink: #ede8e0;
   --color-ink-2: #b9b3aa;
-  --color-ink-3: #8a857d;
+  --color-ink-3: #918d85; /* 5.45:1 on paper, 5.01:1 on surface */
   --color-accent: #5fb3ae;
   --color-accent-2: #1b3735;
   --color-info: #8db4de;

@@ -19,7 +19,9 @@ RUN uv sync --frozen --no-dev --no-install-project
 COPY backend/src ./src
 COPY backend/alembic ./alembic
 COPY backend/alembic.ini ./
-RUN uv sync --frozen --no-dev
+# Test suites shipped inside wheels are never imported at runtime.
+RUN uv sync --frozen --no-dev \
+    && find /app/.venv/lib -depth -type d -name tests -path "*site-packages*" -exec rm -rf {} +
 
 FROM python:3.13-slim
 ARG VERSION=devel

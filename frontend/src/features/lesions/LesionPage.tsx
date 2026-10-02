@@ -6,8 +6,12 @@ import { EmptyState } from "@/design-system/components/EmptyState";
 import { Notice } from "@/design-system/components/Notice";
 import { TextField } from "@/design-system/components/TextField";
 import { imageUrl } from "@/lib/images";
+import { useSession } from "@/lib/auth/session";
 import { INTERVALS, useCreateObservation, useLesion, useObservations, useUpdateLesion } from "@/lib/lesions";
+import { formatDelta, formatMm } from "@/lib/measurements";
 import { usePerson } from "@/lib/persons";
+import { QuickVisit } from "@/features/capture/QuickVisit";
+import { SnoozeControls } from "@/features/reminders/SnoozeControls";
 import { DueBadge } from "./LesionList";
 import { lesionTitle, locationLine } from "./lesionName";
 import styles from "./lesions.module.css";
@@ -22,13 +26,26 @@ export function LesionPage() {
   const createVisit = useCreateObservation(lesionId);
   const update = useUpdateLesion(lesionId);
   const [editing, setEditing] = useState(false);
+  const [quick, setQuick] = useState(false);
   const canEdit = person.data?.my_role === "owner" || person.data?.my_role === "manager";
   const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "long" });
+  const session = useSession();
+  const showUncertainty = session.data?.user.show_uncertainty ?? true;
+  const locale = i18n.resolvedLanguage ?? "en";
 
   function newVisit() {
+    if (!navigator.onLine) {
+      setQuick(true); // no connection: record the visit on this device and upload it later
+      return;
+    }
     createVisit.mutate(
       { captured_tz: Intl.DateTimeFormat().resolvedOptions().timeZone },
-      { onSuccess: (observation) => void navigate(`/observations/${observation.id}`) },
+      {
+        onSuccess: (observation) => void navigate(`/observations/${observation.id}`),
+        onError: (error) => {
+          if (error instanceof TypeError) setQuick(true); // the network went away mid-request
+        },
+      },
     );
   }
 
@@ -64,12 +81,45 @@ export function LesionPage() {
           </dd>
         </div>
         <div>
+          <dt>{t("lesions.latestSize")}</dt>
+          <dd className="numeric">
+            {data.latest_measurement
+              ? formatMm(
+                  data.latest_measurement.longest_mm,
+                  data.latest_measurement.sigma_longest_mm,
+                  locale,
+                  showUncertainty,
+                )
+              : "—"}
+          </dd>
+        </div>
+        {data.measurement_change && (
+          <div>
+            <dt>
+              {t("lesions.sinceDate", { date: dateFormat.format(new Date(data.measurement_change.since)) })}
+            </dt>
+            <dd className="numeric">
+              {formatDelta(
+                data.measurement_change.delta_mm,
+                data.measurement_change.sigma_mm,
+                locale,
+                showUncertainty,
+              )}{" "}
+              ·{" "}
+              {data.measurement_change.detectable
+                ? t("lesions.measuredChange")
+                : t("lesions.noDetectableChange")}
+            </dd>
+          </div>
+        )}
+        <div>
           <dt>{t("lesions.nextDue")}</dt>
           <dd className="numeric">
             {data.next_due_on ? dateFormat.format(new Date(data.next_due_on)) : "—"}
           </dd>
         </div>
       </dl>
+      <SnoozeControls lesion={data} canEdit={canEdit} />
       {data.notes && <p>{data.notes}</p>}
 
       {canEdit && (
@@ -82,7 +132,8 @@ export function LesionPage() {
           </Button>
         </div>
       )}
-      {createVisit.error && <Notice kind="error">{createVisit.error.message}</Notice>}
+      {createVisit.error && !quick && <Notice kind="error">{createVisit.error.message}</Notice>}
+      {quick && <QuickVisit lesionId={data.id} lesionLabel={lesionTitle(data, t)} onDone={() => undefined} />}
       {editing && (
         <EditLesionForm
           lesion={data}
@@ -112,6 +163,11 @@ export function LesionPage() {
                     {visit.images.slice(0, 4).map((image) => (
                       <img key={image.id} src={imageUrl(image.id, "thumb")} alt="" loading="lazy" />
                     ))}
+                  </span>
+                )}
+                {visit.quality_flags.length > 0 && (
+                  <span className={styles.chips}>
+                    <span className={[styles.badge, styles.due].join(" ")}>{t("quality.short")}</span>
                   </span>
                 )}
                 {visit.symptoms.length > 0 && (

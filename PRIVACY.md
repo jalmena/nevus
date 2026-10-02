@@ -17,6 +17,15 @@ neVus does not store health conclusions. It does not compute or store risk score
 
 Everything is stored on the operator's own server, in one data directory: a database file (or an operator-provided PostgreSQL database) and a tree of image files named by their content hash. Nothing is sent to the project, to any cloud service or to third parties. The software contains no analytics or telemetry.
 
+## What stays on your phone
+
+To work without a connection, the app keeps some data in the browser of the device you use it on:
+
+- the pages you have opened (lists of persons, marks and visits) and small versions of the photographs, at most 400 of them for at most 30 days, so a known page opens offline;
+- visits recorded without a connection, with their photographs, until they have been uploaded.
+
+Full-size photographs, originals and exports are never kept there. Signing out removes all of it from that device. On a shared device, sign out when you are done.
+
 ## Who can see what
 
 - Access requires an account. Registration is closed: the administrator creates accounts.

@@ -5,6 +5,7 @@ import { Notice } from "@/design-system/components/Notice";
 import { TextField } from "@/design-system/components/TextField";
 import type { MapPoint } from "@/features/bodymap/zones";
 import { INTERVALS, type LesionIn } from "@/lib/lesions";
+import { suggestName } from "@/lib/names";
 import { zoneName } from "./lesionName";
 import styles from "./lesions.module.css";
 
@@ -18,7 +19,7 @@ interface Props {
 }
 
 export function NewLesionForm({ point, view, pending, error, onSubmit, onCancel }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [label, setLabel] = useState("");
   const [type, setType] = useState<"mole" | "other">("mole");
   const [firstNoticed, setFirstNoticed] = useState("");
@@ -49,6 +50,15 @@ export function NewLesionForm({ point, view, pending, error, onSubmit, onCancel 
         onChange={(e) => setLabel(e.target.value)}
         maxLength={120}
       />
+      <div>
+        <Button
+          type="button"
+          variant="quiet"
+          onClick={() => setLabel(suggestName(i18n.resolvedLanguage ?? "en"))}
+        >
+          {t("lesions.suggestName")}
+        </Button>
+      </div>
       <label className={styles.row}>
         <span>{t("lesions.type")}</span>
         <select value={type} onChange={(e) => setType(e.target.value as "mole" | "other")}>

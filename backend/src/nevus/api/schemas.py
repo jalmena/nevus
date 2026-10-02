@@ -32,6 +32,8 @@ class UserOut(BaseModel):
     language: str
     theme: str
     show_uncertainty: bool
+    card_line_mm: float | None
+    email_reminders: bool
     created_at: datetime
     last_login_at: datetime | None
     disabled_at: datetime | None
@@ -60,6 +62,10 @@ class UserUpdateMe(BaseModel):
     theme: Theme | None = None
     show_uncertainty: bool | None = None
     email: str | None = Field(default=None, max_length=254)
+    card_line_mm: float | None = Field(
+        default=None, ge=45.0, le=55.0, description="Measured length of the printed card's 50 mm line"
+    )
+    email_reminders: bool | None = None
 
 
 class PasswordChange(BaseModel):

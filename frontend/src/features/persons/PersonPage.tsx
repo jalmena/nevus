@@ -11,12 +11,15 @@ import { LesionList } from "@/features/lesions/LesionList";
 import { NewLesionForm } from "@/features/lesions/NewLesionForm";
 import { lesionTitle } from "@/features/lesions/lesionName";
 import { useCreateLesion, useLesions } from "@/lib/lesions";
-import { usePerson } from "@/lib/persons";
+import { ExportForm } from "@/features/data/ExportForm";
+import { PurgePerson } from "@/features/data/PurgePerson";
+import { formatBytes, useUsage } from "@/lib/data";
+import { usePerson, useUpdatePerson } from "@/lib/persons";
 import styles from "./persons.module.css";
 
 export function PersonPage() {
   const { personId = "" } = useParams();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const person = usePerson(personId);
   const lesions = useLesions(personId);
@@ -26,6 +29,8 @@ export function PersonPage() {
   const [placing, setPlacing] = useState(false);
   const [point, setPoint] = useState<MapPoint | null>(null);
   const canEdit = person.data?.my_role === "owner" || person.data?.my_role === "manager";
+  const updatePerson = useUpdatePerson(personId);
+  const usage = useUsage(personId);
 
   const markers: Marker[] = (lesions.data ?? [])
     .filter((lesion) => lesion.location.view === view)
@@ -131,6 +136,36 @@ export function PersonPage() {
         )}
         {lesions.data && lesions.data.length > 0 && <LesionList lesions={lesions.data} />}
       </section>
+
+      {person.data?.my_role === "owner" && (
+        <section className={styles.mapSection} aria-labelledby="profile-heading">
+          <h2 id="profile-heading">{t("persons.profileTitle")}</h2>
+          <label className={styles.switchRow}>
+            <input
+              type="checkbox"
+              checked={person.data.experimental_analysis}
+              aria-describedby="experimental-hint"
+              onChange={(e) => updatePerson.mutate({ experimental_analysis: e.target.checked })}
+            />
+            {t("persons.experimental")}
+          </label>
+          <p id="experimental-hint" className="text-secondary">
+            {t("persons.experimentalHint")}
+          </p>
+          {updatePerson.error && <Notice kind="error">{updatePerson.error.message}</Notice>}
+          {usage.data && (
+            <p className="text-secondary">
+              {t("data.usage", {
+                count: usage.data.images,
+                size: formatBytes(usage.data.bytes, i18n.resolvedLanguage ?? "en"),
+              })}
+            </p>
+          )}
+          {usage.data?.over_quota && <Notice kind="attention">{t("data.overQuota")}</Notice>}
+          <ExportForm personId={personId} label={t("data.exportPerson")} />
+          <PurgePerson personId={personId} name={person.data.display_name} />
+        </section>
+      )}
     </div>
   );
 }

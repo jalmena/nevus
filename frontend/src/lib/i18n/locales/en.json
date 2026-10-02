@@ -44,7 +44,10 @@
       "owner": "Owner",
       "manager": "Manager",
       "viewer": "Viewer"
-    }
+    },
+    "profileTitle": "Profile settings",
+    "experimental": "Experimental analysis",
+    "experimentalHint": "Off by default. When on, neVus may propose outlines and changes on its own; each proposal is labelled experimental and you confirm or reject it."
   },
   "images": {
     "addPhoto": "Add a photo",
@@ -66,7 +69,8 @@
     "open": "Open the photo",
     "alt": "{{role}}, {{date}}",
     "noDate": "No capture date",
-    "delete": "Move to trash"
+    "delete": "Move to trash",
+    "openWithWarnings": "Open the photo (has quality warnings)"
   },
   "settings": {
     "title": "Settings",
@@ -92,7 +96,12 @@
     },
     "title": "Body map",
     "hint": "Tap a zone to select it.",
-    "selected": "{{zone}} · {{view}}"
+    "selected": "{{zone}} · {{view}}",
+    "cluster_one": "One mark here",
+    "cluster_other": "{{count}} marks here: zoom in",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "zoomReset": "Show the whole body"
   },
   "zones": {
     "1100": "Head",
@@ -191,7 +200,12 @@
     "emptyTitle": "No marks yet",
     "emptyTextEdit": "Add a mark by tapping its place on the body map.",
     "emptyTextView": "Nobody has added marks for this person yet.",
-    "backToPerson": "Back to the person"
+    "backToPerson": "Back to the person",
+    "latestSize": "Latest size",
+    "sinceDate": "Since {{date}}",
+    "measuredChange": "measured change",
+    "noDetectableChange": "no detectable change",
+    "suggestName": "Suggest a name"
   },
   "observations": {
     "title": "Visits",
@@ -212,5 +226,211 @@
     },
     "backTo": "Back to {{lesion}}",
     "delete": "Move visit to trash"
+  },
+  "quality": {
+    "title": "Saved with quality warnings",
+    "short": "Quality warnings",
+    "checking": "Checking the photos…",
+    "hint": "The visit is kept as it is. If you can, take the photo again.",
+    "flags": {
+      "blurry": "Blurry: hold the phone steady and tap the mark to focus.",
+      "too_dark": "Too dark: add light or move closer to a window.",
+      "too_bright": "Overexposed: avoid direct sunlight and the flash.",
+      "glare": "Glare: tilt the phone a little so reflections move off the mark.",
+      "low_resolution": "Low resolution: use the camera at full size rather than a screenshot or a forwarded copy."
+    }
+  },
+  "measure": {
+    "back": "Back to the visit",
+    "title": "Measure",
+    "stepsLabel": "Steps",
+    "stepScale": "Scale",
+    "stepMark": "The mark",
+    "canvasScale": "Photo. Tap the coin or the ends of a known length.",
+    "canvasMark": "Photo. Tap the mark to outline it.",
+    "zoomHint": "Pinch or use the mouse wheel to zoom, drag to move. With a keyboard: + and − zoom, Enter places at the centre.",
+    "cardSearching": "Looking for the reference card…",
+    "cardFound": "Reference card found, tilted {{tilt}}°.",
+    "cardTilted": "Reference card found, but tilted {{tilt}}° (limit {{limit}}°). If you can, retake the photo holding the phone parallel to the skin.",
+    "cardSmall": "The card looks small: come closer next time.",
+    "cardNotFound": "No reference card in this photo. Use a coin or a length you know.",
+    "useCard": "Use the reference card",
+    "withCoin": "Use a coin",
+    "withLine": "Use a known length",
+    "coin": "coin",
+    "coinTap": "Tap the coin.",
+    "coinAdjust": "Drag the handles until the circle follows the coin's edge.",
+    "denomination": "Coin",
+    "coins": {
+      "1c": "1 cent",
+      "2c": "2 cents",
+      "5c": "5 cents",
+      "10c": "10 cents",
+      "20c": "20 cents",
+      "50c": "50 cents",
+      "1e": "1 euro",
+      "2e": "2 euros"
+    },
+    "coinTiltNote": "A coin cannot show whether the phone was tilted, so the uncertainty is larger than with the card.",
+    "useThisCoin": "Use this coin",
+    "lineTap_one": "Tap one more end of the length.",
+    "lineTap_other": "Tap both ends of something whose length you know.",
+    "lineAdjust": "Drag the ends if needed and type the length.",
+    "lengthMm": "Length in millimetres",
+    "useThisLine": "Use this length",
+    "clearLine": "Start again",
+    "lineEnd": "End {{n}} of the length",
+    "mark": "mark",
+    "markTap": "Tap the mark.",
+    "markAdjust": "Check the outline. Switch to a circle to adjust it by hand.",
+    "moveHandle": "Move the {{what}}",
+    "sizeHandle": "Resize the {{what}}",
+    "longest": "Longest",
+    "across": "Across",
+    "area": "Area",
+    "flags": {
+      "tilted": "The photo is tilted beyond {{limit}}°: this measurement is kept but flagged.",
+      "unverified_card": "The card's print size is not verified (Settings, Reference card), so the uncertainty is larger.",
+      "tilt_unknown": "Camera tilt is unknown with a coin or a length; hold the phone parallel to the skin."
+    },
+    "save": "Save the measurement",
+    "asCircle": "Adjust as a circle",
+    "again": "Outline again",
+    "changeScale": "Change the scale",
+    "disclaimer": "A measurement describes size. It says nothing about what the mark is.",
+    "visitTitle": "Measurements",
+    "noneYet": "No measurements for this visit yet.",
+    "needPhoto": "Add a photo to measure the mark.",
+    "measurePhoto": "Measure on the photo",
+    "measurePhotoN": "Measure on photo {{n}}",
+    "delete": "Delete",
+    "scaleKinds": {
+      "card": "card",
+      "coin": "coin",
+      "manual": "known length",
+      "unknown": "scale"
+    },
+    "tiltedShort": "tilted"
+  },
+  "card": {
+    "title": "Reference card",
+    "intro": "Print it, cut it out and place its window over the mark when you take a photo: neVus reads the scale and the tilt from it.",
+    "downloadA4": "Download for A4 paper",
+    "downloadLetter": "Download for US Letter paper",
+    "lineLabel": "Measured length of the 50 mm line",
+    "lineHint": "After printing, measure the line with a ruler and type what you read (for example 49.6).",
+    "verified": "Print verified: the line measured {{mm}} mm.",
+    "unverified": "Not verified yet: measurements made with the card carry a larger uncertainty."
+  },
+  "reminders": {
+    "title": "Due for a photo",
+    "nothing": "Nothing is due right now.",
+    "dueToday": "due today",
+    "dueSince": "due since {{date}}",
+    "snoozedUntil": "Reminder snoozed until {{date}}.",
+    "unsnooze": "Remind me again",
+    "notNow": "Not now:",
+    "snoozeWeek": "In a week",
+    "snoozeMonth": "In a month",
+    "settingsTitle": "Reminders",
+    "settingsIntro": "Marks due for a photo appear on the home page. You can also receive one email a day when something is due; it lists names and dates, never photos.",
+    "email": "Email address",
+    "emailReminders": "Send me a daily email when marks are due",
+    "needEmail": "Add an email address to turn email reminders on."
+  },
+  "admin": {
+    "emailTitle": "Email delivery (administrator)",
+    "emailIntro": "The mail server neVus uses to send reminders. Nothing is sent until this is filled in and people turn reminders on.",
+    "host": "Server",
+    "port": "Port",
+    "security": "Security",
+    "securityNone": "None (only on a trusted network)",
+    "username": "User name",
+    "password": "Password",
+    "passwordKept": "A password is stored. Leave this empty to keep it.",
+    "sender": "Sender address",
+    "publicUrl": "Address of this neVus",
+    "publicUrlHint": "Used for the link in emails, for example https://nevus.example.home",
+    "saved": "Saved.",
+    "testTo": "Send a test message to",
+    "sendTest": "Send a test",
+    "testSent": "Sent. Check the inbox.",
+    "instanceTitle": "Instance (administrator)",
+    "defaultLanguage": "Language for new accounts"
+  },
+  "sudo": {
+    "title": "Confirm it is you",
+    "intro": "This action needs your password again.",
+    "confirm": "Confirm",
+    "wrong": "Wrong password.",
+    "cancelled": "Cancelled."
+  },
+  "trash": {
+    "title": "Trash",
+    "intro": "Deleted marks, visits and photos stay here for 30 days, then go for good.",
+    "emptyTitle": "The trash is empty",
+    "emptyText": "What you delete stays here for a while in case you change your mind.",
+    "kinds": {
+      "person": "Person",
+      "lesion": "Mark",
+      "observation": "Visit",
+      "image": "Photo"
+    },
+    "goesOn": "removed for good on {{date}}",
+    "restore": "Restore",
+    "deleteNow": "Delete now",
+    "open": "Open the trash",
+    "backToSettings": "Back to settings"
+  },
+  "data": {
+    "title": "Your data",
+    "intro": "Take everything with you as one encrypted file, or recover what you deleted.",
+    "exportPerson": "Export this person",
+    "exportAll": "Export the whole instance (administrator)",
+    "exportIntro": "Choose a passphrase. You will need it to open the file; neVus does not keep it, so nobody can recover the file without it. It opens with the standard age tool.",
+    "passphrase": "Passphrase",
+    "passphraseAgain": "Repeat the passphrase",
+    "startExport": "Start the export",
+    "exportStarted": "The export is being prepared. It appears under Settings, Your data.",
+    "status": {
+      "queued": "Waiting",
+      "building": "Being prepared…",
+      "ready": "Ready",
+      "failed": "Failed"
+    },
+    "expires": "downloadable until {{date}}",
+    "remove": "Remove",
+    "usage_one": "{{count}} photo, {{size}}",
+    "usage_other": "{{count}} photos, {{size}}",
+    "overQuota": "This person's photos use more space than the limit the administrator set. Nothing is refused; consider removing old duplicates.",
+    "purgeTitle": "Delete this person for good",
+    "purgeIntro": "Every mark, visit, measurement and photo of {{name}} will be removed now, without passing through the trash. Export first if you want to keep a copy.",
+    "typeName": "Type {{name}} to confirm",
+    "purgeAction": "Delete for good"
+  },
+  "offline": {
+    "offline": "Offline.",
+    "waiting_one": "One visit is waiting to upload.",
+    "waiting_other": "{{count}} visits are waiting to upload.",
+    "uploading": "Uploading saved visits…",
+    "failed_one": "one could not upload yet",
+    "failed_other": "{{count}} could not upload yet",
+    "uploadNow": "Upload now",
+    "quickIntro": "No connection. Take the photos now: the visit is kept on this device and uploads by itself when you are back online.",
+    "photosReady_one": "One photo ready.",
+    "photosReady_other": "{{count}} photos ready.",
+    "keep": "Keep this visit",
+    "saved": "Kept on this device. It will upload when the connection is back."
+  },
+  "capture": {
+    "open": "Live camera",
+    "title": "Live camera",
+    "preview": "Camera preview",
+    "ghost": "Last photo",
+    "torch": "Torch",
+    "shutter": "Take the photo",
+    "error": "The camera could not start: {{message}}. Use Take a photo instead.",
+    "lastTime": "Last time: try to match the distance and the angle.",
+    "lastTimeAlt": "Previous close-up"
   }
 }

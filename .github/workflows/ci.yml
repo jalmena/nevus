@@ -17,7 +17,7 @@ jobs:
   commits:
     name: Conventional commits
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, nevus]
     steps:
       - uses: actions/checkout@v5
         with:
@@ -28,7 +28,7 @@ jobs:
 
   backend:
     name: Backend
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, nevus]
     defaults:
       run:
         working-directory: backend
@@ -41,7 +41,7 @@ jobs:
           POSTGRES_DB: nevus
         ports: ["5432:5432"]
         options: >-
-          --health-cmd "pg_isready -U nevus" --health-interval 5s --health-timeout 5s --health-retries 10
+          --health-cmd "pg_isready -U nevus" --health-interval 5s --health-timeout 5s --health-retries 12
     steps:
       - uses: actions/checkout@v5
       - uses: astral-sh/setup-uv@v6
@@ -82,7 +82,7 @@ jobs:
 
   frontend:
     name: Frontend
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, nevus]
     defaults:
       run:
         working-directory: frontend
@@ -107,9 +107,49 @@ jobs:
       - run: pnpm test
       - run: pnpm build
 
+  e2e:
+    name: End to end
+    runs-on: [self-hosted, nevus]
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: frontend/.node-version
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - name: Backend environment
+        working-directory: backend
+        run: uv sync --frozen
+      - run: pnpm build
+      - name: Browser
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Journey on a phone-sized browser, with accessibility checks
+        env:
+          CI: "1"
+          NEVUS_E2E_DATA: ${{ runner.temp }}/e2e-data
+        run: pnpm e2e
+      - name: Keep the report when it fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report
+          retention-days: 7
+
   image:
     name: Container image
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, nevus]
     steps:
       - uses: actions/checkout@v5
       - name: Build
@@ -123,7 +163,7 @@ jobs:
         run: |
           mkdir -p ci-data
           docker run -d --name nevus -p 8080:8080 -v "$PWD/ci-data:/data" nevus:ci
-          for i in $(seq 1 60); do curl -fsS http://127.0.0.1:8080/healthz && break || sleep 1; done
+          for i in $(seq 1 120); do curl -fsS http://127.0.0.1:8080/healthz && break || sleep 1; done
           curl -fsS http://127.0.0.1:8080/healthz | tee /dev/stderr | grep -q '"status":"ok"'
           # The index must answer 200 without a session: CasaOS accepts only 200 or 401 there.
           test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/)" = "200"
@@ -135,19 +175,24 @@ jobs:
         run: |
           sudo mkdir -p ci-data-puid && sudo chown root:root ci-data-puid
           docker run -d --name nevuspuid -e PUID=1500 -e PGID=1500 -p 8081:8080 -v "$PWD/ci-data-puid:/data" nevus:ci
-          for i in $(seq 1 60); do curl -fsS http://127.0.0.1:8081/healthz && break || sleep 1; done
+          for i in $(seq 1 120); do curl -fsS http://127.0.0.1:8081/healthz && break || sleep 1; done
           curl -fsS http://127.0.0.1:8081/healthz | grep -q '"storage":"ok"'
           uid=$(docker exec nevuspuid sh -c 'stat -c %u /proc/1')
           echo "pid 1 runs as uid $uid"; test "$uid" = "1500"
           docker rm -f nevuspuid
+      - name: Leave nothing behind on the runner
+        if: always()
+        run: docker rm -f nevus nevuspuid >/dev/null 2>&1 || true
 
   security:
     name: Security
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, nevus]
     steps:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
+      - name: Clear a download a cancelled run can leave behind on this runner
+        run: rm -f /tmp/gitleaks.tmp
       - name: Secrets
         uses: gitleaks/gitleaks-action@v2
         env:

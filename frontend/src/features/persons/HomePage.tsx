@@ -6,6 +6,7 @@ import { Card } from "@/design-system/components/Card";
 import { EmptyState } from "@/design-system/components/EmptyState";
 import { Notice } from "@/design-system/components/Notice";
 import { TextField } from "@/design-system/components/TextField";
+import { DueList } from "@/features/reminders/DueList";
 import { useCreatePerson, usePersons } from "@/lib/persons";
 import styles from "./persons.module.css";
 
@@ -38,6 +39,7 @@ export function HomePage() {
 
   return (
     <div className={styles.page}>
+      <DueList />
       <header className={styles.header}>
         <h1>{t("persons.title")}</h1>
         {!adding && persons.data && persons.data.length > 0 && (

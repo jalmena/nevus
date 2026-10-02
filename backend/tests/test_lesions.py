@@ -190,3 +190,35 @@ def test_due_dates_follow_the_last_visit(client: TestClient) -> None:
     summary = client.get(f"/api/lesions/{created['id']}").json()
     assert summary["next_due_on"] == (recent.date() + timedelta(days=30)).isoformat()
     assert summary["due"] is False
+
+
+def test_client_minted_identifiers_make_retries_harmless(client: TestClient) -> None:
+    """The offline queue may send the same visit and photo twice; nothing is duplicated."""
+    import uuid as _uuid
+
+    claim(client)
+    pid = person(client)
+    created = lesion(client, pid)
+    visit_id = str(_uuid.uuid4())
+    first = client.post(
+        f"/api/lesions/{created['id']}/observations", json={"id": visit_id, "notes": "offline"}, headers=SAME_ORIGIN
+    )
+    again = client.post(
+        f"/api/lesions/{created['id']}/observations", json={"id": visit_id, "notes": "offline"}, headers=SAME_ORIGIN
+    )
+    assert (
+        first.status_code == 201 and again.status_code == 201 and first.json()["id"] == again.json()["id"] == visit_id
+    )
+    photo_id = str(_uuid.uuid4())
+    for _ in range(2):
+        response = client.post(
+            f"/api/observations/{visit_id}/images",
+            files={"file": ("photo.jpg", jpeg_with_metadata(), "image/jpeg")},
+            data={"client_id": photo_id},
+            headers=SAME_ORIGIN,
+        )
+        assert response.status_code == 201 and response.json()["id"] == photo_id
+    assert len(client.get(f"/api/lesions/{created['id']}/observations").json()[0]["images"]) == 1
+    other = lesion(client, pid, label="Other")
+    clash = client.post(f"/api/lesions/{other['id']}/observations", json={"id": visit_id}, headers=SAME_ORIGIN)
+    assert clash.status_code == 409

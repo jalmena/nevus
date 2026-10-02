@@ -4,6 +4,62 @@
  */
 
 export interface paths {
+    "/api/admin/email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Email */
+        get: operations["get_email_api_admin_email_get"];
+        /** Put Email */
+        put: operations["put_email_api_admin_email_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/email/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Test Email
+         * @description Send one message now and say plainly what went wrong if it did not go.
+         */
+        post: operations["test_email_api_admin_email_test_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/instance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Instance */
+        get: operations["get_instance_api_admin_instance_get"];
+        /** Put Instance */
+        put: operations["put_instance_api_admin_instance_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/claim": {
         parameters: {
             query?: never;
@@ -163,6 +219,78 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/due": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Due List */
+        get: operations["due_list_api_due_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/exports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Exports */
+        get: operations["list_exports_api_exports_get"];
+        put?: never;
+        /**
+         * Request Export
+         * @description Exporting everything is sensitive, so it needs the password again (sudo mode).
+         */
+        post: operations["request_export_api_exports_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/exports/{export_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove Export */
+        delete: operations["remove_export_api_exports__export_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/exports/{export_id}/download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download */
+        get: operations["download_api_exports__export_id__download_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/images/{image_id}": {
         parameters: {
             query?: never;
@@ -179,6 +307,60 @@ export interface paths {
          * @description Moves the image to the trash; the purge and the garbage collection of blobs arrive with data management.
          */
         delete: operations["delete_image_api_images__image_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/images/{image_id}/fit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Propose Fit
+         * @description A proposal around a tap, in the photo's upright pixels. Nothing is stored.
+         */
+        post: operations["propose_fit_api_images__image_id__fit_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/images/{image_id}/scale": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Image Scale */
+        get: operations["image_scale_api_images__image_id__scale_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/images/{image_id}/scale-references": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add Scale Reference */
+        post: operations["add_scale_reference_api_images__image_id__scale_references_post"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -226,6 +408,23 @@ export interface paths {
         patch: operations["update_lesion_api_lesions__lesion_id__patch"];
         trace?: never;
     };
+    "/api/lesions/{lesion_id}/measurements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lesion Measurements */
+        get: operations["lesion_measurements_api_lesions__lesion_id__measurements_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/lesions/{lesion_id}/observations": {
         parameters: {
             query?: never;
@@ -239,6 +438,44 @@ export interface paths {
         /** Create Observation */
         post: operations["create_observation_api_lesions__lesion_id__observations_post"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/lesions/{lesion_id}/snooze": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Snooze
+         * @description Not now: the mark leaves the due list for a week or a month. A new visit ends the snooze.
+         */
+        post: operations["snooze_api_lesions__lesion_id__snooze_post"];
+        /** Unsnooze */
+        delete: operations["unsnooze_api_lesions__lesion_id__snooze_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/measurements/{measurement_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Measurement */
+        delete: operations["delete_measurement_api_measurements__measurement_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -278,6 +515,47 @@ export interface paths {
         put?: never;
         /** Upload Observation Image */
         post: operations["upload_observation_image_api_observations__observation_id__images_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/observations/{observation_id}/measurements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Observation Measurements */
+        get: operations["observation_measurements_api_observations__observation_id__measurements_get"];
+        put?: never;
+        /**
+         * Create Measurement
+         * @description Submitting a measurement is the confirmation: nothing proposed is ever stored without it.
+         */
+        post: operations["create_measurement_api_observations__observation_id__measurements_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/observations/{observation_id}/measurements/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preview Measurement
+         * @description The same computation as saving, without saving: the interface shows it while the outline moves.
+         */
+        post: operations["preview_measurement_api_observations__observation_id__measurements_preview_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -392,6 +670,123 @@ export interface paths {
         put?: never;
         /** Create Lesion */
         post: operations["create_lesion_api_persons__person_id__lesions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/persons/{person_id}/purge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Purge Person
+         * @description Delete a person and everything about them for good, now. Owner only, password again.
+         */
+        delete: operations["purge_person_api_persons__person_id__purge_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/persons/{person_id}/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Usage
+         * @description Storage used by one person's photographs, against the operator's soft quota.
+         */
+        get: operations["usage_api_persons__person_id__usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/reference-card": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Reference Card
+         * @description Two window cards, two strips and a 50 mm line to verify the printer did not scale the page.
+         */
+        get: operations["reference_card_api_reference_card_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/trash": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Trash
+         * @description Top-level deletions only: a visit deleted together with its mark comes back with the mark.
+         */
+        get: operations["list_trash_api_trash_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/trash/{kind}/{item_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Purge Now
+         * @description Remove for good, without waiting for the purge. Needs the password again.
+         */
+        delete: operations["purge_now_api_trash__kind___item_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/trash/{kind}/{item_id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restore */
+        post: operations["restore_api_trash__kind___item_id__restore_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -560,6 +955,8 @@ export interface components {
             captured_at?: string | null;
             /** Captured Tz */
             captured_tz?: string | null;
+            /** Client Id */
+            client_id?: string | null;
             /** File */
             file: string;
             /**
@@ -575,12 +972,227 @@ export interface components {
              */
             role: "overview" | "close_up" | "with_reference" | "other";
         };
+        /** CardOut */
+        CardOut: {
+            /** Card */
+            card?: string | null;
+            /** Centre Px */
+            centre_px?: number[] | null;
+            /** Flags */
+            flags?: string[];
+            /** Found */
+            found: boolean;
+            /** Marker Px */
+            marker_px?: number | null;
+            /** Mm Per Px */
+            mm_per_px?: number | null;
+            /** Tilt Deg */
+            tilt_deg?: number | null;
+        };
+        /** ChangeBrief */
+        ChangeBrief: {
+            /** Delta Mm */
+            delta_mm: number;
+            /** Detectable */
+            detectable: boolean;
+            /** Sigma Mm */
+            sigma_mm: number;
+            /**
+             * Since
+             * Format: date-time
+             */
+            since: string;
+        };
+        /** ChangeOut */
+        ChangeOut: {
+            /** Delta Mm */
+            delta_mm: number;
+            /** Detectable */
+            detectable: boolean;
+            /** Sigma Mm */
+            sigma_mm: number;
+            /**
+             * Since
+             * Format: date-time
+             */
+            since: string;
+        };
+        /** CircleShape */
+        CircleShape: {
+            /** Cx */
+            cx: number;
+            /** Cy */
+            cy: number;
+            /** R */
+            r: number;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "circle";
+        };
+        /** CoinIn */
+        CoinIn: {
+            /** Cx */
+            cx: number;
+            /** Cy */
+            cy: number;
+            /**
+             * Denomination
+             * @enum {string}
+             */
+            denomination: "1c" | "2c" | "5c" | "10c" | "20c" | "50c" | "1e" | "2e";
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "coin";
+            /** R */
+            r: number;
+        };
         /** Credentials */
         Credentials: {
             /** Password */
             password: string;
             /** Username */
             username: string;
+        };
+        /** DueOut */
+        DueOut: {
+            /** Label */
+            label: string | null;
+            /** Last Observed At */
+            last_observed_at: string | null;
+            /**
+             * Lesion Id
+             * Format: uuid
+             */
+            lesion_id: string;
+            /**
+             * Next Due On
+             * Format: date
+             */
+            next_due_on: string;
+            /** Overdue Days */
+            overdue_days: number;
+            /**
+             * Person Id
+             * Format: uuid
+             */
+            person_id: string;
+            /** Person Name */
+            person_name: string;
+            /** Zone */
+            zone: string;
+        };
+        /** EmailSettingsIn */
+        EmailSettingsIn: {
+            /** Host */
+            host?: string | null;
+            /**
+             * Password
+             * @description Omit to keep, empty to remove
+             */
+            password?: string | null;
+            /**
+             * Port
+             * @default 587
+             */
+            port: number;
+            /** Public Url */
+            public_url?: string | null;
+            /**
+             * Security
+             * @default starttls
+             * @enum {string}
+             */
+            security: "starttls" | "ssl" | "none";
+            /** Sender */
+            sender?: string | null;
+            /** Username */
+            username?: string | null;
+        };
+        /** EmailSettingsOut */
+        EmailSettingsOut: {
+            /** Has Password */
+            has_password: boolean;
+            /** Host */
+            host: string | null;
+            /** Port */
+            port: number;
+            /** Public Url */
+            public_url: string | null;
+            /** Ready */
+            ready: boolean;
+            /**
+             * Security
+             * @enum {string}
+             */
+            security: "starttls" | "ssl" | "none";
+            /** Sender */
+            sender: string | null;
+            /** Username */
+            username: string | null;
+        };
+        /** ExportIn */
+        ExportIn: {
+            /** Passphrase */
+            passphrase: string;
+            /**
+             * Person Id
+             * @description None exports every person (administrators only)
+             */
+            person_id?: string | null;
+        };
+        /** ExportOut */
+        ExportOut: {
+            /** Bytes */
+            bytes: number | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Error */
+            error: string | null;
+            /** Expires At */
+            expires_at: string | null;
+            /** File Name */
+            file_name: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Person Id */
+            person_id: string | null;
+            /** Status */
+            status: string;
+        };
+        /** FitIn */
+        FitIn: {
+            /**
+             * Target
+             * @enum {string}
+             */
+            target: "coin" | "lesion";
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
+        };
+        /** FitOut */
+        FitOut: {
+            /** Cx */
+            cx: number;
+            /** Cy */
+            cy: number;
+            /** Method */
+            method: string;
+            /** Outline */
+            outline: number[][] | null;
+            /** R */
+            r: number;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -638,6 +1250,10 @@ export interface components {
              * Format: uuid
              */
             person_id: string;
+            /** Quality Checked At */
+            quality_checked_at: string | null;
+            /** Quality Flags */
+            quality_flags: string[];
             /** Re Encoded */
             re_encoded: boolean;
             /** Renditions */
@@ -650,6 +1266,33 @@ export interface components {
             source_format: string;
             /** Width */
             width: number;
+        };
+        /** ImageScaleOut */
+        ImageScaleOut: {
+            card: components["schemas"]["CardOut"] | null;
+            /** Card Checked */
+            card_checked: boolean;
+            /**
+             * Image Id
+             * Format: uuid
+             */
+            image_id: string;
+            /** References */
+            references: components["schemas"]["ScaleReferenceOut"][];
+            /** Tilt Limit Deg */
+            tilt_limit_deg: number;
+            /** Upright Height */
+            upright_height: number;
+            /** Upright Width */
+            upright_width: number;
+        };
+        /** InstanceOut */
+        InstanceOut: {
+            /**
+             * Default Language
+             * @enum {string}
+             */
+            default_language: "en" | "es";
         };
         /** InstanceStatus */
         InstanceStatus: {
@@ -711,7 +1354,9 @@ export interface components {
             last_observed_at: string | null;
             /** Latest Image Id */
             latest_image_id: string | null;
+            latest_measurement?: components["schemas"]["MeasurementBrief"] | null;
             location: components["schemas"]["LocationOut"];
+            measurement_change?: components["schemas"]["ChangeBrief"] | null;
             /** Next Due On */
             next_due_on: string | null;
             /** Notes */
@@ -723,6 +1368,8 @@ export interface components {
              * Format: uuid
              */
             person_id: string;
+            /** Snoozed Until */
+            snoozed_until?: string | null;
             /** Status */
             status: string;
             /** Tags */
@@ -777,12 +1424,153 @@ export interface components {
             /** Zone */
             zone: string;
         };
+        /** ManualIn */
+        ManualIn: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "manual";
+            /** Length Mm */
+            length_mm: number;
+            /** X1 */
+            x1: number;
+            /** X2 */
+            x2: number;
+            /** Y1 */
+            y1: number;
+            /** Y2 */
+            y2: number;
+        };
+        /** MeasurementBrief */
+        MeasurementBrief: {
+            /** Flags */
+            flags: string[];
+            /** Longest Mm */
+            longest_mm: number;
+            /**
+             * Measured At
+             * Format: date-time
+             */
+            measured_at: string;
+            /** Perpendicular Mm */
+            perpendicular_mm: number;
+            /** Sigma Longest Mm */
+            sigma_longest_mm: number;
+        };
+        /** MeasurementIn */
+        MeasurementIn: {
+            /**
+             * Image Id
+             * Format: uuid
+             */
+            image_id: string;
+            /**
+             * Method
+             * @enum {string}
+             */
+            method: "assisted" | "manual";
+            /**
+             * Scale Reference Id
+             * Format: uuid
+             */
+            scale_reference_id: string;
+            /** Shape */
+            shape: components["schemas"]["CircleShape"] | components["schemas"]["OutlineShape"];
+        };
+        /** MeasurementOut */
+        MeasurementOut: {
+            /** Area Mm2 */
+            area_mm2: number;
+            /**
+             * Captured At
+             * Format: date-time
+             */
+            captured_at: string;
+            change?: components["schemas"]["ChangeOut"] | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Flags */
+            flags: string[];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Image Id
+             * Format: uuid
+             */
+            image_id: string;
+            /**
+             * Lesion Id
+             * Format: uuid
+             */
+            lesion_id: string;
+            /** Longest Mm */
+            longest_mm: number;
+            /** Method */
+            method: string;
+            /**
+             * Observation Id
+             * Format: uuid
+             */
+            observation_id: string;
+            /** Perpendicular Mm */
+            perpendicular_mm: number;
+            /** Scale Kind */
+            scale_kind: string;
+            /**
+             * Scale Reference Id
+             * Format: uuid
+             */
+            scale_reference_id: string;
+            /** Shape */
+            shape: {
+                [key: string]: unknown;
+            };
+            /** Sigma Area Mm2 */
+            sigma_area_mm2: number;
+            /** Sigma Longest Mm */
+            sigma_longest_mm: number;
+            /** Sigma Perpendicular Mm */
+            sigma_perpendicular_mm: number;
+            /** Tilt Deg */
+            tilt_deg: number | null;
+        };
+        /** MeasurementPreview */
+        MeasurementPreview: {
+            /** Area Mm2 */
+            area_mm2: number;
+            /** Flags */
+            flags: string[];
+            /** Longest Mm */
+            longest_mm: number;
+            /** Perpendicular Mm */
+            perpendicular_mm: number;
+            /** Sigma Area Mm2 */
+            sigma_area_mm2: number;
+            /** Sigma Longest Mm */
+            sigma_longest_mm: number;
+            /** Sigma Perpendicular Mm */
+            sigma_perpendicular_mm: number;
+            /** Tilt Deg */
+            tilt_deg: number | null;
+        };
         /** ObservationIn */
         ObservationIn: {
             /** Captured At */
             captured_at?: string | null;
             /** Captured Tz */
             captured_tz?: string | null;
+            /**
+             * Id
+             * @description Minted by the client (UUIDv7) so a retried upload from the offline queue is a no-op
+             */
+            id?: string | null;
             /** Notes */
             notes?: string | null;
             /** Symptoms */
@@ -841,6 +1629,16 @@ export interface components {
             notes?: string | null;
             /** Symptoms */
             symptoms?: ("itching" | "bleeding" | "pain" | "looks_different")[] | null;
+        };
+        /** OutlineShape */
+        OutlineShape: {
+            /** Points */
+            points: number[][];
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "outline";
         };
         /** PasswordChange */
         PasswordChange: {
@@ -921,6 +1719,38 @@ export interface components {
             /** Width */
             width: number;
         };
+        /** ScaleReferenceOut */
+        ScaleReferenceOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Geometry */
+            geometry: {
+                [key: string]: unknown;
+            };
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Image Id
+             * Format: uuid
+             */
+            image_id: string;
+            /** Kind */
+            kind: string;
+            /** Mm Per Px */
+            mm_per_px: number;
+            /** Reference Mm */
+            reference_mm: number | null;
+            /** Sigma Scale */
+            sigma_scale: number;
+            /** Tilt Deg */
+            tilt_deg: number | null;
+        };
         /** SessionOut */
         SessionOut: {
             /**
@@ -932,10 +1762,66 @@ export interface components {
             sudo_until: string | null;
             user: components["schemas"]["UserOut"];
         };
+        /** SnoozeIn */
+        SnoozeIn: {
+            /**
+             * Days
+             * @enum {integer}
+             */
+            days: 7 | 30;
+        };
         /** SudoIn */
         SudoIn: {
             /** Password */
             password: string;
+        };
+        /** TestEmailIn */
+        TestEmailIn: {
+            /** To */
+            to: string;
+        };
+        /** TrashItem */
+        TrashItem: {
+            /**
+             * Deleted At
+             * Format: date-time
+             */
+            deleted_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "person" | "lesion" | "observation" | "image";
+            /** Label */
+            label: string;
+            /**
+             * Person Id
+             * Format: uuid
+             */
+            person_id: string;
+            /** Person Name */
+            person_name: string;
+            /**
+             * Purge After
+             * Format: date-time
+             */
+            purge_after: string;
+        };
+        /** UsageOut */
+        UsageOut: {
+            /** Bytes */
+            bytes: number;
+            /** Images */
+            images: number;
+            /** Over Quota */
+            over_quota: boolean;
+            /** Quota Bytes */
+            quota_bytes: number | null;
         };
         /** UserCreate */
         UserCreate: {
@@ -954,6 +1840,8 @@ export interface components {
         };
         /** UserOut */
         UserOut: {
+            /** Card Line Mm */
+            card_line_mm: number | null;
             /**
              * Created At
              * Format: date-time
@@ -963,6 +1851,8 @@ export interface components {
             disabled_at: string | null;
             /** Email */
             email: string | null;
+            /** Email Reminders */
+            email_reminders: boolean;
             /**
              * Id
              * Format: uuid
@@ -986,8 +1876,15 @@ export interface components {
         };
         /** UserUpdateMe */
         UserUpdateMe: {
+            /**
+             * Card Line Mm
+             * @description Measured length of the printed card's 50 mm line
+             */
+            card_line_mm?: number | null;
             /** Email */
             email?: string | null;
+            /** Email Reminders */
+            email_reminders?: boolean | null;
             /** Language */
             language?: ("en" | "es") | null;
             /** Show Uncertainty */
@@ -1062,6 +1959,143 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    get_email_api_admin_email_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmailSettingsOut"];
+                };
+            };
+        };
+    };
+    put_email_api_admin_email_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmailSettingsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmailSettingsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    test_email_api_admin_email_test_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TestEmailIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_instance_api_admin_instance_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InstanceOut"];
+                };
+            };
+        };
+    };
+    put_instance_api_admin_instance_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InstanceOut"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InstanceOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     claim_api_auth_claim_post: {
         parameters: {
             query?: never;
@@ -1303,6 +2337,137 @@ export interface operations {
             };
         };
     };
+    due_list_api_due_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DueOut"][];
+                };
+            };
+        };
+    };
+    list_exports_api_exports_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExportOut"][];
+                };
+            };
+        };
+    };
+    request_export_api_exports_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExportIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExportOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_export_api_exports__export_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                export_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    download_api_exports__export_id__download_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                export_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_image_api_images__image_id__get: {
         parameters: {
             query?: never;
@@ -1351,6 +2516,107 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    propose_fit_api_images__image_id__fit_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                image_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FitIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FitOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    image_scale_api_images__image_id__scale_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                image_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImageScaleOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_scale_reference_api_images__image_id__scale_references_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                image_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CoinIn"] | components["schemas"]["ManualIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScaleReferenceOut"];
+                };
             };
             /** @description Validation Error */
             422: {
@@ -1488,6 +2754,37 @@ export interface operations {
             };
         };
     };
+    lesion_measurements_api_lesions__lesion_id__measurements_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lesion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeasurementOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_observations_api_lesions__lesion_id__observations_get: {
         parameters: {
             query?: never;
@@ -1542,6 +2839,101 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ObservationOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    snooze_api_lesions__lesion_id__snooze_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lesion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SnoozeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LesionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unsnooze_api_lesions__lesion_id__snooze_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lesion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LesionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_measurement_api_measurements__measurement_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                measurement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
@@ -1702,6 +3094,107 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ImageOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    observation_measurements_api_observations__observation_id__measurements_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                observation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeasurementOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_measurement_api_observations__observation_id__measurements_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                observation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MeasurementIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeasurementOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_measurement_api_observations__observation_id__measurements_preview_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                observation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MeasurementIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeasurementPreview"];
                 };
             };
             /** @description Validation Error */
@@ -2079,6 +3572,178 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["LesionOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    purge_person_api_persons__person_id__purge_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                person_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    usage_api_persons__person_id__usage_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                person_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsageOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reference_card_api_reference_card_get: {
+        parameters: {
+            query?: {
+                page?: "a4" | "letter";
+                lang?: "en" | "es";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_trash_api_trash_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrashItem"][];
+                };
+            };
+        };
+    };
+    purge_now_api_trash__kind___item_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                kind: "person" | "lesion" | "observation" | "image";
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    restore_api_trash__kind___item_id__restore_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                kind: "person" | "lesion" | "observation" | "image";
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

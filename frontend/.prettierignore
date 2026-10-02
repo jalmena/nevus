@@ -6,3 +6,5 @@ pnpm-lock.yaml
 openapi.json
 src/lib/api/schema.d.ts
 src/features/bodymap/zones.json
+test-results
+playwright-report

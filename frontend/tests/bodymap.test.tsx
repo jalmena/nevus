@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { BodyMap } from "@/features/bodymap/BodyMap";
@@ -22,7 +22,8 @@ describe("<BodyMap>", () => {
     const onSelectZone = vi.fn();
     const onPlace = vi.fn();
     render(<BodyMap view="front" onSelectZone={onSelectZone} onPlace={onPlace} />);
-    expect(screen.getAllByRole("button")).toHaveLength(28);
+    const map = screen.getByRole("group");
+    expect(within(map).getAllByRole("button")).toHaveLength(28);
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Right pectoral" }));
     expect(onSelectZone).toHaveBeenCalledWith(expect.objectContaining({ code: "1250" }));
@@ -58,5 +59,29 @@ describe("<BodyMap>", () => {
     expect(marker).toHaveAttribute("transform", "translate(108 101)");
     await userEvent.setup().click(marker);
     expect(onSelectMarker).toHaveBeenCalledWith("m1");
+  });
+});
+
+describe("<BodyMap> zoom and clusters", () => {
+  it("groups markers that would overlap and zooms in when the group is chosen", async () => {
+    await i18n.changeLanguage("en");
+    render(
+      <BodyMap
+        view="front"
+        markers={[
+          { id: "a", x: 0.5, y: 0.3, label: "First" },
+          { id: "b", x: 0.505, y: 0.302, label: "Second" },
+          { id: "c", x: 0.2, y: 0.8, label: "Far" },
+        ]}
+        onSelectMarker={() => undefined}
+      />,
+    );
+    const group = screen.getByRole("button", { name: "2 marks here: zoom in" });
+    expect(screen.getByRole("button", { name: "Far" })).toBeInTheDocument();
+    const map = screen.getByRole("group");
+    const before = map.getAttribute("viewBox");
+    await userEvent.setup().click(group);
+    expect(map.getAttribute("viewBox")).not.toBe(before);
+    expect(screen.getByRole("button", { name: "Show the whole body" })).toBeInTheDocument();
   });
 });
