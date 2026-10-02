@@ -91,7 +91,9 @@ export function PersonPage() {
           {placing
             ? point
               ? t("lesions.placed")
-              : t("lesions.placingHint")
+              : zone
+                ? t("lesions.placingSpot", { zone: t(`zones.${zone.code}`, { defaultValue: zone.name }) })
+                : t("lesions.placingHint")
             : zone
               ? t("bodymap.selected", {
                   zone: t(`zones.${zone.code}`, { defaultValue: zone.name }),

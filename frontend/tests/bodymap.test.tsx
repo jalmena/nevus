@@ -58,6 +58,19 @@ describe("<BodyMap>", () => {
     expect(point.y * 404).toBeLessThanOrEqual(bottom);
   });
 
+  it("reports a tap on the selected zone or on the background as no selection", async () => {
+    await i18n.changeLanguage("en");
+    const onSelectZone = vi.fn();
+    render(<BodyMap view="front" selectedZone="1250" onSelectZone={onSelectZone} />);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "Right pectoral" }));
+    expect(onSelectZone).toHaveBeenLastCalledWith(null);
+    await user.click(screen.getByRole("button", { name: "Left pectoral" }));
+    expect(onSelectZone).toHaveBeenLastCalledWith(expect.objectContaining({ code: "1251" }));
+    await user.click(screen.getByRole("group"));
+    expect(onSelectZone).toHaveBeenLastCalledWith(null);
+  });
+
   it("while a mark is placed, the first tap zooms in on the zone and the second places the mark", async () => {
     await i18n.changeLanguage("en");
     const onPlace = vi.fn();

@@ -193,6 +193,7 @@
     "title": "Marks",
     "add": "Add a mark",
     "placingHint": "Tap the zone where the mark is: the map zooms in on it. Then tap the exact spot.",
+    "placingSpot": "Tap the exact spot of the mark in {{zone}}.",
     "placed": "Now describe the mark below.",
     "newTitle": "New mark",
     "label": "Name",

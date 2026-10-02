@@ -8,7 +8,16 @@ import {
   type WheelEvent,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { MAP_HEIGHT, MAP_WIDTH, bodyMap, zonesForView, type MapPoint, type View, type Zone } from "./zones";
+import {
+  MAP_HEIGHT,
+  MAP_WIDTH,
+  bodyMap,
+  zoneByCode,
+  zonesForView,
+  type MapPoint,
+  type View,
+  type Zone,
+} from "./zones";
 import styles from "./BodyMap.module.css";
 
 export interface Marker {
@@ -24,7 +33,8 @@ interface Props {
   view: View;
   markers?: Marker[];
   selectedZone?: string | null;
-  onSelectZone?: (zone: Zone) => void;
+  /** The tapped zone; null when the selected zone is tapped again or the tap lands outside the body. */
+  onSelectZone?: (zone: Zone | null) => void;
   /** When set, a tap inside a zone also yields the tapped point; the keyboard places at the zone's anchor. */
   onPlace?: (point: MapPoint) => void;
   /** While a mark is being placed, the first tap on a zone zooms in on it and the second places the mark. */
@@ -165,12 +175,31 @@ export function BodyMap({
 
   function activate(zone: Zone, point: MapPoint) {
     if (moved.current) return; // that was a drag, not a tap
+    if (!placing && zone.code === selectedZone) {
+      onSelectZone?.(null); // the same zone again: nothing selected
+      return;
+    }
     onSelectZone?.(zone);
     if (placing && focused !== zone.code && !closeEnough(zone)) {
       zoomToZone(zone);
       return;
     }
     onPlace?.(point);
+  }
+
+  /** A tap on the background (the silhouette or the space around it): nothing selected any more. */
+  function onBackgroundClick(event: MouseEvent<SVGSVGElement>) {
+    if (moved.current || (event.target as Element).closest("[data-zone]")) return;
+    onSelectZone?.(null);
+    if (placing && focused) showAll();
+  }
+
+  // Placing starts with a zone already selected: zoom in on it, so the next tap is the precise one.
+  const [wasPlacing, setWasPlacing] = useState(placing);
+  if (placing !== wasPlacing) {
+    setWasPlacing(placing);
+    const zone = placing && selectedZone ? zoneByCode(selectedZone) : undefined;
+    if (zone && !closeEnough(zone)) zoomToZone(zone);
   }
 
   function onKey(event: KeyboardEvent<SVGPathElement>, zone: Zone) {
@@ -266,6 +295,7 @@ export function BodyMap({
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
+        onClick={onBackgroundClick}
       >
         <path className={styles.silhouette} d={bodyMap.views[view].silhouette} />
         {zones.map((zone) => (

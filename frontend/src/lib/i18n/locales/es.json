@@ -193,6 +193,7 @@
     "title": "Marcas",
     "add": "Añadir una marca",
     "placingHint": "Toca la zona donde está la marca: el mapa la amplía. Después toca el punto exacto.",
+    "placingSpot": "Toca el punto exacto de la marca en {{zone}}.",
     "placed": "Ahora describe la marca aquí abajo.",
     "newTitle": "Nueva marca",
     "label": "Nombre",
