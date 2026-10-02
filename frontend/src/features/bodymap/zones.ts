@@ -1,6 +1,6 @@
 import data from "./zones.json";
 
-export type View = "front" | "back" | "head";
+export type View = "front" | "back" | "head" | "hands" | "feet";
 export type Side = "left" | "right" | "midline";
 export type Region = "head" | "trunk" | "arm" | "leg";
 
@@ -25,7 +25,7 @@ interface BodyMapData {
 }
 
 export const bodyMap = data as BodyMapData;
-export const VIEWS: View[] = ["front", "back", "head"];
+export const VIEWS: View[] = ["front", "back", "head", "hands", "feet"];
 export const [, , MAP_WIDTH, MAP_HEIGHT] = bodyMap.viewBox;
 
 const byCode = new Map(bodyMap.zones.map((zone) => [zone.code, zone]));

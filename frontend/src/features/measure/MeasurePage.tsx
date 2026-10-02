@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate, useParams } from "react-router";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 import { Button } from "@/design-system/components/Button";
 import { Notice } from "@/design-system/components/Notice";
 import { TextField } from "@/design-system/components/TextField";
@@ -22,6 +22,7 @@ import {
   type Point,
 } from "@/lib/measurements";
 import { Handle, PhotoCanvas, useCanvas } from "./PhotoCanvas";
+import { useProposals } from "@/lib/proposals";
 import styles from "./measure.module.css";
 
 type Shape = { type: "outline"; points: number[][] } | ({ type: "circle" } & Circle);
@@ -50,6 +51,9 @@ export function MeasurePage() {
   const [method, setMethod] = useState<"assisted" | "manual">("assisted");
   const [preview, setPreview] = useState<MeasurementPreview | null>(null);
   const [previewError, setPreviewError] = useState<string | null>(null);
+  const [search] = useSearchParams();
+  const proposals = useProposals(search.get("proposal") ? imageId : "");
+  const proposed = proposals.data?.find((item) => item.id === search.get("proposal"))?.outline ?? null;
 
   const data = scale.data;
   const width = data?.upright_width ?? 1;
@@ -59,6 +63,11 @@ export function MeasurePage() {
   useEffect(() => {
     if (!referenceId && cardReference) setReferenceId(cardReference.id);
   }, [cardReference, referenceId]);
+
+  // Adjusting an experimental proposal: its outline is where the mark step starts.
+  useEffect(() => {
+    if (step === "mark" && !shape && proposed) setShape({ type: "outline", points: proposed });
+  }, [step, shape, proposed]);
 
   useEffect(() => {
     if (!shape || !referenceId) {

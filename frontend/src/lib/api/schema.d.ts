@@ -394,6 +394,61 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/evaluation/photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Photos */
+        get: operations["list_photos_api_evaluation_photos_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/evaluation/photos/{image_id}/label": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Put Label */
+        put: operations["put_label_api_evaluation_photos__image_id__label_put"];
+        post?: never;
+        /** Delete Label */
+        delete: operations["delete_label_api_evaluation_photos__image_id__label_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/evaluation/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Summary
+         * @description Metrics from the proposals already recorded; `nevus evaluate` runs the current analyzer afresh.
+         */
+        get: operations["summary_api_evaluation_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/exports": {
         parameters: {
             query?: never;
@@ -484,6 +539,26 @@ export interface paths {
          * @description A proposal around a tap, in the photo's upright pixels. Nothing is stored.
          */
         post: operations["propose_fit_api_images__image_id__fit_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/images/{image_id}/proposals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Proposals
+         * @description Nothing unless the person turned the experimental analysis on (FR-ANA-01).
+         */
+        get: operations["list_proposals_api_images__image_id__proposals_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -952,6 +1027,43 @@ export interface paths {
         get: operations["usage_api_persons__person_id__usage_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/proposals/{proposal_id}/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirm Proposal
+         * @description The person accepts the proposed outline: it becomes a measurement, linked to the analysis.
+         */
+        post: operations["confirm_proposal_api_proposals__proposal_id__confirm_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/proposals/{proposal_id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reject Proposal */
+        post: operations["reject_proposal_api_proposals__proposal_id__reject_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1447,6 +1559,11 @@ export interface components {
              */
             status: "aligned" | "abstained";
         };
+        /** ConfirmIn */
+        ConfirmIn: {
+            /** Scale Reference Id */
+            scale_reference_id?: string | null;
+        };
         /** Credentials */
         Credentials: {
             /** Password */
@@ -1530,6 +1647,35 @@ export interface components {
             sender: string | null;
             /** Username */
             username: string | null;
+        };
+        /** EvaluationPhoto */
+        EvaluationPhoto: {
+            /** Captured On */
+            captured_on: string | null;
+            /**
+             * Image Id
+             * Format: uuid
+             */
+            image_id: string;
+            label: components["schemas"]["LabelOut"] | null;
+            /** Mark */
+            mark: string;
+            /** Person Name */
+            person_name: string;
+            /** Proposal */
+            proposal: number[][] | null;
+            /** Quality Flags */
+            quality_flags: string[];
+            /** Role */
+            role: string;
+            /** Skin Tone */
+            skin_tone: string | null;
+            /** Upright Height */
+            upright_height: number;
+            /** Upright Width */
+            upright_width: number;
+            /** Zone */
+            zone: string;
         };
         /** ExportIn */
         ExportIn: {
@@ -1714,6 +1860,25 @@ export interface components {
             logout_url?: string | null;
             /** Version */
             version: string;
+        };
+        /** LabelIn */
+        LabelIn: {
+            /** Outline */
+            outline?: number[][] | null;
+            /** Quality */
+            quality?: ("good" | "bad") | null;
+        };
+        /** LabelOut */
+        LabelOut: {
+            /**
+             * Labelled At
+             * Format: date-time
+             */
+            labelled_at: string;
+            /** Outline */
+            outline: number[][] | null;
+            /** Quality */
+            quality: ("good" | "bad") | null;
         };
         /** LesionIn */
         LesionIn: {
@@ -2132,6 +2297,66 @@ export interface components {
             /** Skin Tone */
             skin_tone?: string | null;
         };
+        /** ProposalOut */
+        ProposalOut: {
+            /** Analyzer */
+            analyzer: string;
+            /** Confidence */
+            confidence: number | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "pending" | "confirmed" | "rejected" | "automatic";
+            /** Found */
+            found: boolean;
+            /** Framing Flags */
+            framing_flags: ("mark_off_centre" | "mark_small" | "mark_cut" | "no_mark_found")[];
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Image Id
+             * Format: uuid
+             */
+            image_id: string;
+            /** Outline */
+            outline: number[][] | null;
+            /** Reason */
+            reason: ("no_mark_found" | "low_contrast" | "irregular_region" | "too_large" | "too_small") | null;
+            size: components["schemas"]["ProposedSize"] | null;
+            /** Version */
+            version: string;
+        };
+        /** ProposedSize */
+        ProposedSize: {
+            /** Area Mm2 */
+            area_mm2: number;
+            /** Longest Mm */
+            longest_mm: number;
+            /** Perpendicular Mm */
+            perpendicular_mm: number;
+            /** Scale Kind */
+            scale_kind: string;
+            /**
+             * Scale Reference Id
+             * Format: uuid
+             */
+            scale_reference_id: string;
+            /** Sigma Area Mm2 */
+            sigma_area_mm2: number;
+            /** Sigma Longest Mm */
+            sigma_longest_mm: number;
+            /** Sigma Perpendicular Mm */
+            sigma_perpendicular_mm: number;
+        };
         /** RenditionOut */
         RenditionOut: {
             /** Bytes */
@@ -2150,6 +2375,11 @@ export interface components {
             /** Lesion Id */
             lesion_id?: string | null;
             /**
+             * Lesion Ids
+             * @description For a selection
+             */
+            lesion_ids?: string[] | null;
+            /**
              * Paper
              * @default a4
              * @enum {string}
@@ -2159,7 +2389,7 @@ export interface components {
              * Scope
              * @enum {string}
              */
-            scope: "lesion" | "profile";
+            scope: "lesion" | "profile" | "selection";
         };
         /** ReportOut */
         ReportOut: {
@@ -2206,7 +2436,7 @@ export interface components {
              * Scope
              * @enum {string}
              */
-            scope: "lesion" | "profile" | "visit";
+            scope: "lesion" | "profile" | "visit" | "selection";
             /**
              * Status
              * @enum {string}
@@ -2547,7 +2777,7 @@ export interface components {
              * View
              * @enum {string}
              */
-            view: "front" | "back" | "head";
+            view: "front" | "back" | "head" | "hands" | "feet";
         };
     };
     responses: never;
@@ -3317,6 +3547,123 @@ export interface operations {
             };
         };
     };
+    list_photos_api_evaluation_photos_get: {
+        parameters: {
+            query?: {
+                only?: "all" | "unlabelled" | "labelled";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvaluationPhoto"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_label_api_evaluation_photos__image_id__label_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                image_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LabelIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LabelOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_label_api_evaluation_photos__image_id__label_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                image_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    summary_api_evaluation_summary_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     list_exports_api_exports_get: {
         parameters: {
             query?: never;
@@ -3510,6 +3857,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["FitOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_proposals_api_images__image_id__proposals_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                image_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProposalOut"][];
                 };
             };
             /** @description Validation Error */
@@ -4845,6 +5223,72 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UsageOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    confirm_proposal_api_proposals__proposal_id__confirm_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                proposal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConfirmIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeasurementOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reject_proposal_api_proposals__proposal_id__reject_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                proposal_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProposalOut"];
                 };
             };
             /** @description Validation Error */

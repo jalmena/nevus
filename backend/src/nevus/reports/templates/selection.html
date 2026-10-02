@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% from "_record.html" import record with context %}
+{% from "_summary.html" import summary with context %}
+{% from "_closing.html" import closing with context %}
+{% block content %}
+<section class="appointment">
+  <p>{{ w("selection_marks") }}</p>
+  <ul>
+    {% for mark in records %}<li>{{ mark.number }}. {{ mark.title }} · {{ mark.zone }}</li>{% endfor %}
+  </ul>
+</section>
+{{ summary() }}
+{% for mark in records %}
+<div class="record">
+  {{ record(mark) }}
+</div>
+{% endfor %}
+{{ closing() }}
+{% endblock %}

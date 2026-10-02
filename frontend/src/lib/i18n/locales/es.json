@@ -96,7 +96,9 @@
     "views": {
       "front": "Frente",
       "back": "Espalda",
-      "head": "Cabeza"
+      "head": "Cabeza",
+      "hands": "Manos",
+      "feet": "Pies"
     },
     "title": "Mapa corporal",
     "hint": "Toca una zona para seleccionarla.",
@@ -168,7 +170,15 @@
     "3151": "Lado derecho de la cara",
     "3170": "Coronilla",
     "3171": "Cara",
-    "3172": "Parte de atrás de la cabeza"
+    "3172": "Parte de atrás de la cabeza",
+    "3210": "Palma derecha",
+    "3211": "Palma izquierda",
+    "3220": "Dorso de la mano derecha",
+    "3221": "Dorso de la mano izquierda",
+    "3310": "Planta del pie derecho",
+    "3311": "Planta del pie izquierdo",
+    "3320": "Empeine del pie derecho",
+    "3321": "Empeine del pie izquierdo"
   },
   "lesions": {
     "title": "Marcas",
@@ -365,7 +375,8 @@
     "sendTest": "Enviar una prueba",
     "testSent": "Enviado. Revisa la bandeja de entrada.",
     "instanceTitle": "Instancia (administración)",
-    "defaultLanguage": "Idioma de las cuentas nuevas"
+    "defaultLanguage": "Idioma de las cuentas nuevas",
+    "evaluationLink": "Conjunto de evaluación: etiqueta tus fotos para medir los analizadores"
   },
   "sudo": {
     "title": "Confirma que eres tú",
@@ -516,7 +527,17 @@
     "download_other": "Descargar el PDF ({{count}} páginas, {{size}})",
     "delete": "Borrar",
     "deleteNamed": "Borrar: {{name}}",
-    "deletedMark": "una marca que ya no está"
+    "deletedMark": "una marca que ya no está",
+    "what": "Informe de",
+    "whatProfile": "todas las marcas (resumen)",
+    "whatSelection": "las marcas que elija, con su registro",
+    "selection_one": "Registro de 1 marca elegida",
+    "selection_many": "Registro de {{count}} marcas elegidas",
+    "selection_other": "Registro de {{count}} marcas elegidas",
+    "visit": "Informe para una cita",
+    "makeSelection_one": "Hacer el informe de 1 marca",
+    "makeSelection_many": "Hacer el informe de {{count}} marcas",
+    "makeSelection_other": "Hacer el informe de {{count}} marcas"
   },
   "appointments": {
     "sectionTitle": "Citas",
@@ -605,5 +626,81 @@
     "copied": "Copiado",
     "warning": "Este enlace solo se muestra ahora. Quien lo tenga verá los nombres de las marcas y sus fechas, así que guárdalo en privado. Crear un enlace nuevo desactiva este.",
     "exists": "Hay un enlace de calendario desde el {{date}}. Para verlo de nuevo, crea uno nuevo."
+  },
+  "proposals": {
+    "title": "Medidas propuestas",
+    "experimental": "Experimental",
+    "intro": "Las hace el análisis experimental activado para esta persona. Una propuesta solo entra en el registro si la usas; puedes ajustarla antes o rechazarla.",
+    "use": "Usar esta medida",
+    "adjust": "Ajustarla",
+    "reject": "Rechazar",
+    "noScale": "Esta foto aún no tiene escala: ajústala para elegir una.",
+    "confidence": "Claridad del contorno: {{level}}",
+    "levels": {
+      "high": "clara",
+      "medium": "bastante clara",
+      "low": "poco clara"
+    },
+    "nothing": "El análisis experimental no encontró un contorno fiable en una foto: {{reason}}",
+    "reasons": {
+      "no_mark_found": "nada destacaba sobre la piel.",
+      "low_contrast": "la marca se diferencia demasiado poco de la piel de alrededor.",
+      "irregular_region": "la zona encontrada era demasiado irregular.",
+      "too_large": "la zona encontrada era demasiado grande para ser una sola marca.",
+      "too_small": "la zona encontrada era demasiado pequeña."
+    },
+    "framingIntro": "Para la próxima foto:",
+    "framing": {
+      "mark_off_centre": "pon la marca en el centro del encuadre.",
+      "mark_small": "acércate para que la marca ocupe más de la foto.",
+      "mark_cut": "deja la marca entera dentro del encuadre."
+    }
+  },
+  "evaluation": {
+    "back": "Volver a los ajustes",
+    "title": "Conjunto de evaluación",
+    "intro": "Etiqueta tus propias fotos para ver cómo se comportan los analizadores con ellas: dibuja el contorno real de la marca e indica si la foto es buena. Las etiquetas se quedan en este servidor.",
+    "summary": "Cómo se comporta el analizador de contornos",
+    "nothingYet": "Todavía no hay fotos etiquetadas.",
+    "caption": "{{name}} {{version}} frente a tus etiquetas, por tono de piel",
+    "tone": "Tono de piel",
+    "photos": "Fotos",
+    "found": "Contorneadas",
+    "diameterError": "Error del diámetro (medio / peor)",
+    "all": "Todas",
+    "unknownTone": "sin registrar",
+    "quality": "Los avisos de calidad coinciden con tu juicio en el {{agreement}} de las fotos: avisaron de {{caught}} de {{poor}} fotos malas y de {{flagged}} de {{good}} buenas.",
+    "command": "Estas cifras usan las propuestas ya hechas. Para pasar el analizador actual de nuevo por todas las fotos etiquetadas: nevus evaluate.",
+    "photosTitle": "Fotos",
+    "filter": "Mostrar",
+    "filters": {
+      "unlabelled": "Por etiquetar",
+      "labelled": "Etiquetadas",
+      "all": "Todas"
+    },
+    "none": "No hay fotos aquí.",
+    "labelled": "etiquetada",
+    "backToList": "Volver al conjunto de evaluación",
+    "labelTitle": "Etiquetar una foto",
+    "labelIntro": "Contornea la marca tal como es. Tócala para ajustar un contorno, o pon los puntos tú; la línea discontinua es la propuesta del analizador.",
+    "tool": "Contornear",
+    "tools": {
+      "tap": "Tocando la marca",
+      "points": "Poniendo puntos"
+    },
+    "canvasTap": "Foto. Toca la marca para ajustar su contorno.",
+    "canvasPoints": "Foto. Cada toque añade un punto del contorno.",
+    "legend": "Discontinua: la propuesta del analizador. Continua: tu etiqueta.",
+    "fromProposal": "Partir de la propuesta",
+    "undoPoint": "Quitar el último punto",
+    "clear": "Borrar el contorno",
+    "qualityQuestion": "¿Es esta foto lo bastante buena para medir la marca?",
+    "qualityLabels": {
+      "good": "Buena",
+      "bad": "Mala"
+    },
+    "save": "Guardar la etiqueta",
+    "removeLabel": "Quitar la etiqueta",
+    "saved": "Etiqueta guardada."
   }
 }

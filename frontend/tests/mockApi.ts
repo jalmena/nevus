@@ -54,6 +54,13 @@ export interface MockState {
     created_at: string;
   }[];
   webhooks: { id: string; name: string; preset: string; url: string; enabled: boolean }[];
+  /** Experimental outline proposals by image id. */
+  proposals: Record<
+    string,
+    { id: string; found: boolean; reason?: string; decision: string; framing?: string[] }[]
+  >;
+  /** Labels of the personal evaluation set, by image id. */
+  labels: Record<string, { outline: number[][] | null; quality: string | null }>;
   /** "proxy": a reverse proxy signs people in; there are no local passwords. */
   authMode: "local" | "proxy";
   calendar: { exists: boolean };
@@ -116,6 +123,8 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     webhooks: [],
     calendar: { exists: false },
     authMode: "local",
+    proposals: {},
+    labels: {},
     ...initial,
   };
   const personOut = (p: { id: string; display_name: string }) => ({
@@ -479,6 +488,118 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
         });
       }
       if (path === "/api/admin/instance" && method === "GET") return json({ default_language: "en" });
+      if (path.startsWith("/api/evaluation/photos") && method === "GET") {
+        const only = new URL(url).searchParams.get("only") ?? "all";
+        const all = state.observations.flatMap((o) => o.images);
+        return json(
+          all
+            .filter((id) =>
+              only === "unlabelled" ? !state.labels[id] : only === "labelled" ? !!state.labels[id] : true,
+            )
+            .map((id) => ({
+              image_id: id,
+              person_name: "Ana",
+              skin_tone: "MST3",
+              mark: "Chest mark",
+              zone: "1250",
+              captured_on: "2026-09-01",
+              role: "close_up",
+              upright_width: 640,
+              upright_height: 480,
+              quality_flags: [],
+              proposal: [
+                [300, 220],
+                [340, 220],
+                [340, 260],
+                [300, 260],
+              ],
+              label: state.labels[id] ? { ...state.labels[id], labelled_at: "2026-10-01T10:00:00Z" } : null,
+            })),
+        );
+      }
+      if (path === "/api/evaluation/summary") {
+        const n = Object.keys(state.labels).length;
+        const row = {
+          photos: n,
+          found: n,
+          mean_iou: n ? 0.92 : null,
+          mean_dice: n ? 0.96 : null,
+          mean_diameter_error: n ? 0.03 : null,
+          worst_diameter_error: n ? 0.05 : null,
+        };
+        return json({
+          analyzer: { name: "segment.auto", version: "1.0.0" },
+          labelled: n,
+          outline: { overall: row, by_tone: n ? { MST3: row } : {} },
+          quality: {
+            overall: {
+              photos: 0,
+              agreement: null,
+              poor_caught: 0,
+              poor_missed: 0,
+              good_flagged: 0,
+              good_clear: 0,
+            },
+            by_tone: {},
+          },
+        });
+      }
+      match = /^\/api\/evaluation\/photos\/([^/]+)\/label$/.exec(path);
+      if (match && method === "PUT") {
+        const input = body as { outline: number[][] | null; quality: string | null };
+        state.labels[match[1] ?? ""] = input;
+        return json({ ...input, labelled_at: "2026-10-01T10:00:00Z" });
+      }
+      match = /^\/api\/images\/([^/]+)\/proposals$/.exec(path);
+      if (match && method === "GET") {
+        return json(
+          (state.proposals[match[1] ?? ""] ?? []).map((item) => ({
+            id: item.id,
+            image_id: match?.[1],
+            analyzer: "segment.auto",
+            version: "1.0.0",
+            found: item.found,
+            reason: item.found ? null : (item.reason ?? "no_mark_found"),
+            outline: item.found
+              ? [
+                  [300, 220],
+                  [340, 220],
+                  [340, 260],
+                  [300, 260],
+                ]
+              : null,
+            confidence: item.found ? 0.9 : null,
+            framing_flags: item.framing ?? [],
+            decision: item.decision,
+            created_at: "2026-10-01T10:00:00Z",
+            size: item.found
+              ? {
+                  scale_reference_id: "ref-card",
+                  scale_kind: "card",
+                  longest_mm: 5.1,
+                  perpendicular_mm: 4.9,
+                  area_mm2: 19.6,
+                  sigma_longest_mm: 0.2,
+                  sigma_perpendicular_mm: 0.2,
+                  sigma_area_mm2: 1.5,
+                }
+              : null,
+          })),
+        );
+      }
+      match = /^\/api\/proposals\/([^/]+)\/(confirm|reject)$/.exec(path);
+      if (match && method === "POST") {
+        const all = Object.values(state.proposals).flat();
+        const found = all.find((item) => item.id === match?.[1]);
+        if (!found) return json({ detail: "No such proposal." }, 404);
+        found.decision = match[2] === "confirm" ? "confirmed" : "rejected";
+        if (match[2] === "confirm") {
+          const created = { id: nextId(), observation_id: "o1", image_id: "i1", longest_mm: 5.1 };
+          state.measurements.push(created);
+          return json(measurementOut(created), 201);
+        }
+        return json({ id: found.id, decision: found.decision });
+      }
       match = /^\/api\/images\/([^/]+)\/scale$/.exec(path);
       if (match) {
         return json({
@@ -579,11 +700,17 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
         return json(listed);
       }
       if (match && method === "POST") {
-        const input = body as { scope: string; lesion_id?: string; language?: string; paper?: string };
+        const input = body as {
+          scope: string;
+          lesion_id?: string;
+          lesion_ids?: string[];
+          language?: string;
+          paper?: string;
+        };
         const created = {
           id: nextId(),
           scope: input.scope,
-          lesion_ids: input.lesion_id ? [input.lesion_id] : [],
+          lesion_ids: input.lesion_ids ?? (input.lesion_id ? [input.lesion_id] : []),
           language: input.language ?? "en",
           paper: input.paper ?? "a4",
           status: "queued",

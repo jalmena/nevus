@@ -17,7 +17,7 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-View = Literal["front", "back", "head"]
+View = Literal["front", "back", "head", "hands", "feet"]
 Side = Literal["left", "right", "midline"]
 Region = Literal["head", "trunk", "arm", "leg"]
 

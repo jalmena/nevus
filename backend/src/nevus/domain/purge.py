@@ -20,6 +20,7 @@ from nevus.db.models import (
     Analysis,
     Appointment,
     CalendarFeed,
+    EvaluationLabel,
     Export,
     Image,
     Lesion,
@@ -83,6 +84,7 @@ def _delete_images(db: Session, image_ids: list[uuid.UUID]) -> None:
     ]
     if pairs:
         db.execute(delete(Analysis).where(Analysis.id.in_(pairs)))
+    db.execute(delete(EvaluationLabel).where(EvaluationLabel.image_id.in_(image_ids)))
     db.execute(delete(Rendition).where(Rendition.image_id.in_(image_ids)))
     db.execute(delete(Image).where(Image.id.in_(image_ids)))
 

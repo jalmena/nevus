@@ -60,7 +60,15 @@
     "3151": "Right side of the face",
     "3170": "Top of the head",
     "3171": "Face",
-    "3172": "Back of the head"
+    "3172": "Back of the head",
+    "3210": "Right palm",
+    "3211": "Left palm",
+    "3220": "Back of the right hand",
+    "3221": "Back of the left hand",
+    "3310": "Sole of the right foot",
+    "3311": "Sole of the left foot",
+    "3320": "Top of the right foot",
+    "3321": "Top of the left foot"
   },
   "es": {
     "1100": "Cabeza",
@@ -123,6 +131,14 @@
     "3151": "Lado derecho de la cara",
     "3170": "Coronilla",
     "3171": "Cara",
-    "3172": "Parte de atrás de la cabeza"
+    "3172": "Parte de atrás de la cabeza",
+    "3210": "Palma derecha",
+    "3211": "Palma izquierda",
+    "3220": "Dorso de la mano derecha",
+    "3221": "Dorso de la mano izquierda",
+    "3310": "Planta del pie derecho",
+    "3311": "Planta del pie izquierdo",
+    "3320": "Empeine del pie derecho",
+    "3321": "Empeine del pie izquierdo"
   }
 }

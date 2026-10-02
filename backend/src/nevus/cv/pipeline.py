@@ -4,6 +4,9 @@
 Both run for every photo, whatever the profile's experimental setting: they describe the photo and
 find the scale, they do not analyse the skin (ADR-0003). Each writes its own analysis record; the
 photo's warning list is recomputed from the latest record of each, so their order does not matter.
+
+The experimental outline proposal runs only for persons who turned the experimental analysis on, after
+the card search (lower priority), and waits for the person's decision.
 """
 
 from __future__ import annotations
@@ -16,9 +19,9 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from nevus import analysis
-from nevus.cv import card_detect, quality
+from nevus.cv import card_detect, quality, segment
 from nevus.cv.imageio import Img, decode, upright
-from nevus.db.models import Image, Observation, ScaleReference
+from nevus.db.models import Image, Observation, Person, ScaleReference
 from nevus.db.types import utcnow
 from nevus.jobs import queue
 from nevus.jobs.registry import JobContext, JobKind, register
@@ -26,6 +29,7 @@ from nevus.storage.blobs import BlobStore
 
 QUALITY_KIND = "analyze.quality"
 CARD_KIND = "analyze.card"
+SEGMENT_KIND = "analyze.segment"
 CARD_FLAGS = ("tilted", "card_small")
 
 
@@ -37,6 +41,22 @@ def enqueue_analyses(db: Session, image: Image) -> None:
         queue.enqueue(
             db, CARD_KIND, {"image_id": str(image.id)}, dedupe_key=f"card:{image.id}:{card_detect.VERSION}", priority=4
         )
+        enqueue_proposal(db, image)
+
+
+def enqueue_proposal(db: Session, image: Image) -> bool:
+    """The experimental outline proposal, only when the person has the experimental analysis on."""
+    person = db.get(Person, image.person_id)
+    if person is None or not person.experimental_analysis or image.observation_id is None:
+        return False
+    job = queue.enqueue(
+        db,
+        SEGMENT_KIND,
+        {"image_id": str(image.id)},
+        dedupe_key=f"segment:{image.id}:{segment.VERSION}",
+        priority=3,
+    )
+    return job is not None
 
 
 def upright_size(image: Image) -> tuple[int, int]:
@@ -172,5 +192,41 @@ def _card_store(ctx: JobContext, payload: dict[str, Any], result: dict[str, Any]
     refresh_image_flags(ctx.db, image)
 
 
+# --- experimental outline proposal ------------------------------------------------------------------
+
+
+def _segment_load(ctx: JobContext, payload: dict[str, Any]) -> dict[str, Any] | None:
+    image = _image(ctx, payload)
+    if image is None:
+        return None
+    person = ctx.db.get(Person, image.person_id)
+    if person is None or not person.experimental_analysis:
+        return None  # switched off since it was queued
+    card = analysis.latest(ctx.db, "image", image.id, card_detect.NAME)
+    return {"data": _read(ctx, image), "orientation": image.orientation, "card": card.outputs if card else None}
+
+
+def _segment_compute(value: dict[str, Any]) -> dict[str, Any]:
+    return segment.propose(upright(decode(value["data"]), int(value["orientation"])), value["card"])
+
+
+def _segment_store(ctx: JobContext, payload: dict[str, Any], result: dict[str, Any]) -> None:
+    image = _image(ctx, payload)
+    if image is None:
+        return
+    analysis.record(
+        ctx.db,
+        target_type="image",
+        target_id=image.id,
+        analyzer=segment.NAME,
+        version=segment.VERSION,
+        params=segment.PARAMS,
+        input_hash=image.sha256,
+        outputs=result,
+        decision="pending" if result.get("found") else "automatic",
+    )
+
+
 register(JobKind(QUALITY_KIND, _quality_load, _quality_compute, _quality_store, timeout=90.0))
+register(JobKind(SEGMENT_KIND, _segment_load, _segment_compute, _segment_store, timeout=120.0))
 register(JobKind(CARD_KIND, _card_load, _card_compute, _card_store, timeout=120.0))

@@ -88,9 +88,19 @@ def update_person(
     changes = body.model_dump(exclude_unset=True)
     if "experimental_analysis" in changes and access.role != ACCESS_OWNER:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Only the owner can change the experimental analysis setting.")
+    switched_on = changes.get("experimental_analysis") is True and not person.experimental_analysis
     for field, value in changes.items():
         setattr(person, field, value)
     db.flush()
+    if switched_on:
+        from nevus.cv.pipeline import enqueue_proposal
+
+        for image in db.scalars(
+            select(Image).where(
+                Image.person_id == person.id, Image.deleted_at.is_(None), Image.observation_id.is_not(None)
+            )
+        ):
+            enqueue_proposal(db, image)
     service.audit(
         db, "person.update", user, "person", person.id, client_ip(request, settings), {"fields": sorted(changes)}
     )

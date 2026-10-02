@@ -222,7 +222,12 @@ def context(payload: dict[str, Any]) -> dict[str, Any]:
         on = words.day(date.fromisoformat(raw_appointment["date"]))
         appointment = {"title": words("appointment_title", date=on), "notes": raw_appointment.get("notes")}
         first = appointment["title"]
-    titles = {"lesion": "lesion_title", "profile": "profile_title", "visit": "visit_report_title"}
+    titles = {
+        "lesion": "lesion_title",
+        "profile": "profile_title",
+        "visit": "visit_report_title",
+        "selection": "selection_title",
+    }
     wanted = set(payload.get("records") or [])
     return {
         "w": words,
@@ -238,9 +243,11 @@ def context(payload: dict[str, Any]) -> dict[str, Any]:
         "lesions": lesions,
         "front": svg.body_view("front", markers, height=300, radius=8),
         "back": svg.body_view("back", markers, height=300, radius=8),
-        "head": svg.body_view("head", markers, height=300, radius=8)
-        if any(raw["view"] == "head" for raw in payload["lesions"])
-        else "",
+        "details": [
+            (view, svg.body_view(view, markers, height=300, radius=8))
+            for view in ("head", "hands", "feet")
+            if any(raw["view"] == view for raw in payload["lesions"])
+        ],
         "highlights": [lesion for lesion in lesions if lesion["change"] and lesion["change"]["detectable"]],
         "methods_scale": words("methods_scale", kinds=", ".join(words(f"scale_{k}") for k in scale_kinds))
         if scale_kinds

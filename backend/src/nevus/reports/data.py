@@ -194,7 +194,8 @@ def gather(
     paper: str,
     appointment: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """A mark's record (`lesion`), the summary of every mark (`profile`), or both for an appointment (`visit`)."""
+    """A mark's record (`lesion`), the summary of every mark (`profile`), or the summary followed by the records
+    of some marks: those of an appointment's checklist (`visit`) or those the person chose (`selection`)."""
     if scope == "lesion":
         lesions = [db.get(Lesion, uuid.UUID(i)) for i in lesion_ids]
         chosen = [lesion for lesion in lesions if lesion is not None and lesion.deleted_at is None]
@@ -203,7 +204,7 @@ def gather(
             db.scalars(select(Lesion).where(Lesion.person_id == person.id, Lesion.deleted_at.is_(None))).all(),
             key=_order,
         )
-    with_records = set(lesion_ids) if scope == "visit" else set()
+    with_records = set(lesion_ids) if scope in ("visit", "selection") else set()
     lesions_data = [
         _lesion(db, store, lesion, n, with_visits=scope == "lesion" or str(lesion.id) in with_records)
         for n, lesion in enumerate(chosen, 1)

@@ -21,11 +21,14 @@ export function Reports({
   personId,
   lesionId,
   titleOf,
+  marks = [],
 }: {
   personId: string;
   lesionId?: string;
   /** The name of a mark, for listing its reports. */
   titleOf: (lesionId: string) => string;
+  /** On a person's page: the marks that can be chosen for a report of some of them. */
+  marks?: { id: string; title: string }[];
 }) {
   const { t, i18n } = useTranslation();
   const reports = useReports(personId);
@@ -34,6 +37,8 @@ export function Reports({
   const uiLanguage: ReportLanguage = i18n.resolvedLanguage === "es" ? "es" : "en";
   const [language, setLanguage] = useState<ReportLanguage>(uiLanguage);
   const [paper, setPaper] = useState<Paper>("a4");
+  const [scope, setScope] = useState<"profile" | "selection">("profile");
+  const [chosen, setChosen] = useState<string[]>([]);
   const locale = i18n.resolvedLanguage ?? "en";
   const dateFormat = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
   const shown = (reports.data ?? []).filter((report) =>
@@ -42,15 +47,16 @@ export function Reports({
 
   function submit(event: FormEvent) {
     event.preventDefault();
-    create.mutate(
-      lesionId
-        ? { scope: "lesion", lesion_id: lesionId, language, paper }
-        : { scope: "profile", language, paper },
-    );
+    if (lesionId) create.mutate({ scope: "lesion", lesion_id: lesionId, language, paper });
+    else if (scope === "selection")
+      create.mutate({ scope: "selection", lesion_ids: chosen, language, paper });
+    else create.mutate({ scope: "profile", language, paper });
   }
 
   function describe(report: ReportOut): string {
     if (report.scope === "profile") return t("reports.profile");
+    if (report.scope === "selection") return t("reports.selection", { count: report.lesion_ids.length });
+    if (report.scope === "visit") return t("reports.visit");
     const id = report.lesion_ids[0];
     return id ? t("reports.lesion", { name: titleOf(id) }) : t("reports.profile");
   }
@@ -59,6 +65,49 @@ export function Reports({
     <section className={styles.section} aria-labelledby={lesionId ? "mark-reports" : "person-reports"}>
       <h2 id={lesionId ? "mark-reports" : "person-reports"}>{t("reports.title")}</h2>
       <p className="text-secondary">{lesionId ? t("reports.introLesion") : t("reports.introProfile")}</p>
+      {!lesionId && marks.length > 0 && (
+        <fieldset className={styles.choice}>
+          <legend>{t("reports.what")}</legend>
+          <label>
+            <input
+              type="radio"
+              name="scope"
+              checked={scope === "profile"}
+              onChange={() => setScope("profile")}
+            />
+            {t("reports.whatProfile")}
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="scope"
+              checked={scope === "selection"}
+              onChange={() => setScope("selection")}
+            />
+            {t("reports.whatSelection")}
+          </label>
+          {scope === "selection" && (
+            <ul className={styles.marks}>
+              {marks.map((mark) => (
+                <li key={mark.id}>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={chosen.includes(mark.id)}
+                      onChange={(e) =>
+                        setChosen((current) =>
+                          e.target.checked ? [...current, mark.id] : current.filter((id) => id !== mark.id),
+                        )
+                      }
+                    />
+                    {mark.title}
+                  </label>
+                </li>
+              ))}
+            </ul>
+          )}
+        </fieldset>
+      )}
       <form className={styles.form} onSubmit={submit}>
         <label className={styles.field}>
           <span>{t("reports.language")}</span>
@@ -74,12 +123,17 @@ export function Reports({
             <option value="letter">{t("reports.letter")}</option>
           </select>
         </label>
-        <Button type="submit" disabled={create.isPending}>
+        <Button
+          type="submit"
+          disabled={create.isPending || (scope === "selection" && !lesionId && chosen.length === 0)}
+        >
           {create.isPending
             ? t("common.working")
             : lesionId
               ? t("reports.makeLesion")
-              : t("reports.makeProfile")}
+              : scope === "selection"
+                ? t("reports.makeSelection", { count: chosen.length })
+                : t("reports.makeProfile")}
         </Button>
       </form>
       {create.error && <Notice kind="error">{create.error.message}</Notice>}

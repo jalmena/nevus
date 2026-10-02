@@ -5,6 +5,7 @@ import { Button } from "@/design-system/components/Button";
 import { Notice } from "@/design-system/components/Notice";
 import { PhotoGallery } from "@/features/images/PhotoGallery";
 import { QualityNotice } from "@/features/images/QualityNotice";
+import { Proposals } from "@/features/measure/Proposals";
 import { VisitMeasurements } from "@/features/measure/VisitMeasurements";
 import {
   SYMPTOMS,
@@ -93,6 +94,7 @@ export function ObservationPage() {
         />
       </section>
 
+      <Proposals observationId={data.id} images={data.images} canEdit={canEdit} />
       <VisitMeasurements observationId={data.id} images={data.images} canEdit={canEdit} />
 
       <section className={styles.section} aria-labelledby="notes-heading">

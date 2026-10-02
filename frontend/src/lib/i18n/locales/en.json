@@ -96,7 +96,9 @@
     "views": {
       "front": "Front",
       "back": "Back",
-      "head": "Head"
+      "head": "Head",
+      "hands": "Hands",
+      "feet": "Feet"
     },
     "title": "Body map",
     "hint": "Tap a zone to select it.",
@@ -168,7 +170,15 @@
     "3151": "Right side of the face",
     "3170": "Top of the head",
     "3171": "Face",
-    "3172": "Back of the head"
+    "3172": "Back of the head",
+    "3210": "Right palm",
+    "3211": "Left palm",
+    "3220": "Back of the right hand",
+    "3221": "Back of the left hand",
+    "3310": "Sole of the right foot",
+    "3311": "Sole of the left foot",
+    "3320": "Top of the right foot",
+    "3321": "Top of the left foot"
   },
   "lesions": {
     "title": "Marks",
@@ -365,7 +375,8 @@
     "sendTest": "Send a test",
     "testSent": "Sent. Check the inbox.",
     "instanceTitle": "Instance (administrator)",
-    "defaultLanguage": "Language for new accounts"
+    "defaultLanguage": "Language for new accounts",
+    "evaluationLink": "Evaluation set: label your photos to measure the analyzers"
   },
   "sudo": {
     "title": "Confirm it is you",
@@ -516,7 +527,15 @@
     "download_other": "Download the PDF ({{count}} pages, {{size}})",
     "delete": "Delete",
     "deleteNamed": "Delete: {{name}}",
-    "deletedMark": "a mark that is no longer here"
+    "deletedMark": "a mark that is no longer here",
+    "what": "Report of",
+    "whatProfile": "every mark (summary)",
+    "whatSelection": "the marks I choose, with their records",
+    "selection_one": "Record of 1 chosen mark",
+    "selection_other": "Records of {{count}} chosen marks",
+    "visit": "Report for an appointment",
+    "makeSelection_one": "Make the report of 1 mark",
+    "makeSelection_other": "Make the report of {{count}} marks"
   },
   "appointments": {
     "sectionTitle": "Appointments",
@@ -602,5 +621,81 @@
     "copied": "Copied",
     "warning": "This link is shown only now. Anyone with it sees the names of the marks and their dates, so keep it private. Making a new link stops this one.",
     "exists": "A calendar link exists since {{date}}. To see it again, make a new one."
+  },
+  "proposals": {
+    "title": "Proposed measurements",
+    "experimental": "Experimental",
+    "intro": "Made by the experimental analysis turned on for this person. A proposal enters the record only if you use it; you can adjust it first or reject it.",
+    "use": "Use this measurement",
+    "adjust": "Adjust it",
+    "reject": "Reject",
+    "noScale": "No scale on this photo yet: adjust it to choose one.",
+    "confidence": "How clear the outline was: {{level}}",
+    "levels": {
+      "high": "clear",
+      "medium": "fairly clear",
+      "low": "unclear"
+    },
+    "nothing": "The experimental analysis found no outline it could trust on a photo: {{reason}}",
+    "reasons": {
+      "no_mark_found": "nothing stood out from the skin.",
+      "low_contrast": "the mark differs too little from the skin around it.",
+      "irregular_region": "the region it found was too ragged.",
+      "too_large": "the region it found was too large to be one mark.",
+      "too_small": "the region it found was too small."
+    },
+    "framingIntro": "For the next photo:",
+    "framing": {
+      "mark_off_centre": "put the mark in the middle of the frame.",
+      "mark_small": "come closer, so the mark fills more of the photo.",
+      "mark_cut": "keep the whole mark inside the frame."
+    }
+  },
+  "evaluation": {
+    "back": "Back to the settings",
+    "title": "Evaluation set",
+    "intro": "Label your own photos to see how the analyzers do on them: draw the mark's true outline and say whether the photo is good. The labels stay on this server.",
+    "summary": "How the outline analyzer does",
+    "nothingYet": "No photo is labelled yet.",
+    "caption": "{{name}} {{version}} against your labels, per skin tone",
+    "tone": "Skin tone",
+    "photos": "Photos",
+    "found": "Outlined",
+    "diameterError": "Diameter error (mean / worst)",
+    "all": "All",
+    "unknownTone": "not recorded",
+    "quality": "Quality warnings agree with your judgement on {{agreement}} of the photos: {{caught}} of {{poor}} poor photos were warned about, and {{flagged}} of {{good}} good ones.",
+    "command": "These figures use the proposals already made. To run the current analyzer afresh on every labelled photo: nevus evaluate.",
+    "photosTitle": "Photos",
+    "filter": "Show",
+    "filters": {
+      "unlabelled": "To label",
+      "labelled": "Labelled",
+      "all": "All"
+    },
+    "none": "No photos here.",
+    "labelled": "labelled",
+    "backToList": "Back to the evaluation set",
+    "labelTitle": "Label a photo",
+    "labelIntro": "Outline the mark as it really is. Tap it to fit an outline, or place the points yourself; the dashed line is the analyzer's proposal.",
+    "tool": "Outline by",
+    "tools": {
+      "tap": "Tapping the mark",
+      "points": "Placing points"
+    },
+    "canvasTap": "Photo. Tap the mark to fit its outline.",
+    "canvasPoints": "Photo. Each tap adds a point of the outline.",
+    "legend": "Dashed: the analyzer's proposal. Solid: your label.",
+    "fromProposal": "Start from the proposal",
+    "undoPoint": "Remove the last point",
+    "clear": "Clear the outline",
+    "qualityQuestion": "Is this photo good enough to measure the mark?",
+    "qualityLabels": {
+      "good": "Good",
+      "bad": "Poor"
+    },
+    "save": "Save the label",
+    "removeLabel": "Remove the label",
+    "saved": "Label saved."
   }
 }

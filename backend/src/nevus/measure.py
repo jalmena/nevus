@@ -17,7 +17,7 @@ import cv2
 import numpy as np
 
 # Placement uncertainty in pixels of the photo as displayed for adjusting (the 2048 px rendition).
-BORDER_PX = {"assisted": 1.5, "manual": 2.5}
+BORDER_PX = {"assisted": 1.5, "automatic": 1.5, "manual": 2.5}
 DISPLAY_LONG_EDGE = 2048
 UNVERIFIED_PRINT_SIGMA = 0.010
 VERIFIED_PRINT_SIGMA = 0.004
