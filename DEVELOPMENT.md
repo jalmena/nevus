@@ -51,6 +51,8 @@ pnpm run build && pnpm run shots      # in frontend/
 
 It starts the real backend on a scratch data directory, walks every screen on a phone and on a desktop (Playwright, `e2e/gallery.spec.ts`), saves each in light and dark under `frontend/.screenshots/<device>/`, and makes contact sheets (`contact-<device>-<scheme>.png`) with `tools/screenshots/contact_sheet.py`. Check spacing, wrapping, contrast and wording in both schemes, and fix what looks wrong before the change is done. The journey test (`pnpm run e2e`) saves screenshots of its own pages too when `NEVUS_E2E_SHOTS=<dir>` is set. `uv run tools/screenshots/take.py` is a different thing: the three store screenshots, from a seeded instance with plausible photos, for `docs/design/screenshots/`.
 
+A review pass reads the gallery with a designer's eye: one primary action per screen, destructive actions apart, occasional tools folded, the content's own order, two panes where there is room. The rules and the before-and-after boards of the last pass are in [`docs/design/DESIGN_REVIEW.md`](docs/design/DESIGN_REVIEW.md); a board is a labelled contact sheet of the first screen of each key page, before and after, rendered at one scale so the two can be compared.
+
 ## Conventions
 
 - English everywhere; see [`CONTRIBUTING.md`](CONTRIBUTING.md).
