@@ -12,7 +12,6 @@ export default defineConfig({
     globals: true,
     setupFiles: ["tests/setup.ts"],
     // The first test of a file pays for compiling the app; on a loaded machine that passes five seconds.
-    testTimeout: 15_000,
     include: ["tests/**/*.test.{ts,tsx}", "src/**/*.test.ts"],
   },
 });
