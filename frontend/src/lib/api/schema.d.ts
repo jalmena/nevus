@@ -696,6 +696,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/lesions/{lesion_id}/sightings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Sightings
+         * @description Where a mark was seen in full-body sessions, newest first.
+         */
+        get: operations["sightings_api_lesions__lesion_id__sightings_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/lesions/{lesion_id}/snooze": {
         parameters: {
             query?: never;
@@ -1013,6 +1033,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/persons/{person_id}/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Sessions */
+        get: operations["list_sessions_api_persons__person_id__sessions_get"];
+        put?: never;
+        /** Start Session */
+        post: operations["start_session_api_persons__person_id__sessions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/persons/{person_id}/usage": {
         parameters: {
             query?: never;
@@ -1120,6 +1158,177 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/session-marks/{mark_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Mark */
+        delete: operations["delete_mark_api_session_marks__mark_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update Mark
+         * @description Confirm or reject a proposed mark, or link a mark to a known one or to a new one.
+         */
+        patch: operations["update_mark_api_session_marks__mark_id__patch"];
+        trace?: never;
+    };
+    "/api/session-marks/{mark_id}/crop": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Mark Crop
+         * @description The mark and its surroundings, cut from the zone photo's full rendition.
+         */
+        get: operations["mark_crop_api_session_marks__mark_id__crop_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sessions/protocol": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Protocol */
+        get: operations["protocol_api_sessions_protocol_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sessions/{session_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Session */
+        get: operations["get_session_api_sessions__session_id__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete Session
+         * @description The session goes; its photos go to the trash, from where the purge removes them.
+         */
+        delete: operations["delete_session_api_sessions__session_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sessions/{session_id}/compare/{other_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Compare Sessions
+         * @description FR-SES-04: the zones both sessions photographed, earlier and later, for the comparison view.
+         */
+        get: operations["compare_sessions_api_sessions__session_id__compare__other_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sessions/{session_id}/finish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Finish Session */
+        post: operations["finish_session_api_sessions__session_id__finish_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sessions/{session_id}/zones/{zone}/marks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add Mark
+         * @description A mark the person points at on the zone photo, linked to a known mark or recorded as a new one.
+         */
+        post: operations["add_mark_api_sessions__session_id__zones__zone__marks_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sessions/{session_id}/zones/{zone}/photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Zone Photo */
+        post: operations["zone_photo_api_sessions__session_id__zones__zone__photo_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sessions/{session_id}/zones/{zone}/skip": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Skip Zone */
+        post: operations["skip_zone_api_sessions__session_id__zones__zone__skip_post"];
+        /** Unskip Zone */
+        delete: operations["unskip_zone_api_sessions__session_id__zones__zone__skip_delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1367,6 +1576,69 @@ export interface components {
             /** Zones */
             zones: components["schemas"]["Zone"][];
         };
+        /** BodySessionOut */
+        BodySessionOut: {
+            /** Can Edit */
+            can_edit: boolean;
+            /** Experimental */
+            experimental: boolean;
+            /** Finished At */
+            finished_at: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Notes */
+            notes: string | null;
+            /**
+             * Person Id
+             * Format: uuid
+             */
+            person_id: string;
+            /** Protocol */
+            protocol: string;
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "open" | "finished";
+            /** Zones */
+            zones: components["schemas"]["SessionZoneOut"][];
+        };
+        /** BodySessionSummary */
+        BodySessionSummary: {
+            /** Captured */
+            captured: number;
+            /** Finished At */
+            finished_at: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Marks */
+            marks: number;
+            /** Pending */
+            pending: number;
+            /** Skipped */
+            skipped: number;
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "open" | "finished";
+        };
         /** Body_upload_image_api_persons__person_id__images_post */
         Body_upload_image_api_persons__person_id__images_post: {
             /** Captured At */
@@ -1410,6 +1682,22 @@ export interface components {
              * @enum {string}
              */
             role: "overview" | "close_up" | "with_reference" | "other";
+        };
+        /** Body_zone_photo_api_sessions__session_id__zones__zone__photo_post */
+        Body_zone_photo_api_sessions__session_id__zones__zone__photo_post: {
+            /** Captured Tz */
+            captured_tz?: string | null;
+            /** File */
+            file: string;
+        };
+        /** CaptureZoneOut */
+        CaptureZoneOut: {
+            /** Covers */
+            covers: string[];
+            /** Id */
+            id: string;
+            /** Sensitive */
+            sensitive: boolean;
         };
         /** CardOut */
         CardOut: {
@@ -2021,6 +2309,24 @@ export interface components {
             /** Y2 */
             y2: number;
         };
+        /** MarkIn */
+        MarkIn: {
+            /** Lesion Id */
+            lesion_id?: string | null;
+            new_mark?: components["schemas"]["NewMark"] | null;
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
+        };
+        /** MarkUpdate */
+        MarkUpdate: {
+            /** Lesion Id */
+            lesion_id?: string | null;
+            new_mark?: components["schemas"]["NewMark"] | null;
+            /** State */
+            state?: ("confirmed" | "rejected") | null;
+        };
         /** MeasurementBrief */
         MeasurementBrief: {
             /** Flags */
@@ -2148,6 +2454,13 @@ export interface components {
             created_at: string;
             /** Url */
             url: string;
+        };
+        /** NewMark */
+        NewMark: {
+            /** Label */
+            label?: string | null;
+            /** Zone Code */
+            zone_code: string;
         };
         /** ObservationIn */
         ObservationIn: {
@@ -2475,6 +2788,39 @@ export interface components {
             /** Tilt Deg */
             tilt_deg: number | null;
         };
+        /** SessionIn */
+        SessionIn: {
+            /** Notes */
+            notes?: string | null;
+        };
+        /** SessionMarkOut */
+        SessionMarkOut: {
+            /** Crop Url */
+            crop_url: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Lesion Id */
+            lesion_id: string | null;
+            /** Match */
+            match: ("matched" | "new" | "uncertain") | null;
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "person" | "candidate";
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "pending" | "confirmed" | "rejected";
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
+        };
         /** SessionOut */
         SessionOut: {
             /**
@@ -2485,6 +2831,41 @@ export interface components {
             /** Sudo Until */
             sudo_until: string | null;
             user: components["schemas"]["UserOut"];
+        };
+        /** SessionPairOut */
+        SessionPairOut: {
+            /**
+             * Earlier Image Id
+             * Format: uuid
+             */
+            earlier_image_id: string;
+            /**
+             * Later Image Id
+             * Format: uuid
+             */
+            later_image_id: string;
+            /** Zone */
+            zone: string;
+        };
+        /** SessionZoneOut */
+        SessionZoneOut: {
+            /** Analysing */
+            analysing: boolean;
+            /** Image Id */
+            image_id: string | null;
+            /** Marks */
+            marks: components["schemas"]["SessionMarkOut"][];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "captured" | "skipped";
+            /** Upright Height */
+            upright_height: number | null;
+            /** Upright Width */
+            upright_width: number | null;
+            /** Zone */
+            zone: string;
         };
         /** SideOut */
         SideOut: {
@@ -2501,6 +2882,28 @@ export interface components {
             upright_height: number;
             /** Upright Width */
             upright_width: number;
+        };
+        /** Sighting */
+        Sighting: {
+            /** Crop Url */
+            crop_url: string;
+            /**
+             * Mark Id
+             * Format: uuid
+             */
+            mark_id: string;
+            /**
+             * Session Id
+             * Format: uuid
+             */
+            session_id: string;
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /** Zone */
+            zone: string;
         };
         /** SnoozeIn */
         SnoozeIn: {
@@ -4220,6 +4623,37 @@ export interface operations {
             };
         };
     };
+    sightings_api_lesions__lesion_id__sightings_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lesion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Sighting"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     snooze_api_lesions__lesion_id__snooze_post: {
         parameters: {
             query?: never;
@@ -5205,6 +5639,72 @@ export interface operations {
             };
         };
     };
+    list_sessions_api_persons__person_id__sessions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                person_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BodySessionSummary"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    start_session_api_persons__person_id__sessions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                person_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SessionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BodySessionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     usage_api_persons__person_id__usage_get: {
         parameters: {
             query?: never;
@@ -5411,6 +5911,380 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_mark_api_session_marks__mark_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                mark_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_mark_api_session_marks__mark_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                mark_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MarkUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionMarkOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mark_crop_api_session_marks__mark_id__crop_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                mark_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    protocol_api_sessions_protocol_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaptureZoneOut"][];
+                };
+            };
+        };
+    };
+    get_session_api_sessions__session_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BodySessionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_session_api_sessions__session_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    compare_sessions_api_sessions__session_id__compare__other_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+                other_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionPairOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    finish_session_api_sessions__session_id__finish_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BodySessionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_mark_api_sessions__session_id__zones__zone__marks_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+                zone: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MarkIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionMarkOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    zone_photo_api_sessions__session_id__zones__zone__photo_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+                zone: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_zone_photo_api_sessions__session_id__zones__zone__photo_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BodySessionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    skip_zone_api_sessions__session_id__zones__zone__skip_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+                zone: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BodySessionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unskip_zone_api_sessions__session_id__zones__zone__skip_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+                zone: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BodySessionOut"];
+                };
             };
             /** @description Validation Error */
             422: {

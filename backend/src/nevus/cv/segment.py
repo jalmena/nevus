@@ -18,6 +18,7 @@ import numpy as np
 
 from nevus.cv import fit
 from nevus.cv.card import APERTURE_RADIUS, CARDS, WINDOW
+from nevus.cv.hair import paint_over_hairs
 from nevus.cv.imageio import Img, resize_long_edge
 
 NAME = "segment.auto"
@@ -106,12 +107,7 @@ def only_the_window(image: Img, card: dict[str, Any]) -> Img:
 
 
 def without_hair(image: Img, x: float, y: float, p: dict[str, Any]) -> Img:
-    """Thin dark lines (hairs) around the seed, filled in from their surroundings (the DullRazor idea).
-
-    A black-hat with a kernel wider than a hair and narrower than a mark keeps only the thin dark lines;
-    they are painted over before the outline is fitted, so a hair crossing the mark does not join it to
-    its neighbours. Only the region the fit will look at is touched.
-    """
+    """Hairs around the seed painted over (see `cv.hair`); only the region the fit will look at is touched."""
     height, width = image.shape[:2]
     half = int(max(60, 0.18 * min(width, height)))
     x0, y0 = max(0, int(x) - half), max(0, int(y) - half)
@@ -119,25 +115,11 @@ def without_hair(image: Img, x: float, y: float, p: dict[str, Any]) -> Img:
     crop = image[y0:y1, x0:x1]
     if crop.size == 0:
         return image
-    size = max(9, int(float(p["hair_kernel_fraction"]) * min(crop.shape[:2])) | 1)
-    gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
-    response = cv2.morphologyEx(gray, cv2.MORPH_BLACKHAT, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (size, size)))
-    candidates = (response > int(p["hair_threshold"])).astype(np.uint8)
-    count, labels, stats, _ = cv2.connectedComponentsWithStats(candidates, connectivity=8)
-    mask = np.zeros_like(candidates)
-    for label in range(1, count):
-        if stats[label, cv2.CC_STAT_AREA] < 3 * size:
-            continue  # specks of skin texture and noise, not hairs
-        points = np.column_stack(np.nonzero(labels == label)[::-1]).astype(np.float32)
-        (_, _), (w, h), _ = cv2.minAreaRect(points)
-        long_side, short_side = max(w, h), max(1.0, min(w, h))
-        if long_side >= 2.5 * size and long_side / short_side >= 4:
-            mask[labels == label] = 255
-    if not mask.any():
+    cleaned_crop = paint_over_hairs(crop, float(p["hair_kernel_fraction"]), int(p["hair_threshold"]))
+    if cleaned_crop is crop:
         return image
-    grown = cv2.dilate(mask, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)))
     cleaned = image.copy()
-    cleaned[y0:y1, x0:x1] = cv2.inpaint(crop, grown, 5, cv2.INPAINT_TELEA)
+    cleaned[y0:y1, x0:x1] = cleaned_crop
     return cleaned
 
 

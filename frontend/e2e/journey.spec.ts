@@ -137,3 +137,68 @@ test("from a fresh instance to a measured mark, accessibly", async ({ page }) =>
   await expect(page.getByRole("heading", { name: "Settings", exact: true })).toBeVisible();
   await accessible(page, "settings");
 });
+
+/** Signs in as the administrator, claiming the instance when this test runs first. */
+async function signIn(page: Page) {
+  await page.goto("/");
+  const claim = page.getByRole("heading", { name: "Claim this instance", exact: true });
+  await expect(claim.or(page.getByRole("heading", { name: "Sign in", exact: true }))).toBeVisible();
+  await page.getByLabel("Username").fill("Jose");
+  await page.getByLabel("Password", { exact: true }).fill("correct horse battery");
+  if (await claim.isVisible()) {
+    await page.getByLabel("Repeat the password").fill("correct horse battery");
+    await page.getByRole("button", { name: "Create the administrator", exact: true }).click();
+  } else {
+    await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  }
+  await expect(page.getByRole("heading", { name: "Persons", exact: true })).toBeVisible();
+}
+
+test("a full-body session: regions photographed or skipped, a mark pointed at, accessibly", async ({
+  page,
+}) => {
+  await signIn(page);
+  const person = page.getByRole("link", { name: /Ana/ });
+  if ((await person.count()) === 0) {
+    await page.getByRole("button", { name: "Add a person", exact: true }).click();
+    await page.getByLabel("Name", { exact: true }).fill("Ana");
+    await page.getByRole("button", { name: "Create", exact: true }).click();
+  }
+  await person.first().click();
+  await expect(page.getByRole("heading", { name: "Full-body sessions", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Start a session", exact: true }).click();
+
+  await expect(page.getByRole("heading", { level: 1, name: /^Session of/ })).toBeVisible();
+  await accessible(page, "session");
+  const chest = page
+    .getByRole("listitem")
+    .filter({ has: page.getByRole("heading", { name: "Chest and shoulders" }) });
+  await chest.getByLabel("Take the photo").setInputFiles(PHOTO);
+  await expect(chest.getByText("0 marks")).toBeVisible({ timeout: 30_000 });
+  const abdomen = page
+    .getByRole("listitem")
+    .filter({ has: page.getByRole("heading", { name: "Abdomen and pelvis" }) });
+  await abdomen.getByRole("button", { name: "Skip", exact: true }).click();
+  await expect(abdomen.getByText("Skipped", { exact: true })).toBeVisible();
+  await expect(page.getByText(/1 of 18 regions photographed/)).toBeVisible();
+  await shot(page, "session");
+
+  await chest.getByRole("link", { name: "Open the photo of Chest and shoulders" }).click();
+  const canvas = page.getByRole("application", { name: "Photo of Chest and shoulders" });
+  await expect(canvas).toBeVisible();
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error("no canvas");
+  await page.mouse.click(box.x + box.width * 0.3, box.y + box.height * 0.4);
+  const chooser = page.getByRole("region", { name: "The mark you tapped" });
+  await expect(chooser).toBeVisible();
+  await accessible(page, "zone");
+  await chooser.getByLabel("Name (optional)").fill("Below the collarbone");
+  await chooser.getByRole("button", { name: "Record a new mark", exact: true }).click();
+  await expect(page.getByRole("button", { name: /1\. Below the collarbone/ })).toBeVisible();
+  await shot(page, "session-zone");
+
+  await page.getByRole("link", { name: "Back to the session", exact: true }).click();
+  await expect(chest.getByText("1 mark", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Finish the session", exact: true }).click();
+  await expect(page.getByText(/^Finished/)).toBeVisible();
+});

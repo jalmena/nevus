@@ -11,6 +11,9 @@ import { ObservationPage } from "@/features/lesions/ObservationPage";
 import { MeasurePage } from "@/features/measure/MeasurePage";
 import { HomePage } from "@/features/persons/HomePage";
 import { PersonPage } from "@/features/persons/PersonPage";
+import { SessionComparePage } from "@/features/sessions/SessionComparePage";
+import { SessionPage } from "@/features/sessions/SessionPage";
+import { ZonePage } from "@/features/sessions/ZonePage";
 import { SettingsPage } from "@/features/settings/SettingsPage";
 import { TrashPage } from "@/features/trash/TrashPage";
 import { Shell } from "./Shell";
@@ -34,6 +37,9 @@ export function AppRoutes() {
         <Route path="observations/:observationId" element={<ObservationPage />} />
         <Route path="observations/:observationId/measure/:imageId" element={<MeasurePage />} />
         <Route path="appointments/:appointmentId" element={<AppointmentPage />} />
+        <Route path="sessions/:sessionId" element={<SessionPage />} />
+        <Route path="sessions/:sessionId/zones/:zone" element={<ZonePage />} />
+        <Route path="sessions/:sessionId/compare/:otherId" element={<SessionComparePage />} />
         <Route path="evaluation" element={<EvaluationPage />} />
         <Route path="evaluation/:imageId" element={<LabelPage />} />
         <Route path="settings" element={<SettingsPage />} />

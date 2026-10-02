@@ -58,7 +58,7 @@ def from_cards(card_a: list[list[float]], card_b: list[list[float]]) -> dict[str
     return {"status": "aligned", "method": "card", "reason": None, "matrix": (matrix / matrix[2, 2]).tolist()}
 
 
-def _plausible(matrix: np.ndarray, p: dict[str, Any]) -> str | None:
+def plausible(matrix: np.ndarray, p: dict[str, Any]) -> str | None:
     """Reject transforms no hand-held re-photograph produces: huge zoom, mirror, strong perspective."""
     affine = matrix[:2, :2] / matrix[2, 2]
     det = float(np.linalg.det(affine))
@@ -72,7 +72,22 @@ def _plausible(matrix: np.ndarray, p: dict[str, Any]) -> str | None:
     return None
 
 
-def from_features(image_a: Img, image_b: Img, params: dict[str, Any] | None = None) -> dict[str, Any]:
+def _mask_for(mask: np.ndarray | None, shape: tuple[int, ...]) -> np.ndarray | None:
+    if mask is None:
+        return None
+    resized = cv2.resize(mask.astype(np.uint8) * 255, (shape[1], shape[0]), interpolation=cv2.INTER_NEAREST)
+    return resized if resized.any() else None
+
+
+def from_features(
+    image_a: Img,
+    image_b: Img,
+    params: dict[str, Any] | None = None,
+    mask_a: np.ndarray | None = None,
+    mask_b: np.ndarray | None = None,
+) -> dict[str, Any]:
+    """The transform from B to A. With masks (of any size), only features inside them are matched:
+    on the skin, say, so that a background seen in both photos cannot line them up."""
     p = {**PARAMS, **(params or {})}
     small_a, sa = resize_long_edge(image_a, int(p["long_edge"]))
     small_b, sb = resize_long_edge(image_b, int(p["long_edge"]))
@@ -80,8 +95,8 @@ def from_features(image_a: Img, image_b: Img, params: dict[str, Any] | None = No
     gray_a = clahe.apply(cv2.cvtColor(small_a, cv2.COLOR_BGR2GRAY))
     gray_b = clahe.apply(cv2.cvtColor(small_b, cv2.COLOR_BGR2GRAY))
     sift = cv2.SIFT.create(nfeatures=4000)
-    kp_a, desc_a = sift.detectAndCompute(gray_a, None)
-    kp_b, desc_b = sift.detectAndCompute(gray_b, None)
+    kp_a, desc_a = sift.detectAndCompute(gray_a, _mask_for(mask_a, gray_a.shape))
+    kp_b, desc_b = sift.detectAndCompute(gray_b, _mask_for(mask_b, gray_b.shape))
     base: dict[str, Any] = {"method": "features", "matrix": None, "matches": 0, "inliers": 0, "inlier_ratio": 0.0}
     if desc_a is None or desc_b is None or len(kp_a) < 8 or len(kp_b) < 8:
         return {**base, "status": "abstained", "reason": "too_little_detail"}
@@ -103,7 +118,7 @@ def from_features(image_a: Img, image_b: Img, params: dict[str, Any] | None = No
     # Back to full-resolution coordinates: full_a = S_a^-1 * small_a, small_b = S_b * full_b.
     matrix = np.linalg.inv(_scale_matrix(sa)) @ small_matrix @ _scale_matrix(sb)
     matrix /= matrix[2, 2]
-    problem = _plausible(matrix, p)
+    problem = plausible(matrix, p)
     if problem:
         return {**base, "status": "abstained", "reason": problem}
     return {**base, "status": "aligned", "reason": None, "matrix": matrix.tolist()}

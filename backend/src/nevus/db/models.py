@@ -134,7 +134,7 @@ class Setting(Base):
     updated_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow, onupdate=utcnow)
 
 
-IMAGE_ROLES = ("overview", "close_up", "with_reference", "other")
+IMAGE_ROLES = ("overview", "close_up", "with_reference", "other", "session")
 IMAGE_MODALITIES = ("camera", "dermatoscope")
 RENDITION_KINDS = ("full", "preview", "thumb")
 
@@ -428,6 +428,70 @@ class Webhook(Base):
     created_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
 
     __table_args__ = (Index("ix_webhooks_user_id", "user_id"),)
+
+
+class BodySession(Base):
+    """A full-body session (FR-SES-01): one photo per capture zone of the protocol, any zone skippable."""
+
+    __tablename__ = "body_sessions"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    person_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("persons.id", ondelete="CASCADE"), nullable=False)
+    protocol: Mapped[str] = mapped_column(String(40), nullable=False)
+    status: Mapped[str] = mapped_column(String(16), nullable=False, default="open")
+    notes: Mapped[str | None] = mapped_column(Text)
+    started_by: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"))
+    started_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
+    finished_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+
+    __table_args__ = (Index("ix_body_sessions_person_id", "person_id"),)
+
+
+class SessionZone(Base):
+    """One capture zone of a session: pending, captured (with its photo) or skipped."""
+
+    __tablename__ = "session_zones"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    session_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("body_sessions.id", ondelete="CASCADE"), nullable=False
+    )
+    zone: Mapped[str] = mapped_column(String(32), nullable=False)
+    status: Mapped[str] = mapped_column(String(16), nullable=False, default="pending")
+    image_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("images.id", ondelete="SET NULL"))
+    updated_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow, onupdate=utcnow)
+
+    __table_args__ = (Index("ux_session_zones_session_zone", "session_id", "zone", unique=True),)
+
+
+class SessionMark(Base):
+    """A mark seen on a zone photo (FR-SES-02, FR-SES-03): placed by the person, or proposed.
+
+    `x` and `y` are normalised to the upright photo. A proposed mark (`source` candidate) waits as
+    `pending` until the person confirms or rejects it; `match` says whether it seemed to be a known
+    mark seen last time (matched), one not seen before (new), or a known one not found again (uncertain).
+    """
+
+    __tablename__ = "session_marks"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid7)
+    session_zone_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("session_zones.id", ondelete="CASCADE"), nullable=False
+    )
+    x: Mapped[float] = mapped_column(Float, nullable=False)
+    y: Mapped[float] = mapped_column(Float, nullable=False)
+    lesion_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("lesions.id", ondelete="SET NULL"))
+    source: Mapped[str] = mapped_column(String(16), nullable=False, default="person")
+    state: Mapped[str] = mapped_column(String(16), nullable=False, default="confirmed")
+    match: Mapped[str | None] = mapped_column(String(16))
+    analysis_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("analyses.id", ondelete="SET NULL"))
+    created_by: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"))
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)
+
+    __table_args__ = (
+        Index("ix_session_marks_zone_id", "session_zone_id"),
+        Index("ix_session_marks_lesion_id", "lesion_id"),
+    )
 
 
 class EvaluationLabel(Base):
