@@ -21,8 +21,22 @@ import { Shell } from "./Shell";
 export function AppRoutes() {
   return (
     <Routes>
-      <Route path="/claim" element={<ClaimPage />} />
-      <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="/claim"
+        element={
+          <main>
+            <ClaimPage />
+          </main>
+        }
+      />
+      <Route
+        path="/login"
+        element={
+          <main>
+            <LoginPage />
+          </main>
+        }
+      />
       <Route
         element={
           <RequireAuth>

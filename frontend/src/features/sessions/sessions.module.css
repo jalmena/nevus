@@ -52,11 +52,15 @@
 }
 
 .zone.skipped {
-  opacity: 0.75;
+  background: var(--color-surface-2);
 }
 
 .zone h2 {
   font-size: var(--text-md);
+}
+
+.zone.skipped h2 {
+  color: var(--color-ink-2);
 }
 
 .zoneText {

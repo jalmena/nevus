@@ -1,13 +1,49 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { measuredVisit, PASSWORD, PHOTO, shot, totpCode } from "./helpers";
 
 // Every screen of the app, photographed on each device and in both colour schemes, for a look at the
 // design. Not a test of behaviour: the journey is. `pnpm run shots` runs it and makes contact sheets.
 const DIR = process.env.NEVUS_SHOTS_DIR ?? fileURLToPath(new URL("../.screenshots", import.meta.url));
+// With NEVUS_SHOTS_AXE set, every screen is also checked with axe in both colour schemes and the
+// findings (every impact, best practices included) are written next to the screenshots: the audit.
+const AXE = Boolean(process.env.NEVUS_SHOTS_AXE);
+
+interface Finding {
+  screen: string;
+  scheme: string;
+  id: string;
+  impact: string | null | undefined;
+  help: string;
+  nodes: string[];
+}
 
 test("every screen, for a look at the design", async ({ page }, info) => {
-  const snap = (name: string) => shot(page, name, `${DIR}/${info.project.name}`);
+  const findings: Finding[] = [];
+  const snap = async (name: string) => {
+    await shot(page, name, `${DIR}/${info.project.name}`);
+    if (!AXE) return;
+    for (const scheme of ["light", "dark"] as const) {
+      await page.emulateMedia({ colorScheme: scheme });
+      await page.waitForTimeout(400); // colours transition; measured mid-way they fail for no reason
+      const results = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"])
+        .analyze();
+      for (const violation of results.violations) {
+        findings.push({
+          screen: name,
+          scheme,
+          id: violation.id,
+          impact: violation.impact,
+          help: violation.help,
+          nodes: violation.nodes.map((node) => node.target.join(" ")),
+        });
+      }
+    }
+    await page.emulateMedia({ colorScheme: "light" });
+  };
   const region = (name: string) =>
     page.getByRole("listitem").filter({ has: page.getByRole("heading", { name }) });
 
@@ -144,4 +180,9 @@ test("every screen, for a look at the design", async ({ page }, info) => {
   await snap("24-login-code");
   await page.getByRole("button", { name: "Use a recovery code instead", exact: true }).click();
   await snap("25-login-recovery");
+
+  if (AXE) {
+    mkdirSync(DIR, { recursive: true });
+    writeFileSync(`${DIR}/a11y-${info.project.name}.json`, JSON.stringify(findings, null, 2));
+  }
 });
