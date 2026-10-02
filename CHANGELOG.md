@@ -1,3 +1,24 @@
+## v1.0.0 (2026-10-02)
+
+### Feat
+
+- **lesions**: a mark can be moved to the trash from its page
+- **sessions**: any part of a zone photo can be blurred, and the original is gone at once
+- **bodymap**: a tap on a zone zooms in on it before the mark is placed
+- **backup**: the latest backup is read back every week to prove it would restore
+- **auth**: a second factor with an authenticator app, recovery codes and accounts administration
+
+### Fix
+
+- **i18n**: a visit is a "vistazo" in Spanish
+- **bodymap**: a tap on the selected zone or outside the body deselects it, and a selected zone is where a new mark goes
+- **a11y**: a main landmark on the sign-in pages, and skipped regions without opacity
+- **auth**: the second factor's QR code is a standalone SVG
+
+### Perf
+
+- **frontend**: pages after the home page load when opened, and vendor code apart
+
 ## v0.4.0 (2026-10-02)
 
 ### Feat
