@@ -141,7 +141,7 @@ Jinja2 templates in English and Spanish, styled with the same design tokens as t
 - Body map: SVG silhouettes with zone paths from the generated geometry, pointer and keyboard interaction, pinch and drag handled with pointer events, markers clustered when they would overlap; while a mark is placed, a tap on a zone zooms in on it before the second tap places the mark.
 - Photo canvas: one SVG component shared by measuring, comparing and the session zones, with zoom and pan by wheel, pinch, drag and keyboard, and a view that two photos can share.
 - Comparison: side-by-side, overlay, wipe and difference views over the server's alignment result (WebP overlays and heatmaps); charts are hand-made SVG with a table and a CSV beside them.
-- Service worker (`vite-plugin-pwa`): precache of the shell, network-first for API reads, cache-first for content-addressed renditions, purged on sign-out.
+- Service worker (`frontend/src/sw.ts`, built with Workbox through `vite-plugin-pwa`): precache of the shell, network-first for API reads, cache-first for content-addressed renditions, purged on sign-out; it also shows push messages as notifications and opens the app when one is tapped.
 - Loading: the home page, the sign-in pages and the shell come first (about 180 kB compressed with React, the query client and the catalogues in chunks of their own); every other page loads when it is first opened, so the body map's geometry (about 60 kB compressed) travels only to the person page. Measured on 1.0.0; `pnpm run build` prints the chunks.
 
 ## 6. Security architecture (summary)

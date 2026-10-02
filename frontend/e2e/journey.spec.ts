@@ -73,6 +73,7 @@ test("from a fresh instance to a measured mark, accessibly", async ({ page }) =>
   if (process.env.NEVUS_E2E_SHOTS) await download.saveAs(`${process.env.NEVUS_E2E_SHOTS}/mark-report.pdf`);
   await page.getByRole("link", { name: "Settings", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Settings", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Notifications on this device/ })).toBeVisible();
   await accessible(page, "settings");
 });
 

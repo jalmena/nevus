@@ -925,5 +925,19 @@
       "missing_blobs": "Photographs the database refers to are missing from the archive.",
       "live_store": "Files in the live store are missing or damaged."
     }
+  },
+  "push": {
+    "title": "Notifications on this device (experimental)",
+    "intro": "When marks are due for a photo, this device gets one notification a day, after the reminder hour. The message travels encrypted through your browser's push service, which sees only that something was sent.",
+    "onThisDevice": "This device receives them.",
+    "offThisDevice": "This device does not receive them yet.",
+    "devices_zero": "No device of yours is subscribed yet.",
+    "devices_one": "{{count}} device of yours subscribed.",
+    "devices_other": "{{count}} devices of yours subscribed.",
+    "turnOn": "Turn on for this device",
+    "turnOff": "Turn off for this device",
+    "test": "Send a test notification",
+    "tested": "Sent to {{sent}}, failed for {{failed}}.",
+    "note": "On iPhone and iPad, notifications work only once neVus is installed on the Home Screen and opened from there."
   }
 }

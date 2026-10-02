@@ -47,6 +47,7 @@ Data at rest and in motion
 - Backups and exports are encrypted with a passphrase in the `age` format and can be decrypted with the standard `age` tool without neVus.
 - Webhook and email secrets are encrypted with a key derived from a server secret stored in a file, never in the database or the compose file.
 - The application never contacts external services unless the operator configures a channel; there is no telemetry.
+- Push notifications are off by default (`NEVUS_WEB_PUSH`). When on, each message is encrypted on the server for one device (RFC 8291, `aes128gcm`) and signed with the server's VAPID key, which is stored encrypted; the browser vendor's push service relays what it cannot read. Messages carry names and dates, never images or notes; endpoints must be HTTPS; a device is forgotten after repeated failures.
 
 Supply chain and build
 
@@ -69,4 +70,4 @@ Logging and audit
 
 ## Threat model review
 
-The structured review (assets, entry points, misuse cases, controls, residual risks) for 1.0.0 is in [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md), with what it changed and what it accepts. It is repeated when a release adds an entry point (for example Web Push or a new integration) or a learned model that runs over uploaded photographs.
+The structured review (assets, entry points, misuse cases, controls, residual risks) for 1.0.0 is in [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md), with what it changed and what it accepts. It is repeated when a release adds an entry point or a learned model that runs over uploaded photographs; the addendum for Web Push (1.1.0) is in the same document.

@@ -8,6 +8,7 @@ import { ExportForm } from "@/features/data/ExportForm";
 import { ExportList } from "@/features/data/ExportList";
 import { Link } from "react-router";
 import { ReferenceCardSettings } from "./ReferenceCardSettings";
+import { PushSettings } from "./PushSettings";
 import { ReminderSettings } from "./ReminderSettings";
 import { SecondFactorSettings } from "./SecondFactorSettings";
 import { useInstance, useLogout, useSession, useUpdateMe } from "@/lib/auth/session";
@@ -65,6 +66,7 @@ export function SettingsPage() {
         {update.error && <Notice kind="error">{update.error.message}</Notice>}
       </Card>
       <ReminderSettings />
+      <PushSettings />
       <SecondFactorSettings />
       <ReferenceCardSettings />
       <Card className={styles.group}>

@@ -1534,6 +1534,20 @@
         "title": "EmailSettingsOut",
         "type": "object"
       },
+      "EndpointIn": {
+        "properties": {
+          "endpoint": {
+            "maxLength": 2000,
+            "title": "Endpoint",
+            "type": "string"
+          }
+        },
+        "required": [
+          "endpoint"
+        ],
+        "title": "EndpointIn",
+        "type": "object"
+      },
       "EvaluationPhoto": {
         "properties": {
           "captured_on": {
@@ -2159,6 +2173,28 @@
           "version"
         ],
         "title": "InstanceStatus",
+        "type": "object"
+      },
+      "KeysIn": {
+        "properties": {
+          "auth": {
+            "maxLength": 64,
+            "minLength": 16,
+            "title": "Auth",
+            "type": "string"
+          },
+          "p256dh": {
+            "maxLength": 128,
+            "minLength": 80,
+            "title": "P256Dh",
+            "type": "string"
+          }
+        },
+        "required": [
+          "p256dh",
+          "auth"
+        ],
+        "title": "KeysIn",
         "type": "object"
       },
       "LabelIn": {
@@ -3790,6 +3826,36 @@
         "title": "ProposedSize",
         "type": "object"
       },
+      "PushStatusOut": {
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "public_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Public Key"
+          },
+          "subscriptions": {
+            "title": "Subscriptions",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "enabled",
+          "public_key",
+          "subscriptions"
+        ],
+        "title": "PushStatusOut",
+        "type": "object"
+      },
       "QueuedOut": {
         "properties": {
           "queued": {
@@ -4511,6 +4577,26 @@
         "title": "SnoozeIn",
         "type": "object"
       },
+      "SubscriptionIn": {
+        "properties": {
+          "endpoint": {
+            "maxLength": 2000,
+            "minLength": 12,
+            "pattern": "^https?://",
+            "title": "Endpoint",
+            "type": "string"
+          },
+          "keys": {
+            "$ref": "#/components/schemas/KeysIn"
+          }
+        },
+        "required": [
+          "endpoint",
+          "keys"
+        ],
+        "title": "SubscriptionIn",
+        "type": "object"
+      },
       "SudoIn": {
         "properties": {
           "password": {
@@ -4544,31 +4630,6 @@
           "to"
         ],
         "title": "TestEmailIn",
-        "type": "object"
-      },
-      "TestOut": {
-        "properties": {
-          "detail": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Detail"
-          },
-          "ok": {
-            "title": "Ok",
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "ok",
-          "detail"
-        ],
-        "title": "TestOut",
         "type": "object"
       },
       "TotpCodeIn": {
@@ -5535,6 +5596,49 @@
         ],
         "title": "Zone",
         "type": "object"
+      },
+      "nevus__api__push__TestOut": {
+        "properties": {
+          "failed": {
+            "title": "Failed",
+            "type": "integer"
+          },
+          "sent": {
+            "title": "Sent",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "sent",
+          "failed"
+        ],
+        "title": "TestOut",
+        "type": "object"
+      },
+      "nevus__api__webhooks__TestOut": {
+        "properties": {
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok",
+          "detail"
+        ],
+        "title": "TestOut",
+        "type": "object"
       }
     }
   },
@@ -5936,7 +6040,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TestOut"
+                  "$ref": "#/components/schemas/nevus__api__webhooks__TestOut"
                 }
               }
             },
@@ -9357,6 +9461,123 @@
         "summary": "Reject Proposal",
         "tags": [
           "proposals"
+        ]
+      }
+    },
+    "/api/push": {
+      "get": {
+        "operationId": "push_status_api_push_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushStatusOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Push Status",
+        "tags": [
+          "push"
+        ]
+      }
+    },
+    "/api/push/subscriptions": {
+      "delete": {
+        "operationId": "unsubscribe_api_push_subscriptions_delete",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EndpointIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Unsubscribe",
+        "tags": [
+          "push"
+        ]
+      },
+      "post": {
+        "description": "This device's subscription, as the browser gave it; the same endpoint again just refreshes it.",
+        "operationId": "subscribe_api_push_subscriptions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushStatusOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Subscribe",
+        "tags": [
+          "push"
+        ]
+      }
+    },
+    "/api/push/test": {
+      "post": {
+        "description": "A message to every device of the person, now, so they can see it arrive.",
+        "operationId": "test_message_api_push_test_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nevus__api__push__TestOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Test Message",
+        "tags": [
+          "push"
         ]
       }
     },

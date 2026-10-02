@@ -936,5 +936,20 @@
       "missing_blobs": "Faltan en el archivo fotografías a las que la base de datos se refiere.",
       "live_store": "Hay ficheros del almacén en uso que faltan o están dañados."
     }
+  },
+  "push": {
+    "title": "Notificaciones en este dispositivo (experimental)",
+    "intro": "Cuando haya marcas pendientes de foto, este dispositivo recibirá una notificación al día, pasada la hora de los recordatorios. El mensaje viaja cifrado por el servicio de push de tu navegador, que solo ve que se envió algo.",
+    "onThisDevice": "Este dispositivo las recibe.",
+    "offThisDevice": "Este dispositivo aún no las recibe.",
+    "devices_zero": "Ningún dispositivo tuyo está suscrito todavía.",
+    "devices_one": "{{count}} dispositivo tuyo suscrito.",
+    "devices_many": "{{count}} dispositivos tuyos suscritos.",
+    "devices_other": "{{count}} dispositivos tuyos suscritos.",
+    "turnOn": "Activar en este dispositivo",
+    "turnOff": "Desactivar en este dispositivo",
+    "test": "Enviar una notificación de prueba",
+    "tested": "Enviada a {{sent}}, falló en {{failed}}.",
+    "note": "En iPhone y iPad las notificaciones funcionan solo cuando neVus está instalada en la pantalla de inicio y se abre desde ahí."
   }
 }

@@ -31,6 +31,7 @@ services:
       # External PostgreSQL instead of the built-in SQLite (the operator then backs up the database):
       # NEVUS_DATABASE_URL: "postgresql+psycopg://nevus:password@db.example.com:5432/nevus"
       # NEVUS_LOG_LEVEL: "info"
+      # NEVUS_WEB_PUSH: "true"          # notifications to installed apps; needs HTTPS, see docs/DEPLOYMENT.md
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8080/healthz"]
       interval: 30s
