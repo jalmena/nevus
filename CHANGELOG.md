@@ -1,3 +1,11 @@
+## v0.4.0 (2026-10-02)
+
+### Feat
+
+- **frontend**: full-body sessions, marking zone photos and comparing sessions
+- **sessions**: full-body sessions zone by zone, with marks linked to the registry
+- **analysis**: spots on a body region, and lining two regions up by their pattern
+
 ## v0.3.0 (2026-10-02)
 
 ### Feat
