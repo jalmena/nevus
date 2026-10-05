@@ -201,3 +201,38 @@
   font-weight: var(--font-weight-emphasis);
   cursor: pointer;
 }
+
+/* The zone page: the photograph on the left, sticky, the marks and their panels on the right. */
+.layout {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.photoPane,
+.dataPane {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+  min-width: 0;
+}
+
+@media (width >= 900px) {
+  .zones {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .zone.current {
+    grid-column: 1 / -1;
+  }
+
+  .layout {
+    grid-template-columns: minmax(0, 13fr) minmax(0, 11fr);
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  .photoPane {
+    position: sticky;
+    top: var(--space-4);
+  }
+}

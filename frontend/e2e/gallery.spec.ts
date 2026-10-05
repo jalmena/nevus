@@ -80,6 +80,7 @@ test("every screen, for a look at the design", async ({ page }, info) => {
   await measuredVisit(page, false);
   await page.getByRole("link", { name: /Back to Chest mark/ }).click();
   await expect(page.getByRole("slider", { name: /Longest diameter at 2 visits/ })).toBeVisible();
+  await openTool(page, "mark-reports", "Reports");
   await page.getByRole("button", { name: "Make the record of this mark", exact: true }).click();
   await expect(page.getByRole("link", { name: /Download the PDF/ })).toBeVisible({ timeout: 60_000 });
   await snap("08-mark");
@@ -150,6 +151,7 @@ test("every screen, for a look at the design", async ({ page }, info) => {
   await page.getByRole("link", { name: "Settings", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Settings", exact: true })).toBeVisible();
   await snap("17-settings");
+  await openTool(page, "second-factor", "Second factor");
   await page.getByRole("button", { name: "Set up a second factor", exact: true }).click();
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
@@ -164,6 +166,7 @@ test("every screen, for a look at the design", async ({ page }, info) => {
   await expect(page.getByRole("region", { name: "Recovery codes" })).toBeVisible();
   await snap("20-settings-recovery-codes");
   await page.getByRole("button", { name: "I have saved them", exact: true }).click();
+  await openTool(page, "instance", "Instance (administrator)");
   await page.getByRole("link", { name: /Evaluation set/ }).click();
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await snap("21-evaluation");

@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams } from "react-router";
 import { Button } from "@/design-system/components/Button";
+import { Disclosure } from "@/design-system/components/Disclosure";
 import { EmptyState } from "@/design-system/components/EmptyState";
 import { Notice } from "@/design-system/components/Notice";
 import { TextField } from "@/design-system/components/TextField";
@@ -203,7 +204,9 @@ export function LesionPage() {
 
       <SizeChart lesionId={data.id} />
       <Sightings lesionId={data.id} />
-      <Reports personId={data.person_id} lesionId={data.id} titleOf={() => lesionTitle(data, t)} />
+      <Disclosure id="mark-reports" title={t("reports.title")} hint={t("reports.hintLesion")}>
+        <Reports personId={data.person_id} lesionId={data.id} titleOf={() => lesionTitle(data, t)} embedded />
+      </Disclosure>
 
       {canEdit && (
         <div className={styles.dangerZone}>

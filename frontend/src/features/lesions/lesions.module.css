@@ -103,7 +103,7 @@
 
 .facts {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: var(--space-3);
   margin: 0;
 }
@@ -218,4 +218,34 @@
   margin-top: var(--space-5);
   padding-top: var(--space-4);
   border-top: 1px solid var(--color-border);
+}
+
+/* The visit page: the photographs on the left, sticky, and what was measured and noted on the right. */
+.layout {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.photoPane,
+.dataPane {
+  min-width: 0;
+}
+
+.dataPane {
+  display: grid;
+  gap: var(--space-4);
+  align-content: start;
+}
+
+@media (width >= 900px) {
+  .layout {
+    grid-template-columns: minmax(0, 13fr) minmax(0, 11fr);
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  .photoPane {
+    position: sticky;
+    top: var(--space-4);
+  }
 }

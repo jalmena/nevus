@@ -164,6 +164,17 @@
   color: var(--color-paper);
 }
 
+/* Once the visit has a measurement, measuring again is a secondary action. */
+.measureLinkDone {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-ink);
+}
+
+.measureLinkDone:hover {
+  color: var(--color-ink);
+}
+
 .experimental {
   margin-left: var(--space-2);
   padding: 2px var(--space-2);

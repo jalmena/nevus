@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/design-system/components/Button";
-import { Card } from "@/design-system/components/Card";
 import { Notice } from "@/design-system/components/Notice";
 import { TextField } from "@/design-system/components/TextField";
 import {
@@ -13,10 +12,11 @@ import {
   useWebhooks,
   type Preset,
 } from "@/lib/notifications";
+import { Group } from "@/features/settings/Group";
 import styles from "@/features/settings/settings.module.css";
 
 /** For administrators: the daily list of due marks, sent to Home Assistant, ntfy, Gotify, n8n or any address. */
-export function WebhookSettings() {
+export function WebhookSettings({ folded = false }: { folded?: boolean }) {
   const { t, i18n } = useTranslation();
   const hooks = useWebhooks();
   const create = useCreateWebhook();
@@ -47,8 +47,7 @@ export function WebhookSettings() {
   }
 
   return (
-    <Card className={styles.group}>
-      <h2 className={styles.subheading}>{t("webhooks.title")}</h2>
+    <Group folded={folded} id="webhooks" title={t("webhooks.title")} hint={t("webhooks.hint")}>
       <p className="text-secondary">{t("webhooks.intro")}</p>
       {(hooks.data ?? []).length > 0 && (
         <ul className={styles.hooks}>
@@ -144,6 +143,6 @@ export function WebhookSettings() {
         </Button>
       </form>
       {create.error && <Notice kind="error">{create.error.message}</Notice>}
-    </Card>
+    </Group>
   );
 }

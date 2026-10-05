@@ -1,14 +1,14 @@
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/design-system/components/Button";
-import { Card } from "@/design-system/components/Card";
 import { Notice } from "@/design-system/components/Notice";
 import { TextField } from "@/design-system/components/TextField";
 import { useSession, useUpdateMe } from "@/lib/auth/session";
+import { Group } from "./Group";
 import styles from "./settings.module.css";
 
 /** Download the printable card, and record the measured length of its 50 mm verification line. */
-export function ReferenceCardSettings() {
+export function ReferenceCardSettings({ folded = false }: { folded?: boolean }) {
   const { t, i18n } = useTranslation();
   const session = useSession();
   const update = useUpdateMe();
@@ -24,8 +24,7 @@ export function ReferenceCardSettings() {
   }
 
   return (
-    <Card className={styles.group}>
-      <h2 className={styles.subheading}>{t("card.title")}</h2>
+    <Group folded={folded} id="reference-card" title={t("card.title")} hint={t("card.hint")}>
       <p className="text-secondary">{t("card.intro")}</p>
       <div className={styles.links}>
         <a href={`/api/reference-card?page=a4&lang=${lang}`} download>
@@ -53,6 +52,6 @@ export function ReferenceCardSettings() {
         <p className="text-secondary">{t("card.unverified")}</p>
       )}
       {update.error && <Notice kind="error">{update.error.message}</Notice>}
-    </Card>
+    </Group>
   );
 }

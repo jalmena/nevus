@@ -106,8 +106,8 @@ describe("size over time", () => {
       "aria-valuetext",
       "Sep 1, 2026: 0.93",
     );
-    await user.click(screen.getByRole("radio", { name: "Colour contrast with the skin" }));
-    expect(screen.getByRole("slider", { name: /Colour contrast with the skin at 2 visits/ })).toHaveAttribute(
+    await user.click(screen.getByRole("radio", { name: "Colour contrast" }));
+    expect(screen.getByRole("slider", { name: /Colour contrast at 2 visits/ })).toHaveAttribute(
       "aria-valuetext",
       "Sep 1, 2026: 33 ΔE",
     );

@@ -111,7 +111,7 @@ export function ZonePage() {
       : t("sessions.markHintView");
 
   return (
-    <div className={styles.page}>
+    <div className={[styles.page, "page-wide"].join(" ")}>
       <p>
         <Link to={`/sessions/${sessionId}`}>{t("sessions.backToSession")}</Link>
       </p>
@@ -122,127 +122,134 @@ export function ZonePage() {
           {t("sessions.analysing")}
         </p>
       )}
-      {zone.image_id ? (
-        <PhotoCanvas
-          src={imageUrl(zone.image_id, "full")}
-          width={width}
-          height={height}
-          label={t("sessions.canvas", { zone: regionName })}
-          onTap={place}
-        >
-          {regions.map((region, index) => (
-            <rect
-              key={index}
-              x={region.x * width}
-              y={region.y * height}
-              width={region.width * width}
-              height={region.height * height}
-              className={styles.blurRegion}
-            />
-          ))}
-          {zone.marks.map((item, index) => (
-            <Dot
-              key={item.id}
-              mark={item}
-              index={index + 1}
-              x={item.x * width}
-              y={item.y * height}
-              selected={item.id === selected}
-            />
-          ))}
-          {draft && <Dot index={0} x={draft.x * width} y={draft.y * height} selected />}
-          {corner && <Dot index={0} x={corner.x * width} y={corner.y * height} selected />}
-        </PhotoCanvas>
-      ) : (
-        <Notice kind="info">{t("sessions.noPhoto")}</Notice>
-      )}
-
-      {canEdit && zone.image_id && !blurring && !draft && (
-        <div>
-          <Button variant="quiet" onClick={startBlurring}>
-            {t("sessions.blur")}
-          </Button>
-        </div>
-      )}
-
-      {blurring && (
-        <section className={styles.panel} aria-labelledby="blur-heading">
-          <h2 id="blur-heading">{t("sessions.blurTitle")}</h2>
-          <p className="text-secondary">{t("sessions.blurNote")}</p>
-          <div className={styles.row}>
-            <Button
-              onClick={() => blur.mutate({ regions }, { onSuccess: stopBlurring })}
-              disabled={regions.length === 0 || blur.isPending}
+      <div className={styles.layout}>
+        <div className={styles.photoPane}>
+          {zone.image_id ? (
+            <PhotoCanvas
+              src={imageUrl(zone.image_id, "full")}
+              width={width}
+              height={height}
+              label={t("sessions.canvas", { zone: regionName })}
+              onTap={place}
             >
-              {t("sessions.blurApply", { count: regions.length })}
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => setRegions((current) => current.slice(0, -1))}
-              disabled={regions.length === 0}
-            >
-              {t("sessions.blurUndo")}
-            </Button>
-            <Button variant="quiet" onClick={stopBlurring}>
-              {t("common.cancel")}
-            </Button>
-          </div>
-          {blur.error && <Notice kind="error">{blur.error.message}</Notice>}
-        </section>
-      )}
+              {regions.map((region, index) => (
+                <rect
+                  key={index}
+                  x={region.x * width}
+                  y={region.y * height}
+                  width={region.width * width}
+                  height={region.height * height}
+                  className={styles.blurRegion}
+                />
+              ))}
+              {zone.marks.map((item, index) => (
+                <Dot
+                  key={item.id}
+                  mark={item}
+                  index={index + 1}
+                  x={item.x * width}
+                  y={item.y * height}
+                  selected={item.id === selected}
+                />
+              ))}
+              {draft && <Dot index={0} x={draft.x * width} y={draft.y * height} selected />}
+              {corner && <Dot index={0} x={corner.x * width} y={corner.y * height} selected />}
+            </PhotoCanvas>
+          ) : (
+            <Notice kind="info">{t("sessions.noPhoto")}</Notice>
+          )}
 
-      {draft && canEdit && !blurring && (
-        <NewMarkForm
-          covers={covers}
-          lesions={here}
-          title={title}
-          pending={add.isPending}
-          error={add.error?.message}
-          onCancel={() => setDraft(null)}
-          onSave={(link) => add.mutate({ ...draft, ...link }, { onSuccess: () => setDraft(null) })}
-        />
-      )}
+          {canEdit && zone.image_id && !blurring && !draft && (
+            <div>
+              <Button variant="quiet" onClick={startBlurring}>
+                {t("sessions.blur")}
+              </Button>
+            </div>
+          )}
 
-      {zone.marks.length > 0 && (
-        <section className={styles.section} aria-labelledby="marks-heading">
-          <h2 id="marks-heading">{t("sessions.marksTitle")}</h2>
-          <ol className={styles.marks}>
-            {zone.marks.map((item, index) => (
-              <li key={item.id}>
-                <button
-                  type="button"
-                  className={[styles.markButton, item.id === selected ? styles.markSelected : ""].join(" ")}
-                  onClick={() => {
-                    setSelected(item.id);
-                    setDraft(null);
-                  }}
+          {blurring && (
+            <section className={styles.panel} aria-labelledby="blur-heading">
+              <h2 id="blur-heading">{t("sessions.blurTitle")}</h2>
+              <p className="text-secondary">{t("sessions.blurNote")}</p>
+              <div className={styles.row}>
+                <Button
+                  onClick={() => blur.mutate({ regions }, { onSuccess: stopBlurring })}
+                  disabled={regions.length === 0 || blur.isPending}
                 >
-                  <img src={item.crop_url} alt="" />
-                  <span>
-                    {index + 1}. {describe(item, named, t)}
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ol>
-        </section>
-      )}
+                  {t("sessions.blurApply", { count: regions.length })}
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => setRegions((current) => current.slice(0, -1))}
+                  disabled={regions.length === 0}
+                >
+                  {t("sessions.blurUndo")}
+                </Button>
+                <Button variant="quiet" onClick={stopBlurring}>
+                  {t("common.cancel")}
+                </Button>
+              </div>
+              {blur.error && <Notice kind="error">{blur.error.message}</Notice>}
+            </section>
+          )}
+        </div>
+        <div className={styles.dataPane}>
+          {draft && canEdit && !blurring && (
+            <NewMarkForm
+              covers={covers}
+              lesions={here}
+              title={title}
+              pending={add.isPending}
+              error={add.error?.message}
+              onCancel={() => setDraft(null)}
+              onSave={(link) => add.mutate({ ...draft, ...link }, { onSuccess: () => setDraft(null) })}
+            />
+          )}
 
-      {mark && canEdit && (
-        <MarkPanel
-          mark={mark}
-          covers={covers}
-          lesions={here}
-          title={title}
-          named={named}
-          busy={update.isPending || remove.isPending}
-          onUpdate={(body) => update.mutate({ id: mark.id, body })}
-          onRemove={() => remove.mutate(mark.id, { onSuccess: () => setSelected(null) })}
-        />
-      )}
-      {(update.error ?? remove.error) && (
-        <Notice kind="error">{(update.error ?? remove.error)?.message}</Notice>
-      )}
+          {zone.marks.length > 0 && (
+            <section className={styles.section} aria-labelledby="marks-heading">
+              <h2 id="marks-heading">{t("sessions.marksTitle")}</h2>
+              <ol className={styles.marks}>
+                {zone.marks.map((item, index) => (
+                  <li key={item.id}>
+                    <button
+                      type="button"
+                      className={[styles.markButton, item.id === selected ? styles.markSelected : ""].join(
+                        " ",
+                      )}
+                      onClick={() => {
+                        setSelected(item.id);
+                        setDraft(null);
+                      }}
+                    >
+                      <img src={item.crop_url} alt="" />
+                      <span>
+                        {index + 1}. {describe(item, named, t)}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )}
+
+          {mark && canEdit && (
+            <MarkPanel
+              mark={mark}
+              covers={covers}
+              lesions={here}
+              title={title}
+              named={named}
+              busy={update.isPending || remove.isPending}
+              onUpdate={(body) => update.mutate({ id: mark.id, body })}
+              onRemove={() => remove.mutate(mark.id, { onSuccess: () => setSelected(null) })}
+            />
+          )}
+          {(update.error ?? remove.error) && (
+            <Notice kind="error">{(update.error ?? remove.error)?.message}</Notice>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

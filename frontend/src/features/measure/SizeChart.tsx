@@ -204,6 +204,7 @@ export function SizeChart({ lesionId }: { lesionId: string }) {
       <p className="text-secondary">{showUncertainty ? t("chart.subtitleBand") : t("chart.subtitle")}</p>
       {!asTable && (
         <Segmented
+          wide
           label={t("chart.metric")}
           options={available.map((value) => ({
             value,
