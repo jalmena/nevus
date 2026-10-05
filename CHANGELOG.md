@@ -1,3 +1,9 @@
+## v1.1.1 (2026-10-05)
+
+### Fix
+
+- **pwa**: a new version takes over at once and reloads the pages it finds open
+
 ## v1.1.0 (2026-10-02)
 
 ### Feat

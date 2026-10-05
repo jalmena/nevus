@@ -1,8 +1,7 @@
 /// <reference lib="webworker" />
 // The service worker: the shell and its assets cached by hash, the reading routes of the app cached
 // for a known page to open without a connection, and push messages shown as notifications. It is
-// built by vite-plugin-pwa (injectManifest), which fills in the precache list.
-import { clientsClaim } from "workbox-core";
+// built by vite-plugin-pwa (injectManifest), which fills in the precache list. Updates apply themselves.
 import { ExpirationPlugin } from "workbox-expiration";
 import {
   cleanupOutdatedCaches,
@@ -24,7 +23,6 @@ interface PushPayload {
   url?: string;
 }
 
-clientsClaim();
 precacheAndRoute(self.__WB_MANIFEST);
 cleanupOutdatedCaches();
 
@@ -54,9 +52,23 @@ registerRoute(
   }),
 );
 
-// The page decides when a new version takes over (registerType "prompt").
-self.addEventListener("message", (event) => {
-  if ((event.data as { type?: string } | undefined)?.type === "SKIP_WAITING") void self.skipWaiting();
+// A new version takes over as soon as it is installed, and the pages it finds open are reloaded so they
+// run the new shell. Without this, the old worker kept serving its cached shell until every page of the
+// app was closed, and an updated server looked unchanged. The offline outbox lives in IndexedDB and
+// survives the reload.
+let updating = false;
+self.addEventListener("install", () => {
+  updating = self.registration.active !== null; // an older worker is in charge: this is an update
+  void self.skipWaiting();
+});
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    self.clients.claim().then(async () => {
+      if (!updating) return;
+      const windows = await self.clients.matchAll({ type: "window" });
+      await Promise.all(windows.map((client) => client.navigate(client.url).catch(() => undefined)));
+    }),
+  );
 });
 
 // A push message is JSON the browser has already decrypted: a title, a line or two, where to open.

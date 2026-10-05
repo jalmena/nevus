@@ -53,7 +53,7 @@ Reviewed for 1.0.0 on 2026-10-02 against the code of that release. `SECURITY.md`
 | Exhausting the server | everything | upload size and pixel limits, a free-space guard, job timeouts, one low-priority worker, a 60-second report wait in the interface | No per-user CPU quota; accepted on a private network |
 | Losing the record silently | backups | a nightly encrypted backup, pruned by retention; every week the latest one is read back and the live store checked; administrators warned on failure | A copy off the machine is still the operator's job |
 | Exposing intimate photographs | sessions | every region can be skipped and two say they may show intimate areas; any part of a stored photo can be blurred, which removes the original at once; no telemetry, no third parties | Backups made before a blur hold the original until they rotate |
-| A poisoned dependency or image | supply chain | locked dependencies; secret scanning, dependency audit and image scanning in CI; software bill of materials and provenance on published images; updates with a stability delay | The self-hosted runner is the operator's machine |
+| A poisoned dependency or image | supply chain | locked dependencies; secret scanning, dependency audit and image scanning in CI; software bill of materials and provenance on published images; updates with a stability delay | The checks run on runners GitHub hosts, not ours |
 
 ## What this review changed
 

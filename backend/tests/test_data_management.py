@@ -253,7 +253,10 @@ def test_the_backup_is_verified_weekly_and_on_demand(client: TestClient, setting
     backup.create(settings, "backup passphrase 1", work_factor=10)
     factory, store = _ctx(client, settings)
     zone = ZoneInfo(settings.effective_timezone)
-    early = datetime(2026, 10, 4, settings.backup_hour, 30, tzinfo=zone)
+    # The verification job stamps the real clock, so the simulated days start tomorrow: a fixed date
+    # here worked until the calendar caught up with it.
+    tomorrow = datetime.now(tz=zone) + timedelta(days=1)
+    early = tomorrow.replace(hour=settings.backup_hour, minute=30, second=0, microsecond=0)
     later = early.replace(hour=settings.backup_hour + 2)
     with factory() as db:
         ctx = JobContext(db, store, settings)
