@@ -1,3 +1,9 @@
+## v1.2.0 (2026-10-05)
+
+### Feat
+
+- **design**: a second pass over every screen, on a phone, a tablet and a desktop
+
 ## v1.1.1 (2026-10-05)
 
 ### Fix
