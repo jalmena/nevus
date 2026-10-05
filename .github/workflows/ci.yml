@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     # Pull requests cover feature, release and hotfix branches; main is tested as the release branch it
-    # fast-forwards from. One serial runner cannot afford the same tree twice.
+    # fast-forwards from. The same tree is not tested twice.
     branches: [develop]
   workflow_dispatch:
 
@@ -15,14 +15,14 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-# The jobs form one chain, cheapest and most likely to fail first: on a single serial runner a failure
-# in one skips the ones after it instead of spending the hour on them. With more runners the chain can
-# be widened again (the expensive three are independent of each other).
+# Two stages on GitHub-hosted runners (free for a public repository, many in parallel): the cheap checks
+# first (commit messages, secrets and dependency audits, the frontend's lint, types, tests and build), and
+# only when they pass the three expensive jobs, side by side. A failure in the first stage stops there.
 jobs:
   commits:
     name: Conventional commits
     if: github.event_name == 'pull_request'
-    runs-on: [self-hosted, nevus]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
         with:
@@ -32,9 +32,9 @@ jobs:
         run: uvx --from commitizen cz check --rev-range "origin/${{ github.base_ref }}..HEAD"
 
   backend:
-    needs: frontend
+    needs: [security, frontend]
     name: Backend
-    runs-on: [self-hosted, nevus]
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: backend
@@ -69,7 +69,7 @@ jobs:
               libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 fonts-dejavu-core
           fi
       - name: Tests on SQLite
-        # Two workers for the runner's two cores; every test has its own data directory.
+        # One worker per core; every test has its own data directory.
         run: uv run pytest -n auto --cov=nevus --cov-report=term-missing
       - name: Tests on PostgreSQL
         # One worker: the tests share the service's single database.
@@ -96,9 +96,8 @@ jobs:
           uv run alembic check
 
   frontend:
-    needs: security
     name: Frontend
-    runs-on: [self-hosted, nevus]
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: frontend
@@ -124,9 +123,9 @@ jobs:
       - run: pnpm build
 
   e2e:
-    needs: image
+    needs: [security, frontend]
     name: End to end
-    runs-on: [self-hosted, nevus]
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: frontend
@@ -156,6 +155,11 @@ jobs:
             sudo apt-get install -y -qq --no-install-recommends \
               libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 fonts-dejavu-core
           fi
+      - name: Browser, cached between runs
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('frontend/pnpm-lock.yaml') }}
       - name: Browser
         run: pnpm exec playwright install --with-deps chromium
       - name: Journey on a phone-sized browser, with accessibility checks
@@ -172,9 +176,9 @@ jobs:
           retention-days: 7
 
   image:
-    needs: backend
+    needs: [security, frontend]
     name: Container image
-    runs-on: [self-hosted, nevus]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       - name: Build
@@ -205,19 +209,14 @@ jobs:
           uid=$(docker exec nevuspuid sh -c 'stat -c %u /proc/1')
           echo "pid 1 runs as uid $uid"; test "$uid" = "1500"
           docker rm -f nevuspuid
-      - name: Leave nothing behind on the runner
-        if: always()
-        run: docker rm -f nevus nevuspuid >/dev/null 2>&1 || true
 
   security:
     name: Security
-    runs-on: [self-hosted, nevus]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - name: Clear a download a cancelled run can leave behind on this runner
-        run: rm -f /tmp/gitleaks.tmp
       - name: Secrets
         uses: gitleaks/gitleaks-action@v2
         env:
