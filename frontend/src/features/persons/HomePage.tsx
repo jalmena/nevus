@@ -42,8 +42,6 @@ export function HomePage() {
 
   return (
     <div className={styles.page}>
-      <UpcomingAppointments appointments={upcoming.data} />
-      <DueList />
       <header className={styles.header}>
         <h1>{t("persons.title")}</h1>
         {!adding && persons.data && persons.data.length > 0 && (
@@ -52,6 +50,8 @@ export function HomePage() {
           </Button>
         )}
       </header>
+      <DueList />
+      <UpcomingAppointments appointments={upcoming.data} />
       {persons.error && <Notice kind="error">{persons.error.message}</Notice>}
       {persons.data && persons.data.length === 0 && !adding && (
         <EmptyState

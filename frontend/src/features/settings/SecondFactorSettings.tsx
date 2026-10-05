@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/design-system/components/Button";
-import { Card } from "@/design-system/components/Card";
 import { Notice } from "@/design-system/components/Notice";
 import { TextField } from "@/design-system/components/TextField";
 import { useInstance } from "@/lib/auth/session";
@@ -12,6 +11,7 @@ import {
   useTotpSetup,
   useTotpStatus,
 } from "@/lib/auth/totp";
+import { Group } from "./Group";
 import styles from "./settings.module.css";
 
 const grouped = (secret: string) => secret.replace(/(.{4})/g, "$1 ").trim();
@@ -28,7 +28,7 @@ function download(codes: string[]) {
 }
 
 /** A second factor for the account: an authenticator app, with recovery codes for when it is lost. */
-export function SecondFactorSettings() {
+export function SecondFactorSettings({ folded = false }: { folded?: boolean }) {
   const { t } = useTranslation();
   const local = useInstance().data?.auth_mode !== "proxy";
   const status = useTotpStatus(local);
@@ -56,8 +56,7 @@ export function SecondFactorSettings() {
   }
 
   return (
-    <Card className={styles.group}>
-      <h2 className={styles.subheading}>{t("secondFactor.title")}</h2>
+    <Group folded={folded} id="second-factor" title={t("secondFactor.title")} hint={t("secondFactor.hint")}>
       <p className="text-secondary">{t("secondFactor.intro")}</p>
       {status.data.enabled ? (
         <>
@@ -139,6 +138,6 @@ export function SecondFactorSettings() {
         </section>
       )}
       {failure && <Notice kind="error">{failure.message}</Notice>}
-    </Card>
+    </Group>
   );
 }

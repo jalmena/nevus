@@ -2,7 +2,6 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Button } from "@/design-system/components/Button";
-import { Card } from "@/design-system/components/Card";
 import { Notice } from "@/design-system/components/Notice";
 import { TextField } from "@/design-system/components/TextField";
 import {
@@ -15,10 +14,11 @@ import {
 import { supportedLanguages, type Language } from "@/lib/i18n";
 import { BackupSettings } from "./BackupSettings";
 import { WebhookSettings } from "./WebhookSettings";
+import { Group } from "@/features/settings/Group";
 import styles from "@/features/settings/settings.module.css";
 
 /** For administrators: how reminder emails leave the server, and the language of new accounts. */
-export function AdminSettings() {
+export function AdminSettings({ folded = false }: { folded?: boolean }) {
   const { t } = useTranslation();
   const email = useEmailSettings(true);
   const save = useSaveEmailSettings();
@@ -68,8 +68,7 @@ export function AdminSettings() {
 
   return (
     <>
-      <Card className={styles.group}>
-        <h2 className={styles.subheading}>{t("admin.emailTitle")}</h2>
+      <Group folded={folded} id="email" title={t("admin.emailTitle")} hint={t("admin.emailHint")}>
         <p className="text-secondary">{t("admin.emailIntro")}</p>
         <form className={styles.form} onSubmit={submit}>
           <TextField label={t("admin.host")} value={form.host} onChange={set("host")} autoComplete="off" />
@@ -138,14 +137,10 @@ export function AdminSettings() {
         </form>
         {test.error && <Notice kind="error">{test.error.message}</Notice>}
         {test.isSuccess && <Notice kind="success">{t("admin.testSent")}</Notice>}
-      </Card>
-      <WebhookSettings />
-      <BackupSettings />
-      <Card className={styles.group}>
-        <Link to="/evaluation">{t("admin.evaluationLink")}</Link>
-      </Card>
-      <Card className={styles.group}>
-        <h2 className={styles.subheading}>{t("admin.instanceTitle")}</h2>
+      </Group>
+      <WebhookSettings folded={folded} />
+      <BackupSettings folded={folded} />
+      <Group folded={folded} id="instance" title={t("admin.instanceTitle")} hint={t("admin.instanceHint")}>
         <label className={styles.row}>
           <span>{t("admin.defaultLanguage")}</span>
           <select
@@ -159,7 +154,8 @@ export function AdminSettings() {
             ))}
           </select>
         </label>
-      </Card>
+        <Link to="/evaluation">{t("admin.evaluationLink")}</Link>
+      </Group>
     </>
   );
 }

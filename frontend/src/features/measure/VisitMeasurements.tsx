@@ -61,7 +61,10 @@ export function VisitMeasurements({
           {images.map((image, index) => (
             <Link
               key={image.id}
-              className={styles.measureLink}
+              className={[
+                styles.measureLink,
+                (measurements.data?.length ?? 0) > 0 ? styles.measureLinkDone : "",
+              ].join(" ")}
               to={`/observations/${observationId}/measure/${image.id}`}
             >
               {images.length > 1 ? t("measure.measurePhotoN", { n: index + 1 }) : t("measure.measurePhoto")}

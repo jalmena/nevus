@@ -58,6 +58,28 @@ The first screen of each key page, before and after, at one scale:
 
 The whole gallery is reproduced by `pnpm run shots` at any commit; the before set is the tree of `v1.0.0`. Two measures of the change on a phone: the person page went from 8,111 px to 4,113 px of scrolling, the session page from 10,563 px to 9,702 px; the settings page grew by a card (the account) and a row (the sections). The accessibility sweep of the gallery stays at zero findings.
 
+## Second pass, 2026-10-05
+
+Every screen again, at full size this time, on a phone and on a desktop (and, from this pass on, on a tablet: the gallery photographs three devices). What the first pass had left:
+
+| Screen | Found | Changed |
+| --- | --- | --- |
+| Home | The due strip, a second-level heading, sat above the page's title. | The title and "Add a person" first; then what is due and the coming appointments; then the persons. |
+| Mark | The reports kept a second primary button on the page; the chart's metric control overflowed the phone's width ("Colour contrast with the skin" cut off); the facts grid broke "since" into a narrow column on a desktop. | Reports fold under their title, as on the person page; the metric control wraps and the label is "Colour contrast"; the facts' columns are wider. |
+| Visit | The quality note had landed after the controls and the privacy note, far from the photograph; three primary buttons (take a photo, measure, save); one long column on a desktop. | The note is the photograph's caption; the primary action follows the state (take a photo until there is one, measure until there is a measurement, save when something changed); from 900 px the photographs sit on the left, sticky, and the measurements and notes on the right. |
+| Session | Eighteen regions in one column on a desktop. | Two columns from 900 px; the next region spans both. |
+| Session zone | Photo, marks and panels in one column on a desktop. | From 900 px the photograph sits on the left, sticky, the marks and their panels on the right. |
+| Settings | Fourteen cards in one column, 13,900 px on a phone; the administrator's groups the longest. | The occasional and administrative groups fold under their titles with a hint (second factor, reference card, your data, accounts, email delivery, webhooks, backups, instance); the list of sections opens the one it points to; account, appearance and reminders stay open. |
+| Sign in | The wordmark larger than in the shell. | The shell's size. |
+
+New rules from this pass: the primary action is a function of the page's state, not a fixed button; a control with several options wraps rather than overflows; a group of settings used once a season folds like a tool.
+
+The five screens that changed most, after the pass, on the three devices the gallery photographs:
+
+![Second pass, three devices](review/board-second-pass.png)
+
+On a phone the settings page went from 13,873 px to 6,846 px of scrolling. The accessibility sweep stays at zero findings on all three devices.
+
 ## Deferred, for a decision
 
 The brief proposed a bottom navigation bar on phones (Map, Due, Add, Visit). The interface has a top bar (Persons, Settings) and the person page as the hub, and this pass keeps it: the hub carries the one primary action within the thumb's reach, and a bottom bar would duplicate what the person page now does. The question for the Product Owner, with a default:

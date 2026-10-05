@@ -356,6 +356,7 @@
   "card": {
     "title": "Tarjeta de referencia",
     "intro": "Imprímela, recórtala y pon su ventana sobre la marca al hacer la foto: neVus lee de ella la escala y la inclinación.",
+    "hint": "Imprime la tarjeta y comprueba la impresión.",
     "downloadA4": "Descargar para papel A4",
     "downloadLetter": "Descargar para papel Carta (EE. UU.)",
     "lineLabel": "Longitud medida de la línea de 50 mm",
@@ -382,6 +383,7 @@
   "admin": {
     "emailTitle": "Envío de correo (administración)",
     "emailIntro": "El servidor de correo que usa neVus para los recordatorios. No se envía nada hasta que esto esté completo y la gente active los recordatorios.",
+    "emailHint": "El servidor de correo que envía los recordatorios.",
     "host": "Servidor",
     "port": "Puerto",
     "security": "Seguridad",
@@ -397,6 +399,7 @@
     "sendTest": "Enviar una prueba",
     "testSent": "Enviado. Revisa la bandeja de entrada.",
     "instanceTitle": "Instancia (administración)",
+    "instanceHint": "El idioma de las cuentas nuevas y el conjunto de evaluación.",
     "defaultLanguage": "Idioma de las cuentas nuevas",
     "evaluationLink": "Conjunto de evaluación: etiqueta tus fotos para medir los analizadores"
   },
@@ -429,6 +432,7 @@
   "data": {
     "title": "Tus datos",
     "intro": "Llévate todo en un solo archivo cifrado, o recupera lo que borraste.",
+    "hint": "Exporta todo, o recupera lo que borraste.",
     "exportPerson": "Exportar esta persona",
     "exportAll": "Exportar toda la instancia (administración)",
     "exportIntro": "Elige una frase de paso. La necesitarás para abrir el archivo; neVus no la guarda, así que sin ella nadie puede recuperarlo. Se abre con la herramienta estándar age.",
@@ -531,7 +535,7 @@
       "longest": "Diámetro mayor",
       "area": "Área",
       "compactness": "Compacidad",
-      "contrast": "Contraste de color con la piel"
+      "contrast": "Contraste de color"
     },
     "descriptorsNote": "La compacidad es 1 para un círculo y menor para cualquier otro contorno. El contraste de color (ΔE) es respecto al parche gris de la tarjeta cuando la tarjeta salía en la foto; si no, tal como lo vio la cámara. Describe la foto, no la naturaleza de la marca."
   },
@@ -539,6 +543,7 @@
     "title": "Informes",
     "introProfile": "Un resumen en PDF de todas las marcas, con el mapa corporal y los últimos tamaños, para llevar a la consulta.",
     "hint": "Resúmenes y registros en PDF para el profesional sanitario.",
+    "hintLesion": "El registro en PDF de esta marca para el profesional sanitario.",
     "introLesion": "Un registro en PDF de esta marca para el profesional sanitario: sus fotos con escala, las medidas con su incertidumbre y tus notas.",
     "language": "Idioma",
     "paper": "Papel",
@@ -605,6 +610,7 @@
   "webhooks": {
     "title": "Webhooks",
     "intro": "Envía la lista diaria de marcas que toca fotografiar a Home Assistant, ntfy, Gotify, n8n o cualquier dirección. Cada webhook cubre las personas de las que eres propietario o gestor, y solo lleva nombres y fechas, nunca fotos ni notas.",
+    "hint": "La lista diaria de marcas pendientes, enviada a tus propios servicios.",
     "preset": "Tipo",
     "presets": {
       "home_assistant": "Home Assistant",
@@ -876,6 +882,7 @@
   "secondFactor": {
     "title": "Segundo factor",
     "intro": "Con un segundo factor, iniciar sesión necesita tu contraseña y un código de una aplicación de autenticación en tu teléfono, de modo que la contraseña sola no abre nada.",
+    "hint": "Un código de tu teléfono, además de la contraseña.",
     "on_one": "El segundo factor está activado. Queda {{count}} código de recuperación.",
     "on_many": "El segundo factor está activado. Quedan {{count}} códigos de recuperación.",
     "on_other": "El segundo factor está activado. Quedan {{count}} códigos de recuperación.",
@@ -898,6 +905,7 @@
     "title": "Cuentas (administración)",
     "intro": "Quién puede iniciar sesión en este neVus. No hay registro abierto: creas cada cuenta con una contraseña temporal, que la persona cambia en sus ajustes.",
     "introProxy": "Quién puede iniciar sesión en este neVus. Las cuentas vienen de tu inicio de sesión único; aquí solo puedes desactivar una.",
+    "hint": "Quién puede iniciar sesión, y sus contraseñas.",
     "disabled": "desactivada",
     "secondFactorOn": "segundo factor activado",
     "lastSignIn": "última sesión el {{date}}",
@@ -922,6 +930,7 @@
     "title": "Copias de seguridad (administración)",
     "off": "Las copias nocturnas están desactivadas. Define NEVUS_BACKUP_PASSPHRASE en el servidor para activarlas; la guía de despliegue explica cómo.",
     "intro": "Cada noche, después de las {{hour}}:00, se escribe una copia cifrada en la carpeta backups del directorio de datos. Copia esa carpeta a otra máquina: una copia en el mismo disco no sobrevive al disco.",
+    "hint": "Copias cifradas cada noche, releídas cada semana.",
     "verifyEvery_one": "Cada día se relee la última copia para demostrar que se podría restaurar.",
     "verifyEvery_many": "Cada {{count}} días se relee la última copia para demostrar que se podría restaurar.",
     "verifyEvery_other": "Cada {{count}} días se relee la última copia para demostrar que se podría restaurar.",

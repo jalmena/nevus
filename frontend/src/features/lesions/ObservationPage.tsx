@@ -70,7 +70,7 @@ export function ObservationPage() {
   }
 
   return (
-    <div className={styles.page}>
+    <div className={[styles.page, "page-wide"].join(" ")}>
       <p>
         <Link to={`/lesions/${data.lesion_id}`}>
           {lesion.data ? t("observations.backTo", { lesion: lesionTitle(lesion.data, t) }) : t("common.back")}
@@ -80,76 +80,87 @@ export function ObservationPage() {
         <h1 className="numeric">{dateFormat.format(new Date(data.captured_at))}</h1>
       </header>
 
-      <section className={styles.section} aria-labelledby="photos-heading">
-        <h2 id="photos-heading">{t("observations.photos")}</h2>
-        <PhotoGallery
-          images={data.images}
-          canEdit={canEdit}
-          upload={upload}
-          previousImageId={previousImageId}
-        />
-        <QualityNotice
-          flags={data.quality_flags}
-          checking={data.images.some((image) => !image.quality_checked_at)}
-        />
-      </section>
-
-      <Proposals observationId={data.id} images={data.images} canEdit={canEdit} />
-      <VisitMeasurements observationId={data.id} images={data.images} canEdit={canEdit} />
-
-      <section className={styles.section} aria-labelledby="notes-heading">
-        <h2 id="notes-heading">{t("observations.yourNotes")}</h2>
-        <p className="text-secondary">{t("observations.notesHint")}</p>
-        <div className={styles.checks}>
-          {SYMPTOMS.map((symptom) => (
-            <label key={symptom}>
-              <input
-                type="checkbox"
-                checked={symptoms.includes(symptom)}
-                disabled={!canEdit}
-                onChange={(e) => toggle(symptom, e.target.checked)}
+      <div className={styles.layout}>
+        <section className={[styles.section, styles.photoPane].join(" ")} aria-labelledby="photos-heading">
+          <h2 id="photos-heading">{t("observations.photos")}</h2>
+          <PhotoGallery
+            images={data.images}
+            canEdit={canEdit}
+            upload={upload}
+            previousImageId={previousImageId}
+            primary={data.images.length === 0}
+            caption={
+              <QualityNotice
+                flags={data.quality_flags}
+                checking={data.images.some((image) => !image.quality_checked_at)}
               />
-              {t(`observations.symptoms.${symptom}`)}
-            </label>
-          ))}
-        </div>
-        <label>
-          <span className="text-secondary">{t("observations.notes")}</span>
-          <textarea
-            className={styles.textarea}
-            value={notes}
-            readOnly={!canEdit}
-            maxLength={4000}
-            onChange={(e) => {
-              setDirty(true);
-              setNotes(e.target.value);
-            }}
-          />
-        </label>
-        {update.error && <Notice kind="error">{update.error.message}</Notice>}
-        {canEdit && (
-          <div className={styles.actions}>
-            <Button onClick={save} disabled={!dirty || update.isPending}>
-              {update.isPending ? t("common.working") : t("common.save")}
-            </Button>
-          </div>
-        )}
-      </section>
-
-      {canEdit && (
-        <div className={styles.dangerZone}>
-          <Button
-            variant="danger"
-            disabled={remove.isPending}
-            onClick={() =>
-              remove.mutate(undefined, { onSuccess: () => void navigate(`/lesions/${data.lesion_id}`) })
             }
-          >
-            {t("observations.delete")}
-          </Button>
-          {remove.error && <Notice kind="error">{remove.error.message}</Notice>}
+          />
+        </section>
+
+        <div className={styles.dataPane}>
+          <Proposals observationId={data.id} images={data.images} canEdit={canEdit} />
+          <VisitMeasurements observationId={data.id} images={data.images} canEdit={canEdit} />
+
+          <section className={styles.section} aria-labelledby="notes-heading">
+            <h2 id="notes-heading">{t("observations.yourNotes")}</h2>
+            <p className="text-secondary">{t("observations.notesHint")}</p>
+            <div className={styles.checks}>
+              {SYMPTOMS.map((symptom) => (
+                <label key={symptom}>
+                  <input
+                    type="checkbox"
+                    checked={symptoms.includes(symptom)}
+                    disabled={!canEdit}
+                    onChange={(e) => toggle(symptom, e.target.checked)}
+                  />
+                  {t(`observations.symptoms.${symptom}`)}
+                </label>
+              ))}
+            </div>
+            <label>
+              <span className="text-secondary">{t("observations.notes")}</span>
+              <textarea
+                className={styles.textarea}
+                value={notes}
+                readOnly={!canEdit}
+                maxLength={4000}
+                onChange={(e) => {
+                  setDirty(true);
+                  setNotes(e.target.value);
+                }}
+              />
+            </label>
+            {update.error && <Notice kind="error">{update.error.message}</Notice>}
+            {canEdit && (
+              <div className={styles.actions}>
+                <Button
+                  variant={dirty ? "primary" : "secondary"}
+                  onClick={save}
+                  disabled={!dirty || update.isPending}
+                >
+                  {update.isPending ? t("common.working") : t("common.save")}
+                </Button>
+              </div>
+            )}
+          </section>
+
+          {canEdit && (
+            <div className={styles.dangerZone}>
+              <Button
+                variant="danger"
+                disabled={remove.isPending}
+                onClick={() =>
+                  remove.mutate(undefined, { onSuccess: () => void navigate(`/lesions/${data.lesion_id}`) })
+                }
+              >
+                {t("observations.delete")}
+              </Button>
+              {remove.error && <Notice kind="error">{remove.error.message}</Notice>}
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }

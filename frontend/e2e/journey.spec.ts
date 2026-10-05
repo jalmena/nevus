@@ -63,6 +63,7 @@ test("from a fresh instance to a measured mark, accessibly", async ({ page }) =>
   await expect(chart).toBeVisible();
 
   // The mark's record as a PDF, rendered by the background worker.
+  await openTool(page, "mark-reports", "Reports");
   await page.getByRole("button", { name: "Make the record of this mark", exact: true }).click();
   const pdf = page.getByRole("link", { name: /Download the PDF/ });
   await expect(pdf).toBeVisible({ timeout: 60_000 });
@@ -129,6 +130,7 @@ test("a full-body session: regions photographed or skipped, a mark pointed at, a
 test("the second factor: set up in the settings, then a sign-in that needs the code", async ({ page }) => {
   await signIn(page);
   await page.getByRole("link", { name: "Settings", exact: true }).click();
+  await openTool(page, "second-factor", "Second factor");
   await page.getByRole("button", { name: "Set up a second factor", exact: true }).click();
   const dialog = page.getByRole("dialog");
   await dialog.getByLabel("Password").fill(PASSWORD);
@@ -179,9 +181,11 @@ test("the second factor: set up in the settings, then a sign-in that needs the c
 
   // Leave the account as the other tests expect it.
   await page.getByRole("link", { name: "Settings", exact: true }).click();
+  await openTool(page, "second-factor", "Second factor");
   await expect(page.getByText("The second factor is on. 9 recovery codes left.")).toBeVisible();
   await page.getByRole("button", { name: "Turn it off", exact: true }).click();
   await dialog.getByLabel("Password").fill(PASSWORD);
   await dialog.getByRole("button", { name: "Confirm", exact: true }).click();
+  await openTool(page, "second-factor", "Second factor");
   await expect(page.getByRole("button", { name: "Set up a second factor", exact: true })).toBeVisible();
 });

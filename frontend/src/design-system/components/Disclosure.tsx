@@ -17,6 +17,15 @@ export function Disclosure({ id, title, hint, defaultOpen = false, children }: P
   useEffect(() => {
     if (defaultOpen) setOpen(true); // something became live: show it; never fold on the person's behalf
   }, [defaultOpen]);
+  useEffect(() => {
+    // A link to the tool (#id) opens it, on arrival and when the hash changes.
+    const sync = () => {
+      if (window.location.hash === `#${id}`) setOpen(true);
+    };
+    sync();
+    window.addEventListener("hashchange", sync);
+    return () => window.removeEventListener("hashchange", sync);
+  }, [id]);
   return (
     <details
       id={id}

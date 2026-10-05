@@ -359,6 +359,7 @@
   "card": {
     "title": "Cartão de referência",
     "intro": "Imprima-o, recorte-o e coloque a sua janela sobre a marca quando tirar uma foto: o neVus lê nele a escala e a inclinação.",
+    "hint": "Imprima o cartão e verifique a impressão.",
     "downloadA4": "Transferir para papel A4",
     "downloadLetter": "Transferir para papel US Letter",
     "lineLabel": "Comprimento medido da linha de 50 mm",
@@ -385,6 +386,7 @@
   "admin": {
     "emailTitle": "Envio de e-mail (administrador)",
     "emailIntro": "O servidor de correio que o neVus usa para enviar lembretes. Nada é enviado até isto estar preenchido e as pessoas ligarem os lembretes.",
+    "emailHint": "O servidor de correio que envia os lembretes.",
     "host": "Servidor",
     "port": "Porta",
     "security": "Segurança",
@@ -400,6 +402,7 @@
     "sendTest": "Enviar um teste",
     "testSent": "Enviada. Verifique a caixa de entrada.",
     "instanceTitle": "Instância (administrador)",
+    "instanceHint": "O idioma das contas novas e o conjunto de avaliação.",
     "defaultLanguage": "Idioma das contas novas",
     "evaluationLink": "Conjunto de avaliação: etiquete as suas fotos para medir os analisadores"
   },
@@ -432,6 +435,7 @@
   "data": {
     "title": "Os seus dados",
     "intro": "Leve tudo consigo num único ficheiro cifrado, ou recupere o que eliminou.",
+    "hint": "Exporte tudo, ou recupere o que eliminou.",
     "exportPerson": "Exportar esta pessoa",
     "exportAll": "Exportar a instância inteira (administrador)",
     "exportIntro": "Escolha uma frase-passe. Vai precisar dela para abrir o ficheiro; o neVus não a guarda, por isso ninguém consegue recuperar o ficheiro sem ela. Abre-se com a ferramenta padrão age.",
@@ -538,7 +542,7 @@
       "longest": "Maior diâmetro",
       "area": "Área",
       "compactness": "Compacidade",
-      "contrast": "Contraste de cor com a pele"
+      "contrast": "Contraste de cor"
     },
     "descriptorsNote": "A compacidade é 1 para um círculo e menor para qualquer outro contorno. O contraste de cor (ΔE) é relativo à mancha cinzenta do cartão quando este estava na foto; caso contrário, é como a câmara o viu. Descreve a foto, não a natureza da marca."
   },
@@ -546,6 +550,7 @@
     "title": "Relatórios",
     "introProfile": "Um resumo em PDF de todas as marcas, com o mapa do corpo e os últimos tamanhos, para levar a uma consulta.",
     "hint": "Resumos e registos em PDF para o profissional de saúde.",
+    "hintLesion": "O registo em PDF desta marca para o profissional de saúde.",
     "introLesion": "Um registo em PDF desta marca para o profissional de saúde: as suas fotos com escala, as medições com a sua incerteza e as suas notas.",
     "language": "Idioma",
     "paper": "Papel",
@@ -613,6 +618,7 @@
   "webhooks": {
     "title": "Webhooks",
     "intro": "Envie a lista diária de marcas com foto pendente para o Home Assistant, ntfy, Gotify, n8n ou qualquer endereço. Cada webhook abrange as pessoas de que é titular ou gestor e leva apenas nomes e datas, nunca fotos nem notas.",
+    "hint": "A lista diária de marcas pendentes, enviada aos seus próprios serviços.",
     "preset": "Tipo",
     "presets": {
       "home_assistant": "Home Assistant",
@@ -884,6 +890,7 @@
   "secondFactor": {
     "title": "Segundo fator",
     "intro": "Com um segundo fator, iniciar sessão exige a sua palavra-passe e um código de uma aplicação de autenticação no seu telemóvel, por isso a palavra-passe sozinha não abre nada.",
+    "hint": "Um código do seu telemóvel, além da palavra-passe.",
     "on_one": "O segundo fator está ligado. Resta {{count}} código de recuperação.",
     "on_many": "O segundo fator está ligado. Restam {{count}} códigos de recuperação.",
     "on_other": "O segundo fator está ligado. Restam {{count}} códigos de recuperação.",
@@ -906,6 +913,7 @@
     "title": "Contas (administrador)",
     "intro": "Quem pode iniciar sessão neste neVus. Não há registo aberto: cria cada conta com uma palavra-passe temporária, que a pessoa muda nas suas definições.",
     "introProxy": "Quem pode iniciar sessão neste neVus. As contas vêm do seu início de sessão único; aqui só pode desativar uma.",
+    "hint": "Quem pode iniciar sessão, e as suas palavras-passe.",
     "disabled": "desativada",
     "secondFactorOn": "segundo fator ligado",
     "lastSignIn": "última sessão {{date}}",
@@ -930,6 +938,7 @@
     "title": "Cópias de segurança (administrador)",
     "off": "As cópias de segurança noturnas estão desligadas. Defina NEVUS_BACKUP_PASSPHRASE no servidor para as ligar; o guia de instalação explica como.",
     "intro": "Todas as noites, depois das {{hour}}:00, escreve-se uma cópia de segurança cifrada na pasta de cópias do diretório de dados. Copie essa pasta para outra máquina: uma cópia no mesmo disco não sobrevive ao disco.",
+    "hint": "Cópias cifradas todas as noites, relidas todas as semanas.",
     "verifyEvery_one": "Todos os dias a última cópia é relida para provar que restauraria.",
     "verifyEvery_many": "A cada {{count}} dias a última cópia é relida para provar que restauraria.",
     "verifyEvery_other": "A cada {{count}} dias a última cópia é relida para provar que restauraria.",

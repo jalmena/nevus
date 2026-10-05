@@ -14,8 +14,8 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-WIDTH = {"phone": 300, "desktop": 640}
-COLUMNS = {"phone": 6, "desktop": 3}
+WIDTH = {"phone": 300, "tablet": 420, "desktop": 640}
+COLUMNS = {"phone": 6, "tablet": 4, "desktop": 3}
 MAX_HEIGHT = 1500
 LABEL = 22
 GAP = 8

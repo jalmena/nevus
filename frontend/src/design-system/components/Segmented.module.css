@@ -9,6 +9,7 @@
 .group button {
   min-height: var(--touch-target);
   padding: 0 var(--space-4);
+  white-space: nowrap;
   border: 0;
   background: transparent;
   color: var(--color-ink-2);
@@ -20,15 +21,18 @@
 .wide {
   display: flex;
   flex: 1 1 18rem;
+  flex-wrap: wrap;
   width: 100%;
   border-radius: var(--radius-card);
 }
 
 .wide button {
   flex: 1 1 auto;
+  min-width: max-content; /* a label never breaks or clips: the option moves to the next row instead */
   padding: var(--space-1) var(--space-2);
   font-size: var(--text-sm);
   line-height: var(--leading-heading);
+  white-space: nowrap;
 }
 
 .group button:focus-visible {

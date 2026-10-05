@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/design-system/components/Button";
 import { FileButton } from "@/design-system/components/FileButton";
@@ -17,10 +17,14 @@ interface Props {
     isPending: boolean;
     error: Error | null;
   };
+  /** Shown right under the photographs: their quality note. */
+  caption?: ReactNode;
+  /** Whether taking a photo is the page's primary action (no photograph yet). */
+  primary?: boolean;
 }
 
 /** Thumbnails with a preview dialog, plus the camera and file buttons when the viewer may add photos. */
-export function PhotoGallery({ images, canEdit, upload, previousImageId }: Props) {
+export function PhotoGallery({ images, canEdit, upload, previousImageId, caption, primary = true }: Props) {
   const { t, i18n } = useTranslation();
   const remove = useDeleteImage();
   const [role, setRole] = useState<ImageRole>("close_up");
@@ -74,6 +78,7 @@ export function PhotoGallery({ images, canEdit, upload, previousImageId }: Props
           ))}
         </ul>
       )}
+      {caption}
       {canEdit && upload && (
         <div className={styles.roleRow}>
           <label>
@@ -88,6 +93,7 @@ export function PhotoGallery({ images, canEdit, upload, previousImageId }: Props
           </label>
           <FileButton
             label={upload.isPending ? t("images.uploading") : t("images.takePhoto")}
+            variant={primary ? "primary" : "secondary"}
             capture="environment"
             disabled={upload.isPending}
             onFiles={(files) => files.forEach((file) => upload.mutate({ file, role }))}

@@ -1,13 +1,13 @@
 import { useTranslation } from "react-i18next";
 import { Button } from "@/design-system/components/Button";
-import { Card } from "@/design-system/components/Card";
 import { Notice } from "@/design-system/components/Notice";
 import { useBackupNow, useBackupStatus, useVerifyBackupNow } from "@/lib/admin";
 import { formatBytes } from "@/lib/data";
+import { Group } from "@/features/settings/Group";
 import styles from "@/features/settings/settings.module.css";
 
 /** For administrators: whether the nightly backup runs, the latest one, and whether it would restore. */
-export function BackupSettings() {
+export function BackupSettings({ folded = false }: { folded?: boolean }) {
   const { t, i18n } = useTranslation();
   const status = useBackupStatus(true);
   const backUp = useBackupNow();
@@ -20,8 +20,7 @@ export function BackupSettings() {
   const failure = status.error ?? backUp.error ?? verify.error;
 
   return (
-    <Card className={styles.group}>
-      <h2 className={styles.subheading}>{t("backups.title")}</h2>
+    <Group folded={folded} id="backups" title={t("backups.title")} hint={t("backups.hint")}>
       {!backups.enabled ? (
         <p className="text-secondary">{t("backups.off")}</p>
       ) : (
@@ -87,6 +86,6 @@ export function BackupSettings() {
         </>
       )}
       {failure && <Notice kind="error">{failure.message}</Notice>}
-    </Card>
+    </Group>
   );
 }

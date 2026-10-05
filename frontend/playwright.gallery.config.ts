@@ -7,6 +7,16 @@ const stamp = Date.now();
 const SERVERS = [
   { name: "phone", port: 8791, device: devices["Pixel 7"] },
   {
+    name: "tablet",
+    port: 8793,
+    device: {
+      ...devices["Desktop Chrome"],
+      viewport: { width: 820, height: 1180 },
+      isMobile: true,
+      hasTouch: true,
+    },
+  },
+  {
     name: "desktop",
     port: 8792,
     device: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 900 } },

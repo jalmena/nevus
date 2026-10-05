@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/design-system/components/Button";
-import { Card } from "@/design-system/components/Card";
 import { Notice } from "@/design-system/components/Notice";
 import { TextField } from "@/design-system/components/TextField";
 import {
@@ -13,12 +12,13 @@ import {
   type UserOut,
 } from "@/lib/admin";
 import { useInstance, useSession } from "@/lib/auth/session";
+import { Group } from "@/features/settings/Group";
 import styles from "@/features/settings/settings.module.css";
 
 const MIN_PASSWORD = 10;
 
 /** The household's accounts: who can sign in, with what role, and the ways back in when something is lost. */
-export function UsersAdmin() {
+export function UsersAdmin({ folded = false }: { folded?: boolean }) {
   const { t, i18n } = useTranslation();
   const local = useInstance().data?.auth_mode !== "proxy";
   const me = useSession().data?.user;
@@ -63,8 +63,7 @@ export function UsersAdmin() {
   }
 
   return (
-    <Card className={styles.group}>
-      <h2 className={styles.subheading}>{t("accounts.title")}</h2>
+    <Group folded={folded} id="accounts" title={t("accounts.title")} hint={t("accounts.hint")}>
       <p className="text-secondary">{local ? t("accounts.intro") : t("accounts.introProxy")}</p>
       <ul className={styles.users}>
         {(users.data ?? []).map((user) => (
@@ -175,6 +174,6 @@ export function UsersAdmin() {
         <Notice kind="success">{t("accounts.passwordSet")}</Notice>
       )}
       {failure && <Notice kind="error">{failure.message}</Notice>}
-    </Card>
+    </Group>
   );
 }

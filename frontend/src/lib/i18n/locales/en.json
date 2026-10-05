@@ -356,6 +356,7 @@
   "card": {
     "title": "Reference card",
     "intro": "Print it, cut it out and place its window over the mark when you take a photo: neVus reads the scale and the tilt from it.",
+    "hint": "Print the card and check the print.",
     "downloadA4": "Download for A4 paper",
     "downloadLetter": "Download for US Letter paper",
     "lineLabel": "Measured length of the 50 mm line",
@@ -382,6 +383,7 @@
   "admin": {
     "emailTitle": "Email delivery (administrator)",
     "emailIntro": "The mail server neVus uses to send reminders. Nothing is sent until this is filled in and people turn reminders on.",
+    "emailHint": "The mail server that sends the reminders.",
     "host": "Server",
     "port": "Port",
     "security": "Security",
@@ -397,6 +399,7 @@
     "sendTest": "Send a test",
     "testSent": "Sent. Check the inbox.",
     "instanceTitle": "Instance (administrator)",
+    "instanceHint": "The language for new accounts and the evaluation set.",
     "defaultLanguage": "Language for new accounts",
     "evaluationLink": "Evaluation set: label your photos to measure the analyzers"
   },
@@ -429,6 +432,7 @@
   "data": {
     "title": "Your data",
     "intro": "Take everything with you as one encrypted file, or recover what you deleted.",
+    "hint": "Export everything, or recover what you deleted.",
     "exportPerson": "Export this person",
     "exportAll": "Export the whole instance (administrator)",
     "exportIntro": "Choose a passphrase. You will need it to open the file; neVus does not keep it, so nobody can recover the file without it. It opens with the standard age tool.",
@@ -531,7 +535,7 @@
       "longest": "Longest diameter",
       "area": "Area",
       "compactness": "Compactness",
-      "contrast": "Colour contrast with the skin"
+      "contrast": "Colour contrast"
     },
     "descriptorsNote": "Compactness is 1 for a circle and less for any other outline. The colour contrast (ΔE) is relative to the card's grey patch when the card was in the photo, otherwise as the camera saw it; it describes the photo, not the mark's nature."
   },
@@ -539,6 +543,7 @@
     "title": "Reports",
     "introProfile": "A PDF summary of every mark, with the body map and the latest sizes, to take to a consultation.",
     "hint": "PDF summaries and records for the clinician.",
+    "hintLesion": "The PDF record of this mark for the clinician.",
     "introLesion": "A PDF record of this mark for the clinician: its photos with a scale, the measurements with their uncertainty, and your notes.",
     "language": "Language",
     "paper": "Paper",
@@ -600,6 +605,7 @@
   "webhooks": {
     "title": "Webhooks",
     "intro": "Send the daily list of marks due for a photo to Home Assistant, ntfy, Gotify, n8n or any address. Each webhook covers the persons you own or manage, and carries names and dates only, never photos or notes.",
+    "hint": "The daily list of due marks, sent to your own services.",
     "preset": "Kind",
     "presets": {
       "home_assistant": "Home Assistant",
@@ -868,6 +874,7 @@
   "secondFactor": {
     "title": "Second factor",
     "intro": "With a second factor, signing in needs your password and a code from an authenticator app on your phone, so a password alone opens nothing.",
+    "hint": "A code from your phone, besides the password.",
     "on_one": "The second factor is on. {{count}} recovery code left.",
     "on_other": "The second factor is on. {{count}} recovery codes left.",
     "setUp": "Set up a second factor",
@@ -889,6 +896,7 @@
     "title": "Accounts (administrator)",
     "intro": "Who can sign in to this neVus. There is no open registration: you create each account with a temporary password, which the person changes in their settings.",
     "introProxy": "Who can sign in to this neVus. Accounts come from your single sign-on; here you can only disable one.",
+    "hint": "Who can sign in, and their passwords.",
     "disabled": "disabled",
     "secondFactorOn": "second factor on",
     "lastSignIn": "last signed in {{date}}",
@@ -913,6 +921,7 @@
     "title": "Backups (administrator)",
     "off": "Nightly backups are off. Set NEVUS_BACKUP_PASSPHRASE on the server to turn them on; the deployment guide explains how.",
     "intro": "An encrypted backup is written every night after {{hour}}:00 into the backups folder of the data directory. Copy that folder to another machine: a backup on the same disk does not survive the disk.",
+    "hint": "Nightly encrypted copies, read back every week.",
     "verifyEvery_one": "Every day the latest backup is read back to prove it would restore.",
     "verifyEvery_other": "Every {{count}} days the latest backup is read back to prove it would restore.",
     "verifyNever": "Reading backups back is turned off (NEVUS_BACKUP_VERIFY_DAYS is 0).",
