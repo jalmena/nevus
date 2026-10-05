@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: "prompt",
+      registerType: "autoUpdate",
       includeAssets: ["icons/icon.svg", "brand/wordmark-dark.svg", "fonts/*.woff2"],
       manifest: {
         name: "neVus",
