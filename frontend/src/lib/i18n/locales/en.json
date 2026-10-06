@@ -9,7 +9,8 @@
     "cancel": "Cancel",
     "close": "Close",
     "back": "Back",
-    "save": "Save"
+    "save": "Save",
+    "backTo": "Back to {{title}}"
   },
   "shell": {
     "language": "Language",
