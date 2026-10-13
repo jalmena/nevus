@@ -22,8 +22,10 @@ export function Shell() {
         <div className={desktop ? styles.desktop : styles.phone}>
           {desktop && <Rail />}
           <div className={styles.column}>
-            <AppBar desktop={desktop} />
-            <OutboxBar />
+            <header className={styles.top} data-chrome="bar">
+              <AppBar desktop={desktop} />
+              <OutboxBar />
+            </header>
             <main className={styles.main}>
               <Suspense fallback={<p className="text-secondary">…</p>}>
                 <Outlet />
@@ -72,7 +74,7 @@ export function AppBar({ desktop }: { desktop: boolean }) {
   const [helpOpen, setHelpOpen] = useState(false);
   const showTitle = Boolean(chrome.title) && !titleInView;
   return (
-    <div className={[styles.appBar, desktop ? styles.appBarDesktop : ""].join(" ")} data-chrome="bar">
+    <div className={[styles.appBar, desktop ? styles.appBarDesktop : ""].join(" ")}>
       <div className={styles.lead}>
         {chrome.back ? (
           <Link
@@ -140,7 +142,7 @@ function ActionBar() {
   const chrome = useChrome();
   if (!chrome.primary && !chrome.instruction && !chrome.secondary) return null;
   return (
-    <div className={styles.actionBar} data-chrome="bar">
+    <footer className={styles.actionBar} data-chrome="bar">
       {chrome.secondary && (
         <Button variant="quiet" onClick={chrome.secondary.onClick}>
           {chrome.secondary.label}
@@ -161,7 +163,7 @@ function ActionBar() {
           </Button>
         )
       )}
-    </div>
+    </footer>
   );
 }
 

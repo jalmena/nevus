@@ -15,7 +15,7 @@ import { useExports } from "@/lib/data";
 import { supportedLanguages, type Language } from "@/lib/i18n";
 import { useWebhooks } from "@/lib/notifications";
 import { pushSupported, usePushStatus } from "@/lib/push";
-import { SECTIONS, settingsRail } from "./SettingsHeader";
+import { SECTIONS, settingsRail, type SettingsSection } from "./SettingsHeader";
 import { THEMES } from "./AppearanceSection";
 import { useThisDevice } from "./PushSettings";
 import styles from "./settings.module.css";
@@ -86,25 +86,23 @@ function SettingsRows({ admin }: { admin: boolean }) {
           <div key={group}>
             {group !== "about" && <GroupLabel>{t(`settings.groups.${group}`)}</GroupLabel>}
             <RowList>
-              {sections.map((section) => {
-                const Icon = section.icon;
-                return (
-                  <Row
-                    key={section.id}
-                    to={`/settings/${section.id}`}
-                    leading={<Icon />}
-                    title={section.id === "account" ? user.username : section.label(t)}
-                    meta={
-                      section.id === "about"
-                        ? status.about
-                        : admin && section.admin
-                          ? undefined
-                          : status[section.id]
-                    }
-                    chevron
-                  />
-                );
-              })}
+              {group === "administration" ? (
+                <AdminRows sections={sections} dateFormat={dateFormat} />
+              ) : (
+                sections.map((section) => {
+                  const Icon = section.icon;
+                  return (
+                    <Row
+                      key={section.id}
+                      to={`/settings/${section.id}`}
+                      leading={<Icon />}
+                      title={section.id === "account" ? user.username : section.label(t)}
+                      meta={status[section.id]}
+                      chevron
+                    />
+                  );
+                })
+              )}
               {group === "account" && (
                 <>
                   <Row
@@ -152,7 +150,6 @@ function SettingsRows({ admin }: { admin: boolean }) {
                   />
                 </>
               )}
-              {group === "administration" && <AdminStatus dateFormat={dateFormat} />}
             </RowList>
             {group === "account" && update.error && <Notice kind="error">{update.error.message}</Notice>}
           </div>
@@ -162,23 +159,29 @@ function SettingsRows({ admin }: { admin: boolean }) {
   );
 }
 
-/** The administration rows carry a status that only an administrator may fetch; rendered after the rows. */
-function AdminStatus({ dateFormat }: { dateFormat: Intl.DateTimeFormat }) {
+/** The administration rows, each with a status only an administrator may fetch. */
+function AdminRows({
+  sections,
+  dateFormat,
+}: {
+  sections: SettingsSection[];
+  dateFormat: Intl.DateTimeFormat;
+}) {
   const { t } = useTranslation();
   const users = useUsers();
   const email = useEmailSettings(true);
   const hooks = useWebhooks();
   const backups = useBackupStatus(true);
   const instance = useInstanceSettings(true);
-  const lines = [
-    users.data ? t("settings.status.accounts", { count: users.data.length }) : null,
-    email.data
+  const status: Record<string, string | undefined> = {
+    accounts: users.data ? t("settings.status.accounts", { count: users.data.length }) : undefined,
+    email: email.data
       ? email.data.ready
         ? t("settings.status.emailReady")
         : t("settings.status.emailNotReady")
-      : null,
-    hooks.data ? t("settings.status.webhooks", { count: hooks.data.length }) : null,
-    backups.data
+      : undefined,
+    webhooks: hooks.data ? t("settings.status.webhooks", { count: hooks.data.length }) : undefined,
+    backups: backups.data
       ? !backups.data.enabled
         ? t("settings.status.backupsOff")
         : backups.data.latest
@@ -186,14 +189,26 @@ function AdminStatus({ dateFormat }: { dateFormat: Intl.DateTimeFormat }) {
               date: dateFormat.format(new Date(backups.data.latest.created_at)),
             })
           : t("settings.status.backupsNone")
-      : null,
-    instance.data
+      : undefined,
+    instance: instance.data
       ? t("settings.status.language", { language: t(`languages.${instance.data.default_language}`) })
-      : null,
-  ];
+      : undefined,
+  };
   return (
-    <li className={styles.adminStatus} aria-hidden="true">
-      {lines.filter(Boolean).join(" · ")}
-    </li>
+    <>
+      {sections.map((section) => {
+        const Icon = section.icon;
+        return (
+          <Row
+            key={section.id}
+            to={`/settings/${section.id}`}
+            leading={<Icon />}
+            title={section.label(t)}
+            meta={status[section.id]}
+            chevron
+          />
+        );
+      })}
+    </>
   );
 }

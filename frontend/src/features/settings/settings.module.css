@@ -36,12 +36,6 @@ li + .switchRow {
   border-top: 1px solid var(--color-border);
 }
 
-.adminStatus {
-  padding: var(--space-2) 0 0;
-  color: var(--color-ink-3);
-  font-size: var(--text-sm);
-}
-
 .linkRow a {
   display: flex;
   align-items: center;
