@@ -43,16 +43,16 @@ afterEach(() => vi.unstubAllGlobals());
 describe("full-body sessions", () => {
   it("starts from the person's page and lists every region in the protocol's order", async () => {
     const state = install();
-    renderApp(`/persons/${PERSON.id}`);
+    renderApp(`/persons/${PERSON.id}/sessions`);
     const user = userEvent.setup();
     await user.click(await screen.findByRole("button", { name: "Start a session" }));
     expect(await screen.findByRole("heading", { level: 1, name: /^Session of/ })).toBeInTheDocument();
-    const regions = screen.getAllByRole("heading", { level: 2 });
+    const regions = within(screen.getByRole("list", { name: "Full-body sessions" })).getAllByRole("listitem");
     expect(regions).toHaveLength(PROTOCOL.length);
     expect(regions[0]).toHaveTextContent("Face");
     expect(regions.at(-1)).toHaveTextContent("Soles");
+    expect(screen.getByRole("heading", { level: 2, name: "Face" })).toBeInTheDocument();
     expect(screen.getByText(/0 of 18 regions photographed/)).toBeInTheDocument();
-    expect(screen.getAllByText(/may include intimate areas/)).toHaveLength(2);
     expect(
       state.calls.some((c) => c.method === "POST" && c.url.endsWith(`/api/persons/${PERSON.id}/sessions`)),
     ).toBe(true);
@@ -62,23 +62,21 @@ describe("full-body sessions", () => {
     const state = install({ bodySessions: [session("s1", "2026-10-01T10:00:00Z")] });
     renderApp("/sessions/s1");
     const user = userEvent.setup();
-    const chest = (await screen.findByRole("heading", { name: "Chest and shoulders" })).closest("li");
-    if (!chest) throw new Error("no chest region");
-    await user.upload(within(chest).getByLabelText("Take the photo"), photo());
-    expect(await within(chest).findByText("0 marks")).toBeInTheDocument();
-    expect(
-      within(chest).getByRole("link", { name: "Open the photo of Chest and shoulders" }),
-    ).toHaveAttribute("href", "/sessions/s1/zones/chest");
-    expect(within(chest).queryByRole("button", { name: "Skip" })).not.toBeInTheDocument();
+    await user.click(await screen.findByRole("button", { name: /Chest and shoulders/ }));
+    expect(screen.getByRole("heading", { level: 2, name: "Chest and shoulders" })).toBeInTheDocument();
+    await user.upload(screen.getByLabelText("Take the photo"), photo());
+    const chest = await screen.findByRole("link", { name: /Chest and shoulders/ });
+    expect(chest).toHaveTextContent("0 marks");
+    expect(chest).toHaveAttribute("href", "/sessions/s1/zones/chest");
 
-    const abdomen = screen.getByRole("heading", { name: "Abdomen and pelvis" }).closest("li");
-    if (!abdomen) throw new Error("no abdomen region");
-    await user.click(within(abdomen).getByRole("button", { name: "Skip" }));
-    expect(await within(abdomen).findByText("Skipped")).toBeInTheDocument();
-    await user.click(within(abdomen).getByRole("button", { name: "Photograph it after all" }));
-    expect(await within(abdomen).findByText("Not photographed yet")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /Abdomen and pelvis/ }));
+    await user.click(screen.getByRole("button", { name: "Skip" }));
+    expect(await screen.findByRole("button", { name: /Abdomen and pelvis.*Skipped/ })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /Abdomen and pelvis/ }));
+    expect(await screen.findByRole("button", { name: /Abdomen and pelvis.*not yet/ })).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Finish the session" }));
+    await user.click(screen.getByRole("button", { name: "More" }));
+    await user.click(screen.getByRole("menuitem", { name: "Finish the session" }));
     expect(await screen.findByText(/^Finished/)).toBeInTheDocument();
     expect(state.bodySessions[0]?.status).toBe("finished");
   });
@@ -94,9 +92,12 @@ describe("full-body sessions", () => {
     const canvas = await screen.findByRole("application", { name: "Photo of Chest and shoulders" });
     canvas.focus();
     await user.keyboard("{Enter}");
-    const chooser = await screen.findByRole("region", { name: "The mark you tapped" });
+    const chooser = await screen.findByRole("dialog", { name: "The mark you tapped" });
     // Marks of the zones this photo shows come first.
-    expect(within(chooser).getByLabelText("A mark you follow")).toHaveValue("l1");
+    expect(within(chooser).getByRole("radio", { name: "Chest mark" })).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
     await user.click(within(chooser).getByRole("button", { name: "Link to it" }));
     await waitFor(() => expect(state.bodySessions[0]?.zones.chest?.marks).toHaveLength(1));
     const added = state.calls.find((c) => c.method === "POST" && c.url.endsWith("/zones/chest/marks"));
@@ -105,8 +106,9 @@ describe("full-body sessions", () => {
 
     canvas.focus();
     await user.keyboard("{Enter}");
-    const second = await screen.findByRole("region", { name: "The mark you tapped" });
-    const zones = within(second).getByLabelText("Or record a new mark in");
+    const second = await screen.findByRole("dialog", { name: "The mark you tapped" });
+    await user.click(within(second).getByRole("radio", { name: "A new mark…" }));
+    const zones = within(second).getByRole("combobox", { name: "Or record a new mark in" });
     expect(within(zones).getAllByRole("option")).toHaveLength(
       PROTOCOL.find((z) => z.id === "chest")?.covers.length ?? 0,
     );
@@ -121,16 +123,13 @@ describe("full-body sessions", () => {
     const state = install({ experimental: true, bodySessions: [session("s1", "2026-10-01T10:00:00Z")] });
     renderApp("/sessions/s1");
     const user = userEvent.setup();
-    expect(await screen.findByText(/The experimental analysis is on for this person/)).toBeInTheDocument();
-    const chest = screen.getByRole("heading", { name: "Chest and shoulders" }).closest("li");
-    if (!chest) throw new Error("no chest region");
-    await user.upload(within(chest).getByLabelText("Take the photo"), photo());
-    await user.click(
-      await within(chest).findByRole("link", { name: "Open the photo of Chest and shoulders" }),
-    );
+    expect(await screen.findByText("Experimental")).toBeInTheDocument();
+    await user.click(await screen.findByRole("button", { name: /Chest and shoulders/ }));
+    await user.upload(screen.getByLabelText("Take the photo"), photo());
+    await user.click(await screen.findByRole("link", { name: /Chest and shoulders/ }));
 
     await user.click(await screen.findByRole("button", { name: /Proposed: a spot not linked to any mark/ }));
-    const panel = screen.getByRole("region", { name: /Proposed spot/ });
+    const panel = await screen.findByRole("dialog", { name: "Proposed spot" });
     expect(within(panel).getByText("Experimental")).toBeInTheDocument();
     await user.click(within(panel).getByRole("button", { name: "Not a mark" }));
     await waitFor(() =>
@@ -152,16 +151,19 @@ describe("full-body sessions", () => {
     renderApp("/sessions/s1/zones/chest");
     const user = userEvent.setup();
     const canvas = await screen.findByRole("application", { name: "Photo of Chest and shoulders" });
-    await user.click(screen.getByRole("button", { name: "Blur a part of the photo" }));
+    await user.click(screen.getByRole("button", { name: "More" }));
+    await user.click(screen.getByRole("menuitem", { name: "Blur a part of the photo" }));
     expect(screen.getByRole("button", { name: "Blur 0 areas" })).toBeDisabled();
     await user.pointer([{ keys: "[MouseLeft]", target: canvas, coords: { clientX: 64, clientY: 48 } }]);
     await user.pointer([{ keys: "[MouseLeft]", target: canvas, coords: { clientX: 320, clientY: 240 } }]);
     expect(screen.getByRole("button", { name: "Blur 1 area" })).toBeEnabled();
     await user.click(screen.getByRole("button", { name: "Blur 1 area" }));
+    const confirm = await screen.findByRole("dialog", { name: "Blur the photo?" });
+    await user.click(within(confirm).getByRole("button", { name: "Blur 1 area" }));
     await waitFor(() => expect(state.bodySessions[0]?.zones.chest?.image_id).not.toBe("img1"));
     const sent = state.calls.find((c) => c.method === "POST" && c.url.endsWith("/zones/chest/blur"));
     expect(sent?.body).toEqual({ regions: [{ x: 0.1, y: 0.1, width: 0.4, height: 0.4 }] });
-    expect(screen.queryByRole("heading", { name: "Blur part of the photo" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Blur \d+ area/ })).not.toBeInTheDocument();
   });
 
   it("hides proposed spots when the experimental analysis is off", async () => {
@@ -190,7 +192,7 @@ describe("full-body sessions", () => {
     expect(
       await screen.findByRole("application", { name: "Photo of Chest and shoulders" }),
     ).toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: "Marks on this photo" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("list", { name: "Marks on this photo" })).not.toBeInTheDocument();
   });
 
   it("compares two sessions region by region, and lists where a mark was seen", async () => {
@@ -215,7 +217,7 @@ describe("full-body sessions", () => {
         }),
       ],
     });
-    const { unmount } = renderApp(`/persons/${PERSON.id}`);
+    const { unmount } = renderApp(`/persons/${PERSON.id}/sessions`);
     const user = userEvent.setup();
     await user.click(await screen.findByRole("link", { name: "Compare the last two sessions" }));
     expect(
@@ -249,12 +251,12 @@ describe("full-body sessions", () => {
         }),
       ],
     });
-    const { unmount } = renderApp(`/persons/${PERSON.id}`);
+    const { unmount } = renderApp(`/persons/${PERSON.id}/sessions`);
     expect(await screen.findByText(/2 saltadas/)).toBeInTheDocument();
     expect(screen.getByText(/0 marcas/)).toBeInTheDocument();
     unmount();
     renderApp("/sessions/s1");
-    expect(await screen.findByRole("heading", { name: "Plantas de los pies" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Zona lumbar y glúteos" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: /Plantas de los pies/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Zona lumbar y glúteos/ })).toBeInTheDocument();
   });
 });

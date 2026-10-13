@@ -10,9 +10,6 @@
 .chart {
   position: relative;
   overflow: hidden;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
 }
 
 .chart:focus-visible {
@@ -107,4 +104,37 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-4);
+}
+
+.iconLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-width: var(--touch-target);
+  height: var(--touch-target);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-control);
+  color: var(--color-ink-2);
+  font-weight: var(--font-weight-emphasis);
+  text-decoration: none;
+}
+
+.linkLabel {
+  display: none;
+}
+
+@media (width >= 900px) {
+  .linkLabel {
+    display: inline;
+  }
+}
+
+.iconLink:hover {
+  background: var(--color-surface-2);
+}
+
+.iconLink > svg {
+  width: 20px;
+  height: 20px;
 }

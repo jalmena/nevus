@@ -92,7 +92,7 @@ describe("size over time", () => {
     install();
     renderApp("/lesions/l1");
     const user = userEvent.setup();
-    await user.click(await screen.findByRole("radio", { name: "Area" }));
+    await user.selectOptions(await screen.findByRole("combobox", { name: "Show" }), "Area");
     const chart = screen.getByRole("slider", { name: /Area at 2 visits/ });
     expect(chart).toHaveAttribute("aria-valuetext", "Sep 1, 2026: 19.6 ± 1.5 mm²");
   });
@@ -101,12 +101,12 @@ describe("size over time", () => {
     install();
     renderApp("/lesions/l1");
     const user = userEvent.setup();
-    await user.click(await screen.findByRole("radio", { name: "Compactness" }));
+    await user.selectOptions(await screen.findByRole("combobox", { name: "Show" }), "Compactness");
     expect(screen.getByRole("slider", { name: /Compactness at 2 visits/ })).toHaveAttribute(
       "aria-valuetext",
       "Sep 1, 2026: 0.93",
     );
-    await user.click(screen.getByRole("radio", { name: "Colour contrast" }));
+    await user.selectOptions(screen.getByRole("combobox", { name: "Show" }), "Colour contrast");
     expect(screen.getByRole("slider", { name: /Colour contrast at 2 visits/ })).toHaveAttribute(
       "aria-valuetext",
       "Sep 1, 2026: 33 ΔE",
@@ -185,7 +185,12 @@ describe("comparing two visits", () => {
     install({ comparison: { status: "abstained", reason: "distance" } });
     renderApp("/lesions/l1/compare?mode=overlay");
     expect(await screen.findByText(/They were taken from very different distances\./)).toBeInTheDocument();
-    expect(screen.queryByRole("radiogroup", { name: "View" })).not.toBeInTheDocument();
+    const views = screen.getByRole("radiogroup", { name: "View" });
+    expect(within(views).getByRole("radio", { name: "On top" })).toBeDisabled();
+    expect(within(views).getByRole("radio", { name: "Side by side" })).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
     expect(screen.getAllByRole("application")).toHaveLength(2);
   });
 
@@ -222,8 +227,9 @@ describe("photo pickers", () => {
     });
     renderApp("/lesions/l1/compare");
     const user = userEvent.setup();
-    const earlier = await screen.findByRole("combobox", { name: "Earlier" });
-    await user.selectOptions(earlier, "i3");
+    await user.click(await screen.findByRole("button", { name: /^Earlier/ }));
+    const sheet = await screen.findByRole("dialog", { name: "Earlier" });
+    await user.click(within(sheet).getByRole("button", { name: /Jun 1, 2026/ }));
     await waitFor(() =>
       expect(
         state.calls.some(

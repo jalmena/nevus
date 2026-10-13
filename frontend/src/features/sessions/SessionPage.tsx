@@ -1,149 +1,216 @@
+import { Check, Circle, CircleDashed, Trash2 } from "lucide-react";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate, useParams } from "react-router";
-import { Button } from "@/design-system/components/Button";
-import { FileButton } from "@/design-system/components/FileButton";
+import { useNavigate, useParams } from "react-router";
+import { EmptyState } from "@/design-system/components/EmptyState";
 import { Notice } from "@/design-system/components/Notice";
+import { PageHeader } from "@/design-system/components/PageHeader";
+import { Row, RowList, Thumb } from "@/design-system/components/Row";
+import { StatusChip } from "@/design-system/components/StatusChip";
+import { shortDate } from "@/lib/dates";
+import { personRail } from "@/features/persons/personRail";
+import { useConfirm } from "@/lib/confirm/ConfirmProvider";
+import { usePerson } from "@/lib/persons";
 import { imageUrl } from "@/lib/images";
 import {
+  useBodySession,
   useDeleteSession,
   useFinishSession,
   useProtocol,
-  useBodySession,
   useSkipZone,
   useZonePhoto,
 } from "@/lib/sessions";
 import styles from "./sessions.module.css";
 
-/** A full-body session: each region of the body in the protocol's order, photographed or skipped. */
+/** A full-body session: the region to photograph next, and every region in the protocol's order. */
 export function SessionPage() {
   const { sessionId = "" } = useParams();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const confirm = useConfirm();
   const protocol = useProtocol();
   const session = useBodySession(sessionId);
+  const person = usePerson(session.data?.person_id ?? "");
   const photo = useZonePhoto(sessionId);
   const skip = useSkipZone(sessionId);
   const finish = useFinishSession(sessionId);
   const remove = useDeleteSession();
-  const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "long" });
+  const camera = useRef<HTMLInputElement>(null);
+  const [chosen, setChosen] = useState<string | null>(null);
 
   if (session.error) return <Notice kind="error">{session.error.message}</Notice>;
   if (!session.data || !protocol.data) return <p className="text-secondary">…</p>;
   const data = session.data;
   const sensitive = new Set(protocol.data.filter((zone) => zone.sensitive).map((zone) => zone.id));
   const captured = data.zones.filter((zone) => zone.status === "captured").length;
-  const current = data.zones.find((zone) => zone.status === "pending")?.zone;
+  const skipped = data.zones.filter((zone) => zone.status === "skipped").length;
+  const total = data.zones.length;
+  const current =
+    data.zones.find((zone) => zone.zone === chosen && zone.status === "pending") ??
+    data.zones.find((zone) => zone.status === "pending");
   const busy = photo.isPending || skip.isPending;
+  const canEdit = data.can_edit && data.status === "open";
+  const name = (zone: string) => t(`sessions.zones.${zone}.name`);
 
   return (
-    <div className={styles.page}>
-      <p>
-        <Link to={`/persons/${data.person_id}`}>{t("sessions.back")}</Link>
-      </p>
-      <h1>{t("sessions.titleFor", { date: dateFormat.format(new Date(data.started_at)) })}</h1>
-      <p className="text-secondary">
-        {data.status === "open" ? t("sessions.open") : t("sessions.finished")} ·{" "}
-        {t("sessions.progress", { captured, total: data.zones.length })}
-      </p>
-      <p className="text-secondary">{t("sessions.howTo")}</p>
-      {data.experimental && <Notice kind="info">{t("sessions.experimentalNote")}</Notice>}
-      {(photo.error ?? skip.error) && <Notice kind="error">{(photo.error ?? skip.error)?.message}</Notice>}
-      <ol className={styles.zones}>
-        {data.zones.map((zone) => (
-          <li
-            key={zone.zone}
-            className={[styles.zone, styles[zone.status], zone.zone === current ? styles.current : ""].join(
-              " ",
-            )}
-          >
-            <div className={styles.zoneText}>
-              <h2>{t(`sessions.zones.${zone.zone}.name`)}</h2>
-              {zone.status === "pending" && zone.zone === current && (
-                <>
-                  <p className="text-secondary">{t(`sessions.zones.${zone.zone}.pose`)}</p>
-                  {sensitive.has(zone.zone) && <p className="text-secondary">{t("sessions.sensitive")}</p>}
-                </>
-              )}
-              {zone.status === "pending" && zone.zone !== current && (
-                <details className={styles.pose}>
-                  <summary>{t("sessions.pose")}</summary>
-                  <p className="text-secondary">{t(`sessions.zones.${zone.zone}.pose`)}</p>
-                  {sensitive.has(zone.zone) && <p className="text-secondary">{t("sessions.sensitive")}</p>}
-                </details>
-              )}
-              <p className={styles.status} role={zone.analysing ? "status" : undefined}>
-                {zone.analysing
-                  ? t("sessions.analysing")
-                  : zone.status === "captured"
-                    ? t("sessions.marksCount", {
-                        count: zone.marks.filter((m) => m.state === "confirmed").length,
-                      })
-                    : zone.status === "skipped"
-                      ? t("sessions.skipped")
-                      : t("sessions.pending")}
-              </p>
-            </div>
-            {zone.image_id && (
-              <Link to={`/sessions/${data.id}/zones/${zone.zone}`} className={styles.thumb}>
-                <img
-                  src={imageUrl(zone.image_id, "thumb")}
-                  alt={t("sessions.openZone", { zone: t(`sessions.zones.${zone.zone}.name`) })}
-                />
-              </Link>
-            )}
-            {data.can_edit && (
-              <div className={styles.actions}>
-                {zone.status !== "skipped" && (
-                  <FileButton
-                    label={zone.status === "captured" ? t("sessions.retake") : t("sessions.takePhoto")}
-                    variant={zone.status === "pending" && zone.zone === current ? "primary" : "secondary"}
-                    capture="environment"
-                    disabled={busy}
-                    onFiles={(files) => files[0] && photo.mutate({ zone: zone.zone, file: files[0] })}
-                  />
-                )}
-                {zone.status === "pending" && (
-                  <Button
-                    variant="quiet"
-                    onClick={() => skip.mutate({ zone: zone.zone, skip: true })}
-                    disabled={busy}
-                  >
-                    {t("sessions.skip")}
-                  </Button>
-                )}
-                {zone.status === "skipped" && (
-                  <Button
-                    variant="quiet"
-                    onClick={() => skip.mutate({ zone: zone.zone, skip: false })}
-                    disabled={busy}
-                  >
-                    {t("sessions.unskip")}
-                  </Button>
-                )}
-              </div>
-            )}
-          </li>
-        ))}
-      </ol>
-      {data.can_edit && (
-        <div className={styles.actions}>
-          {data.status === "open" && (
-            <Button onClick={() => finish.mutate()} disabled={finish.isPending}>
-              {t("sessions.finish")}
-            </Button>
-          )}
-          <Button
-            variant="quiet"
-            onClick={() => {
-              if (window.confirm(t("sessions.deleteConfirm")))
-                remove.mutate(data.id, { onSuccess: () => void navigate(`/persons/${data.person_id}`) });
-            }}
-            disabled={remove.isPending}
-          >
-            {t("sessions.delete")}
-          </Button>
+    <div className={[styles.page, "page-wide"].join(" ")}>
+      <PageHeader
+        back={{ to: `/persons/${data.person_id}/sessions`, label: t("sessions.title") }}
+        title={t("sessions.titleFor", { date: shortDate(i18n.resolvedLanguage, data.started_at) })}
+        rail={personRail(t, data.person_id, person.data?.display_name)}
+        meta={[
+          data.status === "open" ? t("sessions.open") : t("sessions.finished"),
+          t("sessions.progress", { captured, total }),
+          skipped > 0 ? t("sessions.skippedCount", { count: skipped }) : null,
+        ]}
+        chip={
+          data.experimental ? (
+            <StatusChip kind="experimental">{t("proposals.experimental")}</StatusChip>
+          ) : undefined
+        }
+        help={{
+          title: t("sessions.tips"),
+          content: (
+            <>
+              <p>{t("sessions.howToMore")}</p>
+              {data.experimental && <p>{t("sessions.experimentalNote")}</p>}
+            </>
+          ),
+        }}
+        primary={
+          canEdit && current
+            ? { label: t("sessions.takePhoto"), pending: busy, onClick: () => camera.current?.click() }
+            : undefined
+        }
+        secondary={
+          canEdit && current
+            ? { label: t("sessions.skip"), onClick: () => skip.mutate({ zone: current.zone, skip: true }) }
+            : undefined
+        }
+        menu={
+          data.can_edit
+            ? [
+                ...(data.status === "open"
+                  ? [
+                      {
+                        label: t("sessions.finish"),
+                        icon: <Check />,
+                        disabled: finish.isPending,
+                        onSelect: () => finish.mutate(),
+                      },
+                    ]
+                  : []),
+                {
+                  label: t("sessions.delete"),
+                  icon: <Trash2 />,
+                  danger: true,
+                  onSelect: () => {
+                    void confirm({
+                      title: t("sessions.deleteQuestion"),
+                      text: t("sessions.deleteNote"),
+                      action: t("sessions.delete"),
+                      danger: true,
+                    }).then(
+                      (yes) =>
+                        yes &&
+                        remove.mutate(data.id, {
+                          onSuccess: () => void navigate(`/persons/${data.person_id}`),
+                        }),
+                    );
+                  },
+                },
+              ]
+            : []
+        }
+      >
+        <div
+          className={styles.progress}
+          role="progressbar"
+          aria-valuemin={0}
+          aria-valuemax={total}
+          aria-valuenow={captured}
+          aria-label={t("sessions.progress", { captured, total })}
+        >
+          <span style={{ width: `${total ? (captured / total) * 100 : 0}%` }} />
         </div>
+        <p className={["text-secondary", styles.howTo].join(" ")}>{t("sessions.howTo")}</p>
+      </PageHeader>
+      {(photo.error ?? skip.error ?? finish.error ?? remove.error) && (
+        <Notice kind="error">{(photo.error ?? skip.error ?? finish.error ?? remove.error)?.message}</Notice>
       )}
+      {canEdit && (
+        <input
+          ref={camera}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className={styles.hiddenInput}
+          aria-label={t("sessions.takePhoto")}
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            event.target.value = "";
+            if (file && current) photo.mutate({ zone: current.zone, file });
+          }}
+        />
+      )}
+
+      <div className={styles.layout}>
+        <div className={styles.regionPane}>
+          {current ? (
+            <article
+              className={styles.current}
+              aria-label={t("sessions.selectRegion", { zone: name(current.zone) })}
+            >
+              <h2>{name(current.zone)}</h2>
+              <p>{t(`sessions.zones.${current.zone}.pose`)}</p>
+              {sensitive.has(current.zone) && <p className="text-secondary">{t("sessions.sensitive")}</p>}
+            </article>
+          ) : (
+            data.status === "open" && <EmptyState>{t("sessions.allDone")}</EmptyState>
+          )}
+        </div>
+        <RowList className={styles.regions} label={t("sessions.title")}>
+          {data.zones.map((zone) => {
+            const isCurrent = zone.zone === current?.zone;
+            const meta = zone.analysing
+              ? t("sessions.analysing")
+              : zone.status === "captured"
+                ? t("sessions.marksCount", {
+                    count: zone.marks.filter((m) => m.state === "confirmed").length,
+                  })
+                : zone.status === "skipped"
+                  ? t("sessions.skipped")
+                  : t("sessions.notYet");
+            if (zone.status === "captured" && zone.image_id)
+              return (
+                <Row
+                  key={zone.zone}
+                  to={`/sessions/${data.id}/zones/${zone.zone}`}
+                  leading={<Thumb src={imageUrl(zone.image_id, "thumb")} />}
+                  title={name(zone.zone)}
+                  meta={<span role={zone.analysing ? "status" : undefined}>{meta}</span>}
+                />
+              );
+            return (
+              <Row
+                key={zone.zone}
+                onClick={
+                  canEdit
+                    ? () => {
+                        setChosen(zone.zone);
+                        if (zone.status === "skipped") skip.mutate({ zone: zone.zone, skip: false });
+                      }
+                    : undefined
+                }
+                selected={isCurrent}
+                leading={zone.status === "skipped" ? <CircleDashed /> : <Circle />}
+                title={name(zone.zone)}
+                meta={meta}
+              />
+            );
+          })}
+        </RowList>
+      </div>
     </div>
   );
 }

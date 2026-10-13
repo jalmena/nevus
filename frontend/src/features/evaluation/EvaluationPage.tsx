@@ -1,9 +1,14 @@
+import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
+import { IconButton } from "@/design-system/components/IconButton";
 import { Notice } from "@/design-system/components/Notice";
+import { PageHeader } from "@/design-system/components/PageHeader";
+import { Section } from "@/design-system/components/Section";
 import { Segmented } from "@/design-system/components/Segmented";
 import { zoneName } from "@/features/lesions/lesionName";
+import { shortDate } from "@/lib/dates";
 import { useEvaluationPhotos, useEvaluationSummary, type OutlineRow } from "@/lib/evaluation";
 import { imageUrl } from "@/lib/images";
 import styles from "./evaluation.module.css";
@@ -14,9 +19,10 @@ const FILTERS = ["unlabelled", "labelled", "all"] as const;
 export function EvaluationPage() {
   const { t, i18n } = useTranslation();
   const [only, setOnly] = useState<(typeof FILTERS)[number]>("unlabelled");
+  const [copied, setCopied] = useState(false);
   const photos = useEvaluationPhotos(only);
+  const unlabelled = useEvaluationPhotos("unlabelled");
   const summary = useEvaluationSummary();
-  const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "medium" });
   const percent = new Intl.NumberFormat(i18n.resolvedLanguage, {
     style: "percent",
     maximumFractionDigits: 1,
@@ -29,16 +35,36 @@ export function EvaluationPage() {
     ? [...Object.entries(summary.data.outline.by_tone), [t("evaluation.all"), summary.data.outline.overall]]
     : [];
 
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText("nevus evaluate");
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
+  }
+
   return (
     <div className={styles.page}>
-      <p>
-        <Link to="/settings">{t("evaluation.back")}</Link>
-      </p>
-      <h1>{t("evaluation.title")}</h1>
-      <p className="text-secondary">{t("evaluation.intro")}</p>
+      <PageHeader
+        help={{
+          title: t("evaluation.title"),
+          content: (
+            <>
+              <p>{t("evaluation.intro")}</p>
+              <p>{t("evaluation.introMore")}</p>
+            </>
+          ),
+        }}
+        back={{ to: "/settings/instance", label: t("settings.title") }}
+        title={t("evaluation.title")}
+        meta={[
+          unlabelled.data ? t("evaluation.toLabel", { count: unlabelled.data.length }) : null,
+          summary.data ? t("evaluation.labelledCount", { count: summary.data.labelled }) : null,
+        ]}
+      ></PageHeader>
 
-      <section className={styles.section} aria-labelledby="summary-heading">
-        <h2 id="summary-heading">{t("evaluation.summary")}</h2>
+      <Section title={t("evaluation.summary")}>
         {summary.data && summary.data.labelled === 0 ? (
           <p className="text-secondary">{t("evaluation.nothingYet")}</p>
         ) : (
@@ -88,11 +114,17 @@ export function EvaluationPage() {
             })}
           </p>
         )}
-        <p className="text-secondary">{t("evaluation.command")}</p>
-      </section>
+        <p className={["text-secondary", styles.command].join(" ")}>
+          {t("evaluation.commandShort")} <code>nevus evaluate</code>
+          <IconButton
+            label={copied ? t("calendar.copied") : t("evaluation.copyCommand")}
+            icon={copied ? <Check /> : <Copy />}
+            onClick={() => void copy()}
+          />
+        </p>
+      </Section>
 
-      <section className={styles.section} aria-labelledby="photos-heading">
-        <h2 id="photos-heading">{t("evaluation.photosTitle")}</h2>
+      <Section title={t("evaluation.photosTitle")}>
         <Segmented
           label={t("evaluation.filter")}
           options={FILTERS.map((value) => ({ value, label: t(`evaluation.filters.${value}`) }))}
@@ -110,14 +142,14 @@ export function EvaluationPage() {
                   {photo.person_name} · {photo.mark === photo.zone ? zoneName(photo.zone, t) : photo.mark}
                 </span>
                 <span className="text-secondary">
-                  {photo.captured_on ? dateFormat.format(new Date(`${photo.captured_on}T12:00:00`)) : ""}
+                  {photo.captured_on ? shortDate(i18n.resolvedLanguage, photo.captured_on) : ""}
                   {photo.label ? ` · ${t("evaluation.labelled")}` : ""}
                 </span>
               </Link>
             </li>
           ))}
         </ul>
-      </section>
+      </Section>
     </div>
   );
 }

@@ -18,16 +18,6 @@ export async function accessible(page: Page, name: string) {
 }
 
 /** Signs in as the administrator, claiming the instance when nobody has yet. */
-/** Opens one of the person page's folded tools (by its element id) unless it is open already. */
-export async function openTool(page: Page, id: string, name: string) {
-  const tool = page.locator(`details#${id}`);
-  await expect(tool).toBeVisible();
-  if (!(await tool.evaluate((element) => (element as HTMLDetailsElement).open))) {
-    await tool.getByRole("heading", { name, exact: true }).click();
-  }
-  await expect(tool).toHaveAttribute("open", "");
-}
-
 export async function signIn(page: Page) {
   await page.goto("/");
   const claim = page.getByRole("heading", { name: "Claim this instance", exact: true });
@@ -44,16 +34,17 @@ export async function signIn(page: Page) {
 }
 
 /** A visit with a photo of the card, and the 5 mm disc in its window measured. */
-export async function measuredVisit(page: Page, first: boolean) {
+export async function measuredVisit(page: Page, first: boolean, onMeasure?: () => Promise<void>) {
   await page.getByRole("button", { name: "New visit", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Photos", exact: true })).toBeVisible();
-  await page.getByLabel("Kind").selectOption("with_reference");
+  await expect(page.getByRole("heading", { name: "Measurements", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Add a photo", exact: true }).click();
+  await page.getByRole("button", { name: "With reference card", exact: true }).click();
   await page.getByLabel("Choose a file").setInputFiles(PHOTO);
   await expect(page.getByRole("button", { name: /Open the photo/ })).toBeVisible();
   await expect(page.getByText("Checking the photos…")).toHaveCount(0, { timeout: 60_000 });
   if (first) await accessible(page, "visit");
 
-  await page.getByRole("link", { name: "Measure on the photo", exact: true }).click();
+  await page.getByRole("button", { name: "Measure", exact: true }).click();
   await expect(page.getByText(/Reference card found/)).toBeVisible({ timeout: 60_000 });
   if (first) await accessible(page, "measure");
   await page.getByRole("button", { name: "Use the reference card", exact: true }).click();
@@ -80,16 +71,40 @@ export async function measuredVisit(page: Page, first: boolean) {
 
   const longest = page.locator("dt", { hasText: "Longest" }).locator("xpath=following-sibling::dd");
   await expect(longest).toHaveText(/^\d+\.\d ± \d+\.\d mm$/, { timeout: 20_000 });
+  if (onMeasure) await onMeasure();
   const value = Number((await longest.textContent())?.split(" ")[0]);
   expect(Math.abs(value - 5.0)).toBeLessThanOrEqual(0.3);
   await page.getByRole("button", { name: "Save the measurement", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Measurements", exact: true })).toBeVisible();
 }
 
+/** Opens the "more" menu of the page and chooses one of its items. */
+export async function more(page: Page, item: string) {
+  await page.getByRole("button", { name: "More", exact: true }).click();
+  await page.getByRole("menuitem", { name: item, exact: true }).click();
+}
+
 /** Screenshots for a human look at layout and both themes, into the directory given (none: no shots). */
 export async function shot(page: Page, name: string, dir = process.env.NEVUS_E2E_SHOTS) {
   if (!dir) return;
   mkdirSync(dir, { recursive: true });
+  // A full-page capture draws sticky bars where the viewport happened to be; flatten them for the sheet,
+  // from the top of the page, with the pointer away from anything it could highlight.
+  await page.addStyleTag({
+    content:
+      "[data-chrome='bar'] { position: static !important; } [data-chrome='rail'] { position: static !important; height: auto !important; }",
+  });
+  await page.mouse.move(0, 0);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  const overflow = await page.evaluate(() => {
+    const width = document.documentElement.clientWidth;
+    if (document.documentElement.scrollWidth <= width) return null;
+    return Array.from(document.querySelectorAll("body *"))
+      .filter((element) => element.getBoundingClientRect().right > width + 1)
+      .slice(0, 5)
+      .map((element) => `${element.tagName.toLowerCase()}.${element.className.toString().slice(0, 40)}`);
+  });
+  if (overflow) console.warn(`${name}: wider than the viewport at ${overflow.join(", ")}`);
   for (const scheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme: scheme });
     await page.waitForTimeout(400); // let colour transitions finish

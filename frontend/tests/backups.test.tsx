@@ -44,15 +44,18 @@ afterEach(() => vi.unstubAllGlobals());
 describe("backups in the settings", () => {
   it("shows the latest backup and its read-back, and starts a backup or a read-back on demand", async () => {
     const state = installMockApi({ claimed: true, session: SESSION });
-    renderApp("/settings");
+    renderApp("/settings/backups");
     const user = userEvent.setup();
-    expect(await screen.findByRole("heading", { name: "Backups (administrator)" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Backups" })).toBeInTheDocument();
     expect(screen.getByText(/3 backups, the latest from/)).toBeInTheDocument();
     expect(screen.getByText(/would restore \(412 files checked\)/)).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Read the latest backup back now" }));
+    await user.click(screen.getByRole("button", { name: "More" }));
+    await user.click(screen.getByRole("menuitem", { name: "Read the latest backup back now" }));
     await waitFor(() => expect(state.backups.verification_queued).toBe(true));
-    expect(await screen.findByRole("button", { name: "Reading it back…" })).toBeDisabled();
+    await user.click(screen.getByRole("button", { name: "More" }));
+    expect(await screen.findByRole("menuitem", { name: "Reading it back…" })).toBeDisabled();
+    await user.keyboard("{Escape}");
     await user.click(screen.getByRole("button", { name: "Back up now" }));
     await waitFor(() => expect(state.backups.backup_queued).toBe(true));
     expect(
@@ -62,7 +65,7 @@ describe("backups in the settings", () => {
 
   it("lists the problems of a backup that would not restore, and says how to turn backups on", async () => {
     installMockApi({ claimed: true, session: SESSION, backups: FAILING });
-    const first = renderApp("/settings");
+    const first = renderApp("/settings/backups");
     const alerts = await screen.findAllByRole("alert");
     const alert = alerts.find((item) => item.textContent?.includes("has problems"));
     if (!alert) throw new Error("no verification notice");
@@ -73,7 +76,7 @@ describe("backups in the settings", () => {
     vi.unstubAllGlobals();
 
     installMockApi({ claimed: true, session: SESSION, backups: { ...FAILING, enabled: false } });
-    renderApp("/settings");
+    renderApp("/settings/backups");
     expect(await screen.findByText(/Nightly backups are off/)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Back up now" })).not.toBeInTheDocument();
   });

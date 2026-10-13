@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/design-system/components/Button";
-import { Segmented } from "@/design-system/components/Segmented";
+import { Download, LineChart, Table } from "lucide-react";
+import { IconButton } from "@/design-system/components/IconButton";
+import { Section } from "@/design-system/components/Section";
+import { Select } from "@/design-system/components/Select";
 import { useSession } from "@/lib/auth/session";
 import { formatMm, useLesionMeasurements, type Measurement } from "@/lib/measurements";
 import styles from "./SizeChart.module.css";
@@ -199,19 +201,37 @@ export function SizeChart({ lesionId }: { lesionId: string }) {
   }
 
   return (
-    <section className={styles.section} aria-labelledby="size-heading">
-      <h2 id="size-heading">{t("chart.title")}</h2>
-      <p className="text-secondary">{showUncertainty ? t("chart.subtitleBand") : t("chart.subtitle")}</p>
+    <Section
+      title={t("chart.title")}
+      className={styles.section}
+      actions={
+        <>
+          <IconButton
+            label={asTable ? t("chart.showChart") : t("chart.showTable")}
+            icon={asTable ? <LineChart /> : <Table />}
+            showLabel="desktop"
+            onClick={() => setAsTable((value) => !value)}
+          />
+          <a
+            href={`/api/lesions/${lesionId}/measurements.csv`}
+            download
+            className={styles.iconLink}
+            aria-label={t("chart.csv")}
+            title={t("chart.csv")}
+          >
+            <Download aria-hidden="true" />
+            <span className={styles.linkLabel}>{t("chart.csv")}</span>
+          </a>
+        </>
+      }
+    >
       {!asTable && (
-        <Segmented
-          wide
+        <Select
           label={t("chart.metric")}
-          options={available.map((value) => ({
-            value,
-            label: t(`chart.metrics.${value}`),
-          }))}
+          labelHidden
           value={metric}
-          onChange={setMetric}
+          onChange={(event) => setMetric(event.target.value as Metric)}
+          options={available.map((value) => ({ value, label: t(`chart.metrics.${value}`) }))}
         />
       )}
       {asTable ? (
@@ -327,14 +347,7 @@ export function SizeChart({ lesionId }: { lesionId: string }) {
           )}
         </div>
       )}
-      <div className={styles.actions}>
-        <Button variant="secondary" onClick={() => setAsTable((value) => !value)}>
-          {asTable ? t("chart.showChart") : t("chart.showTable")}
-        </Button>
-        <a href={`/api/lesions/${lesionId}/measurements.csv`} download>
-          {t("chart.csv")}
-        </a>
-      </div>
-    </section>
+      <p className="text-secondary">{showUncertainty ? t("chart.subtitleBand") : t("chart.subtitle")}</p>
+    </Section>
   );
 }

@@ -66,8 +66,8 @@ describe("notifications on this device", () => {
     fakeBrowser();
     installMockApi({ claimed: true, session: SESSION });
     renderApp("/settings");
-    expect(await screen.findByRole("heading", { name: "Reminders" })).toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: /Notifications on this device/ })).not.toBeInTheDocument();
+    expect(await screen.findByRole("link", { name: /Reminders/ })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Notifications on this device/ })).not.toBeInTheDocument();
   });
 
   it("subscribes this device with the server's key, sends a test, and unsubscribes", async () => {
@@ -77,24 +77,24 @@ describe("notifications on this device", () => {
       session: SESSION,
       push: { enabled: true, public_key: PUBLIC_KEY, subscriptions: 0 },
     });
-    renderApp("/settings");
+    renderApp("/settings/notifications");
     const user = userEvent.setup();
-    expect(await screen.findByText("This device does not receive them yet.")).toBeInTheDocument();
-    expect(screen.getByText("No device of yours is subscribed yet.")).toBeInTheDocument();
+    expect(await screen.findByText(/This device does not receive them yet/)).toBeInTheDocument();
+    expect(screen.getByText(/No device of yours is subscribed yet/)).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Turn on for this device" }));
-    expect(await screen.findByText("This device receives them.")).toBeInTheDocument();
+    expect(await screen.findByText(/This device receives them\./)).toBeInTheDocument();
     const posted = state.calls.find((c) => c.method === "POST" && c.url.endsWith("/api/push/subscriptions"));
     expect(posted?.body).toEqual({
       endpoint: "https://push.example.net/send/device-1",
       keys: { p256dh: PUBLIC_KEY, auth: "BTBZMqHH6r4Tts7J_aSIgg" },
     });
-    expect(screen.getByText("1 device of yours subscribed.")).toBeInTheDocument();
+    expect(screen.getByText(/1 device of yours subscribed/)).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Send a test notification" }));
     expect(await screen.findByText("Sent to 1, failed for 0.")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Turn off for this device" }));
     await waitFor(() => expect(state.push.subscriptions).toBe(0));
-    expect(await screen.findByText("This device does not receive them yet.")).toBeInTheDocument();
+    expect(await screen.findByText(/This device does not receive them yet/)).toBeInTheDocument();
   });
 });

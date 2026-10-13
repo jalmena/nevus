@@ -1,5 +1,6 @@
 import { useEffect, useId, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Help } from "@/design-system/components/Help";
 import { Notice } from "@/design-system/components/Notice";
 import { Segmented } from "@/design-system/components/Segmented";
 import { PhotoCanvas, WHOLE, useCanvas, type SharedView } from "@/features/measure/PhotoCanvas";
@@ -53,19 +54,7 @@ export function ComparisonViewer({
   return (
     <>
       {a.id === b.id && <Notice kind="info">{t("compare.samePhoto")}</Notice>}
-      {comparison.isPending && a.id !== b.id && <p className="text-secondary">{t("compare.aligning")}</p>}
       {comparison.error && <Notice kind="error">{comparison.error.message}</Notice>}
-      {comparison.data && <AlignmentNote comparison={comparison.data} />}
-      {aligned && (
-        <Segmented
-          label={t("compare.mode")}
-          options={MODES.map((value) => ({ value, label: t(`compare.modes.${value}`) }))}
-          value={mode}
-          onChange={choose}
-          wide
-        />
-      )}
-      <p className="text-secondary">{t("compare.zoomHint")}</p>
 
       {mode === "side" && (
         <div className={styles.sideBySide}>
@@ -130,7 +119,24 @@ export function ComparisonViewer({
           />
         </label>
       )}
+      {comparison.data && (
+        <Segmented
+          label={t("compare.mode")}
+          options={MODES.map((value) => ({ value, label: t(`compare.modes.${value}`) }))}
+          value={mode}
+          onChange={choose}
+          disabledValues={aligned ? [] : MODES.filter((value) => value !== "side")}
+          disabledHint={t("compare.needsAligned")}
+          wide
+        />
+      )}
       {mode === "difference" && <DifferenceLegend />}
+      {comparison.isPending && a.id !== b.id && (
+        <p className="text-secondary" role="status">
+          {t("compare.aligning")}
+        </p>
+      )}
+      {comparison.data && <AlignmentNote comparison={comparison.data} />}
     </>
   );
 }
@@ -147,10 +153,10 @@ function AlignmentNote({ comparison }: { comparison: Comparison }) {
     );
   }
   return (
-    <Notice kind="info">
+    <p className="text-secondary">
       {t("compare.abstained")} {comparison.reason ? t(`compare.reasons.${comparison.reason}`) : ""}{" "}
       {t("compare.abstainedHint")}
-    </Notice>
+    </p>
   );
 }
 
@@ -269,7 +275,12 @@ function DifferenceLegend() {
         <span>{t("compare.similar")}</span>
         <span>{t("compare.different")}</span>
       </div>
-      <p className="text-secondary">{t("compare.differenceNote")}</p>
+      <p className={["text-secondary", styles.legendLine].join(" ")}>
+        {t("compare.differenceShort")}
+        <Help title={t("compare.modes.difference")} as="text">
+          <p>{t("compare.differenceNote")}</p>
+        </Help>
+      </p>
     </div>
   );
 }

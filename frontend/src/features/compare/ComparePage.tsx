@@ -1,9 +1,18 @@
+import { ChevronDown } from "lucide-react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useParams, useSearchParams } from "react-router";
+import { useParams, useSearchParams } from "react-router";
+import { Button } from "@/design-system/components/Button";
 import { Notice } from "@/design-system/components/Notice";
+import { PageHeader } from "@/design-system/components/PageHeader";
+import { Row, RowList, Thumb } from "@/design-system/components/Row";
+import { Sheet } from "@/design-system/components/Sheet";
 import { lesionTitle } from "@/features/lesions/lesionName";
-import { type ImageOut } from "@/lib/images";
+import { personRail } from "@/features/persons/personRail";
+import { shortDate } from "@/lib/dates";
+import { imageUrl, type ImageOut } from "@/lib/images";
 import { useLesion, useObservations, type ObservationOut } from "@/lib/lesions";
+import { usePerson } from "@/lib/persons";
 import { ComparisonViewer, MODES, type Mode } from "./ComparisonViewer";
 import styles from "./compare.module.css";
 
@@ -40,8 +49,9 @@ export function ComparePage() {
   const [search, setSearch] = useSearchParams();
   const { t, i18n } = useTranslation();
   const lesion = useLesion(lesionId);
+  const person = usePerson(lesion.data?.person_id ?? "");
   const observations = useObservations(lesionId);
-  const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "medium" });
+  const [picking, setPicking] = useState<"a" | "b" | null>(null);
 
   const visits = [...(observations.data ?? [])]
     .filter((visit) => visit.images.length > 0)
@@ -61,50 +71,43 @@ export function ComparePage() {
 
   if (lesion.error) return <Notice kind="error">{lesion.error.message}</Notice>;
   if (!lesion.data || !observations.data) return <p className="text-secondary">…</p>;
-  const back = (
-    <p>
-      <Link to={`/lesions/${lesionId}`}>{t("compare.back")}</Link>
-    </p>
+  const markTitle = lesionTitle(lesion.data, t);
+  const header = (
+    <PageHeader
+      back={{ to: `/lesions/${lesionId}`, label: markTitle }}
+      title={t("compare.title")}
+      meta={[markTitle, person.data?.display_name ?? null]}
+      help={{ title: t("common.help"), content: <p>{t("compare.zoomHint")}</p> }}
+      rail={personRail(t, lesion.data.person_id, person.data?.display_name)}
+    />
   );
   if (visits.length < 2 && choices.length < 2) {
     return (
-      <div className={styles.page}>
-        {back}
-        <h1>{t("compare.title")}</h1>
+      <div className={[styles.page, "page-wide"].join(" ")}>
+        {header}
         <Notice kind="info">{t("compare.needTwo")}</Notice>
       </div>
     );
   }
 
   const label = (choice: Choice) =>
-    `${dateFormat.format(new Date(choice.visit.captured_at))} · ${t(`images.roles.${choice.image.role}`)}`;
-  const picker = (side: "a" | "b", value: string) => (
-    <label className={styles.picker}>
-      <span className="text-secondary">{side === "a" ? t("compare.earlier") : t("compare.later")}</span>
-      <select
-        value={value}
-        onChange={(event) => choose(side === "a" ? { a: event.target.value } : { b: event.target.value })}
-      >
-        {visits.map((visit) => (
-          <optgroup key={visit.id} label={dateFormat.format(new Date(visit.captured_at))}>
-            {visit.images.map((image) => (
-              <option key={image.id} value={image.id}>
-                {label({ image, visit })}
-              </option>
-            ))}
-          </optgroup>
-        ))}
-      </select>
-    </label>
+    `${shortDate(i18n.resolvedLanguage, choice.visit.captured_at)} · ${t(`images.roles.${choice.image.role}`)}`;
+  const picker = (side: "a" | "b", current: Choice | undefined) => (
+    <Button variant="secondary" className={styles.picker} onClick={() => setPicking(side)}>
+      <span className={styles.pickerSide}>{side === "a" ? t("compare.earlier") : t("compare.later")}</span>
+      <span className={styles.pickerValue}>
+        {current ? shortDate(i18n.resolvedLanguage, current.visit.captured_at) : "—"}
+      </span>
+      <ChevronDown aria-hidden="true" />
+    </Button>
   );
 
   return (
-    <div className={styles.page}>
-      {back}
-      <h1>{t("compare.titleFor", { name: lesionTitle(lesion.data, t) })}</h1>
+    <div className={[styles.page, "page-wide"].join(" ")}>
+      {header}
       <div className={styles.pickers}>
-        {picker("a", a)}
-        {picker("b", b)}
+        {picker("a", first)}
+        {picker("b", second)}
       </div>
       {first && second && (
         <ComparisonViewer
@@ -114,6 +117,30 @@ export function ComparePage() {
           onMode={(mode) => choose({ mode })}
         />
       )}
+      <Sheet
+        open={picking !== null}
+        title={picking === "a" ? t("compare.earlier") : t("compare.later")}
+        onClose={() => setPicking(null)}
+      >
+        <RowList label={t("compare.pickPhoto")}>
+          {choices.map((choice) => {
+            const chosen = (picking === "a" ? a : b) === choice.image.id;
+            return (
+              <Row
+                key={choice.image.id}
+                onClick={() => {
+                  choose(picking === "a" ? { a: choice.image.id } : { b: choice.image.id });
+                  setPicking(null);
+                }}
+                selected={chosen}
+                leading={<Thumb src={imageUrl(choice.image.id, "thumb")} />}
+                title={shortDate(i18n.resolvedLanguage, choice.visit.captured_at)}
+                meta={t(`images.roles.${choice.image.role}`)}
+              />
+            );
+          })}
+        </RowList>
+      </Sheet>
     </div>
   );
 }

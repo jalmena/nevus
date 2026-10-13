@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -29,8 +29,9 @@ afterEach(() => vi.unstubAllGlobals());
 describe("webhooks", () => {
   it("lets an administrator add an ntfy webhook and test it", async () => {
     const state = installMockApi({ claimed: true, session: SESSION, persons: [PERSON] });
-    renderApp("/settings");
+    renderApp("/settings/webhooks");
     const user = userEvent.setup();
+    await user.click(await screen.findByRole("button", { name: "Add a webhook" }));
     await user.selectOptions(await screen.findByRole("combobox", { name: "Kind" }), "ntfy");
     expect(screen.getByText(/The topic address/)).toBeInTheDocument();
     await user.type(screen.getByLabelText("Address"), "https://ntfy.example/skin");
@@ -44,6 +45,8 @@ describe("webhooks", () => {
     await user.click(await screen.findByRole("button", { name: "Send a test to ntfy" }));
     expect(await screen.findByText("The test message arrived.")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Delete the webhook ntfy" }));
+    const confirm = await screen.findByRole("dialog", { name: "Delete the webhook?" });
+    await user.click(within(confirm).getByRole("button", { name: "Delete" }));
     await waitFor(() => expect(state.webhooks).toHaveLength(0));
   });
 });
@@ -51,14 +54,17 @@ describe("webhooks", () => {
 describe("calendar link", () => {
   it("shows the link once with a warning, and stops it", async () => {
     const state = installMockApi({ claimed: true, session: SESSION, persons: [PERSON] });
-    renderApp(`/persons/${PERSON.id}`);
+    renderApp(`/persons/${PERSON.id}/calendar`);
     const user = userEvent.setup();
     await user.click(await screen.findByRole("button", { name: "Make a calendar link" }));
     expect(await screen.findByLabelText("Calendar link")).toHaveValue(
       "http://localhost/api/calendar/secret-token-123.ics",
     );
     expect(screen.getByText(/This link is shown only now/)).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Stop the link" }));
+    await user.click(screen.getByRole("button", { name: "More" }));
+    await user.click(screen.getByRole("menuitem", { name: "Stop the link" }));
+    const confirm = await screen.findByRole("dialog", { name: "Stop the calendar link?" });
+    await user.click(within(confirm).getByRole("button", { name: "Stop the link" }));
     await waitFor(() => expect(state.calendar.exists).toBe(false));
     expect(await screen.findByRole("button", { name: "Make a calendar link" })).toBeInTheDocument();
   });

@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -49,12 +49,12 @@ describe("marks on the body map", () => {
     const user = userEvent.setup();
     const zone = await screen.findByRole("button", { name: "Right pectoral" });
     await user.click(zone);
-    expect(screen.getByRole("status")).toHaveTextContent("Right pectoral · Front");
+    expect(zone).toHaveAttribute("aria-pressed", "true");
     await user.click(zone); // the same zone again: deselected
-    expect(screen.getByRole("status")).toHaveTextContent("Tap a zone to select it.");
+    expect(zone).toHaveAttribute("aria-pressed", "false");
     await user.click(zone);
     await user.click(screen.getByRole("group", { name: /Body map/ })); // outside the body: deselected
-    expect(screen.getByRole("status")).toHaveTextContent("Tap a zone to select it.");
+    expect(zone).toHaveAttribute("aria-pressed", "false");
 
     await user.click(zone);
     const map = screen.getByRole("group", { name: /Body map/ });
@@ -78,7 +78,10 @@ describe("marks on the body map", () => {
     await i18n.changeLanguage("en");
     renderApp("/lesions/l1");
     const user = userEvent.setup();
-    await user.click(await screen.findByRole("button", { name: "Move the mark to the trash" }));
+    await user.click(await screen.findByRole("button", { name: "More" }));
+    await user.click(screen.getByRole("menuitem", { name: "Move the mark to the trash" }));
+    const confirm = await screen.findByRole("dialog", { name: "Move the mark to the trash?" });
+    await user.click(within(confirm).getByRole("button", { name: "Move the mark to the trash" }));
     expect(await screen.findByRole("heading", { name: "Ana" })).toBeInTheDocument();
     expect(state.lesions).toHaveLength(0);
     expect(screen.queryByRole("button", { name: "Shoulder mark" })).not.toBeInTheDocument();
@@ -118,7 +121,7 @@ describe("visits", () => {
     renderApp("/lesions/l1");
     const user = userEvent.setup();
     await user.click(await screen.findByRole("button", { name: "New visit" }));
-    expect(await screen.findByRole("heading", { name: "Photos" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Measurements" })).toBeInTheDocument();
     expect(state.observations).toHaveLength(1);
 
     const file = new File([new Uint8Array([0xff, 0xd8, 0xff, 0xd9])], "photo.jpg", { type: "image/jpeg" });
@@ -126,8 +129,8 @@ describe("visits", () => {
     await waitFor(() => expect(state.observations[0]?.images).toHaveLength(1));
     expect(await screen.findByRole("button", { name: "Open the photo" })).toBeInTheDocument();
 
-    await user.click(screen.getByLabelText("Itching"));
-    await user.type(screen.getByLabelText("Notes"), "Looks the same to me.");
+    await user.click(screen.getByRole("button", { name: "Itching" }));
+    await user.type(screen.getByRole("textbox", { name: "Notes" }), "Looks the same to me.");
     await user.click(screen.getByRole("button", { name: "Save" }));
     await waitFor(() => expect(state.observations[0]?.notes).toBe("Looks the same to me."));
     expect(state.observations[0]?.symptoms).toEqual(["itching"]);
@@ -165,7 +168,7 @@ describe("visits", () => {
     const items = await screen.findAllByRole("listitem");
     expect(items[0]).toHaveTextContent("1 photo");
     expect(items[0]).toHaveTextContent("Pain");
-    expect(items[1]).toHaveTextContent("First look");
+    expect(items[1]).toHaveTextContent("0 photos");
   });
 });
 
@@ -192,8 +195,11 @@ describe("quality warnings", () => {
     });
     await i18n.changeLanguage("en");
     renderApp("/observations/o1");
-    expect(await screen.findByText("Saved with quality warnings")).toBeInTheDocument();
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole("button", { name: "Blurry" }));
+    expect(await screen.findByRole("dialog", { name: "Quality note" })).toBeInTheDocument();
     expect(screen.getByText(/hold the phone steady/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Open the photo (has quality warnings)" })).toBeInTheDocument();
+    expect(screen.getByText("Kept as it is. Retake if you can.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Open the photo (has a quality note)" })).toBeInTheDocument();
   });
 });

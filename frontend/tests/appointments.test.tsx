@@ -55,8 +55,9 @@ afterEach(() => vi.unstubAllGlobals());
 describe("preparing an appointment", () => {
   it("plans one from the person's page and lists what to photograph", async () => {
     const state = install();
-    renderApp(`/persons/${PERSON.id}`);
+    renderApp(`/persons/${PERSON.id}/appointments`);
     const user = userEvent.setup();
+    await user.click(await screen.findByRole("button", { name: "Prepare an appointment" }));
     await user.type(await screen.findByLabelText("Date of the appointment"), "2026-10-20");
     await user.type(screen.getByLabelText("Note (optional)"), "Dermatology");
     await user.click(screen.getByRole("button", { name: "Prepare the appointment" }));
@@ -67,9 +68,9 @@ describe("preparing an appointment", () => {
       .getByRole("heading", { name: "To photograph before the appointment" })
       .closest("section");
     if (!todo) throw new Error("no checklist");
-    expect(within(todo).getByRole("link", { name: "Chest mark" })).toBeInTheDocument();
+    expect(within(todo).getByRole("link", { name: /Chest mark/ })).toBeInTheDocument();
     expect(within(todo).getByText("Never photographed")).toBeInTheDocument();
-    expect(within(todo).getByText("0 of 2 ready")).toBeInTheDocument();
+    expect(screen.getByText(/0 of 2 ready/)).toBeInTheDocument();
   });
 
   it("starts a visit of a mark from the list", async () => {
@@ -90,7 +91,7 @@ describe("preparing an appointment", () => {
     const buttons = await screen.findAllByRole("button", { name: "Photograph now" });
     await user.click(buttons[0] as HTMLElement);
     await waitFor(() => expect(state.observations.length).toBe(2));
-    expect(await screen.findByRole("heading", { name: "Photos" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Measurements" })).toBeInTheDocument();
   });
 
   it("makes the appointment's report and offers it", async () => {
@@ -108,6 +109,7 @@ describe("preparing an appointment", () => {
     });
     renderApp("/appointments/a1");
     const user = userEvent.setup();
+    await user.click(await screen.findByRole("button", { name: /Report for the appointment/ }));
     await user.selectOptions(await screen.findByRole("combobox", { name: "Language" }), "es");
     await user.click(screen.getByRole("button", { name: "Make the report" }));
     await waitFor(() => expect(state.reports[0]?.scope).toBe("visit"));

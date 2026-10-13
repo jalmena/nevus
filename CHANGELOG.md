@@ -1,3 +1,15 @@
+## v1.3.0 (2026-10-14)
+
+### Feat
+
+- **design**: the third pass: app bar, rows, one primary action, sheets and menus
+- **design-system**: icon button, overflow menu, sheet, chip and page header
+
+### Fix
+
+- **design**: the evaluation's fixes: spacing, the map's height, status lines, one date format, the rail everywhere
+- **design**: the action bar keeps its height, the settings rows carry their status, the bars are landmarks
+
 ## v1.2.0 (2026-10-05)
 
 ### Feat

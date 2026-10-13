@@ -7,6 +7,7 @@ import {
   type PointerEvent,
   type WheelEvent,
 } from "react";
+import { Expand, ZoomIn, ZoomOut } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   MAP_HEIGHT,
@@ -383,20 +384,32 @@ export function BodyMap({
         )}
       </svg>
       <div className={styles.zoom}>
-        <button type="button" onClick={() => zoom(1.5)} aria-label={t("bodymap.zoomIn")}>
-          +
-        </button>
         <button
           type="button"
-          onClick={() => zoom(1 / 1.5)}
-          aria-label={t("bodymap.zoomOut")}
-          disabled={vb.w >= MAP_WIDTH}
+          onClick={() => zoom(1.5)}
+          aria-label={t("bodymap.zoomIn")}
+          title={t("bodymap.zoomIn")}
         >
-          −
+          <ZoomIn aria-hidden="true" />
         </button>
         {vb.w < MAP_WIDTH && (
-          <button type="button" onClick={showAll} aria-label={t("bodymap.zoomReset")}>
-            ⤢
+          <button
+            type="button"
+            onClick={() => zoom(1 / 1.5)}
+            aria-label={t("bodymap.zoomOut")}
+            title={t("bodymap.zoomOut")}
+          >
+            <ZoomOut aria-hidden="true" />
+          </button>
+        )}
+        {vb.w < MAP_WIDTH && (
+          <button
+            type="button"
+            onClick={showAll}
+            aria-label={t("bodymap.zoomReset")}
+            title={t("bodymap.zoomReset")}
+          >
+            <Expand aria-hidden="true" />
           </button>
         )}
       </div>

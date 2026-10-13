@@ -93,4 +93,10 @@ The brand assets under `docs/design/brand/identity/` contain glyph outlines deri
 | B612 | Copyright 2012 The B612 Project Authors (https://github.com/polarsys/b612) | SIL OFL 1.1 ([`docs/design/brand/identity/licences/OFL-B612.txt`](docs/design/brand/identity/licences/OFL-B612.txt)) | wordmark outlines |
 | Epilogue | Copyright 2020 The Epilogue Project Authors (https://github.com/Etcetera-Type-Co/Epilogue) | SIL OFL 1.1 ([`docs/design/brand/identity/licences/OFL-Epilogue.txt`](docs/design/brand/identity/licences/OFL-Epilogue.txt)) | interface typeface; static 400/500/600 subsets embedded in PDF reports (`backend/src/nevus/reports/fonts/`, licence alongside); tagline outlines |
 
+## Icons
+
+| Set | Copyright | Licence | Used for |
+| --- | --- | --- | --- |
+| Lucide (`lucide-react`) | Copyright (c) for portions of Lucide are held by Cole Bemis 2013-2022 as part of Feather (MIT); all other copyright (c) for Lucide are held by Lucide Contributors 2022 | ISC (https://github.com/lucide-icons/lucide/blob/main/LICENSE) | the interface's outline icons, bundled with the frontend |
+
 The container image also installs DejaVu Sans from Debian (`fonts-dejavu-core`, Bitstream Vera and DejaVu licences, permissive) as the fallback for characters a report's notes may contain that Epilogue does not cover; when used, the PDF embeds the glyphs it needs.

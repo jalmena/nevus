@@ -8,6 +8,8 @@ export function Segmented<T extends string>({
   value,
   onChange,
   wide = false,
+  disabledValues = [],
+  disabledHint,
 }: {
   label: string;
   options: readonly { value: T; label: string }[];
@@ -15,6 +17,9 @@ export function Segmented<T extends string>({
   onChange: (value: T) => void;
   /** Fill the row, sharing the width equally (for longer labels on phones). */
   wide?: boolean;
+  /** Choices that cannot be made now; `disabledHint` says why. */
+  disabledValues?: readonly T[];
+  disabledHint?: string;
 }) {
   const group = useRef<HTMLDivElement>(null);
 
@@ -22,8 +27,9 @@ export function Segmented<T extends string>({
     const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[event.key];
     if (step === undefined) return;
     event.preventDefault();
-    const index = options.findIndex((option) => option.value === value);
-    const next = options[(index + step + options.length) % options.length];
+    const enabled = options.filter((option) => !disabledValues.includes(option.value));
+    const index = enabled.findIndex((option) => option.value === value);
+    const next = enabled[(index + step + enabled.length) % enabled.length];
     if (!next) return;
     onChange(next.value);
     group.current?.querySelector<HTMLButtonElement>(`[data-value="${next.value}"]`)?.focus();
@@ -45,6 +51,8 @@ export function Segmented<T extends string>({
           aria-checked={option.value === value}
           tabIndex={option.value === value ? 0 : -1}
           className={option.value === value ? styles.active : undefined}
+          disabled={disabledValues.includes(option.value)}
+          title={disabledValues.includes(option.value) ? disabledHint : undefined}
           onClick={() => onChange(option.value)}
           onKeyDown={onKeyDown}
         >

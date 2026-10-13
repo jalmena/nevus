@@ -3,23 +3,52 @@
   gap: var(--space-4);
 }
 
-.page h1 {
-  font-size: var(--text-2xl);
-}
-
 .pickers {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
-  gap: var(--space-3);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  max-width: 44rem;
 }
 
+/* A menu button: which photo is on each side; opens the list of visits. */
 .picker {
-  display: grid;
-  gap: var(--space-1);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: 0 var(--space-3);
+  text-align: left;
 }
 
-.picker select {
-  min-height: var(--touch-target);
+.picker > svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--color-ink-3);
+}
+
+.pickerSide {
+  flex: none;
+  color: var(--color-ink-2);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-emphasis);
+}
+
+.pickerValue {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.legendLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--space-2);
+  font-size: var(--text-sm);
 }
 
 .sideBySide {

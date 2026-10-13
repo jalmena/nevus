@@ -13,6 +13,14 @@ function page<Name extends string>(load: () => Promise<Record<Name, ComponentTyp
 }
 
 const PersonPage = page(() => import("@/features/persons/PersonPage"), "PersonPage");
+const PersonToolPage = lazy(() =>
+  import("@/features/persons/PersonToolPage").then((module) => ({ default: module.PersonToolPage })),
+);
+const LesionReportsPage = page(() => import("@/features/lesions/LesionReportsPage"), "LesionReportsPage");
+const SettingsSectionPage = page(
+  () => import("@/features/settings/SettingsSectionPage"),
+  "SettingsSectionPage",
+);
 const LesionPage = page(() => import("@/features/lesions/LesionPage"), "LesionPage");
 const ObservationPage = page(() => import("@/features/lesions/ObservationPage"), "ObservationPage");
 const ComparePage = page(() => import("@/features/compare/ComparePage"), "ComparePage");
@@ -54,7 +62,13 @@ export function AppRoutes() {
       >
         <Route index element={<HomePage />} />
         <Route path="persons/:personId" element={<PersonPage />} />
+        <Route path="persons/:personId/appointments" element={<PersonToolPage tool="appointments" />} />
+        <Route path="persons/:personId/sessions" element={<PersonToolPage tool="sessions" />} />
+        <Route path="persons/:personId/reports" element={<PersonToolPage tool="reports" />} />
+        <Route path="persons/:personId/calendar" element={<PersonToolPage tool="calendar" />} />
+        <Route path="persons/:personId/profile" element={<PersonToolPage tool="profile" />} />
         <Route path="lesions/:lesionId" element={<LesionPage />} />
+        <Route path="lesions/:lesionId/reports" element={<LesionReportsPage />} />
         <Route path="lesions/:lesionId/compare" element={<ComparePage />} />
         <Route path="observations/:observationId" element={<ObservationPage />} />
         <Route path="observations/:observationId/measure/:imageId" element={<MeasurePage />} />
@@ -65,6 +79,7 @@ export function AppRoutes() {
         <Route path="evaluation" element={<EvaluationPage />} />
         <Route path="evaluation/:imageId" element={<LabelPage />} />
         <Route path="settings" element={<SettingsPage />} />
+        <Route path="settings/:section" element={<SettingsSectionPage />} />
         <Route path="trash" element={<TrashPage />} />
       </Route>
     </Routes>

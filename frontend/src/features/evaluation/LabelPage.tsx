@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useParams } from "react-router";
+import { useParams } from "react-router";
 import { Button } from "@/design-system/components/Button";
 import { Notice } from "@/design-system/components/Notice";
+import { PageHeader } from "@/design-system/components/PageHeader";
 import { Segmented } from "@/design-system/components/Segmented";
 import { PhotoCanvas, useCanvas } from "@/features/measure/PhotoCanvas";
 import { useDeleteLabel, useEvaluationPhotos, useSaveLabel, type Outline } from "@/lib/evaluation";
@@ -48,11 +49,11 @@ export function LabelPage() {
 
   return (
     <div className={styles.page}>
-      <p>
-        <Link to="/evaluation">{t("evaluation.backToList")}</Link>
-      </p>
-      <h1>{t("evaluation.labelTitle")}</h1>
-      <p className="text-secondary">{t("evaluation.labelIntro")}</p>
+      <PageHeader
+        back={{ to: "/evaluation", label: t("evaluation.title") }}
+        title={t("evaluation.labelTitle")}
+        help={{ title: t("evaluation.labelTitle"), content: <p>{t("evaluation.labelIntro")}</p> }}
+      />
       <Segmented
         label={t("evaluation.tool")}
         options={[

@@ -1,12 +1,23 @@
 import type { TFunction } from "i18next";
-import { useState } from "react";
+import { Camera, EyeOff, Undo2 } from "lucide-react";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router";
 import { Button } from "@/design-system/components/Button";
+import { Help } from "@/design-system/components/Help";
 import { Notice } from "@/design-system/components/Notice";
+import { PageHeader } from "@/design-system/components/PageHeader";
+import { Row, RowList, Thumb } from "@/design-system/components/Row";
+import { Select } from "@/design-system/components/Select";
+import { Sheet } from "@/design-system/components/Sheet";
+import { StatusChip } from "@/design-system/components/StatusChip";
 import { TextField } from "@/design-system/components/TextField";
 import { zoneName } from "@/features/lesions/lesionName";
 import { PhotoCanvas, useCanvas } from "@/features/measure/PhotoCanvas";
+import { shortDate } from "@/lib/dates";
+import { personRail } from "@/features/persons/personRail";
+import { useConfirm } from "@/lib/confirm/ConfirmProvider";
+import { usePerson } from "@/lib/persons";
 import { imageUrl } from "@/lib/images";
 import { useLesions, type LesionOut } from "@/lib/lesions";
 import type { Point } from "@/lib/measurements";
@@ -17,6 +28,7 @@ import {
   useDeleteMark,
   useProtocol,
   useUpdateMark,
+  useZonePhoto,
   type MarkOut,
 } from "@/lib/sessions";
 import styles from "./sessions.module.css";
@@ -34,14 +46,18 @@ const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 /** One zone photo of a session: the marks on it, placed by the person or proposed, linked to the registry. */
 export function ZonePage() {
   const { sessionId = "", zone: zoneId = "" } = useParams();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const confirm = useConfirm();
   const session = useBodySession(sessionId);
   const protocol = useProtocol();
   const lesions = useLesions(session.data?.person_id ?? "");
+  const person = usePerson(session.data?.person_id ?? "");
   const add = useAddMark(sessionId, zoneId);
   const update = useUpdateMark();
   const remove = useDeleteMark();
   const blur = useBlurZone(sessionId, zoneId);
+  const retake = useZonePhoto(sessionId);
+  const camera = useRef<HTMLInputElement>(null);
   const [draft, setDraft] = useState<Point | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [blurring, setBlurring] = useState(false);
@@ -61,6 +77,10 @@ export function ZonePage() {
   const named = (id: string | null) => {
     const lesion = all.find((item) => item.id === id);
     return lesion ? title(lesion) : "";
+  };
+  const zoneOf = (id: string | null) => {
+    const lesion = all.find((item) => item.id === id);
+    return lesion ? zoneName(lesion.location.zone, t) : undefined;
   };
   const width = zone.upright_width ?? 1;
   const height = zone.upright_height ?? 1;
@@ -104,6 +124,15 @@ export function ZonePage() {
     setRegions([]);
   }
 
+  function applyBlur() {
+    void confirm({
+      title: t("sessions.blurQuestion"),
+      text: t("sessions.blurNoteMore"),
+      action: t("sessions.blurApply", { count: regions.length }),
+      danger: true,
+    }).then((yes) => yes && blur.mutate({ regions }, { onSuccess: stopBlurring }));
+  }
+
   const hint = blurring
     ? t("sessions.blurHint")
     : canEdit
@@ -112,144 +141,183 @@ export function ZonePage() {
 
   return (
     <div className={[styles.page, "page-wide"].join(" ")}>
-      <p>
-        <Link to={`/sessions/${sessionId}`}>{t("sessions.backToSession")}</Link>
-      </p>
-      <h1>{regionName}</h1>
-      <p className="text-secondary">{hint}</p>
-      {zone.analysing && (
-        <p className="text-secondary" role="status">
-          {t("sessions.analysing")}
+      <PageHeader
+        back={{
+          to: `/sessions/${sessionId}`,
+          label: t("sessions.titleFor", { date: shortDate(i18n.resolvedLanguage, session.data.started_at) }),
+        }}
+        title={regionName}
+        rail={personRail(t, session.data.person_id, person.data?.display_name)}
+        meta={[zone.analysing ? t("sessions.analysing") : null]}
+        actions={
+          blurring
+            ? [
+                {
+                  key: "undo",
+                  label: t("sessions.blurUndo"),
+                  icon: <Undo2 />,
+                  disabled: regions.length === 0,
+                  onClick: () => setRegions((current) => current.slice(0, -1)),
+                },
+              ]
+            : []
+        }
+        primary={
+          blurring
+            ? {
+                label: t("sessions.blurApply", { count: regions.length }),
+                disabled: regions.length === 0,
+                pending: blur.isPending,
+                onClick: applyBlur,
+              }
+            : undefined
+        }
+        secondary={blurring ? { label: t("common.cancel"), onClick: stopBlurring } : undefined}
+        menu={
+          canEdit && zone.image_id && !blurring
+            ? [
+                { label: t("sessions.blur"), icon: <EyeOff />, onSelect: startBlurring },
+                { label: t("sessions.retake"), icon: <Camera />, onSelect: () => camera.current?.click() },
+              ]
+            : []
+        }
+      >
+        <p className={["text-secondary", styles.hint].join(" ")}>
+          {hint}
+          {blurring && (
+            <>
+              {" "}
+              {t("sessions.blurNote")}
+              <Help title={t("sessions.blurTitle")} as="text">
+                <p>{t("sessions.blurNoteMore")}</p>
+              </Help>
+            </>
+          )}
         </p>
+      </PageHeader>
+      {canEdit && (
+        <input
+          ref={camera}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className={styles.hiddenInput}
+          aria-label={t("sessions.retake")}
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            event.target.value = "";
+            if (file) retake.mutate({ zone: zoneId, file });
+          }}
+        />
       )}
+      {(blur.error ?? retake.error ?? update.error ?? remove.error) && (
+        <Notice kind="error">{(blur.error ?? retake.error ?? update.error ?? remove.error)?.message}</Notice>
+      )}
+
       <div className={styles.layout}>
         <div className={styles.photoPane}>
           {zone.image_id ? (
-            <PhotoCanvas
-              src={imageUrl(zone.image_id, "full")}
-              width={width}
-              height={height}
-              label={t("sessions.canvas", { zone: regionName })}
-              onTap={place}
-            >
-              {regions.map((region, index) => (
-                <rect
-                  key={index}
-                  x={region.x * width}
-                  y={region.y * height}
-                  width={region.width * width}
-                  height={region.height * height}
-                  className={styles.blurRegion}
-                />
-              ))}
-              {zone.marks.map((item, index) => (
-                <Dot
-                  key={item.id}
-                  mark={item}
-                  index={index + 1}
-                  x={item.x * width}
-                  y={item.y * height}
-                  selected={item.id === selected}
-                />
-              ))}
-              {draft && <Dot index={0} x={draft.x * width} y={draft.y * height} selected />}
-              {corner && <Dot index={0} x={corner.x * width} y={corner.y * height} selected />}
-            </PhotoCanvas>
+            <div className={styles.canvasFrame}>
+              <PhotoCanvas
+                src={imageUrl(zone.image_id, "full")}
+                width={width}
+                height={height}
+                label={t("sessions.canvas", { zone: regionName })}
+                onTap={place}
+              >
+                {regions.map((region, index) => (
+                  <rect
+                    key={index}
+                    x={region.x * width}
+                    y={region.y * height}
+                    width={region.width * width}
+                    height={region.height * height}
+                    className={styles.blurRegion}
+                  />
+                ))}
+                {zone.marks.map((item, index) => (
+                  <Dot
+                    key={item.id}
+                    mark={item}
+                    index={index + 1}
+                    x={item.x * width}
+                    y={item.y * height}
+                    selected={item.id === selected}
+                  />
+                ))}
+                {draft && <Dot index={0} x={draft.x * width} y={draft.y * height} selected />}
+                {corner && <Dot index={0} x={corner.x * width} y={corner.y * height} selected />}
+              </PhotoCanvas>
+            </div>
           ) : (
             <Notice kind="info">{t("sessions.noPhoto")}</Notice>
           )}
-
-          {canEdit && zone.image_id && !blurring && !draft && (
-            <div>
-              <Button variant="quiet" onClick={startBlurring}>
-                {t("sessions.blur")}
-              </Button>
-            </div>
-          )}
-
-          {blurring && (
-            <section className={styles.panel} aria-labelledby="blur-heading">
-              <h2 id="blur-heading">{t("sessions.blurTitle")}</h2>
-              <p className="text-secondary">{t("sessions.blurNote")}</p>
-              <div className={styles.row}>
-                <Button
-                  onClick={() => blur.mutate({ regions }, { onSuccess: stopBlurring })}
-                  disabled={regions.length === 0 || blur.isPending}
-                >
-                  {t("sessions.blurApply", { count: regions.length })}
-                </Button>
-                <Button
-                  variant="secondary"
-                  onClick={() => setRegions((current) => current.slice(0, -1))}
-                  disabled={regions.length === 0}
-                >
-                  {t("sessions.blurUndo")}
-                </Button>
-                <Button variant="quiet" onClick={stopBlurring}>
-                  {t("common.cancel")}
-                </Button>
-              </div>
-              {blur.error && <Notice kind="error">{blur.error.message}</Notice>}
-            </section>
-          )}
         </div>
         <div className={styles.dataPane}>
-          {draft && canEdit && !blurring && (
-            <NewMarkForm
-              covers={covers}
-              lesions={here}
-              title={title}
-              pending={add.isPending}
-              error={add.error?.message}
-              onCancel={() => setDraft(null)}
-              onSave={(link) => add.mutate({ ...draft, ...link }, { onSuccess: () => setDraft(null) })}
-            />
-          )}
-
           {zone.marks.length > 0 && (
-            <section className={styles.section} aria-labelledby="marks-heading">
-              <h2 id="marks-heading">{t("sessions.marksTitle")}</h2>
-              <ol className={styles.marks}>
-                {zone.marks.map((item, index) => (
-                  <li key={item.id}>
-                    <button
-                      type="button"
-                      className={[styles.markButton, item.id === selected ? styles.markSelected : ""].join(
-                        " ",
-                      )}
-                      onClick={() => {
-                        setSelected(item.id);
-                        setDraft(null);
-                      }}
-                    >
-                      <img src={item.crop_url} alt="" />
-                      <span>
-                        {index + 1}. {describe(item, named, t)}
-                      </span>
-                    </button>
-                  </li>
-                ))}
-              </ol>
-            </section>
-          )}
-
-          {mark && canEdit && (
-            <MarkPanel
-              mark={mark}
-              covers={covers}
-              lesions={here}
-              title={title}
-              named={named}
-              busy={update.isPending || remove.isPending}
-              onUpdate={(body) => update.mutate({ id: mark.id, body })}
-              onRemove={() => remove.mutate(mark.id, { onSuccess: () => setSelected(null) })}
-            />
-          )}
-          {(update.error ?? remove.error) && (
-            <Notice kind="error">{(update.error ?? remove.error)?.message}</Notice>
+            <RowList label={t("sessions.marksTitle")}>
+              {zone.marks.map((item, index) => (
+                <Row
+                  key={item.id}
+                  onClick={() => {
+                    setSelected(item.id);
+                    setDraft(null);
+                  }}
+                  selected={item.id === selected}
+                  leading={<Thumb src={item.crop_url} />}
+                  title={`${index + 1}. ${describe(item, named, t)}`}
+                  meta={
+                    item.source === "candidate" && item.state === "pending"
+                      ? t("proposals.experimental")
+                      : zoneOf(item.lesion_id)
+                  }
+                />
+              ))}
+            </RowList>
           )}
         </div>
       </div>
+
+      <Sheet
+        open={draft !== null && canEdit && !blurring}
+        title={t("sessions.newMarkTitle")}
+        onClose={() => setDraft(null)}
+      >
+        {draft && (
+          <LinkChooser
+            covers={covers}
+            lesions={here}
+            title={title}
+            pending={add.isPending}
+            error={add.error?.message}
+            onCancel={() => setDraft(null)}
+            onLink={(link) => add.mutate({ ...draft, ...link }, { onSuccess: () => setDraft(null) })}
+          />
+        )}
+      </Sheet>
+      <Sheet
+        open={mark !== null && canEdit}
+        title={
+          mark?.source === "candidate" && mark.state === "pending"
+            ? t("sessions.proposalTitle")
+            : t("sessions.markTitle")
+        }
+        onClose={() => setSelected(null)}
+      >
+        {mark && (
+          <MarkPanel
+            mark={mark}
+            covers={covers}
+            lesions={here}
+            title={title}
+            named={named}
+            busy={update.isPending || remove.isPending}
+            onUpdate={(body) => update.mutate({ id: mark.id, body }, { onSuccess: () => setSelected(null) })}
+            onRemove={() => remove.mutate(mark.id, { onSuccess: () => setSelected(null) })}
+            onClose={() => setSelected(null)}
+          />
+        )}
+      </Sheet>
     </div>
   );
 }
@@ -298,100 +366,99 @@ function Dot({
 
 type MarkLink = { lesion_id: string } | { new_mark: { zone_code: string; label: string | null } };
 
-function NewMarkForm({
+/** A radio list of the marks the region covers, and "a new mark"; one primary for the choice made. */
+function LinkChooser({
   covers,
   lesions,
   title,
   pending,
   error,
+  initial,
   onCancel,
-  onSave,
+  onLink,
+  extra,
 }: {
   covers: string[];
   lesions: LesionOut[];
   title: (lesion: LesionOut) => string;
   pending: boolean;
   error?: string;
+  /** The mark linked today, when there is one. */
+  initial?: string | null;
   onCancel: () => void;
-  onSave: (link: MarkLink) => void;
-}) {
-  const { t } = useTranslation();
-  return (
-    <section className={styles.panel} aria-labelledby="new-mark-heading">
-      <h2 id="new-mark-heading">{t("sessions.newMarkTitle")}</h2>
-      <LinkChooser covers={covers} lesions={lesions} title={title} pending={pending} onLink={onSave} />
-      {error && <Notice kind="error">{error}</Notice>}
-      <div>
-        <Button variant="quiet" onClick={onCancel}>
-          {t("common.cancel")}
-        </Button>
-      </div>
-    </section>
-  );
-}
-
-function LinkChooser({
-  covers,
-  lesions,
-  title,
-  pending,
-  onLink,
-}: {
-  covers: string[];
-  lesions: LesionOut[];
-  title: (lesion: LesionOut) => string;
-  pending: boolean;
   onLink: (link: MarkLink) => void;
+  extra?: React.ReactNode;
 }) {
   const { t } = useTranslation();
-  const [chosen, setKnown] = useState("");
-  // The marks may arrive after the chooser opens: until one is chosen, the first is.
-  const known = chosen || lesions[0]?.id || "";
+  const [chosen, setChosen] = useState<string>(initial ?? (lesions.length > 0 ? "" : "new"));
+  const choice = chosen || lesions[0]?.id || "new";
   const [zoneChosen, setZone] = useState("");
   const zone = zoneChosen || covers[0] || "";
   const [label, setLabel] = useState("");
+  const isNew = choice === "new";
   return (
     <div className={styles.chooser}>
-      {lesions.length > 0 && (
-        <div className={styles.row}>
-          <label className={styles.field}>
-            <span>{t("sessions.knownMark")}</span>
-            <select value={known} onChange={(e) => setKnown(e.target.value)}>
-              {lesions.map((lesion) => (
-                <option key={lesion.id} value={lesion.id}>
-                  {title(lesion)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <Button onClick={() => onLink({ lesion_id: known })} disabled={pending || !known}>
-            {t("sessions.linkKnown")}
-          </Button>
+      <div className={styles.choices} role="radiogroup" aria-label={t("sessions.knownMark")}>
+        {lesions.map((lesion) => (
+          <div key={lesion.id} className={styles.choiceItem}>
+            <button
+              type="button"
+              role="radio"
+              aria-checked={choice === lesion.id}
+              className={[styles.choice, choice === lesion.id ? styles.choiceSelected : ""].join(" ")}
+              onClick={() => setChosen(lesion.id)}
+            >
+              <Thumb
+                src={lesion.latest_image_id ? imageUrl(lesion.latest_image_id, "thumb") : null}
+                size={40}
+              />
+              <span>{title(lesion)}</span>
+            </button>
+          </div>
+        ))}
+        <div className={styles.choiceItem}>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={isNew}
+            className={[styles.choice, isNew ? styles.choiceSelected : ""].join(" ")}
+            onClick={() => setChosen("new")}
+          >
+            <span>{t("sessions.newMarkChoice")}</span>
+          </button>
         </div>
+      </div>
+      {isNew && (
+        <>
+          <Select
+            label={t("sessions.newMarkZone")}
+            value={zone}
+            onChange={(e) => setZone(e.target.value)}
+            options={covers.map((code) => ({ value: code, label: zoneName(code, t) }))}
+          />
+          <TextField
+            label={t("sessions.newMarkName")}
+            value={label}
+            onChange={(e) => setLabel(e.target.value)}
+            maxLength={120}
+          />
+        </>
       )}
-      <div className={styles.row}>
-        <label className={styles.field}>
-          <span>{t("sessions.newMarkZone")}</span>
-          <select value={zone} onChange={(e) => setZone(e.target.value)}>
-            {covers.map((code) => (
-              <option key={code} value={code}>
-                {zoneName(code, t)}
-              </option>
-            ))}
-          </select>
-        </label>
-        <TextField
-          label={t("sessions.newMarkName")}
-          value={label}
-          onChange={(e) => setLabel(e.target.value)}
-          maxLength={120}
-        />
+      {error && <Notice kind="error">{error}</Notice>}
+      <div className={styles.sheetActions}>
+        {extra}
+        <Button type="button" variant="quiet" onClick={onCancel}>
+          {t("common.cancel")}
+        </Button>
         <Button
-          variant="secondary"
-          onClick={() => onLink({ new_mark: { zone_code: zone, label: label.trim() || null } })}
-          disabled={pending || !zone}
+          onClick={() =>
+            isNew
+              ? onLink({ new_mark: { zone_code: zone, label: label.trim() || null } })
+              : onLink({ lesion_id: choice })
+          }
+          disabled={pending || (isNew && !zone)}
         >
-          {t("sessions.recordNew")}
+          {isNew ? t("sessions.recordNew") : t("sessions.linkKnown")}
         </Button>
       </div>
     </div>
@@ -407,6 +474,7 @@ function MarkPanel({
   busy,
   onUpdate,
   onRemove,
+  onClose,
 }: {
   mark: MarkOut;
   covers: string[];
@@ -420,51 +488,61 @@ function MarkPanel({
     new_mark?: { zone_code: string; label: string | null };
   }) => void;
   onRemove: () => void;
+  onClose: () => void;
 }) {
   const { t } = useTranslation();
   const proposal = mark.source === "candidate" && mark.state === "pending";
   return (
-    <section className={styles.panel} aria-labelledby="mark-heading">
-      <h2 id="mark-heading">
-        {proposal ? t("sessions.proposalTitle") : t("sessions.markTitle")}{" "}
-        {proposal && <span className={styles.experimental}>{t("proposals.experimental")}</span>}
-      </h2>
-      <img className={styles.crop} src={mark.crop_url} alt={t("sessions.cropAlt")} />
+    <div className={styles.chooser}>
+      <div className={styles.cropRow}>
+        <img className={styles.crop} src={mark.crop_url} alt={t("sessions.cropAlt")} />
+        {proposal && <StatusChip kind="experimental">{t("proposals.experimental")}</StatusChip>}
+      </div>
       {proposal && mark.lesion_id && (
-        <div className={styles.row}>
-          <p>
-            {mark.match === "uncertain"
-              ? t("sessions.proposedUncertain", { name: named(mark.lesion_id) })
-              : t("sessions.proposedMatched", { name: named(mark.lesion_id) })}
-          </p>
+        <p>
+          {mark.match === "uncertain"
+            ? t("sessions.proposedUncertain", { name: named(mark.lesion_id) })
+            : t("sessions.proposedMatched", { name: named(mark.lesion_id) })}
+        </p>
+      )}
+      {proposal && mark.lesion_id ? (
+        <div className={styles.sheetActions}>
+          <Button variant="secondary" onClick={() => onUpdate({ state: "rejected" })} disabled={busy}>
+            {t("sessions.rejectProposal")}
+          </Button>
           <Button onClick={() => onUpdate({ state: "confirmed" })} disabled={busy}>
             {t("sessions.confirmMatch")}
           </Button>
         </div>
+      ) : (
+        <>
+          {!proposal && mark.lesion_id && (
+            <p>
+              <Link to={`/lesions/${mark.lesion_id}`}>{named(mark.lesion_id)}</Link>
+            </p>
+          )}
+          <LinkChooser
+            covers={covers}
+            lesions={lesions}
+            title={title}
+            pending={busy}
+            initial={mark.lesion_id}
+            onCancel={onClose}
+            onLink={(link) => onUpdate(link)}
+            extra={
+              proposal ? (
+                <Button variant="quiet" onClick={() => onUpdate({ state: "rejected" })} disabled={busy}>
+                  {t("sessions.rejectProposal")}
+                </Button>
+              ) : (
+                <Button variant="quiet" onClick={onRemove} disabled={busy}>
+                  {t("sessions.removeMark")}
+                </Button>
+              )
+            }
+          />
+        </>
       )}
-      {!proposal && mark.lesion_id && (
-        <p>
-          <Link to={`/lesions/${mark.lesion_id}`}>{named(mark.lesion_id)}</Link>
-        </p>
-      )}
-      <LinkChooser
-        covers={covers}
-        lesions={lesions}
-        title={title}
-        pending={busy}
-        onLink={(link) => onUpdate(link)}
-      />
-      <div className={styles.row}>
-        {proposal ? (
-          <Button variant="quiet" onClick={() => onUpdate({ state: "rejected" })} disabled={busy}>
-            {t("sessions.rejectProposal")}
-          </Button>
-        ) : (
-          <Button variant="quiet" onClick={onRemove} disabled={busy}>
-            {t("sessions.removeMark")}
-          </Button>
-        )}
-      </div>
-    </section>
+    </div>
   );
 }

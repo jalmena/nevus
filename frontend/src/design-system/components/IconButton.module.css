@@ -1,0 +1,61 @@
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-width: var(--touch-target);
+  padding: 0 var(--space-3);
+}
+
+.icon {
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+}
+
+.icon > svg {
+  width: 20px;
+  height: 20px;
+}
+
+.text {
+  white-space: nowrap;
+}
+
+.textHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.textDesktop {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (width >= 900px) {
+  .textDesktop {
+    position: static;
+    width: auto;
+    height: auto;
+    clip-path: none;
+  }
+}
+
+.quiet {
+  border-radius: var(--radius-pill);
+  color: var(--color-ink-2);
+}
+
+.quiet:hover,
+.quiet:focus-visible {
+  background: var(--color-surface-2);
+  color: var(--color-ink);
+}

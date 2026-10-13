@@ -40,9 +40,10 @@ describe("reminders", () => {
     expect(link).toHaveTextContent("Ana");
     const user = userEvent.setup();
     await user.click(link);
-    await user.click(await screen.findByRole("button", { name: "In a week" }));
+    await user.click(await screen.findByRole("button", { name: "More" }));
+    await user.click(await screen.findByRole("menuitem", { name: "Remind me in a week" }));
     await waitFor(() => expect(state.lesions[0]?.snoozed_until).toBe("2026-10-08"));
-    expect(await screen.findByText(/Reminder snoozed until/)).toBeInTheDocument();
+    expect(await screen.findByText(/snoozed until/)).toBeInTheDocument();
   });
 
   it("shows email delivery settings to administrators only", async () => {
@@ -51,20 +52,22 @@ describe("reminders", () => {
       session: { username: "jose", language: "en", theme: "system", role: "admin" },
     });
     await i18n.changeLanguage("en");
-    const { unmount } = renderApp("/settings");
-    expect(
-      await screen.findByRole("heading", { name: "Email delivery (administrator)" }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole("checkbox", { name: "Send me a daily email when marks are due" })).toBeDisabled();
+    const { unmount } = renderApp("/settings/email");
+    expect(await screen.findByRole("heading", { name: "Email delivery" })).toBeInTheDocument();
     unmount();
+    const reminders = renderApp("/settings/reminders");
+    expect(
+      await screen.findByRole("switch", { name: "Send me a daily email when marks are due" }),
+    ).toBeDisabled();
+    reminders.unmount();
     vi.unstubAllGlobals();
     installMockApi({
       claimed: true,
       session: { username: "ana", language: "en", theme: "system", role: "member" },
     });
-    renderApp("/settings");
-    expect(await screen.findByRole("heading", { name: "Reminders" })).toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: "Email delivery (administrator)" })).not.toBeInTheDocument();
+    renderApp("/settings/email");
+    expect(await screen.findByRole("heading", { name: "Settings" })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Email delivery/ })).not.toBeInTheDocument();
   });
 });
 

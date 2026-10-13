@@ -1,12 +1,19 @@
+import { Check, Circle, RotateCcw, Scaling } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate, useParams, useSearchParams } from "react-router";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import { Button } from "@/design-system/components/Button";
+import { IconButton } from "@/design-system/components/IconButton";
 import { Notice } from "@/design-system/components/Notice";
+import { PageHeader } from "@/design-system/components/PageHeader";
+import { Select } from "@/design-system/components/Select";
 import { TextField } from "@/design-system/components/TextField";
+import { shortDate } from "@/lib/dates";
 import { useSession } from "@/lib/auth/session";
 import { imageUrl } from "@/lib/images";
-import { useObservation } from "@/lib/lesions";
+import { personRail } from "@/features/persons/personRail";
+import { useLesion, useObservation } from "@/lib/lesions";
+import { usePerson } from "@/lib/persons";
 import {
   COINS,
   formatMm,
@@ -15,24 +22,27 @@ import {
   useCreateMeasurement,
   useFit,
   useImageScale,
-  type Circle,
+  type Circle as CircleShape,
   type Denomination,
   type MeasurementIn,
   type MeasurementPreview,
   type Point,
 } from "@/lib/measurements";
-import { Handle, PhotoCanvas, useCanvas } from "./PhotoCanvas";
 import { useProposals } from "@/lib/proposals";
+import { Handle, PhotoCanvas, useCanvas } from "./PhotoCanvas";
 import styles from "./measure.module.css";
 
-type Shape = { type: "outline"; points: number[][] } | ({ type: "circle" } & Circle);
+type Shape = { type: "outline"; points: number[][] } | ({ type: "circle" } & CircleShape);
 
+/** Measuring a mark on one photo: first the scale (the card, a coin or a known length), then the mark. */
 export function MeasurePage() {
   const { observationId = "", imageId = "" } = useParams();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const session = useSession();
   const observation = useObservation(observationId);
+  const lesion = useLesion(observation.data?.lesion_id ?? "");
+  const person = usePerson(lesion.data?.person_id ?? "");
   const scale = useImageScale(imageId);
   const fit = useFit(imageId);
   const addReference = useAddScaleReference(imageId);
@@ -42,12 +52,12 @@ export function MeasurePage() {
   const [step, setStep] = useState<"scale" | "mark">("scale");
   const [referenceId, setReferenceId] = useState<string | null>(null);
   const [tool, setTool] = useState<"none" | "coin" | "manual">("none");
-  const [coin, setCoin] = useState<Circle | null>(null);
+  const [coin, setCoin] = useState<CircleShape | null>(null);
   const [denomination, setDenomination] = useState<Denomination>("1e");
   const [line, setLine] = useState<Point[]>([]);
   const [lengthMm, setLengthMm] = useState("10");
   const [shape, setShape] = useState<Shape | null>(null);
-  const [fitted, setFitted] = useState<Circle | null>(null);
+  const [fitted, setFitted] = useState<CircleShape | null>(null);
   const [method, setMethod] = useState<"assisted" | "manual">("assisted");
   const [preview, setPreview] = useState<MeasurementPreview | null>(null);
   const [previewError, setPreviewError] = useState<string | null>(null);
@@ -168,187 +178,255 @@ export function MeasurePage() {
   if (scale.error) return <Notice kind="error">{scale.error.message}</Notice>;
   if (!data || !observation.data) return <p className="text-secondary">…</p>;
   const locale = i18n.resolvedLanguage ?? "en";
+  const cardFound = Boolean(data.card?.found);
+  const tilted = (data.card?.flags ?? []).includes("tilted");
 
-  return (
-    <div className={styles.page}>
-      <p>
-        <Link to={`/observations/${observationId}`}>{t("measure.back")}</Link>
-      </p>
-      <h1>{t("measure.title")}</h1>
-      <ol className={styles.steps} aria-label={t("measure.stepsLabel")}>
-        <li aria-current={step === "scale" ? "step" : undefined}>{t("measure.stepScale")}</li>
-        <li aria-current={step === "mark" ? "step" : undefined}>{t("measure.stepMark")}</li>
-      </ol>
-
-      <PhotoCanvas
-        src={imageUrl(imageId, "full")}
-        width={width}
-        height={height}
-        label={step === "scale" ? t("measure.canvasScale") : t("measure.canvasMark")}
-        onTap={onTap}
-      >
-        {data.card?.found && data.card.centre_px && (
-          <CardMarker x={data.card.centre_px[0] ?? 0} y={data.card.centre_px[1] ?? 0} />
-        )}
-        {step === "scale" && tool === "coin" && coin && (
-          <CircleEditor circle={coin} onChange={setCoin} label={t("measure.coin")} />
-        )}
-        {step === "scale" && tool === "manual" && <LineEditor points={line} onChange={setLine} />}
-        {step === "mark" && shape?.type === "outline" && <OutlineView points={shape.points} />}
-        {step === "mark" && shape?.type === "circle" && (
-          <CircleEditor
-            circle={shape}
-            onChange={(next) => {
-              setMethod("manual");
-              setShape({ type: "circle", ...next });
-            }}
-            label={t("measure.mark")}
-          />
-        )}
-      </PhotoCanvas>
-      <p className="text-secondary">{t("measure.zoomHint")}</p>
-
-      {step === "scale" && (
-        <section className={styles.panel} aria-labelledby="scale-heading">
-          <h2 id="scale-heading">{t("measure.stepScale")}</h2>
-          {!data.card_checked && <p role="status">{t("measure.cardSearching")}</p>}
-          {data.card?.found && (
-            <Notice kind={(data.card.flags ?? []).includes("tilted") ? "attention" : "success"}>
-              {(data.card.flags ?? []).includes("tilted")
-                ? t("measure.cardTilted", {
-                    tilt: Math.round(data.card.tilt_deg ?? 0),
-                    limit: data.tilt_limit_deg,
-                  })
-                : t("measure.cardFound", { tilt: Math.round(data.card.tilt_deg ?? 0) })}
-              {(data.card.flags ?? []).includes("card_small") && <> {t("measure.cardSmall")}</>}
-            </Notice>
-          )}
-          {data.card_checked && !data.card?.found && <p>{t("measure.cardNotFound")}</p>}
-
-          <div className={styles.actions}>
-            {cardReference && (
-              <Button
-                onClick={() => {
+  const primary =
+    step === "mark"
+      ? {
+          label: t("measure.save"),
+          disabled: !shape || !referenceId,
+          pending: create.isPending,
+          onClick: save,
+        }
+      : tool === "coin"
+        ? {
+            label: t("measure.useThisCoin"),
+            disabled: !coin,
+            pending: addReference.isPending,
+            onClick: confirmCoin,
+          }
+        : tool === "manual"
+          ? {
+              label: t("measure.useThisLine"),
+              disabled: line.length < 2,
+              pending: addReference.isPending,
+              onClick: confirmLine,
+            }
+          : cardReference
+            ? {
+                label: t("measure.useCard"),
+                onClick: () => {
                   setReferenceId(cardReference.id);
                   setStep("mark");
+                },
+              }
+            : data.card_checked
+              ? { label: t("measure.withCoin"), onClick: () => setTool("coin") }
+              : undefined;
+  const secondary =
+    step === "scale" && tool !== "none"
+      ? { label: t("common.cancel"), onClick: () => setTool("none") }
+      : undefined;
+
+  return (
+    <div className={[styles.page, "page-wide"].join(" ")}>
+      <PageHeader
+        back={{
+          to: `/observations/${observationId}`,
+          label: shortDate(locale, observation.data.captured_at),
+        }}
+        title={t("measure.title")}
+        meta={[
+          <span
+            key="scale"
+            className={step === "scale" ? styles.stepCurrent : styles.step}
+            aria-current={step === "scale" ? "step" : undefined}
+          >
+            {t("measure.stepper", { n: 1, name: t("measure.stepScale") })}
+          </span>,
+          <span
+            key="mark"
+            className={step === "mark" ? styles.stepCurrent : styles.step}
+            aria-current={step === "mark" ? "step" : undefined}
+          >
+            {t("measure.stepper", { n: 2, name: t("measure.stepMark") })}
+          </span>,
+        ]}
+        help={{ title: t("common.help"), content: <p>{t("measure.zoomHint")}</p> }}
+        primary={primary}
+        secondary={secondary}
+        instruction={
+          step === "scale" && tool === "none" && !data.card_checked ? t("measure.cardSearching") : undefined
+        }
+        rail={lesion.data ? personRail(t, lesion.data.person_id, person.data?.display_name) : undefined}
+      />
+
+      <div className={styles.layout}>
+        <div className={styles.canvasFrame}>
+          <PhotoCanvas
+            src={imageUrl(imageId, "full")}
+            width={width}
+            height={height}
+            label={step === "scale" ? t("measure.canvasScale") : t("measure.canvasMark")}
+            onTap={onTap}
+          >
+            {data.card?.found && data.card.centre_px && (
+              <CardMarker x={data.card.centre_px[0] ?? 0} y={data.card.centre_px[1] ?? 0} />
+            )}
+            {step === "scale" && tool === "coin" && coin && (
+              <CircleEditor circle={coin} onChange={setCoin} label={t("measure.coin")} />
+            )}
+            {step === "scale" && tool === "manual" && <LineEditor points={line} onChange={setLine} />}
+            {step === "mark" && shape?.type === "outline" && <OutlineView points={shape.points} />}
+            {step === "mark" && shape?.type === "circle" && (
+              <CircleEditor
+                circle={shape}
+                onChange={(next) => {
+                  setMethod("manual");
+                  setShape({ type: "circle", ...next });
                 }}
-              >
-                {t("measure.useCard")}
-              </Button>
-            )}
-            <Button variant={tool === "coin" ? "primary" : "secondary"} onClick={() => setTool("coin")}>
-              {t("measure.withCoin")}
-            </Button>
-            <Button variant={tool === "manual" ? "primary" : "secondary"} onClick={() => setTool("manual")}>
-              {t("measure.withLine")}
-            </Button>
-          </div>
-
-          {tool === "coin" && (
-            <div className={styles.tool}>
-              <p>{coin ? t("measure.coinAdjust") : t("measure.coinTap")}</p>
-              <label className={styles.row}>
-                <span>{t("measure.denomination")}</span>
-                <select
-                  value={denomination}
-                  onChange={(e) => setDenomination(e.target.value as Denomination)}
-                >
-                  {COINS.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {t(`measure.coins.${c.id}`)} ({new Intl.NumberFormat(locale).format(c.mm)} mm)
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <p className="text-secondary">{t("measure.coinTiltNote")}</p>
-              <Button onClick={confirmCoin} disabled={!coin || addReference.isPending}>
-                {t("measure.useThisCoin")}
-              </Button>
-            </div>
-          )}
-          {tool === "manual" && (
-            <div className={styles.tool}>
-              <p>
-                {line.length < 2 ? t("measure.lineTap", { count: 2 - line.length }) : t("measure.lineAdjust")}
-              </p>
-              <TextField
-                label={t("measure.lengthMm")}
-                inputMode="decimal"
-                value={lengthMm}
-                onChange={(e) => setLengthMm(e.target.value)}
+                label={t("measure.mark")}
               />
-              <div className={styles.actions}>
-                <Button onClick={confirmLine} disabled={line.length < 2 || addReference.isPending}>
-                  {t("measure.useThisLine")}
-                </Button>
-                <Button variant="quiet" onClick={() => setLine([])}>
-                  {t("measure.clearLine")}
-                </Button>
-              </div>
-            </div>
-          )}
-          {addReference.error && <Notice kind="error">{addReference.error.message}</Notice>}
-        </section>
-      )}
-
-      {step === "mark" && (
-        <section className={styles.panel} aria-labelledby="mark-heading">
-          <h2 id="mark-heading">{t("measure.stepMark")}</h2>
-          <p>{shape ? t("measure.markAdjust") : t("measure.markTap")}</p>
-          {fit.isPending && <p role="status">{t("common.working")}</p>}
-          {preview && (
-            <dl className={styles.result} aria-live="polite">
-              <div>
-                <dt>{t("measure.longest")}</dt>
-                <dd className="numeric">
-                  {formatMm(preview.longest_mm, preview.sigma_longest_mm, locale, showUncertainty)}
-                </dd>
-              </div>
-              <div>
-                <dt>{t("measure.across")}</dt>
-                <dd className="numeric">
-                  {formatMm(
-                    preview.perpendicular_mm,
-                    preview.sigma_perpendicular_mm,
-                    locale,
-                    showUncertainty,
-                  )}
-                </dd>
-              </div>
-              <div>
-                <dt>{t("measure.area")}</dt>
-                <dd className="numeric">
-                  {new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(preview.area_mm2)} mm²
-                </dd>
-              </div>
-            </dl>
-          )}
-          {preview?.flags.map((flag) => (
-            <Notice key={flag} kind="attention">
-              {t(`measure.flags.${flag}`, { limit: data.tilt_limit_deg })}
-            </Notice>
-          ))}
-          {previewError && <Notice kind="error">{previewError}</Notice>}
-          <div className={styles.actions}>
-            <Button onClick={save} disabled={!shape || !referenceId || create.isPending}>
-              {t("measure.save")}
-            </Button>
-            {shape?.type === "outline" && (
-              <Button variant="secondary" onClick={asCircle}>
-                {t("measure.asCircle")}
-              </Button>
             )}
-            <Button variant="quiet" onClick={() => setShape(null)} disabled={!shape}>
-              {t("measure.again")}
-            </Button>
-            <Button variant="quiet" onClick={() => setStep("scale")}>
-              {t("measure.changeScale")}
-            </Button>
-          </div>
-          {create.error && <Notice kind="error">{create.error.message}</Notice>}
-          <p className="text-secondary">{t("measure.disclaimer")}</p>
-        </section>
-      )}
+          </PhotoCanvas>
+        </div>
+
+        <div className={styles.panel}>
+          {step === "scale" && (
+            <>
+              {!data.card_checked && (
+                <p className="text-secondary" role="status">
+                  {t("measure.cardSearching")}
+                </p>
+              )}
+              {cardFound && (
+                <p className={[styles.status, tilted ? styles.statusAttention : styles.statusOk].join(" ")}>
+                  <Check aria-hidden="true" />
+                  <span>
+                    {tilted
+                      ? t("measure.cardTilted", {
+                          tilt: Math.round(data.card?.tilt_deg ?? 0),
+                          limit: data.tilt_limit_deg,
+                        })
+                      : t("measure.cardFound", { tilt: Math.round(data.card?.tilt_deg ?? 0) })}
+                    {(data.card?.flags ?? []).includes("card_small") && <> {t("measure.cardSmall")}</>}
+                  </span>
+                </p>
+              )}
+              {data.card_checked && !cardFound && (
+                <p className="text-secondary">{t("measure.cardNotFound")}</p>
+              )}
+              {tool === "none" && data.card_checked && (
+                <div className={styles.alternatives}>
+                  {cardReference && (
+                    <Button variant="secondary" onClick={() => setTool("coin")}>
+                      {t("measure.withCoin")}
+                    </Button>
+                  )}
+                  <Button variant="secondary" onClick={() => setTool("manual")}>
+                    {t("measure.withLine")}
+                  </Button>
+                </div>
+              )}
+              {tool === "coin" && (
+                <div className={styles.tool}>
+                  <p>{coin ? t("measure.coinAdjust") : t("measure.coinTap")}</p>
+                  <Select
+                    label={t("measure.denomination")}
+                    value={denomination}
+                    onChange={(e) => setDenomination(e.target.value as Denomination)}
+                    options={COINS.map((c) => ({
+                      value: c.id,
+                      label: `${t(`measure.coins.${c.id}`)} (${new Intl.NumberFormat(locale).format(c.mm)} mm)`,
+                    }))}
+                  />
+                  <p className="text-secondary">{t("measure.coinTiltNote")}</p>
+                </div>
+              )}
+              {tool === "manual" && (
+                <div className={styles.tool}>
+                  <p>
+                    {line.length < 2
+                      ? t("measure.lineTap", { count: 2 - line.length })
+                      : t("measure.lineAdjust")}
+                  </p>
+                  <div className={styles.lengthRow}>
+                    <TextField
+                      label={t("measure.lengthMm")}
+                      inputMode="decimal"
+                      value={lengthMm}
+                      onChange={(e) => setLengthMm(e.target.value)}
+                    />
+                    <IconButton
+                      label={t("measure.clearLine")}
+                      icon={<RotateCcw />}
+                      onClick={() => setLine([])}
+                      disabled={line.length === 0}
+                    />
+                  </div>
+                </div>
+              )}
+              {addReference.error && <Notice kind="error">{addReference.error.message}</Notice>}
+            </>
+          )}
+
+          {step === "mark" && (
+            <>
+              <p>{shape ? t("measure.markAdjust") : t("measure.markTap")}</p>
+              {fit.isPending && (
+                <p className="text-secondary" role="status">
+                  {t("common.working")}
+                </p>
+              )}
+              {preview && (
+                <dl className={styles.result} aria-live="polite">
+                  <div>
+                    <dt>{t("measure.longest")}</dt>
+                    <dd className="numeric">
+                      {formatMm(preview.longest_mm, preview.sigma_longest_mm, locale, showUncertainty)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>{t("measure.across")}</dt>
+                    <dd className="numeric">
+                      {formatMm(
+                        preview.perpendicular_mm,
+                        preview.sigma_perpendicular_mm,
+                        locale,
+                        showUncertainty,
+                      )}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>{t("measure.area")}</dt>
+                    <dd className="numeric">
+                      {new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(preview.area_mm2)}{" "}
+                      mm²
+                    </dd>
+                  </div>
+                </dl>
+              )}
+              {preview?.flags.map((flag) => (
+                <Notice key={flag} kind="attention">
+                  {t(`measure.flags.${flag}`, { limit: data.tilt_limit_deg })}
+                </Notice>
+              ))}
+              {previewError && <Notice kind="error">{previewError}</Notice>}
+              <div className={styles.alternatives}>
+                {shape?.type === "outline" && (
+                  <IconButton label={t("measure.asCircle")} icon={<Circle />} showLabel onClick={asCircle} />
+                )}
+                <IconButton
+                  label={t("measure.again")}
+                  icon={<RotateCcw />}
+                  showLabel
+                  onClick={() => setShape(null)}
+                  disabled={!shape}
+                />
+                <IconButton
+                  label={t("measure.changeScale")}
+                  icon={<Scaling />}
+                  showLabel
+                  onClick={() => setStep("scale")}
+                />
+              </div>
+              {create.error && <Notice kind="error">{create.error.message}</Notice>}
+              <p className={["text-secondary", styles.disclaimer].join(" ")}>{t("measure.disclaimer")}</p>
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -369,8 +447,8 @@ function CircleEditor({
   onChange,
   label,
 }: {
-  circle: Circle;
-  onChange: (c: Circle) => void;
+  circle: CircleShape;
+  onChange: (c: CircleShape) => void;
   label: string;
 }) {
   const { t } = useTranslation();

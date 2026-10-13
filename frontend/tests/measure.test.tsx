@@ -55,7 +55,8 @@ describe("measuring a mark", () => {
     await user.click(screen.getByRole("button", { name: "Save the measurement" }));
     await waitFor(() => expect(state.measurements).toHaveLength(1));
     expect(await screen.findByRole("heading", { name: "Measurements" })).toBeInTheDocument();
-    expect(await screen.findByText(/5\.1 ± 0\.2 mm × 4\.9 ± 0\.2 mm · card/)).toBeInTheDocument();
+    expect(await screen.findByText(/5\.1 ± 0\.2 mm × 4\.9 ± 0\.2 mm/)).toBeInTheDocument();
+    expect(screen.getByText(/^card/)).toBeInTheDocument();
   });
 
   it("hides the uncertainty when the person chose so, but keeps the values", async () => {
