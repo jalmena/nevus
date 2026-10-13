@@ -88,7 +88,7 @@ export function HomePage() {
               to={`/persons/${person.id}`}
               leading={<Initial name={person.display_name} />}
               title={person.display_name}
-              trailing={t(`persons.role.${person.my_role}`)}
+              meta={t(`persons.role.${person.my_role}`)}
               chevron
             />
           ))}

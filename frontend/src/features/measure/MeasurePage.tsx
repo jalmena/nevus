@@ -8,9 +8,12 @@ import { Notice } from "@/design-system/components/Notice";
 import { PageHeader } from "@/design-system/components/PageHeader";
 import { Select } from "@/design-system/components/Select";
 import { TextField } from "@/design-system/components/TextField";
+import { shortDate } from "@/lib/dates";
 import { useSession } from "@/lib/auth/session";
 import { imageUrl } from "@/lib/images";
-import { useObservation } from "@/lib/lesions";
+import { personRail } from "@/features/persons/personRail";
+import { useLesion, useObservation } from "@/lib/lesions";
+import { usePerson } from "@/lib/persons";
 import {
   COINS,
   formatMm,
@@ -38,6 +41,8 @@ export function MeasurePage() {
   const navigate = useNavigate();
   const session = useSession();
   const observation = useObservation(observationId);
+  const lesion = useLesion(observation.data?.lesion_id ?? "");
+  const person = usePerson(lesion.data?.person_id ?? "");
   const scale = useImageScale(imageId);
   const fit = useFit(imageId);
   const addReference = useAddScaleReference(imageId);
@@ -173,7 +178,6 @@ export function MeasurePage() {
   if (scale.error) return <Notice kind="error">{scale.error.message}</Notice>;
   if (!data || !observation.data) return <p className="text-secondary">…</p>;
   const locale = i18n.resolvedLanguage ?? "en";
-  const dateFormat = new Intl.DateTimeFormat(locale, { dateStyle: "long" });
   const cardFound = Boolean(data.card?.found);
   const tilted = (data.card?.flags ?? []).includes("tilted");
 
@@ -220,7 +224,7 @@ export function MeasurePage() {
       <PageHeader
         back={{
           to: `/observations/${observationId}`,
-          label: dateFormat.format(new Date(observation.data.captured_at)),
+          label: shortDate(locale, observation.data.captured_at),
         }}
         title={t("measure.title")}
         meta={[
@@ -245,6 +249,7 @@ export function MeasurePage() {
         instruction={
           step === "scale" && tool === "none" && !data.card_checked ? t("measure.cardSearching") : undefined
         }
+        rail={lesion.data ? personRail(t, lesion.data.person_id, person.data?.display_name) : undefined}
       />
 
       <div className={styles.layout}>

@@ -2,13 +2,13 @@ import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
-import { Help } from "@/design-system/components/Help";
 import { IconButton } from "@/design-system/components/IconButton";
 import { Notice } from "@/design-system/components/Notice";
 import { PageHeader } from "@/design-system/components/PageHeader";
 import { Section } from "@/design-system/components/Section";
 import { Segmented } from "@/design-system/components/Segmented";
 import { zoneName } from "@/features/lesions/lesionName";
+import { shortDate } from "@/lib/dates";
 import { useEvaluationPhotos, useEvaluationSummary, type OutlineRow } from "@/lib/evaluation";
 import { imageUrl } from "@/lib/images";
 import styles from "./evaluation.module.css";
@@ -23,7 +23,6 @@ export function EvaluationPage() {
   const photos = useEvaluationPhotos(only);
   const unlabelled = useEvaluationPhotos("unlabelled");
   const summary = useEvaluationSummary();
-  const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "medium" });
   const percent = new Intl.NumberFormat(i18n.resolvedLanguage, {
     style: "percent",
     maximumFractionDigits: 1,
@@ -48,20 +47,22 @@ export function EvaluationPage() {
   return (
     <div className={styles.page}>
       <PageHeader
+        help={{
+          title: t("evaluation.title"),
+          content: (
+            <>
+              <p>{t("evaluation.intro")}</p>
+              <p>{t("evaluation.introMore")}</p>
+            </>
+          ),
+        }}
         back={{ to: "/settings/instance", label: t("settings.title") }}
         title={t("evaluation.title")}
         meta={[
           unlabelled.data ? t("evaluation.toLabel", { count: unlabelled.data.length }) : null,
           summary.data ? t("evaluation.labelledCount", { count: summary.data.labelled }) : null,
         ]}
-      >
-        <p className={["text-secondary", styles.intro].join(" ")}>
-          {t("evaluation.intro")}
-          <Help title={t("evaluation.title")} as="text">
-            <p>{t("evaluation.introMore")}</p>
-          </Help>
-        </p>
-      </PageHeader>
+      ></PageHeader>
 
       <Section title={t("evaluation.summary")}>
         {summary.data && summary.data.labelled === 0 ? (
@@ -141,7 +142,7 @@ export function EvaluationPage() {
                   {photo.person_name} · {photo.mark === photo.zone ? zoneName(photo.zone, t) : photo.mark}
                 </span>
                 <span className="text-secondary">
-                  {photo.captured_on ? dateFormat.format(new Date(`${photo.captured_on}T12:00:00`)) : ""}
+                  {photo.captured_on ? shortDate(i18n.resolvedLanguage, photo.captured_on) : ""}
                   {photo.label ? ` · ${t("evaluation.labelled")}` : ""}
                 </span>
               </Link>

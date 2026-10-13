@@ -7,6 +7,7 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-2);
+  max-width: 44rem;
 }
 
 /* A menu button: which photo is on each side; opens the list of visits. */

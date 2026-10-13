@@ -17,6 +17,7 @@ import { TextField } from "@/design-system/components/TextField";
 import { QuickVisit } from "@/features/capture/QuickVisit";
 import { SizeChart } from "@/features/measure/SizeChart";
 import { Sightings } from "@/features/sessions/Sightings";
+import { shortDate } from "@/lib/dates";
 import { useSession } from "@/lib/auth/session";
 import { useConfirm } from "@/lib/confirm/ConfirmProvider";
 import { imageUrl } from "@/lib/images";
@@ -29,6 +30,7 @@ import {
   useUpdateLesion,
 } from "@/lib/lesions";
 import { formatDelta, formatMm } from "@/lib/measurements";
+import { personRail } from "@/features/persons/personRail";
 import { usePerson } from "@/lib/persons";
 import { useSnooze } from "@/lib/reminders";
 import { lesionTitle, zoneName } from "./lesionName";
@@ -50,8 +52,6 @@ export function LesionPage() {
   const [editing, setEditing] = useState(false);
   const [quick, setQuick] = useState(false);
   const canEdit = person.data?.my_role === "owner" || person.data?.my_role === "manager";
-  const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "long" });
-  const shortDate = new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "medium" });
   const session = useSession();
   const showUncertainty = session.data?.user.show_uncertainty ?? true;
   const locale = i18n.resolvedLanguage ?? "en";
@@ -117,7 +117,7 @@ export function LesionPage() {
     });
 
   return (
-    <div className={styles.page}>
+    <div className={[styles.page, "page-wide"].join(" ")}>
       <PageHeader
         back={{ to: `/persons/${data.person_id}`, label: person.data?.display_name ?? t("shell.persons") }}
         title={title}
@@ -126,9 +126,9 @@ export function LesionPage() {
           t(`bodymap.views.${data.location.view}`),
           t(`lesions.types.${data.type}`),
           data.snoozed_until
-            ? t("reminders.snoozedMeta", { date: shortDate.format(new Date(data.snoozed_until)) })
+            ? t("reminders.snoozedMeta", { date: shortDate(locale, data.snoozed_until) })
             : data.next_due_on && !data.due
-              ? t("lesions.nextCheck", { date: shortDate.format(new Date(data.next_due_on)) })
+              ? t("lesions.nextCheck", { date: shortDate(locale, data.next_due_on) })
               : null,
           t("lesions.every", { interval }),
         ]}
@@ -155,7 +155,7 @@ export function LesionPage() {
           },
           {
             label: data.measurement_change
-              ? t("lesions.sinceDate", { date: shortDate.format(new Date(data.measurement_change.since)) })
+              ? t("lesions.sinceDate", { date: shortDate(locale, data.measurement_change.since) })
               : "",
             value: data.measurement_change ? (
               <>
@@ -191,6 +191,7 @@ export function LesionPage() {
             ? { label: t("observations.new"), onClick: newVisit, pending: createVisit.isPending }
             : undefined
         }
+        rail={personRail(t, data.person_id, person.data?.display_name)}
         menu={menu}
       >
         {data.notes && <p className={styles.notes}>{data.notes}</p>}
@@ -199,50 +200,53 @@ export function LesionPage() {
         <Notice kind="error">{(createVisit.error ?? snooze.error ?? remove.error)?.message}</Notice>
       ) : null}
 
-      {observations.data && observations.data.length === 0 && (
-        <EmptyState>{t("observations.emptyText")}</EmptyState>
-      )}
-      {observations.data && observations.data.length > 0 && (
-        <Section title={t("observations.title")} className={styles.visits}>
-          <RowList>
-            {observations.data.map((visit) => (
-              <Row
-                key={visit.id}
-                to={`/observations/${visit.id}`}
-                title={
-                  <span className="numeric">{dateFormat.format(new Date(visit.captured_local_date))}</span>
-                }
-                extra={
-                  visit.images.length > 0 ? (
-                    <span className={styles.visitThumbs}>
-                      {visit.images.slice(0, 4).map((image) => (
-                        <img key={image.id} src={imageUrl(image.id, "thumb")} alt="" loading="lazy" />
-                      ))}
-                    </span>
-                  ) : undefined
-                }
-                meta={
-                  <>
-                    {[
-                      t("observations.photoCount", { count: visit.images.length }),
-                      ...visit.symptoms.map((symptom) => t(`observations.symptoms.${symptom}`)),
-                    ].join(" · ")}
-                    {visit.quality_flags.length > 0 && (
-                      <span className={styles.qualityMeta}>
-                        <TriangleAlert aria-hidden="true" /> {t("quality.short")}
-                      </span>
-                    )}
-                  </>
-                }
-                chevron={false}
-              />
-            ))}
-          </RowList>
-        </Section>
-      )}
-
-      <SizeChart lesionId={data.id} />
-      <Sightings lesionId={data.id} />
+      <div className={styles.markLayout}>
+        <div className={styles.markPane}>
+          {observations.data && observations.data.length === 0 && (
+            <EmptyState>{t("observations.emptyText")}</EmptyState>
+          )}
+          {observations.data && observations.data.length > 0 && (
+            <Section title={t("observations.title")} className={styles.visits}>
+              <RowList>
+                {observations.data.map((visit) => (
+                  <Row
+                    key={visit.id}
+                    to={`/observations/${visit.id}`}
+                    title={<span className="numeric">{shortDate(locale, visit.captured_local_date)}</span>}
+                    extra={
+                      visit.images.length > 0 ? (
+                        <span className={styles.visitThumbs}>
+                          {visit.images.slice(0, 4).map((image) => (
+                            <img key={image.id} src={imageUrl(image.id, "thumb")} alt="" loading="lazy" />
+                          ))}
+                        </span>
+                      ) : undefined
+                    }
+                    meta={
+                      <>
+                        {[
+                          t("observations.photoCount", { count: visit.images.length }),
+                          ...visit.symptoms.map((symptom) => t(`observations.symptoms.${symptom}`)),
+                        ].join(" · ")}
+                        {visit.quality_flags.length > 0 && (
+                          <span className={styles.qualityMeta}>
+                            <TriangleAlert aria-hidden="true" /> {t("quality.short")}
+                          </span>
+                        )}
+                      </>
+                    }
+                    chevron={false}
+                  />
+                ))}
+              </RowList>
+            </Section>
+          )}
+        </div>
+        <div className={styles.markPane}>
+          <SizeChart lesionId={data.id} />
+          <Sightings lesionId={data.id} />
+        </div>
+      </div>
 
       <Sheet open={editing} title={t("lesions.edit")} onClose={() => setEditing(false)}>
         <EditLesionForm

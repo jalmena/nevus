@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "./Button";
 import { IconButton } from "./IconButton";
 import { Sheet } from "./Sheet";
+import styles from "./Help.module.css";
 
 /** The long explanation, on demand: a help icon or a "Learn more" button that opens a sheet. */
 export function Help({
@@ -25,7 +26,7 @@ export function Help({
       {as === "icon" ? (
         <IconButton label={label ?? title} icon={<CircleHelp />} onClick={() => setOpen(true)} />
       ) : (
-        <Button variant="quiet" onClick={() => setOpen(true)}>
+        <Button variant="quiet" className={styles.inline} onClick={() => setOpen(true)}>
           {t("common.learnMore")}
         </Button>
       )}

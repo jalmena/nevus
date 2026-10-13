@@ -76,10 +76,18 @@ function SettingsRows({ admin }: { admin: boolean }) {
 
   return (
     <div className={styles.page}>
-      <PageHeader title={t("settings.title")} rail={settingsRail(t, admin)} />
+      <PageHeader
+        back={{ to: "/", label: t("shell.persons") }}
+        title={t("settings.title")}
+        rail={settingsRail(t, admin)}
+      />
       {groups.map((group) => {
         const sections = SECTIONS.filter(
-          (section) => section.group === group && (admin || !section.admin) && show(section.id),
+          (section) =>
+            section.group === group &&
+            section.id !== "appearance" &&
+            (admin || !section.admin) &&
+            show(section.id),
         );
         if (sections.length === 0) return null;
         return (

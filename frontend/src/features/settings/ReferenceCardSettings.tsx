@@ -1,7 +1,6 @@
 import { Download } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Help } from "@/design-system/components/Help";
 import { Notice } from "@/design-system/components/Notice";
 import { RowList } from "@/design-system/components/Row";
 import { TextField } from "@/design-system/components/TextField";
@@ -27,17 +26,19 @@ export function ReferenceCardSettings({ admin }: { admin: boolean }) {
   return (
     <div className={styles.page}>
       <SettingsHeader
+        help={{
+          title: t("card.title"),
+          content: (
+            <>
+              <p>{t("card.hint")}</p>
+              <p>{t("card.intro")}</p>
+            </>
+          ),
+        }}
         admin={admin}
         title={t("card.title")}
         meta={[user.card_line_mm ? t("card.verified", { mm: user.card_line_mm }) : t("card.unverified")]}
-      >
-        <p className={["text-secondary", styles.intro].join(" ")}>
-          {t("card.hint")}
-          <Help title={t("card.title")} as="text">
-            <p>{t("card.intro")}</p>
-          </Help>
-        </p>
-      </SettingsHeader>
+      ></SettingsHeader>
       <RowList>
         <li className={styles.linkRow}>
           <a href={`/api/reference-card?page=a4&lang=${lang}`} download>

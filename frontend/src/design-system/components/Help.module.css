@@ -1,0 +1,6 @@
+/* "Learn more" inside a sentence: no padding, so the words start where the text does. */
+.inline {
+  min-height: 0;
+  padding: 0;
+  font-weight: var(--font-weight-emphasis);
+}

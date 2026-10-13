@@ -83,11 +83,11 @@ describe("the second factor in the settings", () => {
     expect(await screen.findByRole("img", { name: /QR code for the authenticator app/ })).toBeInTheDocument();
     expect(screen.getByText("JBSW Y3DP EHPK 3PXP JBSW Y3DP EHPK 3PXP")).toBeInTheDocument();
     await user.type(screen.getByLabelText("Code the app shows now"), "12 34 56");
-    await user.click(screen.getByRole("button", { name: "Turn the second factor on" }));
+    await user.click(screen.getByRole("button", { name: "Turn it on" }));
     const codes = await screen.findByRole("region", { name: "Recovery codes" });
     expect(within(codes).getAllByRole("listitem")).toHaveLength(10);
     expect(state.totp.enabled).toBe(true);
-    await user.click(within(codes).getByRole("button", { name: "I have saved them" }));
+    await user.click(screen.getByRole("button", { name: "I have saved them" }));
     expect(await screen.findByText("The second factor is on. 10 recovery codes left.")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "More" }));

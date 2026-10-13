@@ -1,8 +1,6 @@
-import { Check, Copy, Download, RefreshCw, ShieldOff } from "lucide-react";
+import { Check, Copy, RefreshCw, ShieldOff } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/design-system/components/Button";
-import { Help } from "@/design-system/components/Help";
 import { IconButton } from "@/design-system/components/IconButton";
 import { Notice } from "@/design-system/components/Notice";
 import { TextField } from "@/design-system/components/TextField";
@@ -47,8 +45,8 @@ export function SecondFactorSettings({ admin }: { admin: boolean }) {
   const on = status.data.enabled;
   const settingUp = Boolean(setup.data) && !on;
 
-  function turnOn(event: FormEvent) {
-    event.preventDefault();
+  function turnOn(event?: FormEvent) {
+    event?.preventDefault();
     enable.mutate(
       { code },
       {
@@ -73,13 +71,33 @@ export function SecondFactorSettings({ admin }: { admin: boolean }) {
   return (
     <div className={styles.page}>
       <SettingsHeader
+        help={{
+          title: t("secondFactor.title"),
+          content: (
+            <>
+              <p>{t("secondFactor.hint")}</p>
+              <p>{t("secondFactor.intro")}</p>
+            </>
+          ),
+        }}
         admin={admin}
         title={t("secondFactor.title")}
         meta={[on ? t("secondFactor.on", { count: status.data.recovery_codes_left }) : t("secondFactor.off")]}
         primary={
-          !on && !settingUp && !codes
-            ? { label: t("secondFactor.setUp"), pending: setup.isPending, onClick: () => setup.mutate() }
-            : undefined
+          codes
+            ? { label: t("secondFactor.codesDone"), onClick: () => setCodes(null) }
+            : settingUp
+              ? { label: t("secondFactor.turnOn"), pending: enable.isPending, onClick: () => turnOn() }
+              : !on
+                ? { label: t("secondFactor.setUp"), onClick: () => setup.mutate() }
+                : undefined
+        }
+        secondary={
+          codes
+            ? { label: t("secondFactor.download"), onClick: () => download(codes) }
+            : settingUp
+              ? { label: t("common.cancel"), onClick: () => setup.reset() }
+              : undefined
         }
         menu={
           on
@@ -98,14 +116,7 @@ export function SecondFactorSettings({ admin }: { admin: boolean }) {
               ]
             : []
         }
-      >
-        <p className={["text-secondary", styles.intro].join(" ")}>
-          {t("secondFactor.hint")}
-          <Help title={t("secondFactor.title")} as="text">
-            <p>{t("secondFactor.intro")}</p>
-          </Help>
-        </p>
-      </SettingsHeader>
+      ></SettingsHeader>
       {settingUp && setup.data && (
         <form className={styles.form} onSubmit={turnOn}>
           <ol className={styles.steps}>
@@ -135,14 +146,6 @@ export function SecondFactorSettings({ admin }: { admin: boolean }) {
             onChange={(e) => setCode(e.target.value)}
           />
           {enable.error && <Notice kind="error">{enable.error.message}</Notice>}
-          <div className={styles.actions}>
-            <Button type="button" variant="quiet" onClick={() => setup.reset()}>
-              {t("common.cancel")}
-            </Button>
-            <Button type="submit" disabled={enable.isPending}>
-              {t("secondFactor.turnOn")}
-            </Button>
-          </div>
         </form>
       )}
       {codes && (
@@ -158,16 +161,6 @@ export function SecondFactorSettings({ admin }: { admin: boolean }) {
               </li>
             ))}
           </ul>
-          <div className={styles.actions}>
-            <IconButton
-              label={t("secondFactor.download")}
-              icon={<Download />}
-              showLabel
-              variant="secondary"
-              onClick={() => download(codes)}
-            />
-            <Button onClick={() => setCodes(null)}>{t("secondFactor.codesDone")}</Button>
-          </div>
         </section>
       )}
       {failure && <Notice kind="error">{failure.message}</Notice>}

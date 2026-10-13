@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { Button } from "@/design-system/components/Button";
 import { EmptyState } from "@/design-system/components/EmptyState";
-import { Help } from "@/design-system/components/Help";
 import { Notice } from "@/design-system/components/Notice";
 import { PageHeader } from "@/design-system/components/PageHeader";
 import { Row, RowList } from "@/design-system/components/Row";
@@ -11,6 +10,7 @@ import { Section } from "@/design-system/components/Section";
 import { Sheet } from "@/design-system/components/Sheet";
 import { TextField } from "@/design-system/components/TextField";
 import { personRail } from "@/features/persons/personRail";
+import { shortDate } from "@/lib/dates";
 import { daysUntil, useAppointments, useCreateAppointment } from "@/lib/appointments";
 import type { PersonOut } from "@/lib/persons";
 import styles from "./appointments.module.css";
@@ -24,7 +24,6 @@ export function PrepareAppointment({ person, canEdit }: { person: PersonOut; can
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState("");
   const [notes, setNotes] = useState("");
-  const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "long" });
 
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -35,21 +34,33 @@ export function PrepareAppointment({ person, canEdit }: { person: PersonOut; can
   }
 
   const list = appointments.data ?? [];
+  const today = new Date().toISOString().slice(0, 10);
   return (
     <div className={styles.page}>
       <PageHeader
+        help={{
+          title: t("appointments.sectionTitle"),
+          content: (
+            <>
+              <p>{t("appointments.hint")}</p>
+              <p>{t("appointments.intro")}</p>
+            </>
+          ),
+        }}
         back={{ to: `/persons/${person.id}`, label: person.display_name }}
         title={t("appointments.sectionTitle")}
+        meta={[
+          appointments.data
+            ? appointments.data.filter((item) => item.date >= today).length > 0
+              ? t("appointments.planned", {
+                  count: appointments.data.filter((item) => item.date >= today).length,
+                })
+              : t("appointments.nonePlanned")
+            : null,
+        ]}
         rail={personRail(t, person.id, person.display_name)}
         primary={canEdit ? { label: t("appointments.new"), onClick: () => setOpen(true) } : undefined}
-      >
-        <p className={["text-secondary", styles.intro].join(" ")}>
-          {t("appointments.hint")}
-          <Help title={t("appointments.sectionTitle")} as="text">
-            <p>{t("appointments.intro")}</p>
-          </Help>
-        </p>
-      </PageHeader>
+      ></PageHeader>
       {appointments.error && <Notice kind="error">{appointments.error.message}</Notice>}
       {appointments.data && list.length === 0 && <EmptyState>{t("appointments.empty")}</EmptyState>}
       {list.length > 0 && (
@@ -61,9 +72,7 @@ export function PrepareAppointment({ person, canEdit }: { person: PersonOut; can
               <Row
                 key={item.id}
                 to={`/appointments/${item.id}`}
-                title={t("appointments.title", {
-                  date: dateFormat.format(new Date(`${item.date}T12:00:00`)),
-                })}
+                title={t("appointments.title", { date: shortDate(i18n.resolvedLanguage, item.date) })}
                 meta={
                   days < 0
                     ? t("appointments.past")
@@ -113,7 +122,6 @@ export function UpcomingAppointments({
   appointments: ReturnType<typeof useAppointments>["data"];
 }) {
   const { t, i18n } = useTranslation();
-  const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "long" });
   if (!appointments || appointments.length === 0) return null;
   return (
     <Section title={t("appointments.upcoming")}>
@@ -124,7 +132,7 @@ export function UpcomingAppointments({
             <Row
               key={item.id}
               to={`/appointments/${item.id}`}
-              title={t("appointments.title", { date: dateFormat.format(new Date(`${item.date}T12:00:00`)) })}
+              title={t("appointments.title", { date: shortDate(i18n.resolvedLanguage, item.date) })}
               meta={`${item.person_name} · ${left === 0 ? t("appointments.ready") : t("appointments.left", { count: left })}`}
             />
           );

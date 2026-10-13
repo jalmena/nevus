@@ -1,7 +1,6 @@
 import { Send } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Help } from "@/design-system/components/Help";
 import { Notice } from "@/design-system/components/Notice";
 import { StatusChip } from "@/design-system/components/StatusChip";
 import {
@@ -49,6 +48,16 @@ export function PushSettings({ admin }: { admin: boolean }) {
   return (
     <div className={styles.page}>
       <SettingsHeader
+        help={{
+          title: t("push.title"),
+          content: (
+            <>
+              <p>{t("push.intro")}</p>
+              <p>{t("push.introMore")}</p>
+              <p>{t("push.note")}</p>
+            </>
+          ),
+        }}
         admin={admin}
         title={t("push.title")}
         chip={<StatusChip kind="experimental">{t("proposals.experimental")}</StatusChip>}
@@ -83,15 +92,7 @@ export function PushSettings({ admin }: { admin: boolean }) {
               ]
             : []
         }
-      >
-        <p className={["text-secondary", styles.intro].join(" ")}>
-          {t("push.intro")}
-          <Help title={t("push.title")} as="text">
-            <p>{t("push.introMore")}</p>
-            <p>{t("push.note")}</p>
-          </Help>
-        </p>
-      </SettingsHeader>
+      ></SettingsHeader>
       {test.data && (
         <Notice kind={test.data.sent > 0 ? "success" : "attention"}>
           {t("push.tested", { sent: test.data.sent, failed: test.data.failed })}

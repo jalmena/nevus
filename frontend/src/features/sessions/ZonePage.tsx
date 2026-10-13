@@ -14,7 +14,10 @@ import { StatusChip } from "@/design-system/components/StatusChip";
 import { TextField } from "@/design-system/components/TextField";
 import { zoneName } from "@/features/lesions/lesionName";
 import { PhotoCanvas, useCanvas } from "@/features/measure/PhotoCanvas";
+import { shortDate } from "@/lib/dates";
+import { personRail } from "@/features/persons/personRail";
 import { useConfirm } from "@/lib/confirm/ConfirmProvider";
+import { usePerson } from "@/lib/persons";
 import { imageUrl } from "@/lib/images";
 import { useLesions, type LesionOut } from "@/lib/lesions";
 import type { Point } from "@/lib/measurements";
@@ -48,6 +51,7 @@ export function ZonePage() {
   const session = useBodySession(sessionId);
   const protocol = useProtocol();
   const lesions = useLesions(session.data?.person_id ?? "");
+  const person = usePerson(session.data?.person_id ?? "");
   const add = useAddMark(sessionId, zoneId);
   const update = useUpdateMark();
   const remove = useDeleteMark();
@@ -59,7 +63,6 @@ export function ZonePage() {
   const [blurring, setBlurring] = useState(false);
   const [corner, setCorner] = useState<Point | null>(null);
   const [regions, setRegions] = useState<Region[]>([]);
-  const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "long" });
 
   if (session.error) return <Notice kind="error">{session.error.message}</Notice>;
   const zone = session.data?.zones.find((item) => item.zone === zoneId);
@@ -74,6 +77,10 @@ export function ZonePage() {
   const named = (id: string | null) => {
     const lesion = all.find((item) => item.id === id);
     return lesion ? title(lesion) : "";
+  };
+  const zoneOf = (id: string | null) => {
+    const lesion = all.find((item) => item.id === id);
+    return lesion ? zoneName(lesion.location.zone, t) : undefined;
   };
   const width = zone.upright_width ?? 1;
   const height = zone.upright_height ?? 1;
@@ -137,9 +144,10 @@ export function ZonePage() {
       <PageHeader
         back={{
           to: `/sessions/${sessionId}`,
-          label: t("sessions.titleFor", { date: dateFormat.format(new Date(session.data.started_at)) }),
+          label: t("sessions.titleFor", { date: shortDate(i18n.resolvedLanguage, session.data.started_at) }),
         }}
         title={regionName}
+        rail={personRail(t, session.data.person_id, person.data?.display_name)}
         meta={[zone.analysing ? t("sessions.analysing") : null]}
         actions={
           blurring
@@ -261,9 +269,7 @@ export function ZonePage() {
                   meta={
                     item.source === "candidate" && item.state === "pending"
                       ? t("proposals.experimental")
-                      : item.lesion_id
-                        ? named(item.lesion_id)
-                        : undefined
+                      : zoneOf(item.lesion_id)
                   }
                 />
               ))}

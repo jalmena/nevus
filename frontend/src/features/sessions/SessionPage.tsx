@@ -7,7 +7,10 @@ import { Notice } from "@/design-system/components/Notice";
 import { PageHeader } from "@/design-system/components/PageHeader";
 import { Row, RowList, Thumb } from "@/design-system/components/Row";
 import { StatusChip } from "@/design-system/components/StatusChip";
+import { shortDate } from "@/lib/dates";
+import { personRail } from "@/features/persons/personRail";
 import { useConfirm } from "@/lib/confirm/ConfirmProvider";
+import { usePerson } from "@/lib/persons";
 import { imageUrl } from "@/lib/images";
 import {
   useBodySession,
@@ -27,13 +30,13 @@ export function SessionPage() {
   const confirm = useConfirm();
   const protocol = useProtocol();
   const session = useBodySession(sessionId);
+  const person = usePerson(session.data?.person_id ?? "");
   const photo = useZonePhoto(sessionId);
   const skip = useSkipZone(sessionId);
   const finish = useFinishSession(sessionId);
   const remove = useDeleteSession();
   const camera = useRef<HTMLInputElement>(null);
   const [chosen, setChosen] = useState<string | null>(null);
-  const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "long" });
 
   if (session.error) return <Notice kind="error">{session.error.message}</Notice>;
   if (!session.data || !protocol.data) return <p className="text-secondary">…</p>;
@@ -53,7 +56,8 @@ export function SessionPage() {
     <div className={[styles.page, "page-wide"].join(" ")}>
       <PageHeader
         back={{ to: `/persons/${data.person_id}/sessions`, label: t("sessions.title") }}
-        title={t("sessions.titleFor", { date: dateFormat.format(new Date(data.started_at)) })}
+        title={t("sessions.titleFor", { date: shortDate(i18n.resolvedLanguage, data.started_at) })}
+        rail={personRail(t, data.person_id, person.data?.display_name)}
         meta={[
           data.status === "open" ? t("sessions.open") : t("sessions.finished"),
           t("sessions.progress", { captured, total }),

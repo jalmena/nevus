@@ -5,6 +5,7 @@ import { IconButton } from "@/design-system/components/IconButton";
 import { Notice } from "@/design-system/components/Notice";
 import { PageHeader } from "@/design-system/components/PageHeader";
 import { Row, RowList } from "@/design-system/components/Row";
+import { shortDate } from "@/lib/dates";
 import { useConfirm } from "@/lib/confirm/ConfirmProvider";
 import { usePurgeNow, useRestore, useTrash } from "@/lib/data";
 import styles from "./trash.module.css";
@@ -18,7 +19,6 @@ export function TrashPage() {
   const trash = useTrash();
   const restore = useRestore();
   const purge = usePurgeNow();
-  const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "medium" });
   return (
     <div className={styles.page}>
       <PageHeader
@@ -38,7 +38,7 @@ export function TrashPage() {
                 leading={<Icon />}
                 title={item.label}
                 meta={`${t(`trash.kinds.${item.kind}`)} · ${item.person_name} · ${t("trash.goesOn", {
-                  date: dateFormat.format(new Date(item.purge_after)),
+                  date: shortDate(i18n.resolvedLanguage, item.purge_after),
                 })}`}
                 trailing={
                   <>

@@ -8,6 +8,7 @@ import { PageHeader } from "@/design-system/components/PageHeader";
 import { Row, RowList, Thumb } from "@/design-system/components/Row";
 import { Sheet } from "@/design-system/components/Sheet";
 import { lesionTitle } from "@/features/lesions/lesionName";
+import { personRail } from "@/features/persons/personRail";
 import { shortDate } from "@/lib/dates";
 import { imageUrl, type ImageOut } from "@/lib/images";
 import { useLesion, useObservations, type ObservationOut } from "@/lib/lesions";
@@ -51,7 +52,6 @@ export function ComparePage() {
   const person = usePerson(lesion.data?.person_id ?? "");
   const observations = useObservations(lesionId);
   const [picking, setPicking] = useState<"a" | "b" | null>(null);
-  const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "medium" });
 
   const visits = [...(observations.data ?? [])]
     .filter((visit) => visit.images.length > 0)
@@ -78,11 +78,12 @@ export function ComparePage() {
       title={t("compare.title")}
       meta={[markTitle, person.data?.display_name ?? null]}
       help={{ title: t("common.help"), content: <p>{t("compare.zoomHint")}</p> }}
+      rail={personRail(t, lesion.data.person_id, person.data?.display_name)}
     />
   );
   if (visits.length < 2 && choices.length < 2) {
     return (
-      <div className={styles.page}>
+      <div className={[styles.page, "page-wide"].join(" ")}>
         {header}
         <Notice kind="info">{t("compare.needTwo")}</Notice>
       </div>
@@ -94,13 +95,15 @@ export function ComparePage() {
   const picker = (side: "a" | "b", current: Choice | undefined) => (
     <Button variant="secondary" className={styles.picker} onClick={() => setPicking(side)}>
       <span className={styles.pickerSide}>{side === "a" ? t("compare.earlier") : t("compare.later")}</span>
-      <span className={styles.pickerValue}>{current ? label(current) : "—"}</span>
+      <span className={styles.pickerValue}>
+        {current ? shortDate(i18n.resolvedLanguage, current.visit.captured_at) : "—"}
+      </span>
       <ChevronDown aria-hidden="true" />
     </Button>
   );
 
   return (
-    <div className={styles.page}>
+    <div className={[styles.page, "page-wide"].join(" ")}>
       {header}
       <div className={styles.pickers}>
         {picker("a", first)}
@@ -131,7 +134,7 @@ export function ComparePage() {
                 }}
                 selected={chosen}
                 leading={<Thumb src={imageUrl(choice.image.id, "thumb")} />}
-                title={dateFormat.format(new Date(choice.visit.captured_at))}
+                title={shortDate(i18n.resolvedLanguage, choice.visit.captured_at)}
                 meta={t(`images.roles.${choice.image.role}`)}
               />
             );

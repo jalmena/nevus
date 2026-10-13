@@ -1,10 +1,10 @@
 import { Check, Copy, Unlink } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Help } from "@/design-system/components/Help";
 import { IconButton } from "@/design-system/components/IconButton";
 import { Notice } from "@/design-system/components/Notice";
 import { PageHeader } from "@/design-system/components/PageHeader";
+import { shortDate } from "@/lib/dates";
 import { useConfirm } from "@/lib/confirm/ConfirmProvider";
 import { useCalendarFeed, useNewCalendarFeed, useStopCalendarFeed } from "@/lib/notifications";
 import type { PersonOut } from "@/lib/persons";
@@ -19,7 +19,6 @@ export function CalendarLink({ person }: { person: PersonOut }) {
   const make = useNewCalendarFeed(person.id);
   const stop = useStopCalendarFeed(person.id);
   const [copied, setCopied] = useState(false);
-  const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "medium" });
   const url = make.data?.url;
   const linked = Boolean(feed.data?.exists || url);
 
@@ -36,12 +35,21 @@ export function CalendarLink({ person }: { person: PersonOut }) {
   return (
     <div className={styles.page}>
       <PageHeader
+        help={{
+          title: t("calendar.title"),
+          content: (
+            <>
+              <p>{t("calendar.hint")}</p>
+              <p>{t("calendar.intro")}</p>
+            </>
+          ),
+        }}
         back={{ to: `/persons/${person.id}`, label: person.display_name }}
         title={t("calendar.title")}
         meta={[
           feed.data?.exists
             ? t("calendar.linkedSince", {
-                date: feed.data.created_at ? dateFormat.format(new Date(feed.data.created_at)) : "",
+                date: feed.data.created_at ? shortDate(i18n.resolvedLanguage, feed.data.created_at) : "",
               })
             : feed.data
               ? t("calendar.notLinked")
@@ -72,14 +80,7 @@ export function CalendarLink({ person }: { person: PersonOut }) {
               ]
             : []
         }
-      >
-        <p className={["text-secondary", styles.intro].join(" ")}>
-          {t("calendar.hint")}
-          <Help title={t("calendar.title")} as="text">
-            <p>{t("calendar.intro")}</p>
-          </Help>
-        </p>
-      </PageHeader>
+      ></PageHeader>
       {url ? (
         <div className={styles.switchRow}>
           <span className="text-secondary">{t("calendar.link")}</span>
@@ -96,7 +97,7 @@ export function CalendarLink({ person }: { person: PersonOut }) {
       ) : feed.data?.exists ? (
         <p>
           {t("calendar.exists", {
-            date: feed.data.created_at ? dateFormat.format(new Date(feed.data.created_at)) : "",
+            date: feed.data.created_at ? shortDate(i18n.resolvedLanguage, feed.data.created_at) : "",
           })}
         </p>
       ) : (

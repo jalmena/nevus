@@ -43,7 +43,7 @@
     "proxyRetry": "Ya he iniciado sesión",
     "secondFactorTitle": "Un paso más",
     "codeIntro": "Escribe el código de seis dígitos de la aplicación de autenticación de tu teléfono.",
-    "recoveryIntro": "Escribe uno de los códigos de recuperación que guardaste al activar el segundo factor. Cada uno vale una vez.",
+    "recoveryIntro": "Introduce uno de los códigos de recuperación que guardaste. Cada uno vale una vez.",
     "code": "Código de la aplicación de autenticación",
     "recoveryCode": "Código de recuperación",
     "continue": "Continuar",
@@ -246,7 +246,7 @@
   "lesions": {
     "title": "Marcas",
     "add": "Añadir una marca",
-    "placingHint": "Toca la zona donde está la marca: el mapa la amplía. Después toca el punto exacto.",
+    "placingHint": "Toca la zona donde está la marca.",
     "placingSpot": "Toca el punto exacto de la marca en {{zone}}.",
     "placed": "Ahora describe la marca aquí abajo.",
     "newTitle": "Nueva marca",
@@ -697,7 +697,9 @@
     "deleteNote": "La lista va con ella; las fotos y el informe se conservan.",
     "reportNotMade": "aún no hecho",
     "reportOptions": "Informe para la cita",
-    "empty": "Aún no hay citas. Indica una fecha y se listan las marcas que fotografiar antes."
+    "empty": "Aún no hay citas. Indica una fecha y se listan las marcas que fotografiar antes.",
+    "planned_one": "{{count}} prevista",
+    "planned_other": "{{count}} previstas"
   },
   "webhooks": {
     "title": "Webhooks",
@@ -877,7 +879,7 @@
     "finish": "Terminar la sesión",
     "delete": "Borrar la sesión",
     "deleteConfirm": "¿Borrar esta sesión? Sus fotos van a la papelera y las marcas vistas en ellas se quitan de la sesión. Las marcas siguen en el registro.",
-    "markHint": "Toca la foto donde haya una marca y vincúlala a una marca que ya sigues o regístrala como nueva.",
+    "markHint": "Toca una marca en la foto para registrarla.",
     "markHintView": "Las marcas vistas en esta foto.",
     "canvas": "Foto de {{zone}}",
     "noPhoto": "Esta región no tiene foto en esta sesión.",
@@ -979,7 +981,7 @@
     },
     "blur": "Difuminar una parte de la foto",
     "blurTitle": "Difuminar parte de la foto",
-    "blurHint": "Toca dos esquinas opuestas del área que quieres difuminar. Añade las áreas que necesites y después aplica.",
+    "blurHint": "Toca dos esquinas opuestas de la zona a difuminar.",
     "blurNote": "Sustituye la foto para siempre; las marcas se conservan.",
     "blurApply_one": "Difuminar {{count}} área",
     "blurApply_many": "Difuminar {{count}} áreas",
@@ -999,7 +1001,9 @@
     "empty": "Aún no hay sesiones. Una sesión fotografía todo el cuerpo, región a región.",
     "photographedOn": "fotografiada el {{date}}",
     "selectRegion": "Fotografiar {{zone}} a continuación",
-    "newMarkChoice": "Una marca nueva…"
+    "newMarkChoice": "Una marca nueva…",
+    "count_one": "{{count}} sesión",
+    "count_other": "{{count}} sesiones"
   },
   "secondFactor": {
     "title": "Segundo factor",
@@ -1015,11 +1019,11 @@
     "qrAlt": "Código QR para la aplicación de autenticación; el mismo secreto está escrito debajo",
     "orType": "O escribe:",
     "firstCode": "Código que muestra ahora la aplicación",
-    "turnOn": "Activar el segundo factor",
+    "turnOn": "Activarlo",
     "turnOff": "Desactivarlo",
     "newCodes": "Nuevos códigos de recuperación",
     "codesTitle": "Códigos de recuperación",
-    "codesIntro": "Cada uno te permite iniciar sesión una vez si pierdes el teléfono. Guárdalos ahora en un lugar seguro: no se vuelven a mostrar.",
+    "codesIntro": "Cada uno te deja entrar una vez si pierdes el teléfono. No se vuelven a mostrar.",
     "download": "Guardar como fichero",
     "codesDone": "Ya los he guardado",
     "off": "El segundo factor está desactivado.",

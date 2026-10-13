@@ -14,6 +14,7 @@ import { type MapPoint, type View, type Zone } from "@/features/bodymap/zones";
 import { LesionList } from "@/features/lesions/LesionList";
 import { NewLesionForm } from "@/features/lesions/NewLesionForm";
 import { lesionTitle } from "@/features/lesions/lesionName";
+import { shortDate } from "@/lib/dates";
 import { useAppointments } from "@/lib/appointments";
 import { formatBytes, useUsage } from "@/lib/data";
 import { useCreateLesion, useLesions } from "@/lib/lesions";
@@ -100,10 +101,12 @@ export function PersonPage() {
             placing={placing}
             onSelectMarker={(id) => void navigate(`/lesions/${id}`)}
           />
-          <p className={["text-secondary", styles.legend].join(" ")} aria-hidden="true">
-            <span className={styles.dot} /> {t("bodymap.tracked")}
-            <span className={[styles.dot, styles.dotDue].join(" ")} /> {t("bodymap.due")}
-          </p>
+          {(lesions.data?.length ?? 0) > 0 && (
+            <p className={["text-secondary", styles.legend].join(" ")} aria-hidden="true">
+              <span className={styles.dot} /> {t("bodymap.tracked")}
+              <span className={[styles.dot, styles.dotDue].join(" ")} /> {t("bodymap.due")}
+            </p>
+          )}
         </div>
 
         <div className={styles.detailPane}>
@@ -155,7 +158,6 @@ function Tools({ personId, canEdit, locale }: { personId: string; canEdit: boole
   const feed = useCalendarFeed(personId);
   const usage = useUsage(personId);
   const person = usePerson(personId);
-  const dateFormat = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
   const today = new Date().toISOString().slice(0, 10);
   const ahead = (appointments.data ?? []).filter((item) => item.date >= today)[0];
   const open = (sessions.data ?? []).find((session) => session.status === "open");
@@ -163,7 +165,7 @@ function Tools({ personId, canEdit, locale }: { personId: string; canEdit: boole
   const base = `/persons/${personId}`;
 
   const appointmentStatus = ahead
-    ? `${dateFormat.format(new Date(`${ahead.date}T12:00:00`))} · ${t("appointments.progress", {
+    ? `${shortDate(locale, ahead.date)} · ${t("appointments.progress", {
         done: ahead.checklist.filter((entry) => entry.state === "photographed").length,
         total: ahead.checklist.length,
       })}`
@@ -171,14 +173,14 @@ function Tools({ personId, canEdit, locale }: { personId: string; canEdit: boole
   const sessionStatus = open
     ? `${t("sessions.open")} · ${t("sessions.regionsCount", { captured: open.captured, total: open.captured + open.skipped + open.pending })}`
     : last
-      ? t("sessions.last", { date: dateFormat.format(new Date(last.started_at)) })
+      ? t("sessions.last", { date: shortDate(locale, last.started_at) })
       : t("sessions.none");
   const reportStatus = reports.data?.length
     ? t("reports.made", { count: reports.data.length })
     : t("reports.none");
   const calendarStatus = feed.data?.exists
     ? t("calendar.linkedSince", {
-        date: feed.data.created_at ? dateFormat.format(new Date(feed.data.created_at)) : "",
+        date: feed.data.created_at ? shortDate(locale, feed.data.created_at) : "",
       })
     : t("calendar.notLinked");
   const profileStatus = [

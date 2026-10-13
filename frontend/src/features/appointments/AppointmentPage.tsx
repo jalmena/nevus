@@ -13,6 +13,7 @@ import { Sheet } from "@/design-system/components/Sheet";
 import { TextField } from "@/design-system/components/TextField";
 import { zoneName } from "@/features/lesions/lesionName";
 import { personRail } from "@/features/persons/personRail";
+import { shortDate } from "@/lib/dates";
 import { useConfirm } from "@/lib/confirm/ConfirmProvider";
 import { formatBytes } from "@/lib/data";
 import {
@@ -45,8 +46,6 @@ export function AppointmentPage() {
   const [language, setLanguage] = useState<ReportLanguage>(i18n.resolvedLanguage === "es" ? "es" : "en");
   const [paper, setPaper] = useState<Paper>("a4");
   const locale = i18n.resolvedLanguage ?? "en";
-  const longDate = new Intl.DateTimeFormat(locale, { dateStyle: "long" });
-  const shortDate = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
 
   if (appointment.error) return <Notice kind="error">{appointment.error.message}</Notice>;
   if (!appointment.data) return <p className="text-secondary">…</p>;
@@ -79,7 +78,7 @@ export function AppointmentPage() {
     <div className={styles.page}>
       <PageHeader
         back={{ to: `/persons/${data.person_id}`, label: data.person_name }}
-        title={t("appointments.title", { date: longDate.format(new Date(`${data.date}T12:00:00`)) })}
+        title={t("appointments.title", { date: shortDate(locale, data.date) })}
         meta={[when, t("appointments.progress", { done: done.length, total: data.checklist.length })]}
         rail={personRail(t, data.person_id, data.person_name)}
         menu={
@@ -129,7 +128,7 @@ export function AppointmentPage() {
                   item.state === "never_photographed"
                     ? t("appointments.never")
                     : t("appointments.dueBy", {
-                        date: shortDate.format(new Date(`${item.next_due_on ?? data.date}T12:00:00`)),
+                        date: shortDate(locale, item.next_due_on ?? data.date),
                       })
                 }
                 trailing={
@@ -159,7 +158,7 @@ export function AppointmentPage() {
                 meta={
                   item.last_observed_at
                     ? t("appointments.photographedOn", {
-                        date: shortDate.format(new Date(item.last_observed_at)),
+                        date: shortDate(locale, item.last_observed_at),
                       })
                     : ""
                 }

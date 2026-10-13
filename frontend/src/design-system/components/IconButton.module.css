@@ -50,6 +50,7 @@
 }
 
 .quiet {
+  border-radius: var(--radius-pill);
   color: var(--color-ink-2);
 }
 

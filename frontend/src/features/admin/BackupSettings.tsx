@@ -1,6 +1,5 @@
 import { RefreshCw } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Help } from "@/design-system/components/Help";
 import { Notice } from "@/design-system/components/Notice";
 import { SettingsHeader } from "@/features/settings/SettingsHeader";
 import { useBackupNow, useBackupStatus, useVerifyBackupNow } from "@/lib/admin";
@@ -25,6 +24,22 @@ export function BackupSettings() {
       <SettingsHeader
         admin
         title={t("backups.title")}
+        help={{
+          title: t("backups.title"),
+          content: (
+            <>
+              <p>{t("backups.hint")}</p>
+              {backups.enabled && (
+                <p>
+                  {t("backups.intro", { hour: String(backups.backup_hour).padStart(2, "0") })}{" "}
+                  {backups.verify_days > 0
+                    ? t("backups.verifyEvery", { count: backups.verify_days })
+                    : t("backups.verifyNever")}
+                </p>
+              )}
+            </>
+          ),
+        }}
         meta={[
           !backups.enabled
             ? t("settings.status.backupsOff")
@@ -58,21 +73,7 @@ export function BackupSettings() {
               ]
             : []
         }
-      >
-        <p className={["text-secondary", styles.intro].join(" ")}>
-          {t("backups.hint")}
-          {backups.enabled && (
-            <Help title={t("backups.title")} as="text">
-              <p>
-                {t("backups.intro", { hour: String(backups.backup_hour).padStart(2, "0") })}{" "}
-                {backups.verify_days > 0
-                  ? t("backups.verifyEvery", { count: backups.verify_days })
-                  : t("backups.verifyNever")}
-              </p>
-            </Help>
-          )}
-        </p>
-      </SettingsHeader>
+      ></SettingsHeader>
       {!backups.enabled ? (
         <p className="text-secondary">{t("backups.off")}</p>
       ) : verification ? (

@@ -26,7 +26,7 @@ export function Shell() {
               <AppBar desktop={desktop} />
               <OutboxBar />
             </header>
-            <main className={styles.main}>
+            <main className={[styles.main, "app-main"].join(" ")}>
               <Suspense fallback={<p className="text-secondary">…</p>}>
                 <Outlet />
               </Suspense>
@@ -173,7 +173,7 @@ function Rail() {
   const item = ({ isActive }: { isActive: boolean }) =>
     [styles.railItem, isActive ? styles.railActive : ""].join(" ");
   return (
-    <nav className={styles.rail} aria-label={t("shell.navigation")}>
+    <nav className={styles.rail} aria-label={t("shell.navigation")} data-chrome="rail">
       <Link to="/" className={styles.railBrand} aria-label={t("app.name")}>
         <Mark size={28} />
         <span>{t("app.name")}</span>

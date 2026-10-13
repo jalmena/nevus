@@ -1,11 +1,10 @@
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Help } from "@/design-system/components/Help";
 import { Row, RowList } from "@/design-system/components/Row";
 import { ExportSheet } from "@/features/data/ExportForm";
 import { ExportList } from "@/features/data/ExportList";
-import { useTrash } from "@/lib/data";
+import { useExports, useTrash } from "@/lib/data";
 import { SettingsHeader } from "./SettingsHeader";
 import styles from "./settings.module.css";
 
@@ -13,21 +12,25 @@ import styles from "./settings.module.css";
 export function YourDataSection({ admin }: { admin: boolean }) {
   const { t } = useTranslation();
   const trash = useTrash();
+  const exports = useExports();
   const [exporting, setExporting] = useState(false);
   return (
     <div className={styles.page}>
       <SettingsHeader
+        help={{
+          title: t("data.title"),
+          content: (
+            <>
+              <p>{t("data.hint")}</p>
+              <p>{t("data.intro")}</p>
+            </>
+          ),
+        }}
         admin={admin}
         title={t("data.title")}
+        meta={[t("settings.status.exports", { count: exports.data?.length ?? 0 })]}
         primary={admin ? { label: t("data.exportAll"), onClick: () => setExporting(true) } : undefined}
-      >
-        <p className={["text-secondary", styles.intro].join(" ")}>
-          {t("data.hint")}
-          <Help title={t("data.title")} as="text">
-            <p>{t("data.intro")}</p>
-          </Help>
-        </p>
-      </SettingsHeader>
+      ></SettingsHeader>
       <ExportList />
       <RowList>
         <Row

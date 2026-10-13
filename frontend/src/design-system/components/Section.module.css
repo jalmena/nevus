@@ -1,19 +1,26 @@
 .section {
   display: grid;
   gap: var(--space-3);
-  margin-top: var(--space-6);
+  margin-top: var(--space-3);
 }
 
 .head {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-3);
+  gap: var(--space-1) var(--space-3);
   min-height: var(--touch-target);
 }
 
 .title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.title {
   font-size: var(--text-lg);
+  white-space: nowrap;
 }
 
 .chip {

@@ -43,7 +43,7 @@
     "proxyRetry": "I have signed in",
     "secondFactorTitle": "One more step",
     "codeIntro": "Enter the six-digit code from the authenticator app on your phone.",
-    "recoveryIntro": "Enter one of the recovery codes you saved when you set the second factor up. Each works once.",
+    "recoveryIntro": "Enter one of the recovery codes you saved. Each works once.",
     "code": "Code from the authenticator",
     "recoveryCode": "Recovery code",
     "continue": "Continue",
@@ -246,7 +246,7 @@
   "lesions": {
     "title": "Marks",
     "add": "Add a mark",
-    "placingHint": "Tap the zone where the mark is: the map zooms in on it. Then tap the exact spot.",
+    "placingHint": "Tap the zone where the mark is.",
     "placingSpot": "Tap the exact spot of the mark in {{zone}}.",
     "placed": "Now describe the mark below.",
     "newTitle": "New mark",
@@ -692,7 +692,9 @@
     "deleteNote": "The checklist goes with it; the photos and the report stay.",
     "reportNotMade": "not made yet",
     "reportOptions": "Report for the appointment",
-    "empty": "No appointments yet. Enter a date and the marks to photograph before it are listed."
+    "empty": "No appointments yet. Enter a date and the marks to photograph before it are listed.",
+    "planned_one": "{{count}} planned",
+    "planned_other": "{{count}} planned"
   },
   "webhooks": {
     "title": "Webhooks",
@@ -870,7 +872,7 @@
     "finish": "Finish the session",
     "delete": "Delete the session",
     "deleteConfirm": "Delete this session? Its photos go to the trash and the marks found on them are removed from it. The marks themselves stay in the registry.",
-    "markHint": "Tap the photo where a mark is, then link it to a mark you already follow or record it as a new one.",
+    "markHint": "Tap a mark on the photo to record it.",
     "markHintView": "The marks seen on this photo.",
     "canvas": "Photo of {{zone}}",
     "noPhoto": "This region has no photo in this session.",
@@ -972,7 +974,7 @@
     },
     "blur": "Blur a part of the photo",
     "blurTitle": "Blur part of the photo",
-    "blurHint": "Tap two opposite corners of the area to blur. Add as many areas as you need, then apply.",
+    "blurHint": "Tap two opposite corners of the area to blur.",
     "blurNote": "Replaces the photo for good; the marks stay.",
     "blurApply_one": "Blur {{count}} area",
     "blurApply_other": "Blur {{count}} areas",
@@ -991,7 +993,9 @@
     "empty": "No sessions yet. A session photographs the whole body, region by region.",
     "photographedOn": "photographed {{date}}",
     "selectRegion": "Photograph {{zone}} next",
-    "newMarkChoice": "A new mark…"
+    "newMarkChoice": "A new mark…",
+    "count_one": "{{count}} session",
+    "count_other": "{{count}} sessions"
   },
   "secondFactor": {
     "title": "Second factor",
@@ -1006,11 +1010,11 @@
     "qrAlt": "QR code for the authenticator app; the same secret is written out below it",
     "orType": "Or type:",
     "firstCode": "Code the app shows now",
-    "turnOn": "Turn the second factor on",
+    "turnOn": "Turn it on",
     "turnOff": "Turn it off",
     "newCodes": "New recovery codes",
     "codesTitle": "Recovery codes",
-    "codesIntro": "Each of these signs you in once if the phone is lost. Save them somewhere safe now: they are not shown again.",
+    "codesIntro": "Each signs you in once if the phone is lost. They are not shown again.",
     "download": "Save as a file",
     "codesDone": "I have saved them",
     "off": "The second factor is off.",

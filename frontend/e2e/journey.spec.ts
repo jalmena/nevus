@@ -140,13 +140,13 @@ test("the second factor: set up in the settings, then a sign-in that needs the c
   await accessible(page, "second factor setup");
   await shot(page, "settings-second-factor");
   await page.getByLabel("Code the app shows now").fill(totpCode(secret));
-  await page.getByRole("button", { name: "Turn the second factor on", exact: true }).click();
+  await page.getByRole("button", { name: "Turn it on", exact: true }).click();
   const codes = page.getByRole("region", { name: "Recovery codes" });
   await expect(codes.getByRole("listitem")).toHaveCount(10);
   const recovery = (await codes.getByRole("listitem").first().textContent()) ?? "";
   await accessible(page, "recovery codes");
   await shot(page, "settings-recovery-codes");
-  await codes.getByRole("button", { name: "I have saved them", exact: true }).click();
+  await page.getByRole("button", { name: "I have saved them", exact: true }).click();
   await expect(page.getByText("The second factor is on. 10 recovery codes left.")).toBeVisible();
 
   // Signing in now needs the code; a wrong one is refused, the next step's accepted.

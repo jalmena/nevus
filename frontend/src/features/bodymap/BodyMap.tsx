@@ -392,15 +392,16 @@ export function BodyMap({
         >
           <ZoomIn aria-hidden="true" />
         </button>
-        <button
-          type="button"
-          onClick={() => zoom(1 / 1.5)}
-          aria-label={t("bodymap.zoomOut")}
-          title={t("bodymap.zoomOut")}
-          disabled={vb.w >= MAP_WIDTH}
-        >
-          <ZoomOut aria-hidden="true" />
-        </button>
+        {vb.w < MAP_WIDTH && (
+          <button
+            type="button"
+            onClick={() => zoom(1 / 1.5)}
+            aria-label={t("bodymap.zoomOut")}
+            title={t("bodymap.zoomOut")}
+          >
+            <ZoomOut aria-hidden="true" />
+          </button>
+        )}
         {vb.w < MAP_WIDTH && (
           <button
             type="button"

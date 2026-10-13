@@ -3,7 +3,6 @@ import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/design-system/components/Button";
 import { EmptyState } from "@/design-system/components/EmptyState";
-import { Help } from "@/design-system/components/Help";
 import { IconButton } from "@/design-system/components/IconButton";
 import { Notice } from "@/design-system/components/Notice";
 import { PageHeader } from "@/design-system/components/PageHeader";
@@ -11,6 +10,7 @@ import { Row, RowList } from "@/design-system/components/Row";
 import { Select } from "@/design-system/components/Select";
 import { Sheet } from "@/design-system/components/Sheet";
 import { personRail } from "@/features/persons/personRail";
+import { shortDateTime } from "@/lib/dates";
 import { formatBytes } from "@/lib/data";
 import type { LesionOut } from "@/lib/lesions";
 import type { PersonOut } from "@/lib/persons";
@@ -53,7 +53,6 @@ export function Reports({
   const [scope, setScope] = useState<"profile" | "selection">("profile");
   const [chosen, setChosen] = useState<string[]>([]);
   const locale = i18n.resolvedLanguage ?? "en";
-  const dateFormat = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
   const shown = (reports.data ?? []).filter((report) =>
     lesionId ? report.scope === "lesion" && report.lesion_ids.includes(lesionId) : true,
   );
@@ -87,19 +86,28 @@ export function Reports({
   return (
     <div className={styles.page}>
       <PageHeader
+        help={{
+          title: t("reports.title"),
+          content: (
+            <>
+              <p>{lesionId ? t("reports.hintLesion") : t("reports.hint")}</p>
+              <p>{lesionId ? t("reports.introLesion") : t("reports.introProfile")}</p>
+            </>
+          ),
+        }}
         back={back}
         title={t("reports.title")}
-        meta={[lesion ? titleOf(lesion.id) : null, person.display_name]}
+        meta={[
+          lesion ? titleOf(lesion.id) : person.display_name,
+          reports.data
+            ? shown.length > 0
+              ? t("reports.made", { count: shown.length })
+              : t("reports.none")
+            : null,
+        ]}
         rail={personRail(t, person.id, person.display_name)}
         primary={{ label: t("reports.make"), onClick: () => setOpen(true) }}
-      >
-        <p className={["text-secondary", styles.intro].join(" ")}>
-          {lesionId ? t("reports.hintLesion") : t("reports.hint")}
-          <Help title={t("reports.title")} as="text">
-            <p>{lesionId ? t("reports.introLesion") : t("reports.introProfile")}</p>
-          </Help>
-        </p>
-      </PageHeader>
+      ></PageHeader>
       {reports.error && <Notice kind="error">{reports.error.message}</Notice>}
       {reports.data && shown.length === 0 && <EmptyState>{t("reports.empty")}</EmptyState>}
       {shown.length > 0 && (
@@ -110,7 +118,7 @@ export function Reports({
               title={describe(report)}
               meta={
                 <>
-                  {dateFormat.format(new Date(report.created_at))} · {t(`languages.${report.language}`)} ·{" "}
+                  {shortDateTime(locale, report.created_at)} · {t(`languages.${report.language}`)} ·{" "}
                   {report.paper === "letter" ? t("reports.letter") : "A4"}
                   {report.status === "failed" && (
                     <span className={styles.failed}>{report.error ?? t("reports.failed")}</span>

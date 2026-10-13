@@ -2,7 +2,6 @@ import { KeyRound, ShieldOff, UserCheck, UserX } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/design-system/components/Button";
-import { Help } from "@/design-system/components/Help";
 import { Menu } from "@/design-system/components/Menu";
 import { Notice } from "@/design-system/components/Notice";
 import { Row, RowList } from "@/design-system/components/Row";
@@ -77,18 +76,20 @@ export function UsersAdmin() {
   return (
     <div className={styles.page}>
       <SettingsHeader
+        help={{
+          title: t("accounts.title"),
+          content: (
+            <>
+              <p>{t("accounts.hint")}</p>
+              <p>{local ? t("accounts.intro") : t("accounts.introProxy")}</p>
+            </>
+          ),
+        }}
         admin
         title={t("accounts.title")}
         meta={[users.data ? t("settings.status.accounts", { count: users.data.length }) : null]}
         primary={local ? { label: t("accounts.addTitle"), onClick: () => setAdding(true) } : undefined}
-      >
-        <p className={["text-secondary", styles.intro].join(" ")}>
-          {t("accounts.hint")}
-          <Help title={t("accounts.title")} as="text">
-            <p>{local ? t("accounts.intro") : t("accounts.introProxy")}</p>
-          </Help>
-        </p>
-      </SettingsHeader>
+      ></SettingsHeader>
       <RowList>
         {(users.data ?? []).map((user) => (
           <Row

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Help } from "@/design-system/components/Help";
 import { Notice } from "@/design-system/components/Notice";
 import { Switch } from "@/design-system/components/Switch";
 import { TextField } from "@/design-system/components/TextField";
@@ -24,17 +23,19 @@ export function ReminderSettings({ admin }: { admin: boolean }) {
   return (
     <div className={styles.page}>
       <SettingsHeader
+        help={{
+          title: t("reminders.settingsTitle"),
+          content: (
+            <>
+              <p>{t("reminders.settingsShort")}</p>
+              <p>{t("reminders.settingsIntro")}</p>
+            </>
+          ),
+        }}
         admin={admin}
         title={t("reminders.settingsTitle")}
         meta={[user.email_reminders ? t("settings.status.emailOn") : t("settings.status.emailOff")]}
-      >
-        <p className={["text-secondary", styles.intro].join(" ")}>
-          {t("reminders.settingsShort")}
-          <Help title={t("reminders.settingsTitle")} as="text">
-            <p>{t("reminders.settingsIntro")}</p>
-          </Help>
-        </p>
-      </SettingsHeader>
+      ></SettingsHeader>
       <form
         className={styles.form}
         onSubmit={(event) => {

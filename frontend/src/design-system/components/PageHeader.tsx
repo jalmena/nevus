@@ -49,7 +49,7 @@ export function PageHeader({
             ? items.join(" · ")
             : items.map((item, index) => (
                 <span key={index} className={styles.metaItem}>
-                  {index > 0 && <span aria-hidden="true"> · </span>}
+                  {index > 0 && <span aria-hidden="true">{" · "}</span>}
                   {item}
                 </span>
               ))}

@@ -34,7 +34,7 @@ export async function signIn(page: Page) {
 }
 
 /** A visit with a photo of the card, and the 5 mm disc in its window measured. */
-export async function measuredVisit(page: Page, first: boolean) {
+export async function measuredVisit(page: Page, first: boolean, onMeasure?: () => Promise<void>) {
   await page.getByRole("button", { name: "New visit", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Measurements", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Add a photo", exact: true }).click();
@@ -71,6 +71,7 @@ export async function measuredVisit(page: Page, first: boolean) {
 
   const longest = page.locator("dt", { hasText: "Longest" }).locator("xpath=following-sibling::dd");
   await expect(longest).toHaveText(/^\d+\.\d ± \d+\.\d mm$/, { timeout: 20_000 });
+  if (onMeasure) await onMeasure();
   const value = Number((await longest.textContent())?.split(" ")[0]);
   expect(Math.abs(value - 5.0)).toBeLessThanOrEqual(0.3);
   await page.getByRole("button", { name: "Save the measurement", exact: true }).click();
@@ -87,8 +88,23 @@ export async function more(page: Page, item: string) {
 export async function shot(page: Page, name: string, dir = process.env.NEVUS_E2E_SHOTS) {
   if (!dir) return;
   mkdirSync(dir, { recursive: true });
-  // A full-page capture draws sticky bars where the viewport happened to be; flatten them for the sheet.
-  await page.addStyleTag({ content: "[data-chrome='bar'] { position: static !important; }" });
+  // A full-page capture draws sticky bars where the viewport happened to be; flatten them for the sheet,
+  // from the top of the page, with the pointer away from anything it could highlight.
+  await page.addStyleTag({
+    content:
+      "[data-chrome='bar'] { position: static !important; } [data-chrome='rail'] { position: static !important; height: auto !important; }",
+  });
+  await page.mouse.move(0, 0);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  const overflow = await page.evaluate(() => {
+    const width = document.documentElement.clientWidth;
+    if (document.documentElement.scrollWidth <= width) return null;
+    return Array.from(document.querySelectorAll("body *"))
+      .filter((element) => element.getBoundingClientRect().right > width + 1)
+      .slice(0, 5)
+      .map((element) => `${element.tagName.toLowerCase()}.${element.className.toString().slice(0, 40)}`);
+  });
+  if (overflow) console.warn(`${name}: wider than the viewport at ${overflow.join(", ")}`);
   for (const scheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme: scheme });
     await page.waitForTimeout(400); // let colour transitions finish

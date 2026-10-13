@@ -3,7 +3,6 @@ import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/design-system/components/Button";
 import { EmptyState } from "@/design-system/components/EmptyState";
-import { Help } from "@/design-system/components/Help";
 import { IconButton } from "@/design-system/components/IconButton";
 import { Notice } from "@/design-system/components/Notice";
 import { Row, RowList } from "@/design-system/components/Row";
@@ -67,18 +66,20 @@ export function WebhookSettings() {
   return (
     <div className={styles.page}>
       <SettingsHeader
+        help={{
+          title: t("webhooks.title"),
+          content: (
+            <>
+              <p>{t("webhooks.hint")}</p>
+              <p>{t("webhooks.intro")}</p>
+            </>
+          ),
+        }}
         admin
         title={t("webhooks.title")}
         meta={[hooks.data ? t("settings.status.webhooks", { count: hooks.data.length }) : null]}
         primary={{ label: t("webhooks.new"), onClick: () => setAdding(true) }}
-      >
-        <p className={["text-secondary", styles.intro].join(" ")}>
-          {t("webhooks.hint")}
-          <Help title={t("webhooks.title")} as="text">
-            <p>{t("webhooks.intro")}</p>
-          </Help>
-        </p>
-      </SettingsHeader>
+      ></SettingsHeader>
       {hooks.data && hooks.data.length === 0 && <EmptyState>{t("webhooks.hint")}</EmptyState>}
       {(hooks.data ?? []).length > 0 && (
         <RowList>

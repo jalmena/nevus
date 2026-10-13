@@ -1,4 +1,4 @@
-import { Camera, Image, Plus, TriangleAlert, Video } from "lucide-react";
+import { Camera, Image, TriangleAlert, Video } from "lucide-react";
 import { useRef, useState, type RefObject } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/design-system/components/Button";
@@ -137,7 +137,7 @@ export function PhotoGallery({
                 onClick={() => onAddOpen(true)}
                 disabled={upload.isPending}
               >
-                <Plus aria-hidden="true" />
+                <Camera aria-hidden="true" />
                 <span>{t("images.addPhoto")}</span>
               </button>
             </li>

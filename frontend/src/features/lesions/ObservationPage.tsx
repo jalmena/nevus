@@ -2,7 +2,6 @@ import { Camera, Ruler, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
-import { useMediaQuery } from "@/app/chrome";
 import type { MenuItem } from "@/design-system/components/Menu";
 import { Chip } from "@/design-system/components/Chip";
 import { Notice } from "@/design-system/components/Notice";
@@ -12,6 +11,7 @@ import { TextArea } from "@/design-system/components/TextArea";
 import { PhotoGallery } from "@/features/images/PhotoGallery";
 import { Proposals } from "@/features/measure/Proposals";
 import { VisitMeasurements } from "@/features/measure/VisitMeasurements";
+import { shortDate } from "@/lib/dates";
 import { useConfirm } from "@/lib/confirm/ConfirmProvider";
 import type { ImageRole } from "@/lib/images";
 import {
@@ -25,6 +25,7 @@ import {
   type Symptom,
 } from "@/lib/lesions";
 import { useVisitMeasurements } from "@/lib/measurements";
+import { personRail } from "@/features/persons/personRail";
 import { usePerson } from "@/lib/persons";
 import { lesionTitle } from "./lesionName";
 import styles from "./lesions.module.css";
@@ -35,7 +36,6 @@ export function ObservationPage() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const confirm = useConfirm();
-  const desktop = useMediaQuery("(min-width: 900px)");
   const observation = useObservation(observationId);
   const lesionId = observation.data?.lesion_id ?? "";
   const lesion = useLesion(lesionId);
@@ -52,7 +52,6 @@ export function ObservationPage() {
   const [symptoms, setSymptoms] = useState<Symptom[]>([]);
   const [dirty, setDirty] = useState(false);
   const canEdit = person.data?.my_role === "owner" || person.data?.my_role === "manager";
-  const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "long" });
   const timeFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, { timeStyle: "short" });
 
   useEffect(() => {
@@ -97,10 +96,6 @@ export function ObservationPage() {
         : !measured && firstImage
           ? { label: t("measure.title"), onClick: () => void navigate(measureUrl(firstImage.id)) }
           : undefined;
-  const secondary =
-    desktop && canEdit && measured && firstImage && !dirty
-      ? { label: t("measure.title"), onClick: () => void navigate(measureUrl(firstImage.id)) }
-      : undefined;
 
   const menu: MenuItem[] = [];
   if (canEdit) {
@@ -135,11 +130,11 @@ export function ObservationPage() {
     <div className={[styles.page, "page-wide"].join(" ")}>
       <PageHeader
         back={{ to: `/lesions/${data.lesion_id}`, label: markTitle }}
-        title={dateFormat.format(new Date(data.captured_at))}
+        title={shortDate(i18n.resolvedLanguage, data.captured_at)}
         meta={[timeFormat.format(new Date(data.captured_at)), markTitle, person.data?.display_name ?? null]}
         primary={primary}
-        secondary={secondary}
         menu={menu}
+        rail={lesion.data ? personRail(t, lesion.data.person_id, person.data?.display_name) : undefined}
       />
       {remove.error && <Notice kind="error">{remove.error.message}</Notice>}
 

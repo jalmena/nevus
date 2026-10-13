@@ -2,7 +2,6 @@ import { FlaskConical } from "lucide-react";
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/design-system/components/Button";
-import { Help } from "@/design-system/components/Help";
 import { Notice } from "@/design-system/components/Notice";
 import { Row, RowList } from "@/design-system/components/Row";
 import { Select } from "@/design-system/components/Select";
@@ -68,6 +67,15 @@ export function AdminSettings() {
   return (
     <div className={styles.page}>
       <SettingsHeader
+        help={{
+          title: t("admin.emailTitle"),
+          content: (
+            <>
+              <p>{t("admin.emailHint")}</p>
+              <p>{t("admin.emailIntro")}</p>
+            </>
+          ),
+        }}
         admin
         title={t("admin.emailTitle")}
         meta={[
@@ -77,14 +85,7 @@ export function AdminSettings() {
               : t("settings.status.emailNotReady")
             : null,
         ]}
-      >
-        <p className={["text-secondary", styles.intro].join(" ")}>
-          {t("admin.emailHint")}
-          <Help title={t("admin.emailTitle")} as="text">
-            <p>{t("admin.emailIntro")}</p>
-          </Help>
-        </p>
-      </SettingsHeader>
+      ></SettingsHeader>
       <form className={styles.form} onSubmit={submit}>
         <TextField label={t("admin.host")} value={form.host} onChange={set("host")} autoComplete="off" />
         <TextField label={t("admin.port")} value={form.port} onChange={set("port")} inputMode="numeric" />
@@ -164,9 +165,16 @@ export function InstanceSection() {
   const saveInstance = useSaveInstanceSettings();
   return (
     <div className={styles.page}>
-      <SettingsHeader admin title={t("admin.instanceTitle")}>
-        <p className={["text-secondary", styles.intro].join(" ")}>{t("admin.instanceHint")}</p>
-      </SettingsHeader>
+      <SettingsHeader
+        admin
+        title={t("admin.instanceTitle")}
+        meta={[
+          instance.data
+            ? t("settings.status.language", { language: t(`languages.${instance.data.default_language}`) })
+            : null,
+        ]}
+        help={{ title: t("admin.instanceTitle"), content: <p>{t("admin.instanceHint")}</p> }}
+      />
       <RowList>
         <Row
           title={t("admin.defaultLanguage")}

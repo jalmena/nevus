@@ -52,9 +52,8 @@ export function LabelPage() {
       <PageHeader
         back={{ to: "/evaluation", label: t("evaluation.title") }}
         title={t("evaluation.labelTitle")}
-      >
-        <p className="text-secondary">{t("evaluation.labelIntro")}</p>
-      </PageHeader>
+        help={{ title: t("evaluation.labelTitle"), content: <p>{t("evaluation.labelIntro")}</p> }}
+      />
       <Segmented
         label={t("evaluation.tool")}
         options={[

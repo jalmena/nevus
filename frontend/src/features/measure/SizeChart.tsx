@@ -220,6 +220,7 @@ export function SizeChart({ lesionId }: { lesionId: string }) {
             title={t("chart.csv")}
           >
             <Download aria-hidden="true" />
+            <span className={styles.linkLabel}>{t("chart.csv")}</span>
           </a>
         </>
       }

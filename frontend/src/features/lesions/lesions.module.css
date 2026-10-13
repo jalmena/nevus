@@ -95,3 +95,24 @@
     top: 64px;
   }
 }
+
+/* The mark page from 900 px: the visits on the left, the size over time and the sightings on the right. */
+.markLayout {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.markPane {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+  min-width: 0;
+}
+
+@media (width >= 900px) {
+  .markLayout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-8);
+    align-items: start;
+  }
+}

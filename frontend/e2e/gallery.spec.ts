@@ -73,7 +73,7 @@ test("every screen, for a look at the design", async ({ page }, info) => {
   await page.getByRole("button", { name: "Create the mark", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Chest mark", exact: true })).toBeVisible();
   await snap("06-mark-empty");
-  await measuredVisit(page, false);
+  await measuredVisit(page, false, () => snap("07b-measure"));
   await snap("07-visit");
   await page.getByRole("link", { name: "Back to Chest mark", exact: true }).click();
   await measuredVisit(page, false);
@@ -171,7 +171,7 @@ test("every screen, for a look at the design", async ({ page }, info) => {
   const secret = (shown ?? "").replace(/\s/g, "");
   await snap("19-settings-second-factor");
   await page.getByLabel("Code the app shows now").fill(totpCode(secret));
-  await page.getByRole("button", { name: "Turn the second factor on", exact: true }).click();
+  await page.getByRole("button", { name: "Turn it on", exact: true }).click();
   await expect(page.getByRole("region", { name: "Recovery codes" })).toBeVisible();
   await snap("20-settings-recovery-codes");
   await page.getByRole("button", { name: "I have saved them", exact: true }).click();
