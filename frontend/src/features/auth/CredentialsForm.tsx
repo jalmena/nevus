@@ -32,6 +32,10 @@ export function CredentialsForm({
 
   function submit(event: FormEvent) {
     event.preventDefault();
+    if (!username.trim() || !password) {
+      setLocalError(t("auth.fillBoth"));
+      return;
+    }
     if (password.length < MIN_PASSWORD) {
       setLocalError(t("auth.passwordTooShort", { count: MIN_PASSWORD }));
       return;
@@ -79,7 +83,7 @@ export function CredentialsForm({
         />
       )}
       {(localError ?? error) && <Notice kind="error">{localError ?? error}</Notice>}
-      <Button type="submit" disabled={pending || !username || !password}>
+      <Button type="submit" disabled={pending}>
         {pending ? t("common.working") : submitLabel}
       </Button>
     </form>

@@ -45,8 +45,14 @@ textarea {
 /* Pages keep a text column inside the shell; a page marked wide lays its panes across the whole shell. */
 main > :not(.page-wide) {
   width: 100%;
-  max-width: 48rem;
+  max-width: 44rem;
   margin-inline: auto;
+}
+
+@media (width >= 900px) {
+  main > :not(.page-wide) {
+    margin-inline: 0;
+  }
 }
 
 .text-secondary {

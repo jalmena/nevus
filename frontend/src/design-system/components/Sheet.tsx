@@ -4,6 +4,18 @@ import { useTranslation } from "react-i18next";
 import { IconButton } from "./IconButton";
 import styles from "./Sheet.module.css";
 
+/** Opens or closes a native dialog, or fakes it with the attribute where the browser cannot (tests). */
+export function showDialog(element: HTMLDialogElement, open: boolean) {
+  if (open && !element.open) {
+    if (typeof element.showModal === "function") element.showModal();
+    else element.setAttribute("open", "");
+  }
+  if (!open && element.open) {
+    if (typeof element.close === "function") element.close();
+    else element.removeAttribute("open");
+  }
+}
+
 /**
  * A tool that opens over the page: a sheet from the bottom on a phone, a dialog in the middle on a
  * desktop. Native <dialog>, so Escape closes it and the focus stays inside while it is open.
@@ -23,10 +35,7 @@ export function Sheet({
   const dialog = useRef<HTMLDialogElement>(null);
   const id = useId();
   useEffect(() => {
-    const element = dialog.current;
-    if (!element) return;
-    if (open && !element.open) element.showModal();
-    if (!open && element.open) element.close();
+    if (dialog.current) showDialog(dialog.current, open);
   }, [open]);
   useEffect(() => {
     // A tap on the backdrop closes the sheet; the panel itself swallows its clicks.
@@ -47,7 +56,7 @@ export function Sheet({
           </h2>
           <IconButton label={t("common.close")} icon={<X />} onClick={onClose} />
         </header>
-        <div className={styles.body}>{children}</div>
+        <div className={styles.body}>{open && children}</div>
       </div>
     </dialog>
   );

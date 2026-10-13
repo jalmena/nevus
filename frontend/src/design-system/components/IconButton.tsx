@@ -26,7 +26,13 @@ export const IconButton = forwardRef<
       aria-label={showLabel === true ? undefined : label}
       title={showLabel === true ? undefined : label}
       {...props}
-      className={[buttonStyles.button, buttonStyles[variant], styles.iconButton, className]
+      className={[
+        buttonStyles.button,
+        buttonStyles[variant],
+        styles.iconButton,
+        variant === "quiet" ? styles.quiet : "",
+        className,
+      ]
         .filter(Boolean)
         .join(" ")}
     >

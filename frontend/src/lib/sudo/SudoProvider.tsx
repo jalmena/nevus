@@ -10,6 +10,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { Button } from "@/design-system/components/Button";
 import { Notice } from "@/design-system/components/Notice";
+import { Sheet } from "@/design-system/components/Sheet";
 import { TextField } from "@/design-system/components/TextField";
 import { api, errorMessage } from "@/lib/api/client";
 import { useInstance } from "@/lib/auth/session";
@@ -25,8 +26,8 @@ const Context = createContext<Ask>(() => Promise.reject(new Error("no sudo provi
 export function SudoProvider({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
   const proxy = useInstance().data?.auth_mode === "proxy";
-  const dialog = useRef<HTMLDialogElement>(null);
   const pending = useRef<{ resolve: () => void; reject: (error: Error) => void } | null>(null);
+  const [open, setOpen] = useState(false);
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -37,9 +38,7 @@ export function SudoProvider({ children }: { children: ReactNode }) {
         pending.current = { resolve, reject };
         setPassword("");
         setError(null);
-        const element = dialog.current;
-        if (element?.showModal) element.showModal();
-        else element?.setAttribute("open", "");
+        setOpen(true);
       }),
     [],
   );
@@ -55,29 +54,22 @@ export function SudoProvider({ children }: { children: ReactNode }) {
       setError(errorMessage(failure, t("sudo.wrong")));
       return;
     }
-    close();
+    setOpen(false);
     pending.current?.resolve();
     pending.current = null;
   }
 
-  function close() {
-    const element = dialog.current;
-    if (element?.close) element.close();
-    else element?.removeAttribute("open");
-  }
-
-  function cancel() {
-    close();
-    pending.current?.reject(new Error(t("sudo.cancelled")));
+  const cancel = useCallback(() => {
+    setOpen(false);
+    if (pending.current) pending.current.reject(new Error(t("sudo.cancelled")));
     pending.current = null;
-  }
+  }, [t]);
 
   return (
     <Context.Provider value={ask}>
       {children}
-      <dialog ref={dialog} className={styles.dialog} aria-labelledby="sudo-title" onCancel={cancel}>
+      <Sheet open={open} title={t("sudo.title")} onClose={cancel}>
         <form onSubmit={submit} className={styles.form}>
-          <h2 id="sudo-title">{t("sudo.title")}</h2>
           <p className="text-secondary">{proxy ? t("sudo.introProxy") : t("sudo.intro")}</p>
           {!proxy && (
             <TextField
@@ -90,15 +82,15 @@ export function SudoProvider({ children }: { children: ReactNode }) {
           )}
           {error && <Notice kind="error">{error}</Notice>}
           <div className={styles.actions}>
-            <Button type="submit" disabled={busy || (!proxy && !password)}>
-              {proxy ? t("sudo.confirmProxy") : t("sudo.confirm")}
-            </Button>
             <Button type="button" variant="quiet" onClick={cancel}>
               {t("common.cancel")}
             </Button>
+            <Button type="submit" disabled={busy}>
+              {proxy ? t("sudo.confirmProxy") : t("sudo.confirm")}
+            </Button>
           </div>
         </form>
-      </dialog>
+      </Sheet>
     </Context.Provider>
   );
 }

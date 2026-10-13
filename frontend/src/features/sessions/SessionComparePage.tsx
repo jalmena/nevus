@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useParams } from "react-router";
+import { useParams } from "react-router";
 import { Notice } from "@/design-system/components/Notice";
+import { PageHeader } from "@/design-system/components/PageHeader";
+import { Select } from "@/design-system/components/Select";
 import { ComparisonViewer } from "@/features/compare/ComparisonViewer";
 import { useBodySession, useSessionPairs } from "@/lib/sessions";
 import styles from "./sessions.module.css";
@@ -15,6 +17,7 @@ export function SessionComparePage() {
   const two = useBodySession(otherId);
   const [chosen, setChosen] = useState<string | null>(null);
   const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "medium" });
+  const longDate = new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "long" });
 
   if (pairs.error) return <Notice kind="error">{pairs.error.message}</Notice>;
   if (!pairs.data || !one.data || !two.data) return <p className="text-secondary">…</p>;
@@ -29,29 +32,32 @@ export function SessionComparePage() {
 
   return (
     <div className={styles.page}>
-      <p>
-        <Link to={`/sessions/${later.id}`}>{t("sessions.backToSession")}</Link>
-      </p>
-      <h1>{t("sessions.compareTitle")}</h1>
-      <p className="text-secondary">
-        {t("sessions.compareDates", {
-          earlier: dateFormat.format(new Date(earlier.started_at)),
-          later: dateFormat.format(new Date(later.started_at)),
-        })}
-      </p>
+      <PageHeader
+        back={{
+          to: `/sessions/${later.id}`,
+          label: t("sessions.titleFor", { date: longDate.format(new Date(later.started_at)) }),
+        }}
+        title={t("sessions.compareTitle")}
+        meta={[
+          t("sessions.compareDates", {
+            earlier: dateFormat.format(new Date(earlier.started_at)),
+            later: dateFormat.format(new Date(later.started_at)),
+          }),
+        ]}
+        help={{ title: t("common.help"), content: <p>{t("compare.zoomHint")}</p> }}
+      />
       {pairs.data.length === 0 ? (
         <Notice kind="info">{t("sessions.compareNone")}</Notice>
       ) : (
-        <label className={styles.field}>
-          <span>{t("sessions.compareZone")}</span>
-          <select value={zone ?? ""} onChange={(e) => setChosen(e.target.value)}>
-            {pairs.data.map((item) => (
-              <option key={item.zone} value={item.zone}>
-                {t(`sessions.zones.${item.zone}.name`)}
-              </option>
-            ))}
-          </select>
-        </label>
+        <Select
+          label={t("sessions.compareZone")}
+          value={zone ?? ""}
+          onChange={(e) => setChosen(e.target.value)}
+          options={pairs.data.map((item) => ({
+            value: item.zone,
+            label: t(`sessions.zones.${item.zone}.name`),
+          }))}
+        />
       )}
       {pair && (
         <ComparisonViewer

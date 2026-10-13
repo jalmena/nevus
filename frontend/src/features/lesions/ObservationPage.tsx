@@ -1,12 +1,19 @@
-import { useEffect, useState } from "react";
+import { Camera, Ruler, Trash2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate, useParams } from "react-router";
-import { Button } from "@/design-system/components/Button";
+import { useNavigate, useParams } from "react-router";
+import { useMediaQuery } from "@/app/chrome";
+import type { MenuItem } from "@/design-system/components/Menu";
+import { Chip } from "@/design-system/components/Chip";
 import { Notice } from "@/design-system/components/Notice";
+import { PageHeader } from "@/design-system/components/PageHeader";
+import { Section } from "@/design-system/components/Section";
+import { TextArea } from "@/design-system/components/TextArea";
 import { PhotoGallery } from "@/features/images/PhotoGallery";
-import { QualityNotice } from "@/features/images/QualityNotice";
 import { Proposals } from "@/features/measure/Proposals";
 import { VisitMeasurements } from "@/features/measure/VisitMeasurements";
+import { useConfirm } from "@/lib/confirm/ConfirmProvider";
+import type { ImageRole } from "@/lib/images";
 import {
   SYMPTOMS,
   useDeleteObservation,
@@ -17,30 +24,36 @@ import {
   useUploadObservationImage,
   type Symptom,
 } from "@/lib/lesions";
+import { useVisitMeasurements } from "@/lib/measurements";
 import { usePerson } from "@/lib/persons";
 import { lesionTitle } from "./lesionName";
 import styles from "./lesions.module.css";
 
+/** One visit: the photographs, the measurement, what the person noticed. */
 export function ObservationPage() {
   const { observationId = "" } = useParams();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const confirm = useConfirm();
+  const desktop = useMediaQuery("(min-width: 900px)");
   const observation = useObservation(observationId);
   const lesionId = observation.data?.lesion_id ?? "";
   const lesion = useLesion(lesionId);
   const visits = useObservations(lesionId);
   const person = usePerson(lesion.data?.person_id ?? "");
+  const measurements = useVisitMeasurements(observationId);
   const update = useUpdateObservation(observationId);
   const remove = useDeleteObservation(observationId, lesionId);
   const upload = useUploadObservationImage(observationId, lesionId);
+  const camera = useRef<HTMLInputElement>(null);
+  const [role, setRole] = useState<ImageRole>("close_up");
+  const [adding, setAdding] = useState(false);
   const [notes, setNotes] = useState("");
   const [symptoms, setSymptoms] = useState<Symptom[]>([]);
   const [dirty, setDirty] = useState(false);
   const canEdit = person.data?.my_role === "owner" || person.data?.my_role === "manager";
-  const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, {
-    dateStyle: "long",
-    timeStyle: "short",
-  });
+  const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "long" });
+  const timeFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, { timeStyle: "short" });
 
   useEffect(() => {
     if (observation.data && !dirty) {
@@ -52,6 +65,7 @@ export function ObservationPage() {
   if (observation.error) return <Notice kind="error">{observation.error.message}</Notice>;
   if (!observation.data) return <p className="text-secondary">…</p>;
   const data = observation.data;
+  const markTitle = lesion.data ? lesionTitle(lesion.data, t) : "…";
   const previous = (visits.data ?? [])
     .filter(
       (visit) => visit.id !== data.id && visit.captured_at < data.captured_at && visit.images.length > 0,
@@ -59,106 +73,131 @@ export function ObservationPage() {
     .sort((a, b) => b.captured_at.localeCompare(a.captured_at))[0];
   const previousImageId =
     previous?.images.find((image) => image.role === "close_up")?.id ?? previous?.images[0]?.id ?? null;
+  const measured = (measurements.data?.length ?? 0) > 0;
+  const firstImage = data.images.find((image) => image.role !== "overview") ?? data.images[0];
+  const measureUrl = (imageId: string) => `/observations/${data.id}/measure/${imageId}`;
 
-  function toggle(symptom: Symptom, checked: boolean) {
+  function toggle(symptom: Symptom) {
     setDirty(true);
-    setSymptoms((current) => (checked ? [...current, symptom] : current.filter((s) => s !== symptom)));
+    setSymptoms((current) =>
+      current.includes(symptom) ? current.filter((s) => s !== symptom) : [...current, symptom],
+    );
   }
 
   function save() {
     update.mutate({ notes: notes.trim() || null, symptoms }, { onSuccess: () => setDirty(false) });
   }
 
+  const primary = !canEdit
+    ? undefined
+    : data.images.length === 0
+      ? { label: t("images.takePhoto"), onClick: () => camera.current?.click(), pending: upload.isPending }
+      : dirty
+        ? { label: t("common.save"), onClick: save, pending: update.isPending }
+        : !measured && firstImage
+          ? { label: t("measure.title"), onClick: () => void navigate(measureUrl(firstImage.id)) }
+          : undefined;
+  const secondary =
+    desktop && canEdit && measured && firstImage && !dirty
+      ? { label: t("measure.title"), onClick: () => void navigate(measureUrl(firstImage.id)) }
+      : undefined;
+
+  const menu: MenuItem[] = [];
+  if (canEdit) {
+    menu.push({ label: t("images.addPhoto"), icon: <Camera />, onSelect: () => setAdding(true) });
+    if (data.images.length > 1)
+      data.images.forEach((image, index) =>
+        menu.push({
+          label: t("measure.measurePhotoN", { n: index + 1 }),
+          icon: <Ruler />,
+          onSelect: () => void navigate(measureUrl(image.id)),
+        }),
+      );
+    menu.push({
+      label: t("observations.delete"),
+      icon: <Trash2 />,
+      danger: true,
+      onSelect: () => {
+        void confirm({
+          title: t("observations.deleteQuestion"),
+          text: t("observations.deleteNote"),
+          action: t("observations.delete"),
+          danger: true,
+        }).then(
+          (yes) =>
+            yes && remove.mutate(undefined, { onSuccess: () => void navigate(`/lesions/${data.lesion_id}`) }),
+        );
+      },
+    });
+  }
+
   return (
     <div className={[styles.page, "page-wide"].join(" ")}>
-      <p>
-        <Link to={`/lesions/${data.lesion_id}`}>
-          {lesion.data ? t("observations.backTo", { lesion: lesionTitle(lesion.data, t) }) : t("common.back")}
-        </Link>
-      </p>
-      <header className={styles.header}>
-        <h1 className="numeric">{dateFormat.format(new Date(data.captured_at))}</h1>
-      </header>
+      <PageHeader
+        back={{ to: `/lesions/${data.lesion_id}`, label: markTitle }}
+        title={dateFormat.format(new Date(data.captured_at))}
+        meta={[timeFormat.format(new Date(data.captured_at)), markTitle, person.data?.display_name ?? null]}
+        primary={primary}
+        secondary={secondary}
+        menu={menu}
+      />
+      {remove.error && <Notice kind="error">{remove.error.message}</Notice>}
 
       <div className={styles.layout}>
-        <section className={[styles.section, styles.photoPane].join(" ")} aria-labelledby="photos-heading">
-          <h2 id="photos-heading">{t("observations.photos")}</h2>
+        <div className={styles.photoPane}>
           <PhotoGallery
             images={data.images}
             canEdit={canEdit}
             upload={upload}
             previousImageId={previousImageId}
-            primary={data.images.length === 0}
-            caption={
-              <QualityNotice
-                flags={data.quality_flags}
-                checking={data.images.some((image) => !image.quality_checked_at)}
-              />
-            }
+            role={role}
+            onRole={setRole}
+            cameraRef={camera}
+            addOpen={adding}
+            onAddOpen={setAdding}
+            quality={{
+              flags: data.quality_flags,
+              checking: data.images.some((image) => !image.quality_checked_at),
+            }}
           />
-        </section>
+        </div>
 
         <div className={styles.dataPane}>
           <Proposals observationId={data.id} images={data.images} canEdit={canEdit} />
           <VisitMeasurements observationId={data.id} images={data.images} canEdit={canEdit} />
 
-          <section className={styles.section} aria-labelledby="notes-heading">
-            <h2 id="notes-heading">{t("observations.yourNotes")}</h2>
-            <p className="text-secondary">{t("observations.notesHint")}</p>
-            <div className={styles.checks}>
+          <Section title={t("observations.notes")}>
+            <div className={styles.chips}>
               {SYMPTOMS.map((symptom) => (
-                <label key={symptom}>
-                  <input
-                    type="checkbox"
-                    checked={symptoms.includes(symptom)}
-                    disabled={!canEdit}
-                    onChange={(e) => toggle(symptom, e.target.checked)}
-                  />
+                <Chip
+                  key={symptom}
+                  pressed={symptoms.includes(symptom)}
+                  disabled={!canEdit}
+                  onClick={() => toggle(symptom)}
+                >
                   {t(`observations.symptoms.${symptom}`)}
-                </label>
+                </Chip>
               ))}
             </div>
-            <label>
-              <span className="text-secondary">{t("observations.notes")}</span>
-              <textarea
-                className={styles.textarea}
-                value={notes}
-                readOnly={!canEdit}
-                maxLength={4000}
-                onChange={(e) => {
-                  setDirty(true);
-                  setNotes(e.target.value);
-                }}
-              />
-            </label>
+            <TextArea
+              label={t("observations.notes")}
+              labelHidden
+              placeholder={t("observations.notesPlaceholder")}
+              value={notes}
+              readOnly={!canEdit}
+              maxLength={4000}
+              onChange={(e) => {
+                setDirty(true);
+                setNotes(e.target.value);
+              }}
+            />
             {update.error && <Notice kind="error">{update.error.message}</Notice>}
-            {canEdit && (
-              <div className={styles.actions}>
-                <Button
-                  variant={dirty ? "primary" : "secondary"}
-                  onClick={save}
-                  disabled={!dirty || update.isPending}
-                >
-                  {update.isPending ? t("common.working") : t("common.save")}
-                </Button>
-              </div>
+            {update.isSuccess && !dirty && (
+              <p className="text-secondary" role="status">
+                {t("common.saved")}
+              </p>
             )}
-          </section>
-
-          {canEdit && (
-            <div className={styles.dangerZone}>
-              <Button
-                variant="danger"
-                disabled={remove.isPending}
-                onClick={() =>
-                  remove.mutate(undefined, { onSuccess: () => void navigate(`/lesions/${data.lesion_id}`) })
-                }
-              >
-                {t("observations.delete")}
-              </Button>
-              {remove.error && <Notice kind="error">{remove.error.message}</Notice>}
-            </div>
-          )}
+          </Section>
         </div>
       </div>
     </div>

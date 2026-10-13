@@ -1,49 +1,72 @@
-import { ArrowLeft } from "lucide-react";
-import type { ReactNode } from "react";
-import { Link } from "react-router";
-import { useTranslation } from "react-i18next";
+import { useEffect, useRef, type ReactNode } from "react";
+import { usePageChrome, setTitleInView, type Chrome } from "@/app/chrome";
 import styles from "./PageHeader.module.css";
 
 /**
- * The top of an inner page: the way back (an arrow named after the parent, whose title shows from
- * 900 px), the title with what sits beside it, one line of meta, and the page's few actions.
+ * The top of a page, in the content: the title, one meta line, a strip of facts. It also tells the
+ * shell what to show around the page (the way back, the icon actions, the menu, the primary action).
  */
 export function PageHeader({
-  back,
   title,
-  aside,
   meta,
-  actions,
-  titleClassName,
-}: {
-  /** Where the arrow goes and what it is called: the parent's title. */
-  back?: { to: string; label: string };
-  title: ReactNode;
-  /** Sits right of the title: a status badge, a role. */
-  aside?: ReactNode;
-  /** One line under the title. */
-  meta?: ReactNode;
-  /** Icon buttons and the "more" menu. */
-  actions?: ReactNode;
-  titleClassName?: string;
+  chip,
+  facts,
+  children,
+  ...chrome
+}: Chrome & {
+  title: string;
+  /** Items separated by " · ". */
+  meta?: ReactNode[];
+  /** A status chip at the end of the meta line. */
+  chip?: ReactNode;
+  /** Numbers that matter, as label and value pairs; pairs without a value are left out. */
+  facts?: { label: string; value: ReactNode | null | undefined }[];
+  children?: ReactNode;
 }) {
-  const { t } = useTranslation();
+  const heading = useRef<HTMLHeadingElement>(null);
+  usePageChrome({ ...chrome, title });
+  useEffect(() => {
+    const element = heading.current;
+    if (!element || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(([entry]) => setTitleInView(entry?.isIntersecting ?? true), {
+      rootMargin: "-56px 0px 0px 0px",
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+  const items = (meta ?? []).filter((item) => item !== null && item !== undefined && item !== "");
+  const shown = (facts ?? []).filter(
+    (fact) => fact.value !== null && fact.value !== undefined && fact.value !== "",
+  );
   return (
     <header className={styles.header}>
-      {back && (
-        <Link to={back.to} className={styles.back} aria-label={t("common.backTo", { title: back.label })}>
-          <ArrowLeft aria-hidden="true" />
-          <span className={styles.backText}>{back.label}</span>
-        </Link>
+      <h1 ref={heading} className={styles.title}>
+        {title}
+      </h1>
+      {(items.length > 0 || chip) && (
+        <p className={styles.meta}>
+          {items.every((item) => typeof item === "string")
+            ? items.join(" · ")
+            : items.map((item, index) => (
+                <span key={index} className={styles.metaItem}>
+                  {index > 0 && <span aria-hidden="true"> · </span>}
+                  {item}
+                </span>
+              ))}
+          {chip && <span className={styles.chip}>{chip}</span>}
+        </p>
       )}
-      <div className={styles.row}>
-        <div className={styles.titles}>
-          <h1 className={titleClassName}>{title}</h1>
-          {aside}
-        </div>
-        {actions && <div className={styles.actions}>{actions}</div>}
-      </div>
-      {meta && <p className={["text-secondary", styles.meta].join(" ")}>{meta}</p>}
+      {shown.length > 0 && (
+        <dl className={styles.facts}>
+          {shown.map((fact) => (
+            <div key={fact.label}>
+              <dt>{fact.label}</dt>
+              <dd className="numeric">{fact.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+      {children}
     </header>
   );
 }

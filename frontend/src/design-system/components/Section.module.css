@@ -1,0 +1,36 @@
+.section {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: var(--touch-target);
+}
+
+.title {
+  font-size: var(--text-lg);
+}
+
+.chip {
+  margin-left: var(--space-2);
+  vertical-align: middle;
+}
+
+.actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.group {
+  margin-top: var(--space-5);
+  color: var(--color-ink-3);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-emphasis);
+}

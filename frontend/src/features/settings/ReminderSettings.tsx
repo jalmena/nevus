@@ -1,52 +1,69 @@
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/design-system/components/Button";
-import { Card } from "@/design-system/components/Card";
+import { Help } from "@/design-system/components/Help";
 import { Notice } from "@/design-system/components/Notice";
+import { Switch } from "@/design-system/components/Switch";
 import { TextField } from "@/design-system/components/TextField";
 import { useSession, useUpdateMe } from "@/lib/auth/session";
+import { SettingsHeader } from "./SettingsHeader";
 import styles from "./settings.module.css";
 
-export function ReminderSettings() {
+/** The daily email: the address, saved as soon as it is left, and whether to send it. */
+export function ReminderSettings({ admin }: { admin: boolean }) {
   const { t } = useTranslation();
-  const session = useSession();
+  const user = useSession().data?.user;
   const update = useUpdateMe();
-  const user = session.data?.user;
   const [address, setAddress] = useState(user?.email ?? "");
   if (!user) return null;
 
-  function saveAddress(event: FormEvent) {
-    event.preventDefault();
-    update.mutate({ email: address.trim() || null });
+  function saveAddress() {
+    const next = address.trim() || null;
+    if (next !== (user?.email ?? null)) update.mutate({ email: next });
   }
 
   return (
-    <Card className={styles.group}>
-      <h2 className={styles.subheading}>{t("reminders.settingsTitle")}</h2>
-      <p className="text-secondary">{t("reminders.settingsIntro")}</p>
-      <form className={styles.inline} onSubmit={saveAddress}>
+    <div className={styles.page}>
+      <SettingsHeader
+        admin={admin}
+        title={t("reminders.settingsTitle")}
+        meta={[user.email_reminders ? t("settings.status.emailOn") : t("settings.status.emailOff")]}
+      >
+        <p className={["text-secondary", styles.intro].join(" ")}>
+          {t("reminders.settingsShort")}
+          <Help title={t("reminders.settingsTitle")} as="text">
+            <p>{t("reminders.settingsIntro")}</p>
+          </Help>
+        </p>
+      </SettingsHeader>
+      <form
+        className={styles.form}
+        onSubmit={(event) => {
+          event.preventDefault();
+          saveAddress();
+        }}
+      >
         <TextField
           label={t("reminders.email")}
           type="email"
           autoComplete="email"
           value={address}
           onChange={(e) => setAddress(e.target.value)}
+          onBlur={saveAddress}
         />
-        <Button type="submit" variant="secondary" disabled={update.isPending}>
-          {t("common.save")}
-        </Button>
       </form>
-      <label className={styles.row}>
-        <span>{t("reminders.emailReminders")}</span>
-        <input
-          type="checkbox"
-          checked={user.email_reminders}
-          disabled={!user.email}
-          onChange={(e) => update.mutate({ email_reminders: e.target.checked })}
-        />
-      </label>
-      {!user.email && <p className="text-secondary">{t("reminders.needEmail")}</p>}
+      <Switch
+        label={t("reminders.emailReminders")}
+        hint={!user.email ? t("reminders.needEmail") : undefined}
+        checked={user.email_reminders}
+        disabled={!user.email}
+        onChange={(checked) => update.mutate({ email_reminders: checked })}
+      />
+      {update.isSuccess && (
+        <p className="text-secondary" role="status">
+          {t("common.saved")}
+        </p>
+      )}
       {update.error && <Notice kind="error">{update.error.message}</Notice>}
-    </Card>
+    </div>
   );
 }

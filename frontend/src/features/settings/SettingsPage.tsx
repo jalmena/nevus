@@ -1,134 +1,199 @@
+import { LogOut } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/design-system/components/Button";
-import { Card } from "@/design-system/components/Card";
+import { Navigate } from "react-router";
+import { useMediaQuery } from "@/app/chrome";
 import { Notice } from "@/design-system/components/Notice";
-import { AdminSettings } from "@/features/admin/AdminSettings";
-import { UsersAdmin } from "@/features/admin/UsersAdmin";
-import { ExportForm } from "@/features/data/ExportForm";
-import { ExportList } from "@/features/data/ExportList";
-import { Link } from "react-router";
-import { Group } from "./Group";
-import { ReferenceCardSettings } from "./ReferenceCardSettings";
-import { PushSettings } from "./PushSettings";
-import { ReminderSettings } from "./ReminderSettings";
-import { SecondFactorSettings } from "./SecondFactorSettings";
+import { PageHeader } from "@/design-system/components/PageHeader";
+import { Row, RowList } from "@/design-system/components/Row";
+import { GroupLabel } from "@/design-system/components/Section";
+import { Select } from "@/design-system/components/Select";
+import { Switch } from "@/design-system/components/Switch";
+import { useBackupStatus, useEmailSettings, useInstanceSettings, useUsers } from "@/lib/admin";
 import { useInstance, useLogout, useSession, useUpdateMe } from "@/lib/auth/session";
+import { useTotpStatus } from "@/lib/auth/totp";
+import { useExports } from "@/lib/data";
 import { supportedLanguages, type Language } from "@/lib/i18n";
+import { useWebhooks } from "@/lib/notifications";
+import { pushSupported, usePushStatus } from "@/lib/push";
+import { SECTIONS, settingsRail } from "./SettingsHeader";
+import { THEMES } from "./AppearanceSection";
+import { useThisDevice } from "./PushSettings";
 import styles from "./settings.module.css";
 
-const THEMES = ["system", "light", "dark"] as const;
-
+/** The settings on a phone: rows in groups, each opening its section. On a desktop the rail does this. */
 export function SettingsPage() {
-  const { t } = useTranslation();
+  const desktop = useMediaQuery("(min-width: 900px)");
+  const session = useSession();
+  const user = session.data?.user;
+  if (!user) return null;
+  if (desktop) return <Navigate to="/settings/appearance" replace />;
+  return <SettingsRows admin={user.role === "admin"} />;
+}
+
+function SettingsRows({ admin }: { admin: boolean }) {
+  const { t, i18n } = useTranslation();
   const session = useSession();
   const instance = useInstance();
   const update = useUpdateMe();
   const logout = useLogout();
+  const local = instance.data?.auth_mode !== "proxy";
+  const totp = useTotpStatus(local);
+  const supported = pushSupported();
+  const push = usePushStatus(supported);
+  const thisDevice = useThisDevice(push.data?.subscriptions);
+  const exports = useExports();
   const user = session.data?.user;
   if (!user) return null;
-  const admin = user.role === "admin";
-  const sections = [
-    { id: "account", label: t("settings.account") },
-    { id: "appearance", label: t("settings.appearance") },
-    { id: "reminders", label: t("reminders.settingsTitle") },
-    { id: "second-factor", label: t("secondFactor.title") },
-    { id: "reference-card", label: t("card.title") },
-    { id: "your-data", label: t("data.title") },
-    ...(admin
-      ? [
-          { id: "accounts", label: t("accounts.title") },
-          { id: "email", label: t("admin.emailTitle") },
-          { id: "webhooks", label: t("webhooks.title") },
-          { id: "backups", label: t("backups.title") },
-          { id: "instance", label: t("admin.instanceTitle") },
-        ]
-      : []),
-    { id: "about", label: t("settings.about") },
+  const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "medium" });
+
+  const status: Record<string, string | undefined> = {
+    account: t(`settings.roles.${user.role}`),
+    reminders: user.email_reminders ? t("settings.status.emailOn") : t("settings.status.emailOff"),
+    notifications: thisDevice ? t("settings.status.deviceOn") : t("settings.status.deviceOff"),
+    "second-factor": totp.data?.enabled
+      ? t("settings.status.secondFactorOn", { count: totp.data.recovery_codes_left })
+      : t("settings.status.secondFactorOff"),
+    "reference-card": user.card_line_mm
+      ? t("settings.status.cardVerified", { mm: user.card_line_mm })
+      : t("settings.status.cardUnverified"),
+    "your-data": t("settings.status.exports", { count: exports.data?.length ?? 0 }),
+    about: t("settings.version", { version: instance.data?.version ?? "" }),
+  };
+  const groups = [
+    "account",
+    "reminders",
+    "security",
+    "measuring",
+    "yourData",
+    "administration",
+    "about",
+  ] as const;
+  const show = (id: string) => {
+    if (id === "notifications") return supported && Boolean(push.data?.enabled);
+    if (id === "second-factor") return local && Boolean(totp.data);
+    return true;
+  };
+
+  return (
+    <div className={styles.page}>
+      <PageHeader title={t("settings.title")} rail={settingsRail(t, admin)} />
+      {groups.map((group) => {
+        const sections = SECTIONS.filter(
+          (section) => section.group === group && (admin || !section.admin) && show(section.id),
+        );
+        if (sections.length === 0) return null;
+        return (
+          <div key={group}>
+            {group !== "about" && <GroupLabel>{t(`settings.groups.${group}`)}</GroupLabel>}
+            <RowList>
+              {sections.map((section) => {
+                const Icon = section.icon;
+                return (
+                  <Row
+                    key={section.id}
+                    to={`/settings/${section.id}`}
+                    leading={<Icon />}
+                    title={section.id === "account" ? user.username : section.label(t)}
+                    meta={
+                      section.id === "about"
+                        ? status.about
+                        : admin && section.admin
+                          ? undefined
+                          : status[section.id]
+                    }
+                    chevron
+                  />
+                );
+              })}
+              {group === "account" && (
+                <>
+                  <Row
+                    title={t("shell.language")}
+                    trailing={
+                      <Select
+                        label={t("shell.language")}
+                        labelHidden
+                        value={user.language}
+                        onChange={(e) => update.mutate({ language: e.target.value as Language })}
+                        options={supportedLanguages.map((code) => ({
+                          value: code,
+                          label: t(`languages.${code}`),
+                        }))}
+                      />
+                    }
+                  />
+                  <Row
+                    title={t("settings.theme")}
+                    trailing={
+                      <Select
+                        label={t("settings.theme")}
+                        labelHidden
+                        value={user.theme}
+                        onChange={(e) => update.mutate({ theme: e.target.value as (typeof THEMES)[number] })}
+                        options={THEMES.map((theme) => ({
+                          value: theme,
+                          label: t(`settings.themes.${theme}`),
+                        }))}
+                      />
+                    }
+                  />
+                  <li className={styles.switchRow}>
+                    <Switch
+                      label={t("settings.showUncertainty")}
+                      checked={user.show_uncertainty}
+                      onChange={(checked) => update.mutate({ show_uncertainty: checked })}
+                    />
+                  </li>
+                  <Row
+                    onClick={() => logout.mutate()}
+                    leading={<LogOut />}
+                    title={t("settings.signOut")}
+                    chevron={false}
+                  />
+                </>
+              )}
+              {group === "administration" && <AdminStatus dateFormat={dateFormat} />}
+            </RowList>
+            {group === "account" && update.error && <Notice kind="error">{update.error.message}</Notice>}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/** The administration rows carry a status that only an administrator may fetch; rendered after the rows. */
+function AdminStatus({ dateFormat }: { dateFormat: Intl.DateTimeFormat }) {
+  const { t } = useTranslation();
+  const users = useUsers();
+  const email = useEmailSettings(true);
+  const hooks = useWebhooks();
+  const backups = useBackupStatus(true);
+  const instance = useInstanceSettings(true);
+  const lines = [
+    users.data ? t("settings.status.accounts", { count: users.data.length }) : null,
+    email.data
+      ? email.data.ready
+        ? t("settings.status.emailReady")
+        : t("settings.status.emailNotReady")
+      : null,
+    hooks.data ? t("settings.status.webhooks", { count: hooks.data.length }) : null,
+    backups.data
+      ? !backups.data.enabled
+        ? t("settings.status.backupsOff")
+        : backups.data.latest
+          ? t("settings.status.backupsLast", {
+              date: dateFormat.format(new Date(backups.data.latest.created_at)),
+            })
+          : t("settings.status.backupsNone")
+      : null,
+    instance.data
+      ? t("settings.status.language", { language: t(`languages.${instance.data.default_language}`) })
+      : null,
   ];
   return (
-    <div className={[styles.page, "page-wide"].join(" ")}>
-      <h1>{t("settings.title")}</h1>
-      <div className={styles.layout}>
-        <nav className={styles.nav} aria-label={t("settings.sections")}>
-          <ul>
-            {sections.map((section) => (
-              <li key={section.id}>
-                <a href={`#${section.id}`}>{section.label}</a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <div className={styles.content}>
-          <Card className={styles.group} id="account">
-            <h2 className={styles.subheading}>{t("settings.account")}</h2>
-            <p>
-              <strong>{user.username}</strong> · {t(`settings.roles.${user.role}`)}
-            </p>
-            <div>
-              <Button variant="secondary" onClick={() => logout.mutate()}>
-                {t("settings.signOut")}
-              </Button>
-            </div>
-          </Card>
-          <Card className={styles.group} id="appearance">
-            <h2 className={styles.subheading}>{t("settings.appearance")}</h2>
-            <label className={styles.row}>
-              <span>{t("shell.language")}</span>
-              <select
-                value={user.language}
-                onChange={(e) => update.mutate({ language: e.target.value as Language })}
-              >
-                {supportedLanguages.map((code) => (
-                  <option key={code} value={code}>
-                    {t(`languages.${code}`)}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className={styles.row}>
-              <span>{t("settings.theme")}</span>
-              <select
-                value={user.theme}
-                onChange={(e) => update.mutate({ theme: e.target.value as (typeof THEMES)[number] })}
-              >
-                {THEMES.map((theme) => (
-                  <option key={theme} value={theme}>
-                    {t(`settings.themes.${theme}`)}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className={styles.row}>
-              <span>{t("settings.showUncertainty")}</span>
-              <input
-                type="checkbox"
-                checked={user.show_uncertainty}
-                onChange={(e) => update.mutate({ show_uncertainty: e.target.checked })}
-              />
-            </label>
-            {update.error && <Notice kind="error">{update.error.message}</Notice>}
-          </Card>
-          <div id="reminders" className={styles.anchor}>
-            <ReminderSettings />
-            <PushSettings />
-          </div>
-          <SecondFactorSettings folded />
-          <ReferenceCardSettings folded />
-          <Group folded id="your-data" title={t("data.title")} hint={t("data.hint")}>
-            <p className="text-secondary">{t("data.intro")}</p>
-            <ExportList />
-            {admin && <ExportForm personId={null} label={t("data.exportAll")} />}
-            <Link to="/trash">{t("trash.open")}</Link>
-          </Group>
-          {admin && <UsersAdmin folded />}
-          {admin && <AdminSettings folded />}
-          <Card className={styles.group} id="about">
-            <h2 className={styles.subheading}>{t("settings.about")}</h2>
-            <p className="text-secondary">{t("app.intendedUse")}</p>
-            <p className="text-secondary numeric">neVus {instance.data?.version}</p>
-          </Card>
-        </div>
-      </div>
-    </div>
+    <li className={styles.adminStatus} aria-hidden="true">
+      {lines.filter(Boolean).join(" · ")}
+    </li>
   );
 }

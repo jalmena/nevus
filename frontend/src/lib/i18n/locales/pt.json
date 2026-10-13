@@ -10,12 +10,16 @@
     "close": "Fechar",
     "back": "Voltar",
     "save": "Guardar",
-    "backTo": "Voltar a {{title}}"
+    "backTo": "Voltar a {{title}}",
+    "learnMore": "Saber mais",
+    "help": "Ajuda",
+    "saved": "Guardado"
   },
   "shell": {
     "language": "Idioma",
     "navigation": "Principal",
-    "persons": "Pessoas"
+    "persons": "Pessoas",
+    "more": "Mais"
   },
   "languages": {
     "en": "Inglês",
@@ -30,7 +34,7 @@
     "passwordTooShort": "A palavra-passe precisa de pelo menos {{count}} caracteres.",
     "passwordsDiffer": "As duas palavras-passe não coincidem.",
     "claimTitle": "Reclamar esta instância",
-    "claimIntro": "Ainda ninguém tem conta. A primeira conta passa a administradora e cria as outras; não há registo aberto.",
+    "claimIntro": "A primeira conta é a administradora; é ela que cria as outras.",
     "claimAction": "Criar o administrador",
     "loginTitle": "Iniciar sessão",
     "loginAction": "Iniciar sessão",
@@ -45,7 +49,8 @@
     "continue": "Continuar",
     "useRecovery": "Usar antes um código de recuperação",
     "useCode": "Usar antes a aplicação de autenticação",
-    "backToPassword": "Voltar"
+    "backToPassword": "Voltar",
+    "fillBoth": "Escreva o nome de utilizador e a palavra-passe."
   },
   "persons": {
     "title": "Pessoas",
@@ -53,7 +58,7 @@
     "add": "Adicionar uma pessoa",
     "create": "Criar",
     "emptyTitle": "Ainda não há pessoas",
-    "emptyText": "Uma pessoa é alguém de quem regista as marcas na pele: você, ou alguém de quem cuida.",
+    "emptyText": "Ainda não há pessoas. Uma pessoa é você, ou alguém de quem cuida.",
     "role": {
       "owner": "Titular",
       "manager": "Gestor",
@@ -62,7 +67,11 @@
     "profileTitle": "Definições do perfil",
     "profileHint": "Análise experimental, exportação, espaço e eliminação.",
     "experimental": "Análise experimental",
-    "experimentalHint": "Desligada por omissão. Quando ligada, o neVus pode propor contornos e alterações por si próprio; cada proposta vem marcada como experimental e é você quem a confirma ou rejeita."
+    "experimentalHint": "Desligada por omissão. Quando ligada, o neVus pode propor contornos e alterações por si próprio; cada proposta vem marcada como experimental e é você quem a confirma ou rejeita.",
+    "profile": "Perfil",
+    "analysisOn": "análise ligada",
+    "analysisOff": "análise desligada",
+    "experimentalShort": "Desligada por omissão; as propostas vêm etiquetadas e é você quem confirma cada uma."
   },
   "images": {
     "addPhoto": "Adicionar uma foto",
@@ -77,7 +86,7 @@
     "chooseFile": "Escolher um ficheiro",
     "uploading": "A enviar…",
     "uploaded": "Guardada. Os dados de localização e os identificadores do aparelho foram removidos do ficheiro.",
-    "privacyNote": "A foto fica neste servidor. Tudo o que a câmara incorporou, exceto a hora da captura e a orientação, é removido antes de a guardar.",
+    "privacyNote": "Fica neste servidor; os dados de localização e do aparelho são removidos.",
     "emptyTitle": "Ainda não há fotos",
     "emptyTextEdit": "Tire a primeira foto de uma marca, ou escolha uma da galeria.",
     "emptyTextView": "Ainda ninguém adicionou fotos desta pessoa.",
@@ -85,7 +94,8 @@
     "alt": "{{role}}, {{date}}",
     "noDate": "Sem data de captura",
     "delete": "Mover para o lixo",
-    "openWithWarnings": "Abrir a foto (tem avisos de qualidade)"
+    "openWithWarnings": "Abrir a foto (tem uma nota de qualidade)",
+    "kind": "Tipo de foto"
   },
   "settings": {
     "title": "Definições",
@@ -105,7 +115,41 @@
       "admin": "administrador",
       "member": "membro"
     },
-    "signOut": "Terminar sessão"
+    "signOut": "Terminar sessão",
+    "groups": {
+      "account": "Conta",
+      "reminders": "Lembretes",
+      "security": "Segurança",
+      "measuring": "Medição",
+      "yourData": "Os seus dados",
+      "administration": "Administração"
+    },
+    "status": {
+      "emailOn": "email diário ligado",
+      "emailOff": "email diário desligado",
+      "deviceOn": "este aparelho ligado",
+      "deviceOff": "este aparelho desligado",
+      "secondFactorOff": "desligado",
+      "secondFactorOn_one": "ligado · {{count}} código restante",
+      "secondFactorOn_other": "ligado · {{count}} códigos restantes",
+      "cardVerified": "impressão verificada, {{mm}} mm",
+      "cardUnverified": "impressão não verificada",
+      "exports_zero": "sem exportações",
+      "exports_one": "{{count}} exportação",
+      "exports_other": "{{count}} exportações",
+      "accounts_one": "{{count}} conta",
+      "accounts_other": "{{count}} contas",
+      "emailReady": "configurado",
+      "emailNotReady": "por configurar",
+      "webhooks_zero": "nenhum",
+      "webhooks_one": "{{count}} webhook",
+      "webhooks_other": "{{count}} webhooks",
+      "backupsLast": "última {{date}}",
+      "backupsOff": "desligadas",
+      "backupsNone": "nenhuma ainda",
+      "language": "contas novas em {{language}}"
+    },
+    "version": "neVus {{version}}"
   },
   "bodymap": {
     "label": "Mapa do corpo, {{view}}",
@@ -125,7 +169,9 @@
     "cluster_other": "{{count}} marcas aqui: amplie",
     "zoomIn": "Ampliar",
     "zoomOut": "Reduzir",
-    "zoomReset": "Mostrar o corpo inteiro"
+    "zoomReset": "Mostrar o corpo inteiro",
+    "tracked": "em seguimento",
+    "due": "pendente"
   },
   "zones": {
     "1100": "Cabeça",
@@ -237,26 +283,32 @@
     "lastVisit": "última observação {{date}}",
     "noVisits": "ainda sem observações",
     "emptyTitle": "Ainda não há marcas",
-    "emptyTextEdit": "Adicione uma marca tocando no seu lugar no mapa do corpo.",
-    "emptyTextView": "Ainda ninguém adicionou marcas desta pessoa.",
+    "emptyTextEdit": "Ainda não há marcas. Toque no corpo onde está a primeira.",
+    "emptyTextView": "Ainda não há marcas.",
     "backToPerson": "Voltar à pessoa",
     "latestSize": "Último tamanho",
     "sinceDate": "Desde {{date}}",
     "measuredChange": "alteração medida",
     "noDetectableChange": "sem alteração detetável",
-    "suggestName": "Sugerir um nome"
+    "suggestName": "Sugerir um nome",
+    "nextCheck": "próxima verificação {{date}}",
+    "every": "a cada {{interval}}",
+    "deleteQuestion": "Mover a marca para o lixo?",
+    "deleteNote": "As suas observações e fotos vão com ela; o lixo guarda-as 30 dias.",
+    "marksCount_one": "{{count}} marca",
+    "marksCount_other": "{{count}} marcas"
   },
   "observations": {
     "title": "Observações",
     "new": "Nova observação",
     "emptyTitle": "Ainda não há observações",
-    "emptyText": "Uma observação é um olhar datado sobre a marca: fotos, as suas notas e o que reparou.",
+    "emptyText": "Ainda não há observações. A primeira observação é a primeira foto desta marca.",
     "photoCount_one": "{{count}} foto",
     "photoCount_many": "{{count}} fotos",
     "photoCount_other": "{{count}} fotos",
     "photos": "Fotos",
     "yourNotes": "As suas notas",
-    "notesHint": "O que reparou, nas suas palavras. O neVus regista-o e nunca o interpreta.",
+    "notesHint": "O que reparou, nas suas palavras.",
     "notes": "Notas",
     "symptoms": {
       "itching": "Comichão",
@@ -265,19 +317,29 @@
       "looks_different": "Parece-me diferente"
     },
     "backTo": "Voltar a {{lesion}}",
-    "delete": "Mover a observação para o lixo"
+    "delete": "Mover a observação para o lixo",
+    "deleteQuestion": "Mover a observação para o lixo?",
+    "deleteNote": "As suas fotos e medições vão com ela; o lixo guarda-as 30 dias.",
+    "notesPlaceholder": "O que reparou, nas suas palavras."
   },
   "quality": {
-    "title": "Guardada com avisos de qualidade",
-    "short": "Avisos de qualidade",
+    "title": "Nota de qualidade",
+    "short": "nota de qualidade",
     "checking": "A verificar as fotos…",
-    "hint": "A observação fica como está. Se puder, tire a foto outra vez.",
+    "hint": "Fica como está. Repita a foto se puder.",
     "flags": {
       "blurry": "Desfocada: segure o telemóvel com firmeza e toque na marca para focar.",
       "too_dark": "Demasiado escura: acrescente luz ou aproxime-se de uma janela.",
       "too_bright": "Sobre-exposta: evite a luz solar direta e o flash.",
       "glare": "Reflexos: incline um pouco o telemóvel para que os reflexos saiam da marca.",
       "low_resolution": "Baixa resolução: use a câmara em tamanho completo, não uma captura de ecrã nem uma cópia reencaminhada."
+    },
+    "flagsShort": {
+      "blurry": "Desfocada",
+      "too_dark": "Muito escura",
+      "too_bright": "Muito clara",
+      "glare": "Reflexos",
+      "low_resolution": "Baixa resolução"
     }
   },
   "measure": {
@@ -338,9 +400,9 @@
     "asCircle": "Ajustar como círculo",
     "again": "Contornar de novo",
     "changeScale": "Mudar a escala",
-    "disclaimer": "Uma medição descreve o tamanho. Nada diz sobre o que a marca é.",
+    "disclaimer": "Só o tamanho: não diz nada sobre o que é a marca.",
     "visitTitle": "Medições",
-    "noneYet": "Ainda não há medições nesta observação.",
+    "noneYet": "Ainda não há medição.",
     "needPhoto": "Adicione uma foto para medir a marca.",
     "measurePhoto": "Medir na foto",
     "measurePhotoN": "Medir na foto {{n}}",
@@ -355,7 +417,9 @@
     "compactness": "Compacidade",
     "contrast": "Contraste de cor",
     "compactnessShort": "compacidade {{value}}",
-    "contrastShort": "contraste de cor ΔE {{value}}"
+    "contrastShort": "contraste de cor ΔE {{value}}",
+    "measureAnother": "Medir noutra foto",
+    "stepper": "{{n}} {{name}}"
   },
   "card": {
     "title": "Cartão de referência",
@@ -382,10 +446,17 @@
     "settingsIntro": "As marcas com foto pendente aparecem na página inicial. Também pode receber um e-mail por dia quando algo está pendente; indica nomes e datas, nunca fotos.",
     "email": "Endereço de e-mail",
     "emailReminders": "Enviar-me um e-mail diário quando houver marcas pendentes",
-    "needEmail": "Adicione um endereço de e-mail para ligar os lembretes por e-mail."
+    "needEmail": "Adicione um endereço de e-mail para ligar os lembretes por e-mail.",
+    "dueCount_one": "{{count}} marca pendente",
+    "dueCount_other": "{{count}} marcas pendentes",
+    "nothingDue": "Nada pendente",
+    "snoozedMeta": "lembrete adiado até {{date}}",
+    "snoozeWeekMenu": "Lembrar-me daqui a uma semana",
+    "snoozeMonthMenu": "Lembrar-me daqui a um mês",
+    "settingsShort": "As marcas pendentes aparecem na página inicial; o e-mail diário é opcional."
   },
   "admin": {
-    "emailTitle": "Envio de e-mail (administrador)",
+    "emailTitle": "Envio de email",
     "emailIntro": "O servidor de correio que o neVus usa para enviar lembretes. Nada é enviado até isto estar preenchido e as pessoas ligarem os lembretes.",
     "emailHint": "O servidor de correio que envia os lembretes.",
     "host": "Servidor",
@@ -402,7 +473,7 @@
     "testTo": "Enviar uma mensagem de teste para",
     "sendTest": "Enviar um teste",
     "testSent": "Enviada. Verifique a caixa de entrada.",
-    "instanceTitle": "Instância (administrador)",
+    "instanceTitle": "Instância",
     "instanceHint": "O idioma das contas novas e o conjunto de avaliação.",
     "defaultLanguage": "Idioma das contas novas",
     "evaluationLink": "Conjunto de avaliação: etiquete as suas fotos para medir os analisadores"
@@ -420,7 +491,7 @@
     "title": "Lixo",
     "intro": "As marcas, observações e fotos eliminadas ficam aqui 30 dias e depois desaparecem de vez.",
     "emptyTitle": "O lixo está vazio",
-    "emptyText": "O que elimina fica aqui durante algum tempo, caso mude de ideias.",
+    "emptyText": "O lixo está vazio.",
     "kinds": {
       "person": "Pessoa",
       "lesion": "Marca",
@@ -431,14 +502,17 @@
     "restore": "Restaurar",
     "deleteNow": "Eliminar agora",
     "open": "Abrir o lixo",
-    "backToSettings": "Voltar às definições"
+    "backToSettings": "Voltar às definições",
+    "keptFor": "Guardado 30 dias",
+    "deleteNowQuestion": "Eliminar agora?",
+    "deleteNowNote": "Depois não poderá ser recuperado."
   },
   "data": {
     "title": "Os seus dados",
     "intro": "Leve tudo consigo num único ficheiro cifrado, ou recupere o que eliminou.",
     "hint": "Exporte tudo, ou recupere o que eliminou.",
     "exportPerson": "Exportar esta pessoa",
-    "exportAll": "Exportar a instância inteira (administrador)",
+    "exportAll": "Exportar a instância inteira",
     "exportIntro": "Escolha uma frase-passe. Vai precisar dela para abrir o ficheiro; o neVus não a guarda, por isso ninguém consegue recuperar o ficheiro sem ela. Abre-se com a ferramenta padrão age.",
     "passphrase": "Frase-passe",
     "passphraseAgain": "Repita a frase-passe",
@@ -526,7 +600,10 @@
     "similar": "Semelhante",
     "different": "Diferente",
     "differenceNote": "Sombreado onde as cores diferem depois de alinhar as fotos. Mostra onde olhar e não mede nada: a luz, a focagem e os pelos também aparecem aqui.",
-    "zoomHint": "Aperte com dois dedos ou use a roda do rato para ampliar, arraste para mover; lado a lado, as duas fotos acompanham. Com teclado: + e − ampliam, as setas movem."
+    "zoomHint": "Aperte com dois dedos ou use a roda do rato para ampliar, arraste para mover; lado a lado, as duas fotos acompanham. Com teclado: + e − ampliam, as setas movem.",
+    "pickPhoto": "Escolher uma foto",
+    "needsAligned": "Precisa de fotos alinhadas",
+    "differenceShort": "Mostra onde olhar; não mede nada."
   },
   "chart": {
     "title": "Tamanho ao longo do tempo",
@@ -577,7 +654,12 @@
     "visit": "Relatório para uma consulta",
     "makeSelection_one": "Criar o relatório de 1 marca",
     "makeSelection_many": "Criar o relatório de {{count}} marcas",
-    "makeSelection_other": "Criar o relatório de {{count}} marcas"
+    "makeSelection_other": "Criar o relatório de {{count}} marcas",
+    "made_one": "{{count}} feito",
+    "made_other": "{{count}} feitos",
+    "none": "nenhum ainda",
+    "make": "Fazer um relatório",
+    "empty": "Ainda não há relatórios. Um relatório é um PDF para levar ao profissional de saúde."
   },
   "appointments": {
     "sectionTitle": "Consultas",
@@ -614,7 +696,16 @@
     "left_one": "1 marca a fotografar",
     "left_many": "{{count}} marcas a fotografar",
     "left_other": "{{count}} marcas a fotografar",
-    "upcoming": "Próximas consultas"
+    "upcoming": "Próximas consultas",
+    "count_one": "{{count}} consulta",
+    "count_other": "{{count}} consultas",
+    "nonePlanned": "nenhuma marcada",
+    "new": "Preparar uma consulta",
+    "deleteQuestion": "Eliminar a consulta?",
+    "deleteNote": "A lista vai com ela; as fotos e o relatório mantêm-se.",
+    "reportNotMade": "ainda não feito",
+    "reportOptions": "Relatório para a consulta",
+    "empty": "Ainda não há consultas. Indique uma data e as marcas a fotografar antes ficam listadas."
   },
   "webhooks": {
     "title": "Webhooks",
@@ -655,7 +746,10 @@
     "lastSent": "Último envio {{date}}",
     "lastFailed": "A última tentativa falhou: {{detail}}",
     "notYet": "Ainda nada enviado",
-    "testNamed": "Enviar um teste para {{name}}"
+    "testNamed": "Enviar um teste para {{name}}",
+    "new": "Adicionar um webhook",
+    "deleteQuestion": "Eliminar o webhook?",
+    "deleteNote": "Nada mais lhe é enviado."
   },
   "calendar": {
     "title": "Calendário",
@@ -668,7 +762,12 @@
     "copy": "Copiar a ligação",
     "copied": "Copiada",
     "warning": "Esta ligação só se mostra agora. Quem a tiver vê os nomes das marcas e as suas datas, por isso mantenha-a privada. Criar uma ligação nova desativa esta.",
-    "exists": "Existe uma ligação de calendário desde {{date}}. Para a voltar a ver, crie uma nova."
+    "exists": "Existe uma ligação de calendário desde {{date}}. Para a voltar a ver, crie uma nova.",
+    "linkedSince": "ligado desde {{date}}",
+    "notLinked": "sem ligação",
+    "stopQuestion": "Parar a ligação do calendário?",
+    "stopNote": "As aplicações de calendário subscritas deixam de atualizar.",
+    "empty": "Ainda sem ligação. Uma ligação deixa a sua aplicação de calendário mostrar as datas pendentes."
   },
   "proposals": {
     "title": "Medições propostas",
@@ -702,7 +801,7 @@
   "evaluation": {
     "back": "Voltar às definições",
     "title": "Conjunto de avaliação",
-    "intro": "Etiquete as suas próprias fotos para ver como os analisadores se saem nelas: desenhe o contorno verdadeiro da marca e diga se a foto é boa. As etiquetas ficam neste servidor.",
+    "intro": "Contorne as suas fotos para medir os analisadores; as etiquetas ficam neste servidor.",
     "summary": "Como se sai o analisador de contornos",
     "nothingYet": "Ainda nenhuma foto está etiquetada.",
     "caption": "{{name}} {{version}} face às suas etiquetas, por tom de pele",
@@ -744,7 +843,14 @@
     },
     "save": "Guardar a etiqueta",
     "removeLabel": "Remover a etiqueta",
-    "saved": "Etiqueta guardada."
+    "saved": "Etiqueta guardada.",
+    "introMore": "Etiquete as suas próprias fotos para ver como os analisadores se saem nelas: desenhe o contorno verdadeiro da marca e diga se a foto é boa. As etiquetas ficam neste servidor.",
+    "toLabel_one": "{{count}} por etiquetar",
+    "toLabel_other": "{{count}} por etiquetar",
+    "labelledCount_one": "{{count}} etiquetada",
+    "labelledCount_other": "{{count}} etiquetadas",
+    "commandShort": "Para correr de novo o analisador atual em todas as fotos etiquetadas:",
+    "copyCommand": "Copiar o comando"
   },
   "sessions": {
     "title": "Sessões de corpo inteiro",
@@ -764,7 +870,7 @@
     "compareLatest": "Comparar as duas últimas sessões",
     "back": "Voltar à pessoa",
     "backToSession": "Voltar à sessão",
-    "howTo": "Use a mesma luz e distância de cada vez. Alguém pode ajudar com as costas, ou apoie o telemóvel e use o temporizador.",
+    "howTo": "A mesma luz e distância de cada vez.",
     "experimentalNote": "A análise experimental está ligada para esta pessoa: depois de cada foto, propõem-se pontos que podem ser marcas para você confirmar ou rejeitar. Nenhum fica registado sem a sua confirmação.",
     "sensitive": "Esta região pode incluir zonas íntimas. Salte-a se preferir; nada mais depende dela.",
     "pose": "Como se colocar",
@@ -882,11 +988,26 @@
     "blur": "Desfocar uma parte da foto",
     "blurTitle": "Desfocar parte da foto",
     "blurHint": "Toque em dois cantos opostos da área a desfocar. Adicione as áreas que precisar e depois aplique.",
-    "blurNote": "A foto desfocada toma o lugar desta. O original é removido de imediato, não fica no lixo e não pode ser recuperado; as marcas na foto mantêm-se.",
+    "blurNote": "Substitui a foto para sempre; as marcas mantêm-se.",
     "blurApply_one": "Desfocar {{count}} área",
     "blurApply_many": "Desfocar {{count}} áreas",
     "blurApply_other": "Desfocar {{count}} áreas",
-    "blurUndo": "Remover a última área"
+    "blurUndo": "Remover a última área",
+    "howToMore": "Use a mesma luz e distância de cada vez. Alguém pode ajudar com as costas, ou apoie o telemóvel e use o temporizador.",
+    "blurNoteMore": "A foto desfocada toma o lugar desta. O original é removido de imediato, não fica no lixo e não pode ser recuperado; as marcas na foto mantêm-se.",
+    "last": "última {{date}}",
+    "none": "nenhuma ainda",
+    "notYet": "ainda não",
+    "tips": "Dicas para uma sessão",
+    "deleteQuestion": "Eliminar a sessão?",
+    "deleteNote": "As suas fotos vão para o lixo e as marcas vistas nelas saem da sessão. As marcas continuam no registo.",
+    "blurQuestion": "Desfocar a foto?",
+    "allDone": "Todas as regiões estão fotografadas ou saltadas.",
+    "regionsCount": "{{captured}} de {{total}} regiões",
+    "empty": "Ainda não há sessões. Uma sessão fotografa o corpo inteiro, região a região.",
+    "photographedOn": "fotografada em {{date}}",
+    "selectRegion": "Fotografar {{zone}} a seguir",
+    "newMarkChoice": "Uma marca nova…"
   },
   "secondFactor": {
     "title": "Segundo fator",
@@ -908,10 +1029,13 @@
     "codesTitle": "Códigos de recuperação",
     "codesIntro": "Cada um destes inicia sessão uma vez se perder o telemóvel. Guarde-os agora num lugar seguro: não voltam a ser mostrados.",
     "download": "Guardar como ficheiro",
-    "codesDone": "Já os guardei"
+    "codesDone": "Já os guardei",
+    "off": "O segundo fator está desligado.",
+    "copySecret": "Copiar o segredo",
+    "copied": "Copiado"
   },
   "accounts": {
-    "title": "Contas (administrador)",
+    "title": "Contas",
     "intro": "Quem pode iniciar sessão neste neVus. Não há registo aberto: cria cada conta com uma palavra-passe temporária, que a pessoa muda nas suas definições.",
     "introProxy": "Quem pode iniciar sessão neste neVus. As contas vêm do seu início de sessão único; aqui só pode desativar uma.",
     "hint": "Quem pode iniciar sessão, e as suas palavras-passe.",
@@ -933,10 +1057,12 @@
     "temporaryPasswordNew": "Palavra-passe temporária",
     "temporaryHint": "Pelo menos {{count}} caracteres. A pessoa muda-a depois de iniciar sessão.",
     "role": "Função",
-    "add": "Criar a conta"
+    "add": "Criar a conta",
+    "actionsFor": "Ações para {{name}}",
+    "off": "desativada"
   },
   "backups": {
-    "title": "Cópias de segurança (administrador)",
+    "title": "Cópias de segurança",
     "off": "As cópias de segurança noturnas estão desligadas. Defina NEVUS_BACKUP_PASSPHRASE no servidor para as ligar; o guia de instalação explica como.",
     "intro": "Todas as noites, depois das {{hour}}:00, escreve-se uma cópia de segurança cifrada na pasta de cópias do diretório de dados. Copie essa pasta para outra máquina: uma cópia no mesmo disco não sobrevive ao disco.",
     "hint": "Cópias cifradas todas as noites, relidas todas as semanas.",
@@ -968,8 +1094,8 @@
     }
   },
   "push": {
-    "title": "Notificações neste aparelho (experimental)",
-    "intro": "Quando houver marcas com foto pendente, este aparelho recebe uma notificação por dia, depois da hora dos lembretes. A mensagem viaja cifrada pelo serviço de push do seu navegador, que só vê que algo foi enviado.",
+    "title": "Notificações neste aparelho",
+    "intro": "Uma notificação por dia quando uma marca estiver pendente.",
     "onThisDevice": "Este aparelho recebe-as.",
     "offThisDevice": "Este aparelho ainda não as recebe.",
     "devices_zero": "Ainda nenhum aparelho seu está subscrito.",
@@ -980,6 +1106,7 @@
     "turnOff": "Desligar neste aparelho",
     "test": "Enviar uma notificação de teste",
     "tested": "Enviada a {{sent}}, falhou em {{failed}}.",
-    "note": "No iPhone e no iPad, as notificações só funcionam depois de o neVus estar instalado no ecrã principal e ser aberto a partir daí."
+    "note": "No iPhone e no iPad, as notificações só funcionam depois de o neVus estar instalado no ecrã principal e ser aberto a partir daí.",
+    "introMore": "Quando houver marcas com foto pendente, este aparelho recebe uma notificação por dia, depois da hora dos lembretes. A mensagem viaja cifrada pelo serviço de push do seu navegador, que só vê que algo foi enviado."
   }
 }

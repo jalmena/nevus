@@ -1,8 +1,15 @@
+import { KeyRound, ShieldOff, UserCheck, UserX } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/design-system/components/Button";
+import { Help } from "@/design-system/components/Help";
+import { Menu } from "@/design-system/components/Menu";
 import { Notice } from "@/design-system/components/Notice";
+import { Row, RowList } from "@/design-system/components/Row";
+import { Select } from "@/design-system/components/Select";
+import { Sheet } from "@/design-system/components/Sheet";
 import { TextField } from "@/design-system/components/TextField";
+import { SettingsHeader } from "@/features/settings/SettingsHeader";
 import {
   useCreateUser,
   useResetUserPassword,
@@ -12,13 +19,12 @@ import {
   type UserOut,
 } from "@/lib/admin";
 import { useInstance, useSession } from "@/lib/auth/session";
-import { Group } from "@/features/settings/Group";
 import styles from "@/features/settings/settings.module.css";
 
 const MIN_PASSWORD = 10;
 
 /** The household's accounts: who can sign in, with what role, and the ways back in when something is lost. */
-export function UsersAdmin({ folded = false }: { folded?: boolean }) {
+export function UsersAdmin() {
   const { t, i18n } = useTranslation();
   const local = useInstance().data?.auth_mode !== "proxy";
   const me = useSession().data?.user;
@@ -27,10 +33,11 @@ export function UsersAdmin({ folded = false }: { folded?: boolean }) {
   const toggle = useSetUserEnabled();
   const resetPassword = useResetUserPassword();
   const resetFactor = useResetUserSecondFactor();
+  const [adding, setAdding] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<"member" | "admin">("member");
-  const [passwordFor, setPasswordFor] = useState<string | null>(null);
+  const [passwordFor, setPasswordFor] = useState<UserOut | null>(null);
   const [newPassword, setNewPassword] = useState("");
   const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "medium" });
   const failure = users.error ?? create.error ?? toggle.error ?? resetPassword.error ?? resetFactor.error;
@@ -52,90 +59,91 @@ export function UsersAdmin({ folded = false }: { folded?: boolean }) {
         onSuccess: () => {
           setUsername("");
           setPassword("");
+          setAdding(false);
         },
       },
     );
   }
 
-  function setPasswordOf(user: UserOut, event: FormEvent) {
+  function setPasswordOf(event: FormEvent) {
     event.preventDefault();
-    resetPassword.mutate({ id: user.id, password: newPassword }, { onSuccess: () => setPasswordFor(null) });
+    if (!passwordFor) return;
+    resetPassword.mutate(
+      { id: passwordFor.id, password: newPassword },
+      { onSuccess: () => setPasswordFor(null) },
+    );
   }
 
   return (
-    <Group folded={folded} id="accounts" title={t("accounts.title")} hint={t("accounts.hint")}>
-      <p className="text-secondary">{local ? t("accounts.intro") : t("accounts.introProxy")}</p>
-      <ul className={styles.users}>
+    <div className={styles.page}>
+      <SettingsHeader
+        admin
+        title={t("accounts.title")}
+        meta={[users.data ? t("settings.status.accounts", { count: users.data.length }) : null]}
+        primary={local ? { label: t("accounts.addTitle"), onClick: () => setAdding(true) } : undefined}
+      >
+        <p className={["text-secondary", styles.intro].join(" ")}>
+          {t("accounts.hint")}
+          <Help title={t("accounts.title")} as="text">
+            <p>{local ? t("accounts.intro") : t("accounts.introProxy")}</p>
+          </Help>
+        </p>
+      </SettingsHeader>
+      <RowList>
         {(users.data ?? []).map((user) => (
-          <li key={user.id} className={styles.user}>
-            <div className={styles.userWhat}>
-              <strong>{user.username}</strong>
-              <span className="text-secondary">{describe(user)}</span>
-            </div>
-            {user.id !== me?.id && (
-              <div className={styles.userActions}>
-                <Button
-                  variant="quiet"
-                  disabled={toggle.isPending}
-                  aria-label={t(user.disabled_at ? "accounts.enableNamed" : "accounts.disableNamed", {
-                    name: user.username,
-                  })}
-                  onClick={() => toggle.mutate({ id: user.id, enabled: Boolean(user.disabled_at) })}
-                >
-                  {user.disabled_at ? t("accounts.enable") : t("accounts.disable")}
-                </Button>
-                {local && (
-                  <Button
-                    variant="quiet"
-                    aria-label={t("accounts.newPasswordNamed", { name: user.username })}
-                    onClick={() => {
-                      setPasswordFor(passwordFor === user.id ? null : user.id);
-                      setNewPassword("");
-                    }}
-                  >
-                    {t("accounts.newPassword")}
-                  </Button>
-                )}
-                {local && user.totp_enabled && (
-                  <Button
-                    variant="quiet"
-                    disabled={resetFactor.isPending}
-                    aria-label={t("accounts.resetSecondFactorNamed", { name: user.username })}
-                    onClick={() => resetFactor.mutate(user.id)}
-                  >
-                    {t("accounts.resetSecondFactor")}
-                  </Button>
-                )}
-              </div>
-            )}
-            {passwordFor === user.id && (
-              <form className={styles.inline} onSubmit={(event) => setPasswordOf(user, event)}>
-                <TextField
-                  label={t("accounts.temporaryPassword", { name: user.username })}
-                  type="text"
-                  autoComplete="off"
-                  hint={t("auth.passwordHint", { count: MIN_PASSWORD })}
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
+          <Row
+            key={user.id}
+            title={user.username}
+            meta={describe(user)}
+            trailing={
+              user.id !== me?.id ? (
+                <Menu
+                  label={t("accounts.actionsFor", { name: user.username })}
+                  items={[
+                    {
+                      label: user.disabled_at ? t("accounts.enable") : t("accounts.disable"),
+                      icon: user.disabled_at ? <UserCheck /> : <UserX />,
+                      disabled: toggle.isPending,
+                      onSelect: () => toggle.mutate({ id: user.id, enabled: Boolean(user.disabled_at) }),
+                    },
+                    ...(local
+                      ? [
+                          {
+                            label: t("accounts.newPassword"),
+                            icon: <KeyRound />,
+                            onSelect: () => {
+                              setPasswordFor(user);
+                              setNewPassword("");
+                            },
+                          },
+                        ]
+                      : []),
+                    ...(local && user.totp_enabled
+                      ? [
+                          {
+                            label: t("accounts.resetSecondFactor"),
+                            icon: <ShieldOff />,
+                            danger: true,
+                            disabled: resetFactor.isPending,
+                            onSelect: () => resetFactor.mutate(user.id),
+                          },
+                        ]
+                      : []),
+                  ]}
                 />
-                <Button
-                  type="submit"
-                  variant="secondary"
-                  disabled={newPassword.length < MIN_PASSWORD || resetPassword.isPending}
-                >
-                  {t("common.save")}
-                </Button>
-                <Button type="button" variant="quiet" onClick={() => setPasswordFor(null)}>
-                  {t("common.cancel")}
-                </Button>
-              </form>
-            )}
-          </li>
+              ) : undefined
+            }
+          />
         ))}
-      </ul>
-      {local && (
+      </RowList>
+      {resetFactor.isSuccess && <Notice kind="success">{t("accounts.secondFactorReset")}</Notice>}
+      {resetPassword.isSuccess && passwordFor === null && (
+        <Notice kind="success">{t("accounts.passwordSet")}</Notice>
+      )}
+      {failure && <Notice kind="error">{failure.message}</Notice>}
+
+      <Sheet open={adding} title={t("accounts.addTitle")} onClose={() => setAdding(false)}>
         <form className={styles.form} onSubmit={add}>
-          <h3>{t("accounts.addTitle")}</h3>
           <TextField
             label={t("auth.username")}
             autoCapitalize="none"
@@ -151,29 +159,54 @@ export function UsersAdmin({ folded = false }: { folded?: boolean }) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <label className={styles.row}>
-            <span>{t("accounts.role")}</span>
-            <select value={role} onChange={(e) => setRole(e.target.value as "member" | "admin")}>
-              <option value="member">{t("settings.roles.member")}</option>
-              <option value="admin">{t("settings.roles.admin")}</option>
-            </select>
-          </label>
-          <div>
+          <Select
+            label={t("accounts.role")}
+            value={role}
+            onChange={(e) => setRole(e.target.value as "member" | "admin")}
+            options={[
+              { value: "member", label: t("settings.roles.member") },
+              { value: "admin", label: t("settings.roles.admin") },
+            ]}
+          />
+          {create.error && <Notice kind="error">{create.error.message}</Notice>}
+          <div className={styles.actions}>
+            <Button type="button" variant="quiet" onClick={() => setAdding(false)}>
+              {t("common.cancel")}
+            </Button>
             <Button
               type="submit"
-              variant="secondary"
               disabled={create.isPending || username.trim().length < 2 || password.length < MIN_PASSWORD}
             >
               {t("accounts.add")}
             </Button>
           </div>
         </form>
-      )}
-      {resetFactor.isSuccess && <Notice kind="success">{t("accounts.secondFactorReset")}</Notice>}
-      {resetPassword.isSuccess && passwordFor === null && (
-        <Notice kind="success">{t("accounts.passwordSet")}</Notice>
-      )}
-      {failure && <Notice kind="error">{failure.message}</Notice>}
-    </Group>
+      </Sheet>
+      <Sheet
+        open={passwordFor !== null}
+        title={passwordFor ? t("accounts.newPasswordNamed", { name: passwordFor.username }) : ""}
+        onClose={() => setPasswordFor(null)}
+      >
+        <form className={styles.form} onSubmit={setPasswordOf}>
+          <TextField
+            label={passwordFor ? t("accounts.temporaryPassword", { name: passwordFor.username }) : ""}
+            type="text"
+            autoComplete="off"
+            hint={t("auth.passwordHint", { count: MIN_PASSWORD })}
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+          {resetPassword.error && <Notice kind="error">{resetPassword.error.message}</Notice>}
+          <div className={styles.actions}>
+            <Button type="button" variant="quiet" onClick={() => setPasswordFor(null)}>
+              {t("common.cancel")}
+            </Button>
+            <Button type="submit" disabled={newPassword.length < MIN_PASSWORD || resetPassword.isPending}>
+              {t("common.save")}
+            </Button>
+          </div>
+        </form>
+      </Sheet>
+    </div>
   );
 }

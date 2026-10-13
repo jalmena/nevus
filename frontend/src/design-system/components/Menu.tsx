@@ -87,12 +87,16 @@ export function Menu({
           className={styles.menu}
           onKeyDown={onKeyDown}
         >
-          {items.map((item) => (
+          {items.map((item, index) => (
             <button
               key={item.label}
               type="button"
               role="menuitem"
-              className={[styles.item, item.danger ? styles.danger : ""].join(" ")}
+              className={[
+                styles.item,
+                item.danger ? styles.danger : "",
+                item.danger && index > 0 && !items[index - 1]?.danger ? styles.separated : "",
+              ].join(" ")}
               disabled={item.disabled}
               onClick={() => {
                 setOpen(false);

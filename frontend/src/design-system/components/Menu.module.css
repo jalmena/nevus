@@ -62,3 +62,11 @@
 .danger .itemIcon {
   color: var(--color-danger);
 }
+
+/* The destructive items come last, after a hairline. */
+.separated {
+  margin-top: var(--space-1);
+  padding-top: var(--space-1);
+  border-top: 1px solid var(--color-border);
+  border-radius: 0 0 var(--radius-control) var(--radius-control);
+}

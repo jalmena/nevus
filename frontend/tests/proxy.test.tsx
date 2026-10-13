@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -53,6 +53,8 @@ describe("behind a single sign-on proxy", () => {
     renderApp("/trash");
     const user = userEvent.setup();
     await user.click(await screen.findByRole("button", { name: "Delete now" }));
+    const confirm = await screen.findByRole("dialog", { name: "Delete it now?" });
+    await user.click(within(confirm).getByRole("button", { name: "Delete now" }));
     expect(await screen.findByText(/Confirm that you want to go ahead/)).toBeInTheDocument();
     expect(screen.queryByLabelText("Password")).not.toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Go ahead" }));

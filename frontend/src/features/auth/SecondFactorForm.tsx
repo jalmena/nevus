@@ -33,7 +33,7 @@ export function SecondFactorForm({ onBack }: { onBack: () => void }) {
         onChange={(e) => setValue(e.target.value)}
       />
       {finish.error && <Notice kind="error">{finish.error.message}</Notice>}
-      <Button type="submit" disabled={finish.isPending || !value.trim()}>
+      <Button type="submit" disabled={finish.isPending}>
         {finish.isPending ? t("common.working") : t("auth.continue")}
       </Button>
       <div className={styles.links}>

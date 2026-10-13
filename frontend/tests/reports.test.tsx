@@ -42,8 +42,9 @@ afterEach(() => vi.unstubAllGlobals());
 describe("reports", () => {
   it("makes the summary of every mark and offers the PDF once it is ready", async () => {
     const state = install();
-    renderApp(`/persons/${PERSON.id}`);
+    renderApp(`/persons/${PERSON.id}/reports`);
     const user = userEvent.setup();
+    await user.click(await screen.findByRole("button", { name: "Make a report" }));
     await user.click(await screen.findByRole("button", { name: "Make the summary" }));
     await waitFor(() =>
       expect(state.calls.find((c) => c.method === "POST" && c.url.endsWith("/reports"))?.body).toEqual({
@@ -63,8 +64,9 @@ describe("reports", () => {
 
   it("makes a mark's record in the chosen language and paper", async () => {
     const state = install();
-    renderApp("/lesions/l1");
+    renderApp("/lesions/l1/reports");
     const user = userEvent.setup();
+    await user.click(await screen.findByRole("button", { name: "Make a report" }));
     await user.selectOptions(await screen.findByRole("combobox", { name: "Language" }), "es");
     await user.selectOptions(screen.getByRole("combobox", { name: "Paper" }), "letter");
     await user.click(screen.getByRole("button", { name: "Make the record of this mark" }));
@@ -93,7 +95,7 @@ describe("reports", () => {
         },
       ],
     });
-    renderApp(`/persons/${PERSON.id}`);
+    renderApp(`/persons/${PERSON.id}/reports`);
     expect(await screen.findByText("The report could not be made.")).toBeInTheDocument();
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Delete: Summary of all marks" }));
@@ -102,8 +104,9 @@ describe("reports", () => {
 
   it("makes a report of the marks chosen on the person's page", async () => {
     const state = install();
-    renderApp(`/persons/${PERSON.id}`);
+    renderApp(`/persons/${PERSON.id}/reports`);
     const user = userEvent.setup();
+    await user.click(await screen.findByRole("button", { name: "Make a report" }));
     await user.click(await screen.findByRole("radio", { name: "the marks I choose, with their records" }));
     const make = screen.getByRole("button", { name: "Make the report of 0 marks" });
     expect(make).toBeDisabled();

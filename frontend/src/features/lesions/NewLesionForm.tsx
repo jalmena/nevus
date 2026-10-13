@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/design-system/components/Button";
 import { Notice } from "@/design-system/components/Notice";
+import { Select } from "@/design-system/components/Select";
 import { TextField } from "@/design-system/components/TextField";
 import type { MapPoint } from "@/features/bodymap/zones";
 import { INTERVALS, type LesionIn } from "@/lib/lesions";
@@ -18,6 +19,7 @@ interface Props {
   onCancel: () => void;
 }
 
+/** The new mark, in a sheet over the map: a name, its type, when it was first noticed, how often to check. */
 export function NewLesionForm({ point, view, pending, error, onSubmit, onCancel }: Props) {
   const { t, i18n } = useTranslation();
   const [label, setLabel] = useState("");
@@ -39,7 +41,6 @@ export function NewLesionForm({ point, view, pending, error, onSubmit, onCancel 
 
   return (
     <form className={styles.form} onSubmit={submit}>
-      <h3>{t("lesions.newTitle")}</h3>
       <p className="text-secondary">
         {t("bodymap.selected", { zone: zoneName(point.zone, t), view: t(`bodymap.views.${view}`) })}
       </p>
@@ -59,36 +60,34 @@ export function NewLesionForm({ point, view, pending, error, onSubmit, onCancel 
           {t("lesions.suggestName")}
         </Button>
       </div>
-      <label className={styles.row}>
-        <span>{t("lesions.type")}</span>
-        <select value={type} onChange={(e) => setType(e.target.value as "mole" | "other")}>
-          <option value="mole">{t("lesions.types.mole")}</option>
-          <option value="other">{t("lesions.types.other")}</option>
-        </select>
-      </label>
+      <Select
+        label={t("lesions.type")}
+        value={type}
+        onChange={(e) => setType(e.target.value as "mole" | "other")}
+        options={[
+          { value: "mole", label: t("lesions.types.mole") },
+          { value: "other", label: t("lesions.types.other") },
+        ]}
+      />
       <TextField
         label={t("lesions.firstNoticed")}
         type="date"
         value={firstNoticed}
         onChange={(e) => setFirstNoticed(e.target.value)}
       />
-      <label className={styles.row}>
-        <span>{t("lesions.interval")}</span>
-        <select value={interval} onChange={(e) => setInterval(Number(e.target.value))}>
-          {INTERVALS.map((days) => (
-            <option key={days} value={days}>
-              {t(`lesions.intervals.${days}`)}
-            </option>
-          ))}
-        </select>
-      </label>
+      <Select
+        label={t("lesions.interval")}
+        value={String(interval)}
+        onChange={(e) => setInterval(Number(e.target.value))}
+        options={INTERVALS.map((days) => ({ value: String(days), label: t(`lesions.intervals.${days}`) }))}
+      />
       {error && <Notice kind="error">{error}</Notice>}
       <div className={styles.actions}>
-        <Button type="submit" disabled={pending}>
-          {t("lesions.create")}
-        </Button>
         <Button type="button" variant="quiet" onClick={onCancel}>
           {t("common.cancel")}
+        </Button>
+        <Button type="submit" disabled={pending}>
+          {t("lesions.create")}
         </Button>
       </div>
     </form>

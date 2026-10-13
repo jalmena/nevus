@@ -2,6 +2,8 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Button } from "@/design-system/components/Button";
 import { Notice } from "@/design-system/components/Notice";
+import { Section } from "@/design-system/components/Section";
+import { StatusChip } from "@/design-system/components/StatusChip";
 import { useSession } from "@/lib/auth/session";
 import { imageUrl, type ImageOut } from "@/lib/images";
 import { formatMm } from "@/lib/measurements";
@@ -45,10 +47,10 @@ export function Proposals({
   const abstained = items.filter((item) => !item.proposal.found);
 
   return (
-    <section className={styles.panel} aria-labelledby="proposals-heading">
-      <h2 id="proposals-heading">
-        {t("proposals.title")} <span className={styles.experimental}>{t("proposals.experimental")}</span>
-      </h2>
+    <Section
+      title={t("proposals.title")}
+      chip={<StatusChip kind="experimental">{t("proposals.experimental")}</StatusChip>}
+    >
       <p className="text-secondary">{t("proposals.intro")}</p>
       {pending.map(({ image, proposal }) => (
         <Pending
@@ -88,7 +90,7 @@ export function Proposals({
           </Notice>
         ))}
       {decide.error && <Notice kind="error">{decide.error.message}</Notice>}
-    </section>
+    </Section>
   );
 }
 

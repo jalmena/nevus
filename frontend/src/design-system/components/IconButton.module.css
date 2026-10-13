@@ -48,3 +48,13 @@
     clip-path: none;
   }
 }
+
+.quiet {
+  color: var(--color-ink-2);
+}
+
+.quiet:hover,
+.quiet:focus-visible {
+  background: var(--color-surface-2);
+  color: var(--color-ink);
+}

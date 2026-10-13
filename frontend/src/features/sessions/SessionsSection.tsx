@@ -1,74 +1,88 @@
+import { Columns2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate } from "react-router";
-import { Button } from "@/design-system/components/Button";
+import { useNavigate } from "react-router";
+import { EmptyState } from "@/design-system/components/EmptyState";
+import { Help } from "@/design-system/components/Help";
 import { Notice } from "@/design-system/components/Notice";
+import { PageHeader } from "@/design-system/components/PageHeader";
+import { Row, RowList } from "@/design-system/components/Row";
+import { personRail } from "@/features/persons/personRail";
+import type { PersonOut } from "@/lib/persons";
 import { usePersonSessions, useStartSession } from "@/lib/sessions";
 import styles from "./sessions.module.css";
 
-/** On a person's page: the full-body sessions, and starting a new one. */
-export function SessionsSection({
-  personId,
-  canEdit,
-  embedded = false,
-}: {
-  personId: string;
-  canEdit: boolean;
-  /** Under a disclosure that carries the heading. */
-  embedded?: boolean;
-}) {
+/** The person's full-body sessions as a page: the ones made, comparing the last two, starting a new one. */
+export function SessionsSection({ person, canEdit }: { person: PersonOut; canEdit: boolean }) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const sessions = usePersonSessions(personId);
-  const start = useStartSession(personId);
+  const sessions = usePersonSessions(person.id);
+  const start = useStartSession(person.id);
   const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "long" });
   const list = sessions.data ?? [];
   const withPhotos = list.filter((session) => session.captured > 0);
-  if (!canEdit && list.length === 0) return null;
-  const Wrapper = embedded ? "div" : "section";
+  const [latest, previous] = withPhotos;
   return (
-    <Wrapper className={styles.section} aria-labelledby={embedded ? undefined : "sessions-heading"}>
-      {!embedded && <h2 id="sessions-heading">{t("sessions.title")}</h2>}
-      <p className="text-secondary">{t("sessions.intro")}</p>
-      {canEdit && (
-        <div>
-          <Button
-            onClick={() =>
-              start.mutate(null, { onSuccess: (session) => void navigate(`/sessions/${session.id}`) })
-            }
-            disabled={start.isPending}
-          >
-            {t("sessions.start")}
-          </Button>
-        </div>
+    <div className={styles.page}>
+      <PageHeader
+        back={{ to: `/persons/${person.id}`, label: person.display_name }}
+        title={t("sessions.title")}
+        rail={personRail(t, person.id, person.display_name)}
+        actions={
+          latest && previous
+            ? [
+                {
+                  key: "compare",
+                  label: t("sessions.compareLatest"),
+                  icon: <Columns2 />,
+                  to: `/sessions/${latest.id}/compare/${previous.id}`,
+                },
+              ]
+            : []
+        }
+        primary={
+          canEdit
+            ? {
+                label: t("sessions.start"),
+                pending: start.isPending,
+                onClick: () =>
+                  start.mutate(null, { onSuccess: (session) => void navigate(`/sessions/${session.id}`) }),
+              }
+            : undefined
+        }
+      >
+        <p className={["text-secondary", styles.intro].join(" ")}>
+          {t("sessions.hint")}
+          <Help title={t("sessions.title")} as="text">
+            <p>{t("sessions.intro")}</p>
+          </Help>
+        </p>
+      </PageHeader>
+      {(sessions.error ?? start.error) && (
+        <Notice kind="error">{(sessions.error ?? start.error)?.message}</Notice>
       )}
-      {start.error && <Notice kind="error">{start.error.message}</Notice>}
+      {sessions.data && list.length === 0 && <EmptyState>{t("sessions.empty")}</EmptyState>}
       {list.length > 0 && (
-        <ul className={styles.list}>
+        <RowList>
           {list.map((session) => (
-            <li key={session.id} className={styles.item}>
-              <Link to={`/sessions/${session.id}`}>
-                {t("sessions.titleFor", { date: dateFormat.format(new Date(session.started_at)) })}
-              </Link>
-              <span className="text-secondary">
-                {session.status === "open" ? t("sessions.open") : t("sessions.finished")} ·{" "}
-                {t("sessions.progress", {
+            <Row
+              key={session.id}
+              to={`/sessions/${session.id}`}
+              title={t("sessions.titleFor", { date: dateFormat.format(new Date(session.started_at)) })}
+              meta={[
+                session.status === "open" ? t("sessions.open") : t("sessions.finished"),
+                t("sessions.regionsCount", {
                   captured: session.captured,
                   total: session.captured + session.skipped + session.pending,
-                })}
-                {session.skipped > 0 ? ` · ${t("sessions.skippedCount", { count: session.skipped })}` : ""} ·{" "}
-                {t("sessions.marksCount", { count: session.marks })}
-              </span>
-            </li>
+                }),
+                session.skipped > 0 ? t("sessions.skippedCount", { count: session.skipped }) : null,
+                t("sessions.marksCount", { count: session.marks }),
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            />
           ))}
-        </ul>
+        </RowList>
       )}
-      {withPhotos.length >= 2 && withPhotos[0] && withPhotos[1] && (
-        <p>
-          <Link to={`/sessions/${withPhotos[0].id}/compare/${withPhotos[1].id}`}>
-            {t("sessions.compareLatest")}
-          </Link>
-        </p>
-      )}
-    </Wrapper>
+    </div>
   );
 }

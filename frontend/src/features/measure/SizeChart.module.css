@@ -108,3 +108,22 @@
   align-items: center;
   gap: var(--space-4);
 }
+
+.iconLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target);
+  height: var(--touch-target);
+  border-radius: var(--radius-control);
+  color: var(--color-ink);
+}
+
+.iconLink:hover {
+  background: var(--color-surface-2);
+}
+
+.iconLink > svg {
+  width: 20px;
+  height: 20px;
+}

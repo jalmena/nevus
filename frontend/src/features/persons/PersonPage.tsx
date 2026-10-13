@@ -1,33 +1,35 @@
+import { Calendar, CalendarPlus, Clock, FileText, ScanLine, User } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate, useParams } from "react-router";
-import { Button } from "@/design-system/components/Button";
-import { Disclosure } from "@/design-system/components/Disclosure";
+import { useNavigate, useParams } from "react-router";
+import { useMediaQuery } from "@/app/chrome";
 import { EmptyState } from "@/design-system/components/EmptyState";
 import { Notice } from "@/design-system/components/Notice";
+import { PageHeader } from "@/design-system/components/PageHeader";
+import { Row, RowList } from "@/design-system/components/Row";
+import { Sheet } from "@/design-system/components/Sheet";
 import { BodyMap, type Marker } from "@/features/bodymap/BodyMap";
 import { ViewToggle } from "@/features/bodymap/ViewToggle";
 import { type MapPoint, type View, type Zone } from "@/features/bodymap/zones";
 import { LesionList } from "@/features/lesions/LesionList";
 import { NewLesionForm } from "@/features/lesions/NewLesionForm";
 import { lesionTitle } from "@/features/lesions/lesionName";
-import { useCreateLesion, useLesions } from "@/lib/lesions";
-import { ExportForm } from "@/features/data/ExportForm";
-import { PurgePerson } from "@/features/data/PurgePerson";
-import { PrepareAppointment } from "@/features/appointments/PrepareAppointment";
-import { Reports } from "@/features/reports/Reports";
-import { SessionsSection } from "@/features/sessions/SessionsSection";
-import { CalendarLink } from "./CalendarLink";
 import { useAppointments } from "@/lib/appointments";
 import { formatBytes, useUsage } from "@/lib/data";
+import { useCreateLesion, useLesions } from "@/lib/lesions";
+import { useCalendarFeed } from "@/lib/notifications";
+import { usePerson } from "@/lib/persons";
+import { useReports } from "@/lib/reports";
 import { usePersonSessions } from "@/lib/sessions";
-import { usePerson, useUpdatePerson } from "@/lib/persons";
+import { personRail } from "./personRail";
 import styles from "./persons.module.css";
 
+/** A person: the body map with the marks on it, the marks as rows, and the tools used once a season. */
 export function PersonPage() {
   const { personId = "" } = useParams();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const desktop = useMediaQuery("(min-width: 900px)");
   const person = usePerson(personId);
   const lesions = useLesions(personId);
   const create = useCreateLesion(personId);
@@ -36,13 +38,7 @@ export function PersonPage() {
   const [placing, setPlacing] = useState(false);
   const [point, setPoint] = useState<MapPoint | null>(null);
   const canEdit = person.data?.my_role === "owner" || person.data?.my_role === "manager";
-  const updatePerson = useUpdatePerson(personId);
-  const usage = useUsage(personId);
-  const appointments = useAppointments(personId);
-  const sessions = usePersonSessions(personId);
-  const today = new Date().toISOString().slice(0, 10);
-  const appointmentAhead = (appointments.data ?? []).some((item) => item.date >= today);
-  const sessionOpen = (sessions.data ?? []).some((session) => session.status === "open");
+  const dueCount = (lesions.data ?? []).filter((lesion) => lesion.due).length;
 
   const markers: Marker[] = (lesions.data ?? [])
     .filter((lesion) => lesion.location.view === view)
@@ -61,172 +57,196 @@ export function PersonPage() {
     setPoint(null);
   }
 
-  function onPlace(next: MapPoint) {
-    if (placing) setPoint(next);
-  }
-
   function cancelPlacing() {
     setPlacing(false);
     setPoint(null);
   }
 
+  const zoneLabel = (code: string, name: string) => t(`zones.${code}`, { defaultValue: name });
+  const instruction = !placing
+    ? undefined
+    : zone
+      ? t("lesions.placingSpot", { zone: zoneLabel(zone.code, zone.name) })
+      : t("lesions.placingHint");
+
   return (
     <div className={[styles.page, "page-wide"].join(" ")}>
-      <p>
-        <Link to="/">{t("common.back")}</Link>
-      </p>
-      <header className={styles.header}>
-        <h1>{person.data?.display_name ?? "…"}</h1>
-        {person.data && <span className="text-secondary">{t(`persons.role.${person.data.my_role}`)}</span>}
-      </header>
+      <PageHeader
+        back={{ to: "/", label: t("shell.persons") }}
+        title={person.data?.display_name ?? "…"}
+        meta={[
+          person.data ? t(`persons.role.${person.data.my_role}`) : null,
+          lesions.data ? t("lesions.marksCount", { count: lesions.data.length }) : null,
+          dueCount > 0 ? t("reminders.dueCount", { count: dueCount }) : null,
+        ]}
+        primary={
+          canEdit && !placing ? { label: t("lesions.add"), onClick: () => setPlacing(true) } : undefined
+        }
+        secondary={placing ? { label: t("common.cancel"), onClick: cancelPlacing } : undefined}
+        instruction={instruction}
+        rail={personRail(t, personId, person.data?.display_name)}
+      />
       {person.error && <Notice kind="error">{person.error.message}</Notice>}
 
       <div className={styles.layout}>
-        <section className={[styles.mapSection, styles.mapPane].join(" ")} aria-labelledby="map-heading">
-          <div className={styles.header}>
-            <h2 id="map-heading">{t("bodymap.title")}</h2>
-            <ViewToggle view={view} onChange={changeView} />
-          </div>
+        <div className={styles.mapPane}>
+          <ViewToggle view={view} onChange={changeView} />
           <BodyMap
             view={view}
             markers={markers}
             selectedZone={placing ? (point?.zone ?? zone?.code) : zone?.code}
             onSelectZone={setZone}
-            onPlace={onPlace}
+            onPlace={(next) => placing && setPoint(next)}
             placing={placing}
             onSelectMarker={(id) => void navigate(`/lesions/${id}`)}
           />
-          <p className="text-secondary" role="status">
-            {placing
-              ? point
-                ? t("lesions.placed")
-                : zone
-                  ? t("lesions.placingSpot", { zone: t(`zones.${zone.code}`, { defaultValue: zone.name }) })
-                  : t("lesions.placingHint")
-              : zone
-                ? t("bodymap.selected", {
-                    zone: t(`zones.${zone.code}`, { defaultValue: zone.name }),
-                    view: t(`bodymap.views.${view}`),
-                  })
-                : t("bodymap.hint")}
+          <p className={["text-secondary", styles.legend].join(" ")} aria-hidden="true">
+            <span className={styles.dot} /> {t("bodymap.tracked")}
+            <span className={[styles.dot, styles.dotDue].join(" ")} /> {t("bodymap.due")}
           </p>
-          {canEdit && !placing && (
-            <div>
-              <Button onClick={() => setPlacing(true)}>{t("lesions.add")}</Button>
-            </div>
-          )}
-          {placing && !point && (
-            <div>
-              <Button variant="quiet" onClick={cancelPlacing}>
-                {t("common.cancel")}
-              </Button>
-            </div>
-          )}
-          {placing && point && (
-            <NewLesionForm
-              point={point}
-              view={view}
-              pending={create.isPending}
-              error={create.error?.message}
-              onCancel={cancelPlacing}
-              onSubmit={(body) =>
-                create.mutate(body, {
-                  onSuccess: (lesion) => {
-                    cancelPlacing();
-                    void navigate(`/lesions/${lesion.id}`);
-                  },
-                })
-              }
-            />
-          )}
-        </section>
+        </div>
 
         <div className={styles.detailPane}>
-          <section className={styles.mapSection} aria-labelledby="marks-heading">
-            <h2 id="marks-heading">{t("lesions.title")}</h2>
-            {lesions.error && <Notice kind="error">{lesions.error.message}</Notice>}
-            {lesions.data && lesions.data.length === 0 && (
-              <EmptyState
-                title={t("lesions.emptyTitle")}
-                text={canEdit ? t("lesions.emptyTextEdit") : t("lesions.emptyTextView")}
-              />
-            )}
-            {lesions.data && lesions.data.length > 0 && <LesionList lesions={lesions.data} />}
-          </section>
-
-          {person.data && (
-            <div className={styles.tools}>
-              {(canEdit || (appointments.data?.length ?? 0) > 0) && (
-                <Disclosure
-                  id="appointments"
-                  title={t("appointments.sectionTitle")}
-                  hint={t("appointments.hint")}
-                  defaultOpen={appointmentAhead}
-                >
-                  <PrepareAppointment personId={personId} canEdit={canEdit} embedded />
-                </Disclosure>
-              )}
-              {(canEdit || (sessions.data?.length ?? 0) > 0) && (
-                <Disclosure
-                  id="sessions"
-                  title={t("sessions.title")}
-                  hint={t("sessions.hint")}
-                  defaultOpen={sessionOpen}
-                >
-                  <SessionsSection personId={personId} canEdit={canEdit} embedded />
-                </Disclosure>
-              )}
-              <Disclosure id="calendar" title={t("calendar.title")} hint={t("calendar.hint")}>
-                <CalendarLink personId={personId} embedded />
-              </Disclosure>
-              <Disclosure id="reports" title={t("reports.title")} hint={t("reports.hint")}>
-                <Reports
-                  personId={personId}
-                  embedded
-                  titleOf={(id) => {
-                    const lesion = lesions.data?.find((item) => item.id === id);
-                    return lesion ? lesionTitle(lesion, t) : t("reports.deletedMark");
-                  }}
-                  marks={(lesions.data ?? []).map((lesion) => ({
-                    id: lesion.id,
-                    title: lesionTitle(lesion, t),
-                  }))}
-                />
-              </Disclosure>
-              {person.data.my_role === "owner" && (
-                <Disclosure id="profile" title={t("persons.profileTitle")} hint={t("persons.profileHint")}>
-                  <div className={styles.mapSection}>
-                    <label className={styles.switchRow}>
-                      <input
-                        type="checkbox"
-                        checked={person.data.experimental_analysis}
-                        aria-describedby="experimental-hint"
-                        onChange={(e) => updatePerson.mutate({ experimental_analysis: e.target.checked })}
-                      />
-                      {t("persons.experimental")}
-                    </label>
-                    <p id="experimental-hint" className="text-secondary">
-                      {t("persons.experimentalHint")}
-                    </p>
-                    {updatePerson.error && <Notice kind="error">{updatePerson.error.message}</Notice>}
-                    {usage.data && (
-                      <p className="text-secondary">
-                        {t("data.usage", {
-                          count: usage.data.images,
-                          size: formatBytes(usage.data.bytes, i18n.resolvedLanguage ?? "en"),
-                        })}
-                      </p>
-                    )}
-                    {usage.data?.over_quota && <Notice kind="attention">{t("data.overQuota")}</Notice>}
-                    <ExportForm personId={personId} label={t("data.exportPerson")} />
-                    <PurgePerson personId={personId} name={person.data.display_name} />
-                  </div>
-                </Disclosure>
-              )}
-            </div>
+          {lesions.error && <Notice kind="error">{lesions.error.message}</Notice>}
+          {lesions.data && lesions.data.length === 0 && (
+            <EmptyState>{canEdit ? t("lesions.emptyTextEdit") : t("lesions.emptyTextView")}</EmptyState>
+          )}
+          {lesions.data && lesions.data.length > 0 && (
+            <section aria-label={t("lesions.title")}>
+              {desktop && <h2 className={styles.paneTitle}>{t("lesions.title")}</h2>}
+              <LesionList lesions={lesions.data} />
+            </section>
+          )}
+          {!desktop && person.data && (
+            <Tools personId={personId} canEdit={canEdit} locale={i18n.resolvedLanguage ?? "en"} />
           )}
         </div>
       </div>
+
+      <Sheet open={placing && point !== null} title={t("lesions.newTitle")} onClose={() => setPoint(null)}>
+        {point && (
+          <NewLesionForm
+            point={point}
+            view={view}
+            pending={create.isPending}
+            error={create.error?.message}
+            onCancel={() => setPoint(null)}
+            onSubmit={(body) =>
+              create.mutate(body, {
+                onSuccess: (lesion) => {
+                  cancelPlacing();
+                  void navigate(`/lesions/${lesion.id}`);
+                },
+              })
+            }
+          />
+        )}
+      </Sheet>
     </div>
+  );
+}
+
+/** The five tools as rows with a one-line status each; on the desktop they live in the rail. */
+function Tools({ personId, canEdit, locale }: { personId: string; canEdit: boolean; locale: string }) {
+  const { t } = useTranslation();
+  const appointments = useAppointments(personId);
+  const sessions = usePersonSessions(personId);
+  const reports = useReports(personId);
+  const feed = useCalendarFeed(personId);
+  const usage = useUsage(personId);
+  const person = usePerson(personId);
+  const dateFormat = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
+  const today = new Date().toISOString().slice(0, 10);
+  const ahead = (appointments.data ?? []).filter((item) => item.date >= today)[0];
+  const open = (sessions.data ?? []).find((session) => session.status === "open");
+  const last = (sessions.data ?? [])[0];
+  const base = `/persons/${personId}`;
+
+  const appointmentStatus = ahead
+    ? `${dateFormat.format(new Date(`${ahead.date}T12:00:00`))} · ${t("appointments.progress", {
+        done: ahead.checklist.filter((entry) => entry.state === "photographed").length,
+        total: ahead.checklist.length,
+      })}`
+    : t("appointments.nonePlanned");
+  const sessionStatus = open
+    ? `${t("sessions.open")} · ${t("sessions.regionsCount", { captured: open.captured, total: open.captured + open.skipped + open.pending })}`
+    : last
+      ? t("sessions.last", { date: dateFormat.format(new Date(last.started_at)) })
+      : t("sessions.none");
+  const reportStatus = reports.data?.length
+    ? t("reports.made", { count: reports.data.length })
+    : t("reports.none");
+  const calendarStatus = feed.data?.exists
+    ? t("calendar.linkedSince", {
+        date: feed.data.created_at ? dateFormat.format(new Date(feed.data.created_at)) : "",
+      })
+    : t("calendar.notLinked");
+  const profileStatus = [
+    person.data?.experimental_analysis ? t("persons.analysisOn") : t("persons.analysisOff"),
+    usage.data
+      ? t("data.usage", { count: usage.data.images, size: formatBytes(usage.data.bytes, locale) })
+      : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+  const rows = [
+    {
+      to: `${base}/appointments`,
+      icon: <Calendar />,
+      title: t("appointments.sectionTitle"),
+      meta: appointmentStatus,
+      live: Boolean(ahead),
+      show: canEdit || (appointments.data?.length ?? 0) > 0,
+    },
+    {
+      to: `${base}/sessions`,
+      icon: <ScanLine />,
+      title: t("sessions.title"),
+      meta: sessionStatus,
+      live: Boolean(open),
+      show: canEdit || (sessions.data?.length ?? 0) > 0,
+    },
+    {
+      to: `${base}/reports`,
+      icon: <FileText />,
+      title: t("reports.title"),
+      meta: reportStatus,
+      live: false,
+      show: true,
+    },
+    {
+      to: `${base}/calendar`,
+      icon: <CalendarPlus />,
+      title: t("calendar.title"),
+      meta: calendarStatus,
+      live: false,
+      show: true,
+    },
+    {
+      to: `${base}/profile`,
+      icon: <User />,
+      title: t("persons.profile"),
+      meta: profileStatus,
+      live: false,
+      show: person.data?.my_role === "owner",
+    },
+  ]
+    .filter((row) => row.show)
+    .sort((a, b) => Number(b.live) - Number(a.live));
+
+  return (
+    <RowList className={styles.tools} label={t("persons.profileTitle")}>
+      {rows.map((row) => (
+        <Row
+          key={row.to}
+          to={row.to}
+          leading={row.live ? <Clock /> : row.icon}
+          title={row.title}
+          meta={<span className={row.live ? styles.live : undefined}>{row.meta}</span>}
+          chevron
+        />
+      ))}
+    </RowList>
   );
 }

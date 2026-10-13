@@ -1,18 +1,6 @@
 .page {
   display: grid;
-  gap: var(--space-4);
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   gap: var(--space-3);
-  flex-wrap: wrap;
-}
-
-.header h1 {
-  font-size: var(--text-2xl);
 }
 
 .addForm {
@@ -22,72 +10,8 @@
 
 .actions {
   display: flex;
+  justify-content: flex-end;
   gap: var(--space-2);
-}
-
-.list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: var(--space-3);
-}
-
-.personLink {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: var(--space-3);
-  color: inherit;
-  text-decoration: none;
-}
-
-.personName {
-  font-weight: var(--font-weight-emphasis);
-  font-size: var(--text-lg);
-}
-
-.mapSection {
-  display: grid;
-  gap: var(--space-3);
-}
-
-.mapSection h2 {
-  font-size: var(--text-lg);
-}
-
-.switchRow {
-  display: flex;
-  gap: var(--space-3);
-  align-items: flex-start;
-}
-
-.switchRow input {
-  width: 22px;
-  height: 22px;
-  margin-top: 2px;
-  accent-color: var(--color-accent);
-}
-
-.calendar {
-  display: grid;
-  gap: var(--space-2);
-}
-
-.calendarField {
-  display: grid;
-  gap: var(--space-1);
-}
-
-.calendarField input {
-  min-height: var(--touch-target);
-  padding: 0 var(--space-2);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-control);
-  background: var(--color-surface);
-  color: var(--color-ink);
-  font-family: var(--font-ui);
-  font-size: var(--text-sm);
 }
 
 /* The person page: the map pane and the detail pane, side by side when there is room. */
@@ -96,20 +20,87 @@
   gap: var(--space-5);
 }
 
+.mapPane {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+/* The whole silhouette, the status line and the bottom bar fit the phone's first viewport. */
+.mapPane svg {
+  max-height: calc(100dvh - 56px - 44px - 24px - 64px - 48px);
+}
+
 .detailPane {
   display: grid;
-  gap: var(--space-5);
+  gap: var(--space-4);
   align-content: start;
   min-width: 0;
 }
 
-.mapPane {
-  min-width: 0;
+.paneTitle {
+  margin-bottom: var(--space-2);
+  font-size: var(--text-lg);
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+}
+
+.dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-left: var(--space-2);
+  border: 1px solid var(--color-paper);
+  border-radius: var(--radius-pill);
+  background: var(--color-marker);
+}
+
+.dot:first-child {
+  margin-left: 0;
+}
+
+.dotDue {
+  background: var(--color-attention);
 }
 
 .tools {
+  margin-top: var(--space-4);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+}
+
+.live {
+  color: var(--color-ink);
+  font-weight: var(--font-weight-body);
+}
+
+.switchRow {
   display: grid;
   gap: var(--space-2);
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.link input {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--touch-target);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
 }
 
 @media (width >= 900px) {
@@ -121,6 +112,18 @@
 
   .mapPane {
     position: sticky;
-    top: var(--space-4);
+    top: 64px;
   }
+
+  .mapPane svg {
+    max-height: calc(100vh - 200px);
+  }
+}
+
+.intro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--space-2);
+  font-size: var(--text-sm);
 }

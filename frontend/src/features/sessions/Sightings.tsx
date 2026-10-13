@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router";
+import { Row, RowList, Thumb } from "@/design-system/components/Row";
+import { Section } from "@/design-system/components/Section";
 import { useSightings } from "@/lib/sessions";
-import styles from "./sessions.module.css";
 
 /** On a mark's page: where it was seen in full-body sessions. */
 export function Sightings({ lesionId }: { lesionId: string }) {
@@ -10,20 +10,18 @@ export function Sightings({ lesionId }: { lesionId: string }) {
   const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, { dateStyle: "medium" });
   if (!sightings.data || sightings.data.length === 0) return null;
   return (
-    <section className={styles.section} aria-labelledby="sightings-heading">
-      <h2 id="sightings-heading">{t("sessions.sightings")}</h2>
-      <ul className={styles.marks}>
+    <Section title={t("sessions.sightings")}>
+      <RowList>
         {sightings.data.map((item) => (
-          <li key={item.mark_id}>
-            <Link to={`/sessions/${item.session_id}/zones/${item.zone}`} className={styles.markButton}>
-              <img src={item.crop_url} alt="" />
-              <span>
-                {dateFormat.format(new Date(item.started_at))} · {t(`sessions.zones.${item.zone}.name`)}
-              </span>
-            </Link>
-          </li>
+          <Row
+            key={item.mark_id}
+            to={`/sessions/${item.session_id}/zones/${item.zone}`}
+            leading={<Thumb src={item.crop_url} />}
+            title={dateFormat.format(new Date(item.started_at))}
+            meta={t(`sessions.zones.${item.zone}.name`)}
+          />
         ))}
-      </ul>
-    </section>
+      </RowList>
+    </Section>
   );
 }

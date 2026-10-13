@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Chip } from "@/design-system/components/Chip";
+import { AppBar } from "@/app/Shell";
 import { PageHeader } from "@/design-system/components/PageHeader";
 import { Sheet } from "@/design-system/components/Sheet";
 import i18n from "@/lib/i18n";
@@ -15,10 +16,11 @@ describe("<PageHeader>", () => {
   it("names the way back after the parent and keeps the title first", () => {
     render(
       <MemoryRouter>
+        <AppBar desktop={false} />
         <PageHeader
           back={{ to: "/persons/1", label: "Ana" }}
           title="Chest mark"
-          meta="Right pectoral · Front"
+          meta={["Right pectoral", "Front"]}
         />
       </MemoryRouter>,
     );

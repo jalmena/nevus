@@ -76,7 +76,7 @@ describe("signing in with a second factor", () => {
 describe("the second factor in the settings", () => {
   it("is set up with a QR code and a first code, hands out the recovery codes once, and turns off", async () => {
     const state = installMockApi({ claimed: true, session: SESSION });
-    renderApp("/settings");
+    renderApp("/settings/second-factor");
     const user = userEvent.setup();
     await user.click(await screen.findByRole("button", { name: "Set up a second factor" }));
     await confirmPassword(user);
@@ -90,7 +90,8 @@ describe("the second factor in the settings", () => {
     await user.click(within(codes).getByRole("button", { name: "I have saved them" }));
     expect(await screen.findByText("The second factor is on. 10 recovery codes left.")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Turn it off" }));
+    await user.click(screen.getByRole("button", { name: "More" }));
+    await user.click(screen.getByRole("menuitem", { name: "Turn it off" }));
     await waitFor(() => expect(state.totp.enabled).toBe(false));
     expect(await screen.findByRole("button", { name: "Set up a second factor" })).toBeInTheDocument();
   });
@@ -99,23 +100,28 @@ describe("the second factor in the settings", () => {
 describe("accounts administration", () => {
   it("lists the accounts, creates one, disables one and turns a lost second factor off", async () => {
     const state = installMockApi({ claimed: true, session: SESSION, users: [ME, ANA] });
-    renderApp("/settings");
+    renderApp("/settings/accounts");
     const user = userEvent.setup();
-    expect(await screen.findByRole("heading", { name: "Accounts (administrator)" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Accounts" })).toBeInTheDocument();
     expect(await screen.findByText("ana")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Disable the account jose" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Actions for jose" })).not.toBeInTheDocument();
 
+    await user.click(screen.getByRole("button", { name: "Add an account" }));
     await user.type(screen.getByLabelText("Username"), "Luis");
     await user.type(screen.getByLabelText("Temporary password"), "a temporary password");
     await user.click(screen.getByRole("button", { name: "Create the account" }));
     await waitFor(() => expect(state.users.map((account) => account.username)).toContain("luis"));
     expect(await screen.findByText("luis")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Disable the account ana" }));
-    expect(await screen.findByRole("button", { name: "Enable the account ana" })).toBeInTheDocument();
-    expect(state.users.find((account) => account.username === "ana")?.disabled_at).not.toBeNull();
+    await user.click(screen.getByRole("button", { name: "Actions for ana" }));
+    await user.click(screen.getByRole("menuitem", { name: "Disable" }));
+    await waitFor(() =>
+      expect(state.users.find((account) => account.username === "ana")?.disabled_at).not.toBeNull(),
+    );
+    await user.click(screen.getByRole("button", { name: "Actions for ana" }));
+    expect(await screen.findByRole("menuitem", { name: "Enable" })).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Turn the second factor off for ana" }));
+    await user.click(screen.getByRole("menuitem", { name: "Turn the second factor off" }));
     await confirmPassword(user);
     await waitFor(() =>
       expect(state.users.find((account) => account.username === "ana")?.totp_enabled).toBe(false),
