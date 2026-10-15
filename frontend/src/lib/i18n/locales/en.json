@@ -95,7 +95,10 @@
     "noDate": "No capture date",
     "delete": "Move to trash",
     "openWithWarnings": "Open the photo (has a quality note)",
-    "kind": "Kind of photo"
+    "kind": "Kind of photo",
+    "normalised": "Normalised",
+    "originalView": "Original",
+    "view": "View"
   },
   "settings": {
     "title": "Settings",

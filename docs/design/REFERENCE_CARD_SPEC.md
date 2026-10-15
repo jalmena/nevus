@@ -54,6 +54,14 @@ The constants live in `backend/src/nevus/cv/card.py`; the generator and the dete
 - Colour: median RGB of the grey and white patches recorded with the analysis for exposure and white-balance checks; no colour correction is applied to stored images, only to derived analyses and comparison views, and always reversibly.
 - Outputs recorded in the analysis: marker ids and corners, homography, mm per pixel and its σ, tilt, patch values, card version, correction factor applied.
 
+## 5a. The normalised view (`normalise.card`)
+
+Once the card is found, a second analyzer makes the photo's normalised view: the original warped by the card homography onto the card plane, so the card is seen flat and upright with its markers in their printed places, cropped to the card plus a 3 mm margin, at the photo's own resolution capped at 24 px/mm and 2048 px on the long edge. Every card photo thus becomes the same picture — the same frame, the same scale, the mark in the window — which is what makes two visits comparable at a glance.
+
+- Stored as two regenerable renditions, `normalised` and `normalised_thumb`; the original is untouched and the analysis records the matrix (image pixels → normalised pixels), the margin and the pixels per millimetre, so anything measured on the original can be drawn on the normalised view.
+- The thumbnail of a card photo is its normalised view wherever the interface shows thumbnails; the visit page shows the normalised view first and keeps the original a tap away.
+- Measurement stays on the original through the homography (section 5): the normalised view changes what is seen, not what is measured.
+
 ## 6. Coin fallback (`scale.coin`)
 
 Euro coins by diameter: 1 c 16.25 mm, 2 c 18.75 mm, 5 c 21.25 mm, 10 c 19.75 mm, 20 c 22.25 mm, 50 c 24.25 mm, 1 € 23.25 mm, 2 € 25.75 mm. The person taps the coin, the analyzer fits a circle (ported from MoleMapper's approach, rescaled to full resolution), the person picks the denomination and may adjust the circle. Uncertainty includes the fit residual and an unknown-tilt term (a coin cannot reveal tilt, so σ_scale is larger than with the card; the interface says so).

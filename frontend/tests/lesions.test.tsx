@@ -203,3 +203,37 @@ describe("quality warnings", () => {
     expect(screen.getByRole("button", { name: "Open the photo (has a quality note)" })).toBeInTheDocument();
   });
 });
+
+describe("photos taken with the reference card", () => {
+  it("shows the normalised view first and keeps the original a tap away", async () => {
+    installMockApi({
+      claimed: true,
+      session: SESSION,
+      persons: [PERSON],
+      lesions: [
+        { id: "l1", person_id: PERSON.id, label: "Chest mark", zone: "1250", x: 0.4, y: 0.25, due: false },
+      ],
+      observations: [
+        {
+          id: "o1",
+          lesion_id: "l1",
+          captured_at: "2026-09-01T10:00:00Z",
+          notes: null,
+          symptoms: [],
+          images: ["i1"],
+        },
+      ],
+      normalised: ["i1"],
+    });
+    await i18n.changeLanguage("en");
+    renderApp("/observations/o1");
+    const user = userEvent.setup();
+    const hero = await screen.findByRole("button", { name: "Open the photo" });
+    expect(within(hero).getByRole("img")).toHaveAttribute("src", "/api/images/i1/normalised");
+    await user.click(hero);
+    const lightbox = screen.getByRole("dialog");
+    expect(within(lightbox).getByRole("img")).toHaveAttribute("src", "/api/images/i1/normalised");
+    await user.click(within(lightbox).getByRole("radio", { name: "Original" }));
+    expect(within(lightbox).getByRole("img")).toHaveAttribute("src", "/api/images/i1/preview");
+  });
+});

@@ -95,7 +95,10 @@
     "noDate": "Sin fecha de captura",
     "delete": "Mover a la papelera",
     "openWithWarnings": "Abrir la foto (tiene una nota de calidad)",
-    "kind": "Tipo de foto"
+    "kind": "Tipo de foto",
+    "normalised": "Normalizada",
+    "originalView": "Original",
+    "view": "Vista"
   },
   "settings": {
     "title": "Ajustes",

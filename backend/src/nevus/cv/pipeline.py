@@ -15,21 +15,24 @@ import uuid
 from functools import lru_cache
 from typing import Any
 
+from PIL import Image as PILImage
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from nevus import analysis
-from nevus.cv import card_detect, quality, segment
+from nevus.cv import card_detect, normalise, quality, segment
 from nevus.cv.imageio import Img, decode, upright
-from nevus.db.models import Image, Observation, Person, ScaleReference
+from nevus.db.models import Analysis, Image, Observation, Person, Rendition, ScaleReference
 from nevus.db.types import utcnow
 from nevus.jobs import queue
 from nevus.jobs.registry import JobContext, JobKind, register
 from nevus.storage.blobs import BlobStore
+from nevus.storage.renditions import renditions_of
 
 QUALITY_KIND = "analyze.quality"
 CARD_KIND = "analyze.card"
 SEGMENT_KIND = "analyze.segment"
+NORMALISE_KIND = "analyze.normalise"
 CARD_FLAGS = ("tilted", "card_small")
 
 
@@ -189,7 +192,70 @@ def _card_store(ctx: JobContext, payload: dict[str, Any], result: dict[str, Any]
                     analysis_id=row.id,
                 )
             )
+        queue.enqueue(
+            ctx.db,
+            NORMALISE_KIND,
+            {"image_id": str(image.id), "analysis_id": str(row.id)},
+            dedupe_key=f"normalise:{image.id}:{normalise.VERSION}",
+            priority=4,
+        )
     refresh_image_flags(ctx.db, image)
+
+
+# --- the normalised view of a card photo -----------------------------------------------------------
+
+
+def _normalise_load(ctx: JobContext, payload: dict[str, Any]) -> dict[str, Any] | None:
+    image = _image(ctx, payload)
+    if image is None:
+        return None
+    card = ctx.db.get(Analysis, uuid.UUID(payload["analysis_id"]))
+    if card is None or not card.outputs.get("found"):
+        return None
+    return {"data": _read(ctx, image), "orientation": image.orientation, "card": dict(card.outputs)}
+
+
+def _normalise_compute(value: dict[str, Any]) -> dict[str, Any] | None:
+    made = normalise.normalise(upright(decode(value["data"]), int(value["orientation"])), value["card"])
+    if made is None:
+        return None
+    picture, how = made
+    rgb = PILImage.fromarray(picture[:, :, ::-1])
+    out = {r.kind: (r.data, r.width, r.height) for r in renditions_of(rgb, ("normalised", "normalised_thumb"))}
+    return {"how": how, "renditions": out}
+
+
+def _normalise_store(ctx: JobContext, payload: dict[str, Any], result: dict[str, Any] | None) -> None:
+    image = _image(ctx, payload)
+    if image is None or result is None:
+        return
+    for kind, (data, width, height) in result["renditions"].items():
+        digest = ctx.store.put(data, derived=True)
+        existing = ctx.db.scalar(select(Rendition).where(Rendition.image_id == image.id, Rendition.kind == kind))
+        if existing is None:
+            ctx.db.add(
+                Rendition(
+                    image_id=image.id,
+                    kind=kind,
+                    sha256=digest,
+                    bytes=len(data),
+                    mime="image/jpeg",
+                    width=width,
+                    height=height,
+                )
+            )
+        else:
+            existing.sha256, existing.bytes, existing.width, existing.height = digest, len(data), width, height
+    analysis.record(
+        ctx.db,
+        target_type="image",
+        target_id=image.id,
+        analyzer=normalise.NAME,
+        version=normalise.VERSION,
+        params=normalise.PARAMS,
+        input_hash=image.sha256,
+        outputs=result["how"],
+    )
 
 
 # --- experimental outline proposal ------------------------------------------------------------------
@@ -230,3 +296,4 @@ def _segment_store(ctx: JobContext, payload: dict[str, Any], result: dict[str, A
 register(JobKind(QUALITY_KIND, _quality_load, _quality_compute, _quality_store, timeout=90.0))
 register(JobKind(SEGMENT_KIND, _segment_load, _segment_compute, _segment_store, timeout=120.0))
 register(JobKind(CARD_KIND, _card_load, _card_compute, _card_store, timeout=120.0))
+register(JobKind(NORMALISE_KIND, _normalise_load, _normalise_compute, _normalise_store, timeout=120.0))

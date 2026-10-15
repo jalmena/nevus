@@ -177,7 +177,7 @@ class Setting(Base):
 
 IMAGE_ROLES = ("overview", "close_up", "with_reference", "other", "session")
 IMAGE_MODALITIES = ("camera", "dermatoscope")
-RENDITION_KINDS = ("full", "preview", "thumb")
+RENDITION_KINDS = ("full", "preview", "thumb", "normalised", "normalised_thumb")
 
 
 class Image(Base):

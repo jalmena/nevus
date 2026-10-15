@@ -177,6 +177,13 @@
   max-height: 80vh;
 }
 
+.previewView {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-2) var(--space-4) 0;
+  color: var(--color-brand-ink);
+}
+
 .previewBar {
   display: flex;
   flex-wrap: wrap;

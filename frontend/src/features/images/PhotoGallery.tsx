@@ -8,7 +8,15 @@ import { Notice } from "@/design-system/components/Notice";
 import { Row, RowList } from "@/design-system/components/Row";
 import { Sheet, showDialog } from "@/design-system/components/Sheet";
 import { LiveCamera, liveCameraAvailable } from "@/features/capture/LiveCamera";
-import { IMAGE_ROLES, imageUrl, useDeleteImage, type ImageOut, type ImageRole } from "@/lib/images";
+import { Segmented } from "@/design-system/components/Segmented";
+import {
+  IMAGE_ROLES,
+  imageUrl,
+  normalisedOf,
+  useDeleteImage,
+  type ImageOut,
+  type ImageRole,
+} from "@/lib/images";
 import styles from "./PhotoGallery.module.css";
 
 interface Props {
@@ -48,6 +56,7 @@ export function PhotoGallery({
   const [current, setCurrent] = useState<string | null>(null);
   const [open, setOpen] = useState<ImageOut | null>(null);
   const [qualityOpen, setQualityOpen] = useState(false);
+  const [view, setView] = useState<"normalised" | "original">("normalised");
   const [live, setLive] = useState(false);
   const preview = useRef<HTMLDialogElement>(null);
   const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, {
@@ -55,6 +64,8 @@ export function PhotoGallery({
     timeStyle: "short",
   });
   const hero = images.find((image) => image.id === current) ?? images[0];
+  const heroNormalised = hero ? normalisedOf(hero) : null;
+  const heroKind = heroNormalised ? "normalised" : "preview";
   const firstFlag = quality.flags[0];
 
   function show(image: ImageOut) {
@@ -88,10 +99,10 @@ export function PhotoGallery({
             aria-label={quality.flags.length > 0 ? t("images.openWithWarnings") : t("images.open")}
           >
             <img
-              src={imageUrl(hero.id, "preview")}
+              src={imageUrl(hero.id, heroKind)}
               alt={alt(hero)}
-              width={hero.renditions.find((r) => r.kind === "preview")?.width}
-              height={hero.renditions.find((r) => r.kind === "preview")?.height}
+              width={hero.renditions.find((r) => r.kind === heroKind)?.width}
+              height={hero.renditions.find((r) => r.kind === heroKind)?.height}
               className={styles.hero}
             />
           </button>
@@ -234,7 +245,23 @@ export function PhotoGallery({
       <dialog ref={preview} className={styles.preview} onClose={() => setOpen(null)}>
         {open && (
           <>
-            <img src={imageUrl(open.id, "preview")} alt={t(`images.roles.${open.role}`)} />
+            <img
+              src={imageUrl(open.id, normalisedOf(open) && view === "normalised" ? "normalised" : "preview")}
+              alt={t(`images.roles.${open.role}`)}
+            />
+            {normalisedOf(open) && (
+              <div className={styles.previewView}>
+                <Segmented
+                  label={t("images.view")}
+                  options={[
+                    { value: "normalised", label: t("images.normalised") },
+                    { value: "original", label: t("images.originalView") },
+                  ]}
+                  value={view}
+                  onChange={setView}
+                />
+              </div>
+            )}
             <div className={styles.previewBar}>
               <span className="numeric">
                 {open.captured_at ? dateFormat.format(new Date(open.captured_at)) : t("images.noDate")} ·{" "}

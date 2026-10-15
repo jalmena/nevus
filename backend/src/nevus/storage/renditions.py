@@ -7,7 +7,7 @@ from dataclasses import dataclass
 
 from PIL import Image
 
-SIZES: dict[str, int] = {"full": 2048, "preview": 1024, "thumb": 256}
+SIZES: dict[str, int] = {"full": 2048, "preview": 1024, "thumb": 256, "normalised": 2048, "normalised_thumb": 256}
 QUALITY = 85
 
 
@@ -49,3 +49,17 @@ def make_renditions(
             copy.save(buffer, format="JPEG", quality=QUALITY, optimize=True, progressive=True)
             out.append(Rendition(kind, buffer.getvalue(), copy.width, copy.height))
         return out
+
+
+def renditions_of(picture: Image.Image, kinds: tuple[str, ...]) -> list[Rendition]:
+    """Renditions of a picture already upright in memory (the normalised view of a card photo)."""
+    rgb = picture.convert("RGB")
+    out = []
+    for kind in kinds:
+        longest = SIZES[kind]
+        copy = rgb.copy()
+        copy.thumbnail((longest, longest), Image.Resampling.LANCZOS)
+        buffer = io.BytesIO()
+        copy.save(buffer, format="JPEG", quality=QUALITY, optimize=True, progressive=True)
+        out.append(Rendition(kind, buffer.getvalue(), copy.width, copy.height))
+    return out
