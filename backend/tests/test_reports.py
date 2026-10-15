@@ -33,10 +33,16 @@ FRONTEND = Path(__file__).resolve().parents[2] / "frontend"
 
 
 def _streams(pdf: bytes) -> list[bytes]:
-    """Every stream of the file, inflated when compressed."""
+    """Every stream of the file, inflated when compressed.
+
+    A stream's bytes are taken from its declared /Length, never from where "endstream" happens to
+    appear: compressed data may end with a newline or a carriage return that a boundary search would
+    eat, and a few bytes short the inflater reports a truncated stream and the JSON is never seen.
+    """
     out = []
-    for match in re.finditer(rb"stream\r?\n(.*?)\r?\nendstream", pdf, re.S):
-        raw = match.group(1)
+    for match in re.finditer(rb"/Length (\d+)[^>]*>>\s*stream\r?\n", pdf, re.S):
+        start = match.end()
+        raw = pdf[start : start + int(match.group(1))]
         try:
             out.append(zlib.decompress(raw))
         except zlib.error:
