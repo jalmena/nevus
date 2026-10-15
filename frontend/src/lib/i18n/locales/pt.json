@@ -95,7 +95,10 @@
     "noDate": "Sem data de captura",
     "delete": "Mover para o lixo",
     "openWithWarnings": "Abrir a foto (tem uma nota de qualidade)",
-    "kind": "Tipo de foto"
+    "kind": "Tipo de foto",
+    "normalised": "Normalizada",
+    "originalView": "Original",
+    "view": "Vista"
   },
   "settings": {
     "title": "Definições",

@@ -7441,7 +7441,9 @@
                 "original",
                 "full",
                 "preview",
-                "thumb"
+                "thumb",
+                "normalised",
+                "normalised_thumb"
               ],
               "title": "Kind",
               "type": "string"

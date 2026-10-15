@@ -5063,7 +5063,7 @@ export interface operations {
             header?: never;
             path: {
                 image_id: string;
-                kind: "original" | "full" | "preview" | "thumb";
+                kind: "original" | "full" | "preview" | "thumb" | "normalised" | "normalised_thumb";
             };
             cookie?: never;
         };

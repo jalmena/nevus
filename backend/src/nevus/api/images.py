@@ -36,7 +36,7 @@ router = APIRouter(prefix="/api", tags=["images"])
 
 ImageRole = Literal["overview", "close_up", "with_reference", "other"]
 Modality = Literal["camera", "dermatoscope"]
-RenditionKind = Literal["original", "full", "preview", "thumb"]
+RenditionKind = Literal["original", "full", "preview", "thumb", "normalised", "normalised_thumb"]
 IMMUTABLE_PRIVATE = "private, max-age=31536000, immutable"
 
 
@@ -220,7 +220,9 @@ def image_file(
         digest, mime = image.sha256, image.mime
         path = store.path(digest)
     else:
-        rendition = next((r for r in image.renditions if r.kind == kind), None)
+        # A card photo's thumbnail is the normalised view once it exists: the mark, not a card on skin.
+        wanted = ("normalised_thumb", "thumb") if kind == "thumb" else (kind,)
+        rendition = next((r for want in wanted for r in image.renditions if r.kind == want), None)
         if rendition is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "No such rendition.")
         digest, mime = rendition.sha256, rendition.mime

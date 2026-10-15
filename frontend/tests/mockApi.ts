@@ -79,6 +79,8 @@ export interface MockState {
   observations: MockObservation[];
   /** Image ids whose quality check found a warning. */
   flagged: string[];
+  /** Photos with a normalised view (taken with the reference card). */
+  normalised: string[];
   measurements: {
     id: string;
     observation_id: string;
@@ -189,6 +191,7 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     lesions: [],
     observations: [],
     flagged: [],
+    normalised: [],
     measurements: [],
     trash: [],
     exports: [],
@@ -295,7 +298,16 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     quality_checked_at: "2026-09-12T10:41:08Z",
     captured_at: "2026-09-12T10:41:07Z",
     created_at: "2026-09-12T10:41:07Z",
-    renditions: [{ kind: "thumb", width: 256, height: 192, bytes: 100 }],
+    renditions: [
+      { kind: "thumb", width: 256, height: 192, bytes: 100 },
+      { kind: "preview", width: 640, height: 480, bytes: 400 },
+      ...(state.normalised.includes(id)
+        ? [
+            { kind: "normalised", width: 1832, height: 1200, bytes: 900 },
+            { kind: "normalised_thumb", width: 256, height: 168, bytes: 90 },
+          ]
+        : []),
+    ],
   });
   const observationOut = (o: MockObservation) => ({
     id: o.id,

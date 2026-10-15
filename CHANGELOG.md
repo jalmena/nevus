@@ -1,3 +1,9 @@
+## v1.4.0 (2026-10-15)
+
+### Feat
+
+- **cv**: the normalised view of a card photo: flat, upright, cropped to the card
+
 ## v1.3.0 (2026-10-14)
 
 ### Feat
