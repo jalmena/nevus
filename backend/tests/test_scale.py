@@ -251,6 +251,26 @@ def test_the_reference_card_downloads(client: TestClient) -> None:
     assert response.content.startswith(b"%PDF")
 
 
+def _paint_grey_patch(photo: np.ndarray, geometry: dict[str, object], value: int) -> np.ndarray:
+    gx, gy, gw, gh = WINDOW.grey
+    quad_mm = np.array([[gx, gy], [gx + gw, gy], [gx + gw, gy + gh], [gx, gy + gh]], np.float64)
+    to_image = np.linalg.inv(np.asarray(geometry["homography"], np.float64))
+    quad_px = cv2.perspectiveTransform(quad_mm.reshape(-1, 1, 2), to_image).reshape(-1, 2)
+    painted = photo.copy()
+    cv2.fillConvexPoly(painted, np.round(quad_px).astype(np.int32), (value, value, value))
+    return painted
+
+
+def test_a_patch_that_does_not_read_as_the_printed_grey_leaves_the_colour_reference_to_the_camera() -> None:
+    photo, _ = photograph(WINDOW)
+    geometry = card_detect.detect(photo)
+    gains = descriptors._grey_patch_gains(photo, geometry)
+    assert gains is not None and np.all(gains >= descriptors.MIN_GAIN) and np.all(gains <= descriptors.MAX_GAIN)
+    # A 3D-printed card's patch comes out black; a card read where it is not shows paper, skin or shadow.
+    assert descriptors._grey_patch_gains(_paint_grey_patch(photo, geometry, 25), geometry) is None
+    assert descriptors._grey_patch_gains(_paint_grey_patch(photo, geometry, 245), geometry) is None
+
+
 def test_a_measurement_describes_shape_and_colour_and_old_ones_can_be_described_later(client: TestClient) -> None:
     claim(client)
     _, visit, image = _visit_with_card_photo(client)

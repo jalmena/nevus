@@ -444,7 +444,7 @@
     "lineHint": "Depois de imprimir, meça a linha com uma régua e escreva o que leu (por exemplo 49,6).",
     "verified": "Impressão verificada: a linha mediu {{mm}} mm.",
     "unverified": "Ainda não verificada: as medições feitas com o cartão têm uma incerteza maior.",
-    "download3d": "Transferir para impressão 3D (duas cores)"
+    "download3d": "Transferir para impressão 3D (STL)"
   },
   "reminders": {
     "title": "Com foto pendente",

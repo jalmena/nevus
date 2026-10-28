@@ -1348,7 +1348,7 @@ export interface paths {
         };
         /**
          * Reference Card 3D
-         * @description The card as two bodies to print, plate and ink, for the window card and the strip, with a note on how.
+         * @description One STL per piece, the window card and the strip, plate and raised ink in one solid, and a note on printing.
          */
         get: operations["reference_card_3d_api_reference_card_3d_get"];
         put?: never;

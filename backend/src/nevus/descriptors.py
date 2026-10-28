@@ -28,6 +28,7 @@ from nevus.storage.blobs import BlobStore
 
 VERSION = "1.0.0"
 GREY_PATCH_SRGB = 0x77 / 255  # how the card's grey patch is printed
+MIN_GAIN, MAX_GAIN = 0.25, 4.0  # beyond two stops either way, the patch is not the printed grey
 MIN_PIXELS = 40
 
 
@@ -116,11 +117,13 @@ def _grey_patch_gains(image: Img, geometry: dict[str, Any]) -> np.ndarray | None
     pixels = image[mask > 0]
     if len(pixels) < MIN_PIXELS:
         return None
-    seen = _linear(np.median(pixels.astype(np.float64), axis=0))
-    if np.any(seen <= 0.002):
-        return None  # a black patch is not the grey patch: the card was not read where it is
+    seen = np.maximum(_linear(np.median(pixels.astype(np.float64), axis=0)), 1e-6)
     gains = _linear(np.array([GREY_PATCH_SRGB * 255] * 3)) / seen
-    return np.asarray(np.clip(gains, 0.25, 4.0), dtype=np.float64)
+    if np.any(gains < MIN_GAIN) or np.any(gains > MAX_GAIN):
+        # Something other than the printed grey: a black or white patch (a card read where it is not, or a
+        # 3D-printed card, whose patch comes out black) or a photo too far gone to correct from it.
+        return None
+    return np.asarray(gains, dtype=np.float64)
 
 
 def _apply_gains(pixels: np.ndarray, gains: np.ndarray | None) -> np.ndarray:

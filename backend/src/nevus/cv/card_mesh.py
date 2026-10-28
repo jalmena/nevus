@@ -1,10 +1,16 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-"""The reference card as something to print in three dimensions: a white plate and black ink on top.
+"""The reference card as something to print in three dimensions: a white plate with black ink raised on it.
 
-The same `draw_card` that lays the card out for paper and for the detector paints here into meshes:
-black fills become raised ink, the grey patch a halftone of raised cells, strokes thin raised bars,
-and the window a hole through the plate. Two bodies come out, the plate and the ink, so a printer
-can change filament at the ink's height, or print both in white and paint the raised parts black.
+The same `draw_card` that lays the card out for paper and for the detector paints here into a mesh:
+black fills become raised ink, strokes thin raised bars, and the window a hole through the plate.
+The grey patch comes out solid black: two colours cannot make its grey, and the colour descriptors
+know to take their reference from the camera when a patch does not read as the printed grey. The
+neVus lockup is raised too, where the paper card carries its lettering (see `lockup`).
+
+Each piece is one STL holding the plate and every ink body, the ink sunk one layer into the plate so
+the shells overlap and the slicer unites them into a solid. Everything above the plate's height is
+ink, so a printer changes filament at that layer, or the whole piece is printed in white and the
+raised parts painted black.
 """
 
 from __future__ import annotations
@@ -12,18 +18,23 @@ from __future__ import annotations
 import io
 import math
 import struct
+import textwrap
 import zipfile
 from dataclasses import dataclass, field
 from typing import Any
 
 import numpy as np
 
+from nevus.cv import lockup
 from nevus.cv.card import APERTURE_RADIUS, STRIP, WINDOW, CardGeometry, draw_card
 
 PLATE_MM = 1.2
 INK_MM = 0.4
+OVERLAP_MM = 0.2  # the ink sinks one layer into the plate: overlapping shells unite in the slicer, touching may not
+INK_Z0, INK_Z1 = PLATE_MM - OVERLAP_MM, PLATE_MM + INK_MM
 MIN_BAR_MM = 0.5
-HALFTONE_CELL_MM = 1.0
+LOCKUP_STEP_MM = 0.1
+LOCKUPS = {WINDOW.name: (1.8, 6.0), STRIP.name: (8.8, 4.0)}  # top edge and cap height in mm, centred on the card
 SEGMENTS = 96
 Tri = tuple[tuple[float, float, float], tuple[float, float, float], tuple[float, float, float]]
 
@@ -75,9 +86,22 @@ class Mesh:
             self.quad((*o0, z0), (*o1, z0), (*o1, z1), (*o0, z1))
             self.quad((*i0, z0), (*i0, z1), (*i1, z1), (*i1, z0))
 
-    def stl(self) -> bytes:
+    def in_printer_frame(self, height: float) -> Mesh:
+        """The bodies with y running upward from the bottom edge, every face's vertex order reversed.
+
+        The drawing has y downward, as on paper and in photographs. A printer's bed is right-handed with z up,
+        so y must run upward there, or the top of the printed piece comes out mirrored and its markers cannot
+        be read. Mirroring turns faces inside out, so their vertex order is reversed to keep pointing outward.
+        """
+
+        def flip(v: tuple[float, float, float]) -> tuple[float, float, float]:
+            return (v[0], height - v[1], v[2])
+
+        return Mesh(bodies=[[(flip(a), flip(c), flip(b)) for a, b, c in body] for body in self.bodies])
+
+    def stl(self, name: str = "neVus reference card") -> bytes:
         """Binary STL; normals from the vertex order, which the slicer recomputes anyway."""
-        out = bytearray(b"neVus reference card".ljust(80, b"\0"))
+        out = bytearray(name.encode("ascii", "replace")[:80].ljust(80, b"\0"))
         out += struct.pack("<I", len(self.triangles))
         for a, b, c in self.triangles:
             n = np.cross(np.subtract(b, a), np.subtract(c, a))
@@ -95,7 +119,7 @@ def _polar(cx: float, cy: float, r: float, angle: float) -> tuple[float, float]:
 
 
 class MeshPainter:
-    """The Painter protocol over two meshes: what is black is ink, what is white is the plate."""
+    """The Painter protocol over a mesh of ink bodies: what is black is raised, what is white is the plate."""
 
     def __init__(self, card: CardGeometry) -> None:
         self.card = card
@@ -116,15 +140,8 @@ class MeshPainter:
     def rect(self, x: float, y: float, w: float, h: float, *, fill: bool = True, stroke: bool = False) -> None:
         if not fill:
             return
-        if self.fill < 0.5:
-            self.ink.box(x, y, w, h, PLATE_MM, PLATE_MM + INK_MM)
-        elif self.fill < 0.95:  # the grey patch: a halftone of raised cells reads as grey from a step back
-            cell = HALFTONE_CELL_MM
-            rows, cols = int(h // cell), int(w // cell)
-            for row in range(rows):
-                for col in range(cols):
-                    if (row + col) % 2 == 0:
-                        self.ink.box(x + col * cell, y + row * cell, cell, cell, PLATE_MM, PLATE_MM + INK_MM)
+        if self.fill < 0.95:  # black, and the grey patch with it: raised ink
+            self.ink.box(x, y, w, h, INK_Z0, INK_Z1)
 
     def rects(self, boxes: list[tuple[float, float, float, float]]) -> None:
         for x, y, w, h in boxes:
@@ -138,20 +155,27 @@ class MeshPainter:
         length = math.hypot(dx, dy)
         if length == 0:
             return
-        nx, ny = -dy / length * half, dx / length * half
+        nx, ny = -dy / length * half, dx / length * half  # the bar's left side; right side first: counter-clockwise
         self.ink.prism(
-            [(x1 + nx, y1 + ny), (x2 + nx, y2 + ny), (x2 - nx, y2 - ny), (x1 - nx, y1 - ny)],
-            PLATE_MM,
-            PLATE_MM + INK_MM,
+            [(x1 - nx, y1 - ny), (x2 - nx, y2 - ny), (x2 + nx, y2 + ny), (x1 + nx, y1 + ny)],
+            INK_Z0,
+            INK_Z1,
         )
 
     def circle(self, cx: float, cy: float, r: float, *, fill: bool = False, stroke: bool = True) -> None:
         if stroke and self.stroke < 0.5:
             half = max(self.width, MIN_BAR_MM) / 2
-            self.ink.annulus(cx, cy, r - half, r + half, PLATE_MM, PLATE_MM + INK_MM)
+            self.ink.annulus(cx, cy, r - half, r + half, INK_Z0, INK_Z1)
 
     def text(self, x: float, y: float, text: str, size_mm: float, *, bold: bool = False, align: str = "left") -> None:
-        return  # lettering is left to the paper version
+        return  # lettering is left to the paper version; the lockup stands in for it
+
+    def lockup(self, centre_x: float, top: float, cap_mm: float) -> None:
+        """The neVus mark and wordmark, raised like the rest of the ink, centred on `centre_x`."""
+        boxes, width, _ = lockup.boxes(cap_mm, LOCKUP_STEP_MM)
+        left = centre_x - width / 2
+        for x, y, w, h in boxes:
+            self.ink.box(left + x, top + y, w, h, INK_Z0, INK_Z1)
 
 
 def plate(card: CardGeometry) -> Mesh:
@@ -164,12 +188,12 @@ def plate(card: CardGeometry) -> Mesh:
     body = mesh.begin()
     cx, cy = card.centre
     half = APERTURE_RADIUS + 2.0  # a square around the hole, tessellated in sectors to meet the circle
-    n = 8 * 9
+    n = SEGMENTS  # the same vertices as the ink ring's inner edge, so the ring's wall and the hole's coincide
     hole = [_polar(cx, cy, APERTURE_RADIUS, 2 * math.pi * i / n) for i in range(n)]
     square = [_square_point(cx, cy, half, 2 * math.pi * i / n) for i in range(n)]
     for i in range(n):
         j = (i + 1) % n
-        for z, flip in ((PLATE_MM, False), (0.0, True)):
+        for z, flip in ((PLATE_MM, True), (0.0, False)):  # the sector runs clockwise: flip the top cap, not the bottom
             quad = [(*hole[i], z), (*hole[j], z), (*square[j], z), (*square[i], z)]
             if flip:
                 quad.reverse()
@@ -211,38 +235,62 @@ def _fan(body: list[Tri], polygon: list[tuple[float, float]], z_top: float, z_bo
         body.append(((*a, z_bottom), (*c, z_bottom), (*b, z_bottom)))
 
 
-def meshes(card: CardGeometry = WINDOW) -> dict[str, Mesh]:
+def mesh(card: CardGeometry = WINDOW) -> Mesh:
+    """The piece as one mesh in the printer's frame: the plate first, then every ink body, sunk `OVERLAP_MM` in."""
     painter = MeshPainter(card)
     draw_card(painter, card, 0.0, 0.0, cut_aperture=False)
-    return {"plate": plate(card), "ink": painter.ink}
+    top, cap_mm = LOCKUPS[card.name]
+    painter.lockup(card.centre[0], top, cap_mm)
+    return Mesh(bodies=[*plate(card).bodies, *painter.ink.bodies]).in_printer_frame(card.height)
 
 
-README = {
-    "en": (
-        "neVus reference card v1, for 3D printing\n\n"
-        "Two bodies: the plate (print in white) and the ink (print in black), or print both in white and paint the\n"
-        "raised parts black with a permanent marker. 100 % scale, 0.2 mm layers, no supports; the ink starts at\n"
-        f"{PLATE_MM} mm and is {INK_MM} mm high, so a single-extruder printer changes filament at that layer.\n"
-        "Light matte filament for the plate; glossy surfaces reflect and hide the markers.\n"
-        "Check the plate with a ruler: the window card is 85.6 x 54 mm, the strip 60 x 20 mm.\n"
-    ),
-    "es": (
-        "Tarjeta de referencia neVus v1, para impresión 3D\n\n"
-        "Dos cuerpos: la placa (imprímela en blanco) y la tinta (en negro), o imprime los dos en blanco y pinta las\n"
-        "partes en relieve con un rotulador permanente negro. Escala 100 %, capas de 0,2 mm, sin soportes; la tinta\n"
-        f"empieza a {PLATE_MM} mm y tiene {INK_MM} mm de alto: una impresora de un extrusor cambia de filamento ahí.\n"
-        "Filamento mate y claro para la placa; las superficies brillantes reflejan y ocultan los marcadores.\n"
-        "Comprueba la placa con una regla: la tarjeta con ventana mide 85,6 x 54 mm y la tira 60 x 20 mm.\n"
-    ),
-}
+def _mm(value: float, lang: str) -> str:
+    text = f"{value:g}"
+    return text.replace(".", ",") if lang in {"es", "pt"} else text
+
+
+def readme(lang: str = "en") -> str:
+    """How to print the pieces, with the height at which the colour changes from plate to ink."""
+    plate_mm, ink_mm, overlap_mm = (_mm(v, lang) for v in (PLATE_MM, INK_MM, OVERLAP_MM))
+    if lang == "es":
+        title = "Tarjeta de referencia neVus v1, para impresión 3D"
+        paragraphs = [
+            "Un STL por pieza: nevus-card-v1.stl (la tarjeta con ventana, 85,6 x 54 mm) y nevus-strip-v1.stl (la tira, "
+            f"60 x 20 mm). Cada archivo lleva la placa y la tinta en relieve juntas; la tinta se hunde {overlap_mm} mm "
+            "en la placa y el laminador une las dos cáscaras en un solo sólido (PrusaSlicer, Bambu Studio, Orca y Cura "
+            "lo hacen por defecto). Escala 100 %, capas de 0,2 mm, sin soportes, cara lisa sobre la cama.",
+            f"Color: la placa mide {plate_mm} mm de grosor y todo lo que está por encima de {plate_mm} mm es tinta, de "
+            f"{ink_mm} mm de alto. Con una impresora multimaterial o un cambio de filamento, imprime en blanco hasta "
+            f"{plate_mm} mm y en negro desde ahí: en el laminador, pon el cambio de color en la capa que empieza a "
+            f"{plate_mm} mm. Con un solo color, imprime toda la pieza en blanco y pinta las partes en relieve con un "
+            "rotulador permanente negro.",
+            "El parche gris sale negro: una impresión no puede hacer su gris, y la aplicación sabe no usarlo. "
+            "Filamento mate y claro: las superficies brillantes reflejan y ocultan los marcadores. Comprueba la pieza "
+            "con una regla antes de usarla.",
+        ]
+    else:
+        title = "neVus reference card v1, for 3D printing"
+        paragraphs = [
+            "One STL per piece: nevus-card-v1.stl (the window card, 85.6 x 54 mm) and nevus-strip-v1.stl (the strip, "
+            f"60 x 20 mm). Each file holds the plate and the raised ink together; the ink sinks {overlap_mm} mm into "
+            "the plate and the slicer unites the two shells into one solid (PrusaSlicer, Bambu Studio, Orca and Cura "
+            "do so by default). 100 % scale, 0.2 mm layers, no supports, flat side down.",
+            f"Colour: the plate is {plate_mm} mm thick and everything above {plate_mm} mm is ink, {ink_mm} mm high. "
+            f"With a multi-material printer or a filament change, print white up to {plate_mm} mm and black from "
+            f"there: in the slicer, set the colour change at the layer that starts at {plate_mm} mm. With one colour, "
+            "print the whole piece in white and paint the raised parts with a black permanent marker.",
+            "The grey patch comes out black: a print cannot make its grey, and the app knows not to use it. Light "
+            "matte filament: glossy surfaces reflect and hide the markers. Check the piece with a ruler before "
+            "using it.",
+        ]
+    return title + "\n\n" + "\n\n".join(textwrap.fill(paragraph, 100) for paragraph in paragraphs) + "\n"
 
 
 def archive(lang: str = "en") -> bytes:
-    """A zip with the four STL files (window card and strip, plate and ink) and how to print them."""
+    """A zip with one STL per piece, the window card and the strip, and a note on how to print them."""
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zf:
         for card, name in ((WINDOW, "card"), (STRIP, "strip")):
-            for part, mesh in meshes(card).items():
-                zf.writestr(f"nevus-{name}-v1-{part}.stl", mesh.stl())
-        zf.writestr("README.txt", README.get(lang, README["en"]))
+            zf.writestr(f"nevus-{name}-v1.stl", mesh(card).stl(f"neVus reference card v1: {name}"))
+        zf.writestr("README.txt", readme(lang))
     return buffer.getvalue()
