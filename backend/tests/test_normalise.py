@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import io
+import uuid
 
 import cv2
 import numpy as np
@@ -114,3 +115,44 @@ def test_a_card_photo_thumbnail_is_revalidated_until_the_mark_is_cut(client: Tes
     assert after.headers["cache-control"] == "private, max-age=31536000, immutable"
     with Image.open(io.BytesIO(after.content)) as small:
         assert small.width == small.height
+
+
+def test_card_photos_from_before_the_mark_crop_catch_up(client: TestClient) -> None:
+    """An instance upgraded from a version without the crop gets it for its old card photos, unasked."""
+    from sqlalchemy import delete, select
+
+    from nevus.cv.pipeline import catch_up_normalisation
+    from nevus.db.models import Analysis, Job, Rendition
+    from nevus.db.models import Image as ImageRow
+    from nevus.jobs.registry import JobContext
+    from nevus.jobs.runner import default_periodic
+
+    claim(client)
+    _, _, image_id = _visit_with_card_photo(client, tilt=0.0)
+    app = client.app
+    factory, store, settings = app.state.session_factory, app.state.blob_store, app.state.settings  # type: ignore[attr-defined]
+    with factory() as db:
+        # The state an older version left behind: a card found, the normalised view made, no crop of the mark.
+        db.execute(
+            delete(Rendition).where(
+                Rendition.image_id == uuid.UUID(image_id), Rendition.kind.in_(["mark", "mark_thumb"])
+            )
+        )
+        db.execute(
+            delete(Analysis).where(Analysis.target_id == uuid.UUID(image_id), Analysis.analyzer == normalise.NAME)
+        )
+        db.execute(delete(Job).where(Job.dedupe_key == f"normalise:{image_id}:{normalise.VERSION}"))
+        image = db.get(ImageRow, uuid.UUID(image_id))
+        assert image is not None
+        image.analysed_at = None
+        db.commit()
+    with factory() as db:
+        assert catch_up_normalisation(JobContext(db, store, settings)) == 1
+        db.commit()
+    client.app.state.jobs.run_until_idle()  # type: ignore[attr-defined]
+    out = client.get(f"/api/images/{image_id}").json()
+    assert {"mark", "mark_thumb"} <= {r["kind"] for r in out["renditions"]} and out["analysed_at"] is not None
+    with factory() as db:
+        assert catch_up_normalisation(JobContext(db, store, settings)) == 0  # done is done
+        assert db.scalar(select(Analysis.version).where(Analysis.analyzer == normalise.NAME)) == normalise.VERSION
+    assert "analysis-catch-up" in {task.name for task in default_periodic()}
