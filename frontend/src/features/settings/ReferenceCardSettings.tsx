@@ -1,4 +1,4 @@
-import { Download } from "lucide-react";
+import { Box, Download } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Notice } from "@/design-system/components/Notice";
@@ -50,6 +50,12 @@ export function ReferenceCardSettings({ admin }: { admin: boolean }) {
           <a href={`/api/reference-card?page=letter&lang=${lang}`} download>
             <Download aria-hidden="true" />
             {t("card.downloadLetter")}
+          </a>
+        </li>
+        <li className={styles.linkRow}>
+          <a href={`/api/reference-card/3d?lang=${lang}`} download>
+            <Box aria-hidden="true" />
+            {t("card.download3d")}
           </a>
         </li>
       </RowList>
