@@ -1,3 +1,9 @@
+## v1.5.2 (2026-10-28)
+
+### Fix
+
+- **card**: one STL per piece, upright and fused, with the neVus lockup
+
 ## v1.5.1 (2026-10-28)
 
 ### Fix
