@@ -1,3 +1,9 @@
+## v1.5.1 (2026-10-28)
+
+### Fix
+
+- **images**: old card photos get the mark's crop by themselves
+
 ## v1.5.0 (2026-10-28)
 
 ### Feat
