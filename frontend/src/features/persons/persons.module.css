@@ -47,6 +47,11 @@
   font-size: var(--text-lg);
 }
 
+.zoneLine {
+  min-height: 1.5em;
+  font-size: var(--text-sm);
+}
+
 .legend {
   display: flex;
   align-items: center;

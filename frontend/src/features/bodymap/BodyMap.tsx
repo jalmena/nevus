@@ -51,6 +51,21 @@ interface ViewBox {
 }
 
 const FULL: ViewBox = { x: 0, y: 0, w: MAP_WIDTH, h: MAP_HEIGHT };
+
+/** The backs of the hands and the tops of the feet, tinted so the two rows of a view read apart. */
+const REVERSE = new Set(["3220", "3221", "3320", "3321"]);
+
+/** A word over each row of the hands and feet views, where the silhouettes alone do not say which is which. */
+const CAPTIONS: Partial<Record<View, { key: string; y: number }[]>> = {
+  hands: [
+    { key: "palms", y: 56 },
+    { key: "backs", y: 236 },
+  ],
+  feet: [
+    { key: "tops", y: 55 },
+    { key: "soles", y: 239 },
+  ],
+};
 const MAX_ZOOM = 6;
 const CLUSTER_PX = 18;
 
@@ -303,7 +318,11 @@ export function BodyMap({
           <path
             key={zone.code}
             d={zone.path}
-            className={[styles.zone, zone.code === selectedZone ? styles.selected : ""].join(" ")}
+            className={[
+              styles.zone,
+              zone.code === selectedZone ? styles.selected : "",
+              REVERSE.has(zone.code) ? styles.reverse : "",
+            ].join(" ")}
             role="button"
             tabIndex={0}
             aria-label={zoneName(zone)}
@@ -311,7 +330,20 @@ export function BodyMap({
             data-zone={zone.code}
             onClick={(event) => activate(zone, pointFromEvent(event, zone))}
             onKeyDown={(event) => onKey(event, zone)}
-          />
+          >
+            <title>{zoneName(zone)}</title>
+          </path>
+        ))}
+        {CAPTIONS[view]?.map((caption) => (
+          <text
+            key={caption.key}
+            x={MAP_WIDTH / 2}
+            y={caption.y}
+            className={styles.caption}
+            textAnchor="middle"
+          >
+            {t(`bodymap.captions.${caption.key}`)}
+          </text>
         ))}
         {groups.map((group) =>
           group.members.length > 1 ? (

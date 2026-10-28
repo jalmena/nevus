@@ -101,6 +101,16 @@ export function PersonPage() {
             placing={placing}
             onSelectMarker={(id) => void navigate(`/lesions/${id}`)}
           />
+          <div className={styles.zoneLine}>
+            {zone && !placing && (
+              <p className="text-secondary" role="status">
+                {t("bodymap.selected", {
+                  zone: zoneLabel(zone.code, zone.name),
+                  view: t(`bodymap.views.${view}`),
+                })}
+              </p>
+            )}
+          </div>
           {(lesions.data?.length ?? 0) > 0 && (
             <p className={["text-secondary", styles.legend].join(" ")} aria-hidden="true">
               <span className={styles.dot} /> {t("bodymap.tracked")}
