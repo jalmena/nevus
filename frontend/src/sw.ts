@@ -36,7 +36,7 @@ registerRoute(
 registerRoute(
   ({ url }) => /^\/api\/images\/[^/]+\/(thumb|preview|mark_thumb|normalised_thumb)$/.test(url.pathname),
   new CacheFirst({
-    cacheName: "photos",
+    cacheName: "photos-v2", // v1 kept whatever came first, immutable or not
     plugins: [
       {
         cacheWillUpdate: async ({ response }) =>
@@ -72,7 +72,7 @@ self.addEventListener("install", () => {
 });
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    self.clients.claim().then(async () => {
+    Promise.all([self.clients.claim(), caches.delete("photos")]).then(async () => {
       if (!updating) return;
       const windows = await self.clients.matchAll({ type: "window" });
       await Promise.all(windows.map((client) => client.navigate(client.url).catch(() => undefined)));

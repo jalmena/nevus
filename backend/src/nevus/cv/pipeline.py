@@ -93,8 +93,10 @@ def refresh_image_flags(db: Session, image: Image) -> None:
     if q is not None and image.quality_checked_at is None:
         image.quality_checked_at = utcnow()
     # Settled once nothing that changes how the photo is shown is still to come: photos outside a visit
-    # get no card search; the others wait for it and, when a card was found, for the normalised view.
-    settled = image.observation_id is None or (c is not None and (not c.outputs.get("found") or n is not None))
+    # get no card search; the others wait for it and, when a card was found, for the normalised view at
+    # its current version (an older one may predate the mark's crop, which the catch-up adds).
+    normalised = n is not None and n.version == normalise.VERSION
+    settled = image.observation_id is None or (c is not None and (not c.outputs.get("found") or normalised))
     if settled and image.analysed_at is None:
         image.analysed_at = utcnow()
     db.flush()
@@ -212,6 +214,39 @@ def _card_store(ctx: JobContext, payload: dict[str, Any], result: dict[str, Any]
 
 
 # --- the normalised view of a card photo -----------------------------------------------------------
+
+
+def catch_up_normalisation(ctx: JobContext) -> int:
+    """Queue the current normalisation for card photos analysed by an older version, or never.
+
+    Runs when the server starts and once a day after: a photo whose card was found before the mark's
+    crop existed gets it without anyone asking, and its thumbnail follows. Photos the current version
+    has seen (a strip card gives no crop, and is still done) are left alone.
+    """
+    has_card = select(ScaleReference.id).where(ScaleReference.image_id == Image.id, ScaleReference.kind == "card")
+    has_mark = select(Rendition.id).where(Rendition.image_id == Image.id, Rendition.kind == "mark")
+    rows = ctx.db.scalars(
+        select(Image).where(
+            Image.deleted_at.is_(None), Image.observation_id.is_not(None), has_card.exists(), ~has_mark.exists()
+        )
+    )
+    queued = 0
+    for image in rows:
+        n = analysis.latest(ctx.db, "image", image.id, normalise.NAME)
+        if n is not None and n.version == normalise.VERSION:
+            continue
+        c = analysis.latest(ctx.db, "image", image.id, card_detect.NAME)
+        if c is None or not c.outputs.get("found"):
+            continue
+        job = queue.enqueue(
+            ctx.db,
+            NORMALISE_KIND,
+            {"image_id": str(image.id), "analysis_id": str(c.id)},
+            dedupe_key=f"normalise:{image.id}:{normalise.VERSION}",
+            priority=2,
+        )
+        queued += job is not None
+    return queued
 
 
 def _normalise_load(ctx: JobContext, payload: dict[str, Any]) -> dict[str, Any] | None:

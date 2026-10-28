@@ -32,7 +32,9 @@ def _load_kinds() -> None:
 
 def default_periodic() -> list[Periodic]:
     """Recurring work: email and webhook digests and the nightly backup (checked every quarter of an hour, queued once
-    a day), and the daily housekeeping (trash purge, file collection, expired exports)."""
+    a day), the daily housekeeping (trash purge, file collection, expired exports), and the daily catch-up that
+    queues the current analyses for photos an older version left behind."""
+    from nevus.cv.pipeline import catch_up_normalisation
     from nevus.maintenance import daily_housekeeping, schedule_backup, schedule_verification
     from nevus.notify.email import schedule_digests
     from nevus.notify.push import schedule_push
@@ -47,10 +49,16 @@ def default_periodic() -> list[Periodic]:
         schedule_backup(ctx)
         schedule_verification(ctx)
 
+    def catch_up(ctx: JobContext) -> None:
+        queued = catch_up_normalisation(ctx)
+        if queued:
+            log.info("analysis.catch_up", queued=queued)
+
     return [
         Periodic("email-digests", 900.0, digests),
         Periodic("nightly-backup", 900.0, backups),
         Periodic("housekeeping", 24 * 3600.0, daily_housekeeping),
+        Periodic("analysis-catch-up", 24 * 3600.0, catch_up),
     ]
 
 
