@@ -441,7 +441,7 @@
     "lineHint": "After printing, measure the line with a ruler and type what you read (for example 49.6).",
     "verified": "Print verified: the line measured {{mm}} mm.",
     "unverified": "Not verified yet: measurements made with the card carry a larger uncertainty.",
-    "download3d": "Download for 3D printing (two colours)"
+    "download3d": "Download for 3D printing (STL)"
   },
   "reminders": {
     "title": "Due for a photo",

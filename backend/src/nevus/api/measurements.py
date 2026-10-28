@@ -267,7 +267,7 @@ def reference_card(
 
 @router.get("/reference-card/3d", response_class=Response, responses={200: {"content": {"application/zip": {}}}})
 def reference_card_3d(user: CurrentUser, lang: Annotated[Language, Query()] = "en") -> Response:
-    """The card as two bodies to print, plate and ink, for the window card and the strip, with a note on how."""
+    """One STL per piece, the window card and the strip, plate and raised ink in one solid, and a note on printing."""
     data = card_mesh.archive(lang)
     return Response(
         data,

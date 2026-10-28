@@ -441,7 +441,7 @@
     "lineHint": "Después de imprimir, mide la línea con una regla y escribe lo que leas (por ejemplo 49,6).",
     "verified": "Impresión verificada: la línea midió {{mm}} mm.",
     "unverified": "Sin verificar todavía: las medidas con la tarjeta llevan una incertidumbre mayor.",
-    "download3d": "Descargar para impresión 3D (dos colores)"
+    "download3d": "Descargar para impresión 3D (STL)"
   },
   "reminders": {
     "title": "Toca hacer foto",
