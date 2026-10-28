@@ -758,6 +758,10 @@ export interface paths {
         /**
          * Image File
          * @description The bytes, only for people who may see the person; cacheable forever because the content is addressed by hash.
+         *
+         *     `thumb` is an alias: a card photo's thumbnail is the mark in its window once it exists, not a card on
+         *     skin. While the analyses that make it may still be running, the alias asks to be revalidated instead
+         *     of cached for a year, so no list keeps showing the card after the mark is cut.
          */
         get: operations["image_file_api_images__image_id___kind__get"];
         put?: never;
@@ -1327,6 +1331,26 @@ export interface paths {
          * @description Two window cards, two strips and a 50 mm line to verify the printer did not scale the page.
          */
         get: operations["reference_card_api_reference_card_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/reference-card/3d": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Reference Card 3D
+         * @description The card as two bodies to print, plate and ink, for the window card and the strip, with a note on how.
+         */
+        get: operations["reference_card_3d_api_reference_card_3d_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2162,7 +2186,7 @@ export interface components {
              * Method
              * @enum {string}
              */
-            method: "card" | "features";
+            method: "card" | "card+mark" | "features";
             /** Overlay Url */
             overlay_url: string | null;
             /** Reason */
@@ -2402,6 +2426,8 @@ export interface components {
         };
         /** ImageOut */
         ImageOut: {
+            /** Analysed At */
+            analysed_at: string | null;
             /** Bytes */
             bytes: number;
             /** Captured At */
@@ -3281,6 +3307,7 @@ export interface components {
             upright_height: number;
             /** Upright Width */
             upright_width: number;
+            window?: components["schemas"]["WindowOut"] | null;
         };
         /** Sighting */
         Sighting: {
@@ -3612,6 +3639,18 @@ export interface components {
             secret?: string | null;
             /** Url */
             url?: string | null;
+        };
+        /**
+         * WindowOut
+         * @description The card's window in this photo's upright pixels: where the mark is, and how big a span to show.
+         */
+        WindowOut: {
+            /** Cx */
+            cx: number;
+            /** Cy */
+            cy: number;
+            /** R */
+            r: number;
         };
         /** Zone */
         Zone: {
@@ -5063,7 +5102,7 @@ export interface operations {
             header?: never;
             path: {
                 image_id: string;
-                kind: "original" | "full" | "preview" | "thumb" | "normalised" | "normalised_thumb";
+                kind: "original" | "full" | "preview" | "thumb" | "normalised" | "normalised_thumb" | "mark" | "mark_thumb";
             };
             cookie?: never;
         };
@@ -6612,6 +6651,37 @@ export interface operations {
                 };
                 content: {
                     "application/pdf": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reference_card_3d_api_reference_card_3d_get: {
+        parameters: {
+            query?: {
+                lang?: "en" | "es" | "pt";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/zip": unknown;
                 };
             };
             /** @description Validation Error */

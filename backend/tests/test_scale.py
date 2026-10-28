@@ -119,7 +119,9 @@ def test_an_unverified_print_is_less_certain_than_a_verified_one() -> None:
     assert measure.card_scale(detection, 49.5).print_factor == pytest.approx(0.99)
 
 
-def _visit_with_card_photo(client: TestClient, tilt: float = 0.0, disc: float = 5.0) -> tuple[str, str, str]:
+def _visit_with_card_photo(
+    client: TestClient, tilt: float = 0.0, disc: float = 5.0, run_jobs: bool = True
+) -> tuple[str, str, str]:
     pid = client.post("/api/persons", json={"display_name": "Ana"}, headers=SAME_ORIGIN).json()["id"]
     lesion = client.post(
         f"/api/persons/{pid}/lesions",
@@ -134,7 +136,8 @@ def _visit_with_card_photo(client: TestClient, tilt: float = 0.0, disc: float = 
         data={"role": "with_reference"},
         headers=SAME_ORIGIN,
     ).json()
-    client.app.state.jobs.run_until_idle()  # type: ignore[attr-defined]
+    if run_jobs:
+        client.app.state.jobs.run_until_idle()  # type: ignore[attr-defined]
     return lesion["id"], visit["id"], image["id"]
 
 

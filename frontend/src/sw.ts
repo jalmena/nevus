@@ -29,12 +29,21 @@ cleanupOutdatedCaches();
 registerRoute(
   new NavigationRoute(createHandlerBoundToURL("/index.html"), { denylist: [/^\/api\//, /^\/healthz$/] }),
 );
-// Small renditions, immutable by hash: kept for offline viewing, a bounded number of them.
+// Small renditions, immutable by hash: kept for offline viewing, a bounded number of them. Only what
+// the server marks immutable is kept: a card photo's `thumb` is a plain thumbnail until the mark is cut
+// from it a few seconds after the upload, and the server says so by asking for revalidation instead.
+// Keeping that first answer would show the card on skin in every list for a month.
 registerRoute(
-  ({ url }) => /^\/api\/images\/[^/]+\/(thumb|preview)$/.test(url.pathname),
+  ({ url }) => /^\/api\/images\/[^/]+\/(thumb|preview|mark_thumb|normalised_thumb)$/.test(url.pathname),
   new CacheFirst({
     cacheName: "photos",
-    plugins: [new ExpirationPlugin({ maxEntries: 400, maxAgeSeconds: 30 * 24 * 3600 })],
+    plugins: [
+      {
+        cacheWillUpdate: async ({ response }) =>
+          response.headers.get("cache-control")?.includes("immutable") ? response : null,
+      },
+      new ExpirationPlugin({ maxEntries: 400, maxAgeSeconds: 30 * 24 * 3600 }),
+    ],
   }),
 );
 // Everything else the app reads, so a known page opens without a connection. Never the originals,

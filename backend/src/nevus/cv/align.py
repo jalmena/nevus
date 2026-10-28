@@ -31,7 +31,7 @@ REASONS = (
 )
 
 NAME = "align"
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 PARAMS: dict[str, Any] = {
     "long_edge": 1600,
     "ratio": 0.75,
@@ -77,6 +77,23 @@ def _mask_for(mask: np.ndarray | None, shape: tuple[int, ...]) -> np.ndarray | N
         return None
     resized = cv2.resize(mask.astype(np.uint8) * 255, (shape[1], shape[0]), interpolation=cv2.INTER_NEAREST)
     return resized if resized.any() else None
+
+
+def anchored(matrix: list[list[float]], anchor_a: tuple[float, float], anchor_b: tuple[float, float]) -> dict[str, Any]:
+    """The card alignment, shifted so that the mark itself coincides: the card may sit differently on the
+    skin at each visit, and the mark, not the card, is what the two photos have in common."""
+    m = np.asarray(matrix, np.float64)
+    moved = cv2.perspectiveTransform(np.array([[anchor_b]], np.float64), m).reshape(2)
+    dx, dy = float(anchor_a[0] - moved[0]), float(anchor_a[1] - moved[1])
+    shift = np.array([[1.0, 0.0, dx], [0.0, 1.0, dy], [0.0, 0.0, 1.0]])
+    out = shift @ m
+    return {
+        "status": "aligned",
+        "method": "card+mark",
+        "reason": None,
+        "matrix": (out / out[2, 2]).tolist(),
+        "shift_px": [round(dx, 1), round(dy, 1)],
+    }
 
 
 def from_features(

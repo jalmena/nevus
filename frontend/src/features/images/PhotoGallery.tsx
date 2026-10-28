@@ -12,10 +12,13 @@ import { Segmented } from "@/design-system/components/Segmented";
 import {
   IMAGE_ROLES,
   imageUrl,
+  markOf,
   normalisedOf,
+  thumbOf,
   useDeleteImage,
   type ImageOut,
   type ImageRole,
+  type RenditionKind,
 } from "@/lib/images";
 import styles from "./PhotoGallery.module.css";
 
@@ -56,7 +59,7 @@ export function PhotoGallery({
   const [current, setCurrent] = useState<string | null>(null);
   const [open, setOpen] = useState<ImageOut | null>(null);
   const [qualityOpen, setQualityOpen] = useState(false);
-  const [view, setView] = useState<"normalised" | "original">("normalised");
+  const [view, setView] = useState<"mark" | "normalised" | "original">("mark");
   const [live, setLive] = useState(false);
   const preview = useRef<HTMLDialogElement>(null);
   const dateFormat = new Intl.DateTimeFormat(i18n.resolvedLanguage, {
@@ -64,8 +67,8 @@ export function PhotoGallery({
     timeStyle: "short",
   });
   const hero = images.find((image) => image.id === current) ?? images[0];
-  const heroNormalised = hero ? normalisedOf(hero) : null;
-  const heroKind = heroNormalised ? "normalised" : "preview";
+  const heroKind: RenditionKind =
+    hero && markOf(hero) ? "mark" : hero && normalisedOf(hero) ? "normalised" : "preview";
   const firstFlag = quality.flags[0];
 
   function show(image: ImageOut) {
@@ -136,7 +139,7 @@ export function PhotoGallery({
                 aria-label={alt(image)}
                 aria-pressed={image.id === hero?.id}
               >
-                <img src={imageUrl(image.id, "thumb")} alt="" loading="lazy" className={styles.thumb} />
+                <img src={thumbOf(image)} alt="" loading="lazy" className={styles.thumb} />
               </button>
             </li>
           ))}
@@ -245,19 +248,19 @@ export function PhotoGallery({
       <dialog ref={preview} className={styles.preview} onClose={() => setOpen(null)}>
         {open && (
           <>
-            <img
-              src={imageUrl(open.id, normalisedOf(open) && view === "normalised" ? "normalised" : "preview")}
-              alt={t(`images.roles.${open.role}`)}
-            />
-            {normalisedOf(open) && (
+            <img src={imageUrl(open.id, lightboxKind(open, view))} alt={t(`images.roles.${open.role}`)} />
+            {(markOf(open) || normalisedOf(open)) && (
               <div className={styles.previewView}>
                 <Segmented
                   label={t("images.view")}
                   options={[
-                    { value: "normalised", label: t("images.normalised") },
-                    { value: "original", label: t("images.originalView") },
+                    ...(markOf(open) ? [{ value: "mark" as const, label: t("images.markView") }] : []),
+                    ...(normalisedOf(open)
+                      ? [{ value: "normalised" as const, label: t("images.cardView") }]
+                      : []),
+                    { value: "original" as const, label: t("images.originalView") },
                   ]}
-                  value={view}
+                  value={lightboxView(open, view)}
                   onChange={setView}
                 />
               </div>
@@ -287,4 +290,18 @@ export function PhotoGallery({
       </dialog>
     </div>
   );
+}
+
+type LightboxView = "mark" | "normalised" | "original";
+
+/** The view the lightbox can honour for this photo: a view it lacks falls back to the next one. */
+function lightboxView(image: ImageOut, wanted: LightboxView): LightboxView {
+  if (wanted === "mark" && !markOf(image)) return normalisedOf(image) ? "normalised" : "original";
+  if (wanted === "normalised" && !normalisedOf(image)) return markOf(image) ? "mark" : "original";
+  return wanted;
+}
+
+function lightboxKind(image: ImageOut, wanted: LightboxView): RenditionKind {
+  const view = lightboxView(image, wanted);
+  return view === "original" ? "preview" : view;
 }

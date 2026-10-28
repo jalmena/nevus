@@ -36,8 +36,10 @@ router = APIRouter(prefix="/api", tags=["images"])
 
 ImageRole = Literal["overview", "close_up", "with_reference", "other"]
 Modality = Literal["camera", "dermatoscope"]
-RenditionKind = Literal["original", "full", "preview", "thumb", "normalised", "normalised_thumb"]
+RenditionKind = Literal["original", "full", "preview", "thumb", "normalised", "normalised_thumb", "mark", "mark_thumb"]
 IMMUTABLE_PRIVATE = "private, max-age=31536000, immutable"
+# Revalidate on every use: the ETag makes that a 304 when nothing changed.
+REVALIDATE_PRIVATE = "private, no-cache"
 
 
 class RenditionOut(BaseModel):
@@ -67,6 +69,7 @@ class ImageOut(BaseModel):
     re_encoded: bool
     quality_flags: list[str]
     quality_checked_at: datetime | None
+    analysed_at: datetime | None
     captured_at: datetime | None
     created_at: datetime
     renditions: list[RenditionOut]
@@ -213,28 +216,35 @@ def get_image(image_id: uuid.UUID, user: CurrentUser, db: DbSession) -> ImageOut
 def image_file(
     image_id: uuid.UUID, kind: RenditionKind, request: Request, user: CurrentUser, db: DbSession
 ) -> Response:
-    """The bytes, only for people who may see the person; cacheable forever because the content is addressed by hash."""
+    """The bytes, only for people who may see the person; cacheable forever because the content is addressed by hash.
+
+    `thumb` is an alias: a card photo's thumbnail is the mark in its window once it exists, not a card on
+    skin. While the analyses that make it may still be running, the alias asks to be revalidated instead
+    of cached for a year, so no list keeps showing the card after the mark is cut.
+    """
     image = _image_for(db, image_id, user)
     store = _store(request)
+    cache = IMMUTABLE_PRIVATE
     if kind == "original":
         digest, mime = image.sha256, image.mime
         path = store.path(digest)
     else:
-        # A card photo's thumbnail is the normalised view once it exists: the mark, not a card on skin.
-        wanted = ("normalised_thumb", "thumb") if kind == "thumb" else (kind,)
+        wanted = ("mark_thumb", "normalised_thumb", "thumb") if kind == "thumb" else (kind,)
         rendition = next((r for want in wanted for r in image.renditions if r.kind == want), None)
         if rendition is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "No such rendition.")
         digest, mime = rendition.sha256, rendition.mime
         path = store.path(digest, derived=True)
+        if kind == "thumb" and image.analysed_at is None:
+            cache = REVALIDATE_PRIVATE
     if request.headers.get("if-none-match") == f'"{digest}"':
-        return Response(status_code=status.HTTP_304_NOT_MODIFIED)
+        return Response(status_code=status.HTTP_304_NOT_MODIFIED, headers={"Cache-Control": cache})
     if not path.is_file():
         raise HTTPException(status.HTTP_404_NOT_FOUND, "The file is missing from the store.")
     return FileResponse(
         path,
         media_type=mime,
-        headers={"Cache-Control": IMMUTABLE_PRIVATE, "ETag": f'"{digest}"', "Content-Disposition": "inline"},
+        headers={"Cache-Control": cache, "ETag": f'"{digest}"', "Content-Disposition": "inline"},
     )
 
 

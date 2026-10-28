@@ -96,6 +96,11 @@ def test_upload_stores_scrubbed_original_and_renditions_with_orientation_applied
 
     thumb = client.get(f"/api/images/{body['id']}/thumb")
     assert thumb.status_code == 200 and thumb.headers["content-type"] == "image/jpeg"
+    # A photo outside a visit gets no card search, so its thumbnail is final as soon as it exists.
+    assert body["analysed_at"] is None  # the quality check has not run yet
+    client.app.state.jobs.run_until_idle()  # type: ignore[attr-defined]
+    assert client.get(f"/api/images/{body['id']}").json()["analysed_at"] is not None
+    thumb = client.get(f"/api/images/{body['id']}/thumb")
     assert thumb.headers["cache-control"] == "private, max-age=31536000, immutable"
     with Image.open(io.BytesIO(thumb.content)) as image:
         assert image.size == (192, 256) and dict(image.getexif()) == {}

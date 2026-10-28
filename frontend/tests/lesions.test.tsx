@@ -205,7 +205,7 @@ describe("quality warnings", () => {
 });
 
 describe("photos taken with the reference card", () => {
-  it("shows the normalised view first and keeps the original a tap away", async () => {
+  it("shows the mark in its window first and keeps the card and the original a tap away", async () => {
     installMockApi({
       claimed: true,
       session: SESSION,
@@ -229,9 +229,11 @@ describe("photos taken with the reference card", () => {
     renderApp("/observations/o1");
     const user = userEvent.setup();
     const hero = await screen.findByRole("button", { name: "Open the photo" });
-    expect(within(hero).getByRole("img")).toHaveAttribute("src", "/api/images/i1/normalised");
+    expect(within(hero).getByRole("img")).toHaveAttribute("src", "/api/images/i1/mark");
     await user.click(hero);
     const lightbox = screen.getByRole("dialog");
+    expect(within(lightbox).getByRole("img")).toHaveAttribute("src", "/api/images/i1/mark");
+    await user.click(within(lightbox).getByRole("radio", { name: "Card" }));
     expect(within(lightbox).getByRole("img")).toHaveAttribute("src", "/api/images/i1/normalised");
     await user.click(within(lightbox).getByRole("radio", { name: "Original" }));
     expect(within(lightbox).getByRole("img")).toHaveAttribute("src", "/api/images/i1/preview");

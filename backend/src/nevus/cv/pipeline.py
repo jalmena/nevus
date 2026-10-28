@@ -34,6 +34,7 @@ CARD_KIND = "analyze.card"
 SEGMENT_KIND = "analyze.segment"
 NORMALISE_KIND = "analyze.normalise"
 CARD_FLAGS = ("tilted", "card_small")
+NORMALISE_FLAGS = ("glare_on_mark",)
 
 
 def enqueue_analyses(db: Session, image: Image) -> None:
@@ -85,9 +86,17 @@ def refresh_image_flags(db: Session, image: Image) -> None:
     c = analysis.latest(db, "image", image.id, card_detect.NAME)
     if c is not None:
         flags.extend(f for f in c.outputs.get("flags", []) if f in CARD_FLAGS)
+    n = analysis.latest(db, "image", image.id, normalise.NAME)
+    if n is not None:
+        flags.extend(f for f in n.outputs.get("flags", []) if f in NORMALISE_FLAGS)
     image.quality_flags = sorted(set(flags))
     if q is not None and image.quality_checked_at is None:
         image.quality_checked_at = utcnow()
+    # Settled once nothing that changes how the photo is shown is still to come: photos outside a visit
+    # get no card search; the others wait for it and, when a card was found, for the normalised view.
+    settled = image.observation_id is None or (c is not None and (not c.outputs.get("found") or n is not None))
+    if settled and image.analysed_at is None:
+        image.analysed_at = utcnow()
     db.flush()
     if image.observation_id is not None:
         refresh_observation_flags(db, image.observation_id)
@@ -220,14 +229,40 @@ def _normalise_compute(value: dict[str, Any]) -> dict[str, Any] | None:
     if made is None:
         return None
     picture, how = made
-    rgb = PILImage.fromarray(picture[:, :, ::-1])
-    out = {r.kind: (r.data, r.width, r.height) for r in renditions_of(rgb, ("normalised", "normalised_thumb"))}
+    out = {
+        r.kind: (r.data, r.width, r.height)
+        for r in renditions_of(PILImage.fromarray(picture[:, :, ::-1]), ("normalised", "normalised_thumb"))
+    }
+    card = normalise.card_named(str(how["card"]))
+    mark = normalise.window(picture, card, how) if card is not None else None
+    if mark is not None:
+        out.update(
+            {
+                r.kind: (r.data, r.width, r.height)
+                for r in renditions_of(PILImage.fromarray(mark[:, :, ::-1]), ("mark", "mark_thumb"))
+            }
+        )
     return {"how": how, "renditions": out}
 
 
 def _normalise_store(ctx: JobContext, payload: dict[str, Any], result: dict[str, Any] | None) -> None:
     image = _image(ctx, payload)
-    if image is None or result is None:
+    if image is None:
+        return
+    if result is None:
+        # Nothing could be made (the card record went away or its geometry was unusable): recorded all the
+        # same, so the photo settles and its plain thumbnail stays.
+        analysis.record(
+            ctx.db,
+            target_type="image",
+            target_id=image.id,
+            analyzer=normalise.NAME,
+            version=normalise.VERSION,
+            params=normalise.PARAMS,
+            input_hash=image.sha256,
+            outputs={"made": False, "flags": []},
+        )
+        refresh_image_flags(ctx.db, image)
         return
     for kind, (data, width, height) in result["renditions"].items():
         digest = ctx.store.put(data, derived=True)
@@ -256,6 +291,7 @@ def _normalise_store(ctx: JobContext, payload: dict[str, Any], result: dict[str,
         input_hash=image.sha256,
         outputs=result["how"],
     )
+    refresh_image_flags(ctx.db, image)
 
 
 # --- experimental outline proposal ------------------------------------------------------------------

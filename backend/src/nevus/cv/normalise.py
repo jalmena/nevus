@@ -15,12 +15,18 @@ from typing import Any
 import cv2
 import numpy as np
 
-from nevus.cv.card import CARDS, CardGeometry
+from nevus.cv.card import APERTURE_RADIUS, CARDS, CardGeometry
 from nevus.cv.imageio import Img
 
 NAME = "normalise.card"
-VERSION = "1.0.0"
-PARAMS: dict[str, Any] = {"margin_mm": 3.0, "max_px_per_mm": 24.0, "max_long_edge": 2048}
+VERSION = "1.1.0"
+PARAMS: dict[str, Any] = {
+    "margin_mm": 3.0,
+    "max_px_per_mm": 24.0,
+    "max_long_edge": 2048,
+    "window_half_mm": 14.0,
+    "glare_mark_min": 0.01,
+}
 
 
 def card_named(name: str) -> CardGeometry | None:
@@ -65,7 +71,53 @@ def normalise(
     out = cv2.warpPerspective(
         image, m, (frame["width"], frame["height"]), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE
     )
-    return out, {**frame, "card": card.name, "matrix": m.tolist()}
+    how: dict[str, Any] = {**frame, "card": card.name, "matrix": m.tolist(), "flags": []}
+    if card.centre is not None and card.name == "window":
+        p = {**PARAMS, **(params or {})}
+        glare = glare_in_window(out, card, frame)
+        how["glare_on_mark"] = round(glare, 4)
+        if glare >= float(p["glare_mark_min"]):
+            how["flags"].append("glare_on_mark")
+    return out, how
+
+
+def window_rect(
+    card: CardGeometry, frame: dict[str, Any], params: dict[str, Any] | None = None
+) -> tuple[int, int, int, int]:
+    """The square around the card's window in normalised pixels: left, top, side, and the window's radius."""
+    p = {**PARAMS, **(params or {})}
+    s = float(frame["px_per_mm"])
+    cx = (card.centre[0] + float(frame["margin_mm"])) * s
+    cy = (card.centre[1] + float(frame["margin_mm"])) * s
+    half = float(p["window_half_mm"]) * s
+    return round(cx - half), round(cy - half), round(2 * half), round(APERTURE_RADIUS * s)
+
+
+def window(picture: Img, card: CardGeometry, frame: dict[str, Any], params: dict[str, Any] | None = None) -> Img | None:
+    """The mark with the ring around it: the window of the card, cut from the normalised picture."""
+    if card.name != "window":
+        return None
+    left, top, side, _ = window_rect(card, frame, params)
+    h, w = picture.shape[:2]
+    x0, y0 = max(0, left), max(0, top)
+    x1, y1 = min(w, left + side), min(h, top + side)
+    if x1 - x0 < 8 or y1 - y0 < 8:
+        return None
+    return picture[y0:y1, x0:x1].copy()
+
+
+def glare_in_window(picture: Img, card: CardGeometry, frame: dict[str, Any]) -> float:
+    """Specular highlights inside the window (saturated, colourless pixels) as a share of its area."""
+    left, top, side, radius = window_rect(card, frame)
+    h, w = picture.shape[:2]
+    mask = np.zeros((h, w), np.uint8)
+    cv2.circle(mask, (left + side // 2, top + side // 2), max(1, radius - 2), 1, -1)
+    inside = mask.astype(bool)
+    if not inside.any() or picture.ndim != 3:
+        return 0.0
+    hsv = cv2.cvtColor(picture, cv2.COLOR_BGR2HSV)
+    specular = (hsv[:, :, 2] >= 250) & (hsv[:, :, 1] <= 40)
+    return float((specular & inside).sum() / inside.sum())
 
 
 def to_normalised(m: list[list[float]], points: np.ndarray) -> np.ndarray:

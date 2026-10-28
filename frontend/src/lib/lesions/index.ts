@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, errorMessage } from "@/lib/api/client";
 import type { components } from "@/lib/api/schema";
-import type { ImageOut, ImageRole } from "@/lib/images";
+import { stillAnalysing, type ImageOut, type ImageRole } from "@/lib/images";
 
 export type LesionOut = components["schemas"]["LesionOut"];
 export type LesionIn = components["schemas"]["LesionIn"];
@@ -91,6 +91,9 @@ export function useObservations(lesionId: string) {
       return data;
     },
     enabled: lesionId !== "",
+    // A card photo's thumbnail becomes the mark in its window a few seconds after the upload.
+    refetchInterval: (query) =>
+      query.state.data?.some((visit) => visit.images.some((image) => stillAnalysing(image))) ? 2000 : false,
   });
 }
 
@@ -105,9 +108,10 @@ export function useObservation(observationId: string) {
       return data;
     },
     enabled: observationId !== "",
-    // Quality checks run in the background after an upload; look again until every photo has one.
+    // Quality checks, the card search and the mark's crop run in the background after an upload; look
+    // again until every photo has them.
     refetchInterval: (query) =>
-      query.state.data?.images.some((image) => !image.quality_checked_at) ? 2000 : false,
+      query.state.data?.images.some((image) => stillAnalysing(image)) ? 2000 : false,
   });
 }
 

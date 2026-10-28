@@ -48,7 +48,7 @@ test("from a fresh instance to a measured mark, accessibly", async ({ page }) =>
   await page.getByRole("combobox", { name: "Show", exact: true }).selectOption({ label: "Longest diameter" });
   await shot(page, "mark");
   await page.getByRole("link", { name: "Compare visits", exact: true }).click();
-  await expect(page.getByText("Lined up with the reference card in both photos.")).toBeVisible({
+  await expect(page.getByText("Lined up on the mark, inside the card's window.")).toBeVisible({
     timeout: 60_000,
   });
   await accessible(page, "compare");

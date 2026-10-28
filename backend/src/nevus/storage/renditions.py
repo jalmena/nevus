@@ -7,7 +7,15 @@ from dataclasses import dataclass
 
 from PIL import Image
 
-SIZES: dict[str, int] = {"full": 2048, "preview": 1024, "thumb": 256, "normalised": 2048, "normalised_thumb": 256}
+SIZES: dict[str, int] = {
+    "full": 2048,
+    "preview": 1024,
+    "thumb": 256,
+    "normalised": 2048,
+    "normalised_thumb": 256,
+    "mark": 1024,
+    "mark_thumb": 256,
+}
 QUALITY = 85
 
 

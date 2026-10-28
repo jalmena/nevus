@@ -1169,6 +1169,7 @@
           "method": {
             "enum": [
               "card",
+              "card+mark",
               "features"
             ],
             "title": "Method",
@@ -1938,6 +1939,18 @@
       },
       "ImageOut": {
         "properties": {
+          "analysed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Analysed At"
+          },
           "bytes": {
             "title": "Bytes",
             "type": "integer"
@@ -2060,6 +2073,7 @@
           "re_encoded",
           "quality_flags",
           "quality_checked_at",
+          "analysed_at",
           "captured_at",
           "created_at",
           "renditions"
@@ -4515,6 +4529,16 @@
           "upright_width": {
             "title": "Upright Width",
             "type": "integer"
+          },
+          "window": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WindowOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -5503,6 +5527,30 @@
           }
         },
         "title": "WebhookUpdate",
+        "type": "object"
+      },
+      "WindowOut": {
+        "description": "The card's window in this photo's upright pixels: where the mark is, and how big a span to show.",
+        "properties": {
+          "cx": {
+            "title": "Cx",
+            "type": "number"
+          },
+          "cy": {
+            "title": "Cy",
+            "type": "number"
+          },
+          "r": {
+            "title": "R",
+            "type": "number"
+          }
+        },
+        "required": [
+          "cx",
+          "cy",
+          "r"
+        ],
+        "title": "WindowOut",
         "type": "object"
       },
       "Zone": {
@@ -7419,7 +7467,7 @@
     },
     "/api/images/{image_id}/{kind}": {
       "get": {
-        "description": "The bytes, only for people who may see the person; cacheable forever because the content is addressed by hash.",
+        "description": "The bytes, only for people who may see the person; cacheable forever because the content is addressed by hash.\n\n`thumb` is an alias: a card photo's thumbnail is the mark in its window once it exists, not a card on\nskin. While the analyses that make it may still be running, the alias asks to be revalidated instead\nof cached for a year, so no list keeps showing the card after the mark is cut.",
         "operationId": "image_file_api_images__image_id___kind__get",
         "parameters": [
           {
@@ -7443,7 +7491,9 @@
                 "preview",
                 "thumb",
                 "normalised",
-                "normalised_thumb"
+                "normalised_thumb",
+                "mark",
+                "mark_thumb"
               ],
               "title": "Kind",
               "type": "string"
@@ -9642,6 +9692,51 @@
           }
         },
         "summary": "Reference Card",
+        "tags": [
+          "measurements"
+        ]
+      }
+    },
+    "/api/reference-card/3d": {
+      "get": {
+        "description": "The card as two bodies to print, plate and ink, for the window card and the strip, with a note on how.",
+        "operationId": "reference_card_3d_api_reference_card_3d_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "lang",
+            "required": false,
+            "schema": {
+              "default": "en",
+              "enum": [
+                "en",
+                "es",
+                "pt"
+              ],
+              "title": "Lang",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/zip": {}
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reference Card 3D",
         "tags": [
           "measurements"
         ]

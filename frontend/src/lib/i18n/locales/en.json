@@ -98,7 +98,9 @@
     "kind": "Kind of photo",
     "normalised": "Normalised",
     "originalView": "Original",
-    "view": "View"
+    "view": "View",
+    "markView": "Mark",
+    "cardView": "Card"
   },
   "settings": {
     "title": "Settings",
@@ -173,7 +175,13 @@
     "zoomOut": "Zoom out",
     "zoomReset": "Show the whole body",
     "tracked": "tracked",
-    "due": "due"
+    "due": "due",
+    "captions": {
+      "palms": "Palms",
+      "backs": "Backs of the hands",
+      "tops": "Tops of the feet",
+      "soles": "Soles"
+    }
   },
   "zones": {
     "1100": "Head",
@@ -333,14 +341,16 @@
       "too_dark": "Too dark: add light or move closer to a window.",
       "too_bright": "Overexposed: avoid direct sunlight and the flash.",
       "glare": "Glare: tilt the phone a little so reflections move off the mark.",
-      "low_resolution": "Low resolution: use the camera at full size rather than a screenshot or a forwarded copy."
+      "low_resolution": "Low resolution: use the camera at full size rather than a screenshot or a forwarded copy.",
+      "glare_on_mark": "Glare on the mark: tilt the phone a little or move away from the light."
     },
     "flagsShort": {
       "blurry": "Blurry",
       "too_dark": "Too dark",
       "too_bright": "Too bright",
       "glare": "Glare",
-      "low_resolution": "Low resolution"
+      "low_resolution": "Low resolution",
+      "glare_on_mark": "Glare on the mark"
     }
   },
   "measure": {
@@ -430,7 +440,8 @@
     "lineLabel": "Measured length of the 50 mm line",
     "lineHint": "After printing, measure the line with a ruler and type what you read (for example 49.6).",
     "verified": "Print verified: the line measured {{mm}} mm.",
-    "unverified": "Not verified yet: measurements made with the card carry a larger uncertainty."
+    "unverified": "Not verified yet: measurements made with the card carry a larger uncertainty.",
+    "download3d": "Download for 3D printing (two colours)"
   },
   "reminders": {
     "title": "Due for a photo",
@@ -599,7 +610,8 @@
     "zoomHint": "Pinch or use the mouse wheel to zoom, drag to move; side by side, both photos follow. With a keyboard: + and − zoom, the arrows move.",
     "pickPhoto": "Choose a photo",
     "needsAligned": "Needs lined-up photos",
-    "differenceShort": "Shows where to look; it measures nothing."
+    "differenceShort": "Shows where to look; it measures nothing.",
+    "alignedMark": "Lined up on the mark, inside the card's window."
   },
   "chart": {
     "title": "Size over time",

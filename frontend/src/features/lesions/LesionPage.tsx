@@ -20,7 +20,7 @@ import { Sightings } from "@/features/sessions/Sightings";
 import { shortDate } from "@/lib/dates";
 import { useSession } from "@/lib/auth/session";
 import { useConfirm } from "@/lib/confirm/ConfirmProvider";
-import { imageUrl } from "@/lib/images";
+import { thumbOf } from "@/lib/images";
 import {
   INTERVALS,
   useCreateObservation,
@@ -217,7 +217,7 @@ export function LesionPage() {
                       visit.images.length > 0 ? (
                         <span className={styles.visitThumbs}>
                           {visit.images.slice(0, 4).map((image) => (
-                            <img key={image.id} src={imageUrl(image.id, "thumb")} alt="" loading="lazy" />
+                            <img key={image.id} src={thumbOf(image)} alt="" loading="lazy" />
                           ))}
                         </span>
                       ) : undefined
