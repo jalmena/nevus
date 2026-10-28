@@ -88,7 +88,7 @@ export function AppBar({ desktop }: { desktop: boolean }) {
         ) : (
           !desktop && (
             <Link to="/" className={styles.brand} aria-label={t("app.name")}>
-              <Mark size={26} />
+              <Mark size={34} />
             </Link>
           )
         )}
@@ -175,7 +175,7 @@ function Rail() {
   return (
     <nav className={styles.rail} aria-label={t("shell.navigation")} data-chrome="rail">
       <Link to="/" className={styles.railBrand} aria-label={t("app.name")}>
-        <Mark size={28} />
+        <Mark size={36} />
         <span>{t("app.name")}</span>
       </Link>
       <NavLink to="/" end className={item}>

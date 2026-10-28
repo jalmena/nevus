@@ -145,8 +145,10 @@ def test_comparing_two_visits_through_the_api(client: TestClient) -> None:
     response = client.post("/api/comparisons", json={"image_a": image_a, "image_b": image_b}, headers=SAME_ORIGIN)
     assert response.status_code == 200, response.text
     body = response.json()
-    assert body["status"] == "aligned" and body["method"] == "card"
+    # Both photos hold the card and the disc: lined up by the card, then shifted so the marks coincide.
+    assert body["status"] == "aligned" and body["method"] == "card+mark"
     assert body["a"]["scale_kind"] == "card" and body["a"]["mm_per_px"] > 0
+    assert body["a"]["window"]["r"] > 0 and body["b"]["window"]["cx"] > 0
     overlay = client.get(body["overlay_url"])
     assert overlay.status_code == 200 and overlay.headers["content-type"] == "image/webp"
     heatmap = client.get(body["heatmap_url"])

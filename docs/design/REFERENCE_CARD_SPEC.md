@@ -44,6 +44,10 @@ The constants live in `backend/src/nevus/cv/card.py`; the generator and the dete
 - Verification: after printing and before first use, measure the 50 mm line; the app's onboarding asks for this and offers a way to record the measured length so the analyzer can apply a correction factor (for example 49.6 mm measured → scale ×1.008).
 - Hygiene: the card touches skin; it is personal, wiped with alcohol, and replaced when worn (faded markers lower detection confidence, which the app reports).
 
+## 4a. Printing in three dimensions
+
+The same drawing routine that lays the card out for paper paints it into meshes (`nevus.cv.card_mesh`), so a printed card and the detector cannot disagree. Two bodies per card, for the window card and the strip: the **plate** (1.2 mm, with the window cut through it) and the **ink** (0.4 mm raised on the plate: the marker cells, the ring and its ticks, the strip's scale, and the grey patch as a halftone of raised 1 mm cells, which reads as grey from a step back). Lettering stays on the paper version. Printed at 100 % with 0.2 mm layers and no supports; a single-extruder printer changes filament at 1.2 mm, or both bodies are printed in white and the raised parts painted with a black permanent marker. Matte filament, as with paper: gloss reflects and hides the markers. The archive with the four STL files and a note is `GET /api/reference-card/3d`, offered next to the paper downloads in Settings → Reference card.
+
 ## 5. Detection requirements for the analyzer (`scale.card`)
 
 - Input: the full-resolution scrubbed original.

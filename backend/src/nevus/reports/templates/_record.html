@@ -42,9 +42,7 @@
 {% endif %}
 
 <h2 class="visits">{{ w("visits_title") }}</h2>
-{% if mark.visits %}
-<p class="secondary small keep">{{ w("checks_intro") }}</p>
-{% else %}
+{% if not mark.visits %}
 <p>{{ w("no_visits") }}</p>
 {% endif %}
 {% for visit in mark.visits %}

@@ -48,11 +48,10 @@ TEXT: dict[str, dict[str, str]] = {
         "head": "head",
         "hands": "hands",
         "feet": "feet",
-        "unknown": "not recorded",
+        "unknown": "—",
         "measured_title": "Measured values",
-        "measured_intro": "Sizes measured on the photographs, each with its standard uncertainty (±). A difference "
-        "is called a measured change only when it is larger than twice the combined uncertainty of the two "
-        "measurements; otherwise it is reported as no detectable change.",
+        "measured_intro": "Sizes with their standard uncertainty (±). A difference counts as a change only when "
+        "it exceeds twice the combined uncertainty.",
         "chart_title": "Longest diameter at each visit",
         "chart_band": "The shaded band is ± one standard uncertainty.",
         "date": "Date",
@@ -99,6 +98,7 @@ TEXT: dict[str, dict[str, str]] = {
         "check_too_dark": "too dark",
         "check_too_bright": "overexposed",
         "check_glare": "glare",
+        "check_glare_on_mark": "glare on the mark",
         "check_low_resolution": "low resolution",
         "check_tilted": "card tilted",
         "check_card_small": "card far away",
@@ -163,11 +163,10 @@ TEXT: dict[str, dict[str, str]] = {
         "head": "cabeza",
         "hands": "manos",
         "feet": "pies",
-        "unknown": "sin registrar",
+        "unknown": "—",
         "measured_title": "Valores medidos",
-        "measured_intro": "Tamaños medidos sobre las fotografías, cada uno con su incertidumbre típica (±). Una "
-        "diferencia se llama cambio medido solo cuando supera el doble de la incertidumbre combinada de las dos "
-        "medidas; si no, se indica como sin cambio detectable.",
+        "measured_intro": "Tamaños con su incertidumbre típica (±). Una diferencia cuenta como cambio solo si "
+        "supera el doble de la incertidumbre combinada.",
         "chart_title": "Diámetro mayor en cada vistazo",
         "chart_band": "La banda sombreada es ± una incertidumbre típica.",
         "date": "Fecha",
@@ -214,6 +213,7 @@ TEXT: dict[str, dict[str, str]] = {
         "check_too_dark": "demasiado oscura",
         "check_too_bright": "sobreexpuesta",
         "check_glare": "reflejos",
+        "check_glare_on_mark": "reflejo sobre la marca",
         "check_low_resolution": "baja resolución",
         "check_tilted": "tarjeta inclinada",
         "check_card_small": "tarjeta lejana",
@@ -279,11 +279,10 @@ TEXT: dict[str, dict[str, str]] = {
         "head": "cabeça",
         "hands": "mãos",
         "feet": "pés",
-        "unknown": "não registado",
+        "unknown": "—",
         "measured_title": "Valores medidos",
-        "measured_intro": "Tamanhos medidos nas fotografias, cada um com a sua incerteza padrão (±). Uma diferença "
-        "só se chama alteração medida quando supera o dobro da incerteza combinada das duas "
-        "medições; caso contrário, indica-se como sem alteração detetável.",
+        "measured_intro": "Tamanhos com a sua incerteza padrão (±). Uma diferença conta como alteração só quando "
+        "excede o dobro da incerteza combinada.",
         "chart_title": "Maior diâmetro em cada observação",
         "chart_band": "A faixa sombreada é ± uma incerteza padrão.",
         "date": "Data",
@@ -330,6 +329,7 @@ TEXT: dict[str, dict[str, str]] = {
         "check_too_dark": "demasiado escura",
         "check_too_bright": "sobre-exposta",
         "check_glare": "reflexos",
+        "check_glare_on_mark": "reflexo sobre a marca",
         "check_low_resolution": "baixa resolução",
         "check_tilted": "cartão inclinado",
         "check_card_small": "cartão longe",

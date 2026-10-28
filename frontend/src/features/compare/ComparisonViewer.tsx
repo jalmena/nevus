@@ -43,8 +43,21 @@ export function ComparisonViewer({
   const aligned = comparison.data?.status === "aligned";
   const requested = wanted ?? own;
   const mode: Mode = MODES.includes(requested) && (aligned || requested === "side") ? requested : "side";
+  const windowA = comparison.data?.a.window ?? null;
+  const windowB = comparison.data?.b.window ?? null;
+  const frameA = windowA ? windowFrame(windowA, a) : WHOLE;
+  const frameB = windowB ? windowFrame(windowB, b) : WHOLE;
+  const bothWindows = Boolean(windowA && windowB);
+  const startKey = `${a.id}:${b.id}:${windowA ? "w" : "-"}`;
 
-  useEffect(() => setView(WHOLE), [a.id, b.id]);
+  // Two card photos open on the mark inside the window; anything else on the whole photo.
+  useEffect(() => setView(frameA), [startKey]);
+
+  /** Side B shows the same part of its own window as side A shows of its window. */
+  const viewOf = (side: 0 | 1): SharedView =>
+    side === 0 || !bothWindows ? view : mapFrame(view, frameA, frameB);
+  const viewFrom = (side: 0 | 1, next: SharedView) =>
+    setView(side === 0 || !bothWindows ? next : mapFrame(next, frameB, frameA));
 
   function choose(next: Mode) {
     if (onMode) onMode(next);
@@ -67,8 +80,8 @@ export function ComparisonViewer({
                   width={photo.width}
                   height={photo.height}
                   label={t("compare.canvas", { photo: photo.label })}
-                  view={view}
-                  onViewChange={setView}
+                  view={viewOf(index as 0 | 1)}
+                  onViewChange={(next) => viewFrom(index as 0 | 1, next)}
                 >
                   {side?.mm_per_px ? <ScaleBar mmPerPx={side.mm_per_px} /> : null}
                 </PhotoCanvas>
@@ -146,9 +159,11 @@ function AlignmentNote({ comparison }: { comparison: Comparison }) {
   if (comparison.status === "aligned") {
     return (
       <p className="text-secondary">
-        {comparison.method === "card"
-          ? t("compare.alignedCard")
-          : t("compare.alignedPoints", { count: comparison.inliers ?? 0 })}
+        {comparison.method === "card+mark"
+          ? t("compare.alignedMark")
+          : comparison.method === "card"
+            ? t("compare.alignedCard")
+            : t("compare.alignedPoints", { count: comparison.inliers ?? 0 })}
       </p>
     );
   }
@@ -283,4 +298,27 @@ function DifferenceLegend() {
       </p>
     </div>
   );
+}
+
+/** A square view around the card's window, with room around the ring, as fractions of the photo. */
+function windowFrame(window: { cx: number; cy: number; r: number }, photo: ComparedPhoto): SharedView {
+  const side = window.r * 2 * 1.3;
+  return {
+    x: (window.cx - side / 2) / photo.width,
+    y: (window.cy - side / 2) / photo.height,
+    w: side / photo.width,
+    h: side / photo.height,
+  };
+}
+
+/** The same relative view, carried from one frame to another. */
+function mapFrame(view: SharedView, from: SharedView, to: SharedView): SharedView {
+  const sx = to.w / from.w;
+  const sy = to.h / from.h;
+  return {
+    x: to.x + (view.x - from.x) * sx,
+    y: to.y + (view.y - from.y) * sy,
+    w: view.w * sx,
+    h: view.h * sy,
+  };
 }

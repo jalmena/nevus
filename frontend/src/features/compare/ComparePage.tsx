@@ -10,7 +10,7 @@ import { Sheet } from "@/design-system/components/Sheet";
 import { lesionTitle } from "@/features/lesions/lesionName";
 import { personRail } from "@/features/persons/personRail";
 import { shortDate } from "@/lib/dates";
-import { imageUrl, type ImageOut } from "@/lib/images";
+import { thumbOf, type ImageOut } from "@/lib/images";
 import { useLesion, useObservations, type ObservationOut } from "@/lib/lesions";
 import { usePerson } from "@/lib/persons";
 import { ComparisonViewer, MODES, type Mode } from "./ComparisonViewer";
@@ -133,7 +133,7 @@ export function ComparePage() {
                   setPicking(null);
                 }}
                 selected={chosen}
-                leading={<Thumb src={imageUrl(choice.image.id, "thumb")} />}
+                leading={<Thumb src={thumbOf(choice.image)} />}
                 title={shortDate(i18n.resolvedLanguage, choice.visit.captured_at)}
                 meta={t(`images.roles.${choice.image.role}`)}
               />

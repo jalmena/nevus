@@ -98,7 +98,9 @@
     "kind": "Tipo de foto",
     "normalised": "Normalizada",
     "originalView": "Original",
-    "view": "Vista"
+    "view": "Vista",
+    "markView": "Marca",
+    "cardView": "Tarjeta"
   },
   "settings": {
     "title": "Ajustes",
@@ -173,7 +175,13 @@
     "zoomOut": "Reducir",
     "zoomReset": "Ver el cuerpo entero",
     "tracked": "en seguimiento",
-    "due": "por revisar"
+    "due": "por revisar",
+    "captions": {
+      "palms": "Palmas",
+      "backs": "Dorsos de las manos",
+      "tops": "Empeines",
+      "soles": "Plantas"
+    }
   },
   "zones": {
     "1100": "Cabeza",
@@ -333,14 +341,16 @@
       "too_dark": "Demasiado oscura: añade luz o acércate a una ventana.",
       "too_bright": "Sobreexpuesta: evita el sol directo y el flash.",
       "glare": "Brillos: inclina un poco el móvil para que los reflejos salgan de la marca.",
-      "low_resolution": "Poca resolución: usa la cámara a tamaño completo, no una captura ni una copia reenviada."
+      "low_resolution": "Poca resolución: usa la cámara a tamaño completo, no una captura ni una copia reenviada.",
+      "glare_on_mark": "Reflejo sobre la marca: inclina un poco el teléfono o aléjate de la luz."
     },
     "flagsShort": {
       "blurry": "Borrosa",
       "too_dark": "Muy oscura",
       "too_bright": "Muy clara",
       "glare": "Reflejos",
-      "low_resolution": "Baja resolución"
+      "low_resolution": "Baja resolución",
+      "glare_on_mark": "Reflejo en la marca"
     }
   },
   "measure": {
@@ -430,7 +440,8 @@
     "lineLabel": "Longitud medida de la línea de 50 mm",
     "lineHint": "Después de imprimir, mide la línea con una regla y escribe lo que leas (por ejemplo 49,6).",
     "verified": "Impresión verificada: la línea midió {{mm}} mm.",
-    "unverified": "Sin verificar todavía: las medidas con la tarjeta llevan una incertidumbre mayor."
+    "unverified": "Sin verificar todavía: las medidas con la tarjeta llevan una incertidumbre mayor.",
+    "download3d": "Descargar para impresión 3D (dos colores)"
   },
   "reminders": {
     "title": "Toca hacer foto",
@@ -599,7 +610,8 @@
     "zoomHint": "Pellizca o usa la rueda del ratón para ampliar y arrastra para moverte; lado a lado, las dos fotos se mueven a la vez. Con teclado: + y − amplían, las flechas mueven.",
     "pickPhoto": "Elegir una foto",
     "needsAligned": "Necesita fotos alineadas",
-    "differenceShort": "Muestra dónde mirar; no mide nada."
+    "differenceShort": "Muestra dónde mirar; no mide nada.",
+    "alignedMark": "Alineadas por la marca, dentro de la ventana de la tarjeta."
   },
   "chart": {
     "title": "Tamaño a lo largo del tiempo",

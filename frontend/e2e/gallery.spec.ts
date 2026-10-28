@@ -87,7 +87,7 @@ test("every screen, for a look at the design", async ({ page }, info) => {
   await snap("08b-mark-reports");
   await page.getByRole("link", { name: "Back to Chest mark", exact: true }).click();
   await page.getByRole("link", { name: "Compare visits", exact: true }).click();
-  await expect(page.getByText("Lined up with the reference card in both photos.")).toBeVisible({
+  await expect(page.getByText("Lined up on the mark, inside the card's window.")).toBeVisible({
     timeout: 60_000,
   });
   await snap("09-compare-side");
@@ -101,6 +101,13 @@ test("every screen, for a look at the design", async ({ page }, info) => {
   await page.getByRole("link", { name: /Ana/ }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Ana", exact: true })).toBeVisible();
   await snap("12-person");
+  // Hands and feet show both sides at once: the captions tell palms from backs, and the selected zone is named.
+  await page.getByRole("radio", { name: "Hands", exact: true }).click();
+  await page.getByRole("button", { name: "Right palm", exact: true }).click();
+  await expect(page.getByRole("status")).toHaveText("Right palm · Hands");
+  await snap("12c-person-hands");
+  await page.getByRole("button", { name: "Right palm", exact: true }).click(); // the same zone again clears it
+  await page.getByRole("radio", { name: "Front", exact: true }).click();
   await page.getByRole("link", { name: /Full-body sessions/ }).click();
   await expect(
     page.getByRole("heading", { level: 1, name: "Full-body sessions", exact: true }),

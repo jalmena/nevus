@@ -98,7 +98,9 @@
     "kind": "Tipo de foto",
     "normalised": "Normalizada",
     "originalView": "Original",
-    "view": "Vista"
+    "view": "Vista",
+    "markView": "Marca",
+    "cardView": "Cartão"
   },
   "settings": {
     "title": "Definições",
@@ -174,7 +176,13 @@
     "zoomOut": "Reduzir",
     "zoomReset": "Mostrar o corpo inteiro",
     "tracked": "em seguimento",
-    "due": "pendente"
+    "due": "pendente",
+    "captions": {
+      "palms": "Palmas",
+      "backs": "Costas das mãos",
+      "tops": "Peitos dos pés",
+      "soles": "Plantas"
+    }
   },
   "zones": {
     "1100": "Cabeça",
@@ -335,14 +343,16 @@
       "too_dark": "Demasiado escura: acrescente luz ou aproxime-se de uma janela.",
       "too_bright": "Sobre-exposta: evite a luz solar direta e o flash.",
       "glare": "Reflexos: incline um pouco o telemóvel para que os reflexos saiam da marca.",
-      "low_resolution": "Baixa resolução: use a câmara em tamanho completo, não uma captura de ecrã nem uma cópia reencaminhada."
+      "low_resolution": "Baixa resolução: use a câmara em tamanho completo, não uma captura de ecrã nem uma cópia reencaminhada.",
+      "glare_on_mark": "Reflexo sobre a marca: incline um pouco o telemóvel ou afaste-se da luz."
     },
     "flagsShort": {
       "blurry": "Desfocada",
       "too_dark": "Muito escura",
       "too_bright": "Muito clara",
       "glare": "Reflexos",
-      "low_resolution": "Baixa resolução"
+      "low_resolution": "Baixa resolução",
+      "glare_on_mark": "Reflexo na marca"
     }
   },
   "measure": {
@@ -433,7 +443,8 @@
     "lineLabel": "Comprimento medido da linha de 50 mm",
     "lineHint": "Depois de imprimir, meça a linha com uma régua e escreva o que leu (por exemplo 49,6).",
     "verified": "Impressão verificada: a linha mediu {{mm}} mm.",
-    "unverified": "Ainda não verificada: as medições feitas com o cartão têm uma incerteza maior."
+    "unverified": "Ainda não verificada: as medições feitas com o cartão têm uma incerteza maior.",
+    "download3d": "Transferir para impressão 3D (duas cores)"
   },
   "reminders": {
     "title": "Com foto pendente",
@@ -606,7 +617,8 @@
     "zoomHint": "Aperte com dois dedos ou use a roda do rato para ampliar, arraste para mover; lado a lado, as duas fotos acompanham. Com teclado: + e − ampliam, as setas movem.",
     "pickPhoto": "Escolher uma foto",
     "needsAligned": "Precisa de fotos alinhadas",
-    "differenceShort": "Mostra onde olhar; não mede nada."
+    "differenceShort": "Mostra onde olhar; não mede nada.",
+    "alignedMark": "Alinhadas pela marca, dentro da janela do cartão."
   },
   "chart": {
     "title": "Tamanho ao longo do tempo",

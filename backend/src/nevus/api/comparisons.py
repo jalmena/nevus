@@ -7,6 +7,7 @@ import hashlib
 import uuid
 from typing import Any, Literal
 
+import numpy as np
 from fastapi import APIRouter, HTTPException, Request, Response, status
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
@@ -14,9 +15,12 @@ from sqlalchemy import select
 
 from nevus import analysis
 from nevus.auth.dependencies import CurrentUser, DbSession
-from nevus.cv import align, card_detect
+from nevus.cv import align, card_detect, fit
+from nevus.cv.card import APERTURE_RADIUS
+from nevus.cv.imageio import Img
+from nevus.cv.normalise import card_named
 from nevus.cv.pipeline import load_upright, upright_size
-from nevus.db.models import Analysis, Image, Person, PersonAccess, ScaleReference, User
+from nevus.db.models import Analysis, Image, Measurement, Person, PersonAccess, ScaleReference, User
 from nevus.storage.blobs import BlobStore
 
 router = APIRouter(prefix="/api/comparisons", tags=["comparisons"])
@@ -28,12 +32,21 @@ class ComparisonIn(BaseModel):
     image_b: uuid.UUID
 
 
+class WindowOut(BaseModel):
+    """The card's window in this photo's upright pixels: where the mark is, and how big a span to show."""
+
+    cx: float
+    cy: float
+    r: float
+
+
 class SideOut(BaseModel):
     image_id: uuid.UUID
     upright_width: int
     upright_height: int
     mm_per_px: float | None
     scale_kind: str | None
+    window: WindowOut | None = None
 
 
 Reason = Literal[
@@ -51,7 +64,7 @@ class ComparisonOut(BaseModel):
     id: uuid.UUID
     status: Literal["aligned", "abstained"]
     reason: Reason | None
-    method: Literal["card", "features"]
+    method: Literal["card", "card+mark", "features"]
     inliers: int | None
     inlier_ratio: float | None
     matrix: list[list[float]] | None
@@ -83,6 +96,39 @@ def _card(db: DbSession, image: Image) -> dict[str, Any] | None:
     return row.outputs if row is not None and row.outputs.get("found") else None
 
 
+def _window(card: dict[str, Any]) -> WindowOut | None:
+    geometry = card_named(str(card.get("card")))
+    if geometry is None or geometry.name != "window" or not card.get("centre_px"):
+        return None
+    cx, cy = card["centre_px"]
+    return WindowOut(cx=float(cx), cy=float(cy), r=APERTURE_RADIUS / float(card["mm_per_px"]))
+
+
+def _anchor(
+    db: DbSession, store: BlobStore, image: Image, picture: Img, card: dict[str, Any]
+) -> tuple[float, float] | None:
+    """Where the mark is in this photo: the saved measurement's centre, else a fit at the window's centre."""
+    measured = db.scalar(
+        select(Measurement)
+        .where(Measurement.image_id == image.id, Measurement.deleted_at.is_(None))
+        .order_by(Measurement.created_at.desc())
+    )
+    if measured is not None:
+        shape = measured.shape
+        if shape.get("type") == "circle":
+            return float(shape["cx"]), float(shape["cy"])
+        points = np.asarray(shape.get("points", []), np.float64)
+        if len(points) >= 3:
+            return float(points[:, 0].mean()), float(points[:, 1].mean())
+    window = _window(card)
+    if window is None:
+        return None
+    found = fit.propose(picture, window.cx, window.cy, "lesion")
+    if found is None:
+        return None
+    return float(found["cx"]), float(found["cy"])
+
+
 def _side(db: DbSession, image: Image) -> SideOut:
     width, height = upright_size(image)
     card = _card(db, image)
@@ -93,6 +139,7 @@ def _side(db: DbSession, image: Image) -> SideOut:
             upright_height=height,
             mm_per_px=float(card["mm_per_px"]),
             scale_kind="card",
+            window=_window(card),
         )
     ref = db.scalar(
         select(ScaleReference)
@@ -144,6 +191,10 @@ def compare(body: ComparisonIn, request: Request, user: CurrentUser, db: DbSessi
     image_a, image_b = load_upright(store, a), load_upright(store, b)
     if card_a and card_b:
         result = align.from_cards(card_a["homography"], card_b["homography"])
+        anchor_a = _anchor(db, store, a, image_a, card_a)
+        anchor_b = _anchor(db, store, b, image_b, card_b)
+        if anchor_a is not None and anchor_b is not None:
+            result = align.anchored(result["matrix"], anchor_a, anchor_b)
     else:
         result = align.from_features(image_a, image_b)
     if result["status"] == "aligned":

@@ -16,7 +16,7 @@ from sqlalchemy.orm import Session
 from nevus import analysis, descriptors, measure
 from nevus.auth import service
 from nevus.auth.dependencies import AppSettings, CurrentUser, DbSession, client_ip
-from nevus.cv import card_detect, fit
+from nevus.cv import card_detect, card_mesh, fit
 from nevus.cv.card_sheet import render_sheet
 from nevus.cv.pipeline import load_upright, upright_size
 from nevus.db.models import (
@@ -262,6 +262,17 @@ def reference_card(
     name = f"nevus-reference-card-v1-{page}-{lang}.pdf"
     return Response(
         pdf, media_type="application/pdf", headers={"Content-Disposition": f'attachment; filename="{name}"'}
+    )
+
+
+@router.get("/reference-card/3d", response_class=Response, responses={200: {"content": {"application/zip": {}}}})
+def reference_card_3d(user: CurrentUser, lang: Annotated[Language, Query()] = "en") -> Response:
+    """The card as two bodies to print, plate and ink, for the window card and the strip, with a note on how."""
+    data = card_mesh.archive(lang)
+    return Response(
+        data,
+        media_type="application/zip",
+        headers={"Content-Disposition": 'attachment; filename="nevus-reference-card-v1-3d.zip"'},
     )
 
 

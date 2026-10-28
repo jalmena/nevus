@@ -177,7 +177,7 @@ class Setting(Base):
 
 IMAGE_ROLES = ("overview", "close_up", "with_reference", "other", "session")
 IMAGE_MODALITIES = ("camera", "dermatoscope")
-RENDITION_KINDS = ("full", "preview", "thumb", "normalised", "normalised_thumb")
+RENDITION_KINDS = ("full", "preview", "thumb", "normalised", "normalised_thumb", "mark", "mark_thumb")
 
 
 class Image(Base):
@@ -201,6 +201,9 @@ class Image(Base):
     # Denormalised from the latest quality analysis so lists need no join; the analysis row is the source.
     quality_flags: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
     quality_checked_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    # Set when the analyses that change how the photo is shown are done: the card search and, when a
+    # card was found, the normalised view. Until then its thumbnail may still change.
+    analysed_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
     captured_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
     captured_tz: Mapped[str | None] = mapped_column(String(64))
     created_by: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"))

@@ -296,6 +296,7 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
     re_encoded: false,
     quality_flags: state.flagged.includes(id) ? ["blurry"] : [],
     quality_checked_at: "2026-09-12T10:41:08Z",
+    analysed_at: "2026-09-12T10:41:09Z",
     captured_at: "2026-09-12T10:41:07Z",
     created_at: "2026-09-12T10:41:07Z",
     renditions: [
@@ -305,6 +306,8 @@ export function installMockApi(initial: Partial<MockState> = {}): MockState {
         ? [
             { kind: "normalised", width: 1832, height: 1200, bytes: 900 },
             { kind: "normalised_thumb", width: 256, height: 168, bytes: 90 },
+            { kind: "mark", width: 560, height: 560, bytes: 300 },
+            { kind: "mark_thumb", width: 256, height: 256, bytes: 60 },
           ]
         : []),
     ],

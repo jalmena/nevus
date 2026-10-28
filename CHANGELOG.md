@@ -1,3 +1,16 @@
+## v1.5.0 (2026-10-28)
+
+### Feat
+
+- **bodymap**: hands and feet tell their sides, and the selected zone is named
+- **reports**: the mark at a glance, dashes for what is unknown
+- **card**: a printable three-dimensional reference card
+- **images**: the mark in its window, lined up on the mark, kept out of stale caches
+
+### Fix
+
+- **shell**: the official mark in the app bar and the rail, at a legible size
+
 ## v1.4.0 (2026-10-15)
 
 ### Feat

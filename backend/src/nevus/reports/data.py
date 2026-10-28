@@ -96,16 +96,38 @@ def _photos(
     )
     out: list[dict[str, Any]] = []
     for image in ranked[:PHOTOS_PER_VISIT]:
+        # The mark in its window when the photo was taken with the card (flat, upright, no card in view);
+        # the whole photo otherwise. The outline is drawn only on the whole photo, whose frame it belongs to.
+        mark = db.scalar(select(Rendition).where(Rendition.image_id == image.id, Rendition.kind == "mark"))
         preview = db.scalar(select(Rendition).where(Rendition.image_id == image.id, Rendition.kind == "preview"))
-        if preview is None:
+        chosen = mark or preview
+        if chosen is None:
             continue
         width, height = upright_size(image)
         on_this = measured if measured is not None and str(image.id) == measured["image_id"] else None
+        if mark is not None:
+            how = analysis.latest(db, "image", image.id, "normalise.card")
+            px_per_mm = float(how.outputs.get("px_per_mm", 0)) if how is not None else 0.0
+            out.append(
+                {
+                    "image_id": str(image.id),
+                    "role": image.role,
+                    "kind": "mark",
+                    "path": str(store.path(mark.sha256, derived=True)),
+                    "upright_width": mark.width,
+                    "upright_height": mark.height,
+                    "mm_per_px": (1.0 / px_per_mm) if px_per_mm else None,
+                    "flags": list(image.quality_flags or []),
+                    "shape": None,
+                }
+            )
+            continue
         out.append(
             {
                 "image_id": str(image.id),
                 "role": image.role,
-                "path": str(store.path(preview.sha256, derived=True)),
+                "kind": "photo",
+                "path": str(store.path(chosen.sha256, derived=True)),
                 "upright_width": width,
                 "upright_height": height,
                 "mm_per_px": on_this["scale_mm_per_px"] if on_this else _scale_of(db, image),
