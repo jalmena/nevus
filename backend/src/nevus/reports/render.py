@@ -24,7 +24,16 @@ from nevus.reports.tokens import COLOURS
 
 HERE = Path(__file__).resolve().parent
 BAR_STEPS_MM = (1, 2, 5, 10, 20, 50)
-CHECK_FLAGS = ("blurry", "too_dark", "too_bright", "glare", "low_resolution", "tilted", "card_small")
+CHECK_FLAGS = (
+    "blurry",
+    "too_dark",
+    "too_bright",
+    "glare",
+    "glare_on_mark",
+    "low_resolution",
+    "tilted",
+    "card_small",
+)
 MEASUREMENT_FLAGS = ("tilted", "unverified_card", "tilt_unknown")
 SYMPTOMS = ("itching", "bleeding", "pain", "looks_different")
 ROLES = ("close_up", "with_reference", "overview", "other")
