@@ -11,6 +11,7 @@ from __future__ import annotations
 import math
 import re
 import uuid
+import zlib
 
 import cv2
 import numpy as np
@@ -36,13 +37,27 @@ def test_marker_cells_have_a_black_border() -> None:
 
 
 @pytest.mark.parametrize("page", ["a4", "letter"])
-@pytest.mark.parametrize("lang", ["en", "es"])
+@pytest.mark.parametrize("lang", ["en", "es", "ja", "ar"])
 def test_the_sheet_is_a_one_page_pdf(page: str, lang: str) -> None:
     pdf = render_sheet(page, lang)
-    assert pdf.startswith(b"%PDF-1.4") and pdf.rstrip().endswith(b"%%EOF")
-    assert pdf.count(b"/Type /Page ") == 1
-    expected = b"595.276 841.89" if page == "a4" else b"612 792"
-    assert expected in pdf
+    assert pdf.startswith(b"%PDF-1.") and pdf.rstrip().endswith(b"%%EOF")
+    objects = _inflated(pdf)
+    assert len(re.findall(rb"/Type /Page\b(?!s)", objects)) == 1
+    if page == "a4":
+        assert re.search(rb"/MediaBox \[0 0 595\.2\d* 841\.8\d*\]", objects)
+    else:
+        assert re.search(rb"/MediaBox \[0 0 612(\.0*)? 792(\.0*)?\]", objects)
+
+
+def _inflated(pdf: bytes) -> bytes:
+    """The PDF with its compressed streams (object streams among them) inflated, so its objects can be read."""
+    out = pdf
+    for match in re.finditer(rb"stream\r?\n(.*?)\r?\nendstream", pdf, re.S):
+        try:
+            out += zlib.decompress(match.group(1))
+        except zlib.error:
+            continue
+    return out
 
 
 @pytest.mark.parametrize("tilt", [0, 10, 20, 30])

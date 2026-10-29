@@ -14,7 +14,7 @@ export function ReferenceCardSettings({ admin }: { admin: boolean }) {
   const user = useSession().data?.user;
   const update = useUpdateMe();
   const [value, setValue] = useState(user?.card_line_mm ? String(user.card_line_mm) : "");
-  const lang = i18n.resolvedLanguage === "es" ? "es" : "en";
+  const lang = i18n.resolvedLanguage ?? "en"; // the sheet and the print note come in the interface's language
   if (!user) return null;
 
   function save() {

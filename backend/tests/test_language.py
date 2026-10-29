@@ -23,6 +23,29 @@ from nevus.reports import i18n
 FRONTEND = Path(__file__).resolve().parents[2] / "frontend"
 
 FORBIDDEN = {
+    # Languages without a list of their own are checked against the names of diseases, which travel across
+    # languages, in every script neVus is written in.
+    "*": [
+        r"melanom\w*",
+        r"carcinom\w*",
+        r"cancer\w*",
+        r"c[áà]ncer\w*",
+        r"krebs",
+        r"kanker",
+        r"rak",
+        r"раков\w*|рак",
+        r"癌",
+        r"黑色素瘤",
+        r"メラノーマ|腫瘍",  # がん alone also starts ordinary words
+        r"(?<![가-힣])암(?![가-힣])|흑색종|종양",  # 암 inside 암호 is a password
+        r"(?<![\u0600-\u06ff])(?:سرطان|ميلانوما|ورم)(?![\u0600-\u06ff])",  # ورم inside ورمز is a code
+        r"कैंसर|मेलेनोमा|ट्यूमर",
+        r"malign\w*",
+        r"benign\w*",
+        r"tumou?r\w*",
+        r"metasta\w*",
+        r"abcde",
+    ],
     "en": [
         r"melanomas?",
         r"carcinomas?",
@@ -106,7 +129,10 @@ def _offences(text: str, language: str) -> list[str]:
     lowered = text.lower()
     for phrase in ALLOWED:
         lowered = lowered.replace(phrase, " ")
-    return [m.group(0) for p in FORBIDDEN[language] for m in re.finditer(rf"\b{p}\b", lowered)]
+    patterns = FORBIDDEN.get(language, FORBIDDEN["*"])
+    # Word boundaries only make sense for the scripts that separate words.
+    bounded = (rf"(?<!\w)(?:{p})(?!\w)" if p[0].isascii() else p for p in patterns)
+    return [m.group(0) for pattern in bounded for m in re.finditer(pattern, lowered)]
 
 
 def _catalogues() -> Iterator[tuple[str, str, str]]:
@@ -114,7 +140,7 @@ def _catalogues() -> Iterator[tuple[str, str, str]]:
         for name, catalogue in (("email", email.TEXT), ("webhooks", webhooks.TEXT), ("calendar", calendar.TEXT)):
             for text in _strings(catalogue[language]):
                 yield f"{name}/{language}", language, text
-        for text in _strings(i18n.TEXT[language]):
+        for text in _strings(i18n.catalogue(language)["text"]):
             yield f"reports/{language}", language, text
         locale = FRONTEND / f"src/lib/i18n/locales/{language}.json"
         if locale.is_file():

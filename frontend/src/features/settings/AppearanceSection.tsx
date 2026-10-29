@@ -4,7 +4,7 @@ import { Row, RowList } from "@/design-system/components/Row";
 import { Select } from "@/design-system/components/Select";
 import { Switch } from "@/design-system/components/Switch";
 import { useSession, useUpdateMe } from "@/lib/auth/session";
-import { supportedLanguages, type Language } from "@/lib/i18n";
+import { languageNames, supportedLanguages, type Language } from "@/lib/i18n";
 import { SettingsHeader } from "./SettingsHeader";
 import styles from "./settings.module.css";
 
@@ -28,7 +28,7 @@ export function AppearanceSection({ admin }: { admin: boolean }) {
               labelHidden
               value={user.language}
               onChange={(e) => update.mutate({ language: e.target.value as Language })}
-              options={supportedLanguages.map((code) => ({ value: code, label: t(`languages.${code}`) }))}
+              options={supportedLanguages.map((code) => ({ value: code, label: languageNames[code] }))}
             />
           }
         />

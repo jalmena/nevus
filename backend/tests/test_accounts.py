@@ -114,7 +114,7 @@ def test_preferences_are_stored_with_the_account(client: TestClient) -> None:
     assert response.status_code == 200
     user = client.get("/api/auth/session").json()["user"]
     assert (user["language"], user["theme"], user["show_uncertainty"]) == ("es", "dark", False)
-    assert client.patch("/api/auth/me", json={"language": "fr"}).status_code == 422
+    assert client.patch("/api/auth/me", json={"language": "xx"}).status_code == 422
 
 
 def test_admin_from_environment_is_created_at_startup(tmp_path, settings) -> None:  # type: ignore[no-untyped-def]

@@ -2499,7 +2499,7 @@ export interface components {
              * Default Language
              * @enum {string}
              */
-            default_language: "en" | "es" | "pt";
+            default_language: "en" | "es" | "ca" | "gl" | "eu" | "pt" | "fr" | "it" | "de" | "nl" | "pl" | "ru" | "tr" | "id" | "zh" | "ja" | "ko" | "hi" | "ar";
         };
         /** InstanceStatus */
         InstanceStatus: {
@@ -3090,7 +3090,7 @@ export interface components {
         /** ReportIn */
         ReportIn: {
             /** Language */
-            language?: ("en" | "es" | "pt") | null;
+            language?: ("en" | "es" | "ca" | "gl" | "eu" | "pt" | "fr" | "it" | "de" | "nl" | "pl" | "ru" | "tr" | "id" | "zh" | "ja" | "ko" | "hi" | "ar") | null;
             /** Lesion Id */
             lesion_id?: string | null;
             /**
@@ -3136,7 +3136,7 @@ export interface components {
              * Language
              * @enum {string}
              */
-            language: "en" | "es" | "pt";
+            language: "en" | "es" | "ca" | "gl" | "eu" | "pt" | "fr" | "it" | "de" | "nl" | "pl" | "ru" | "tr" | "id" | "zh" | "ja" | "ko" | "hi" | "ar";
             /** Lesion Ids */
             lesion_ids: string[];
             /** Pages */
@@ -3494,7 +3494,7 @@ export interface components {
             /** Email Reminders */
             email_reminders?: boolean | null;
             /** Language */
-            language?: ("en" | "es" | "pt") | null;
+            language?: ("en" | "es" | "ca" | "gl" | "eu" | "pt" | "fr" | "it" | "de" | "nl" | "pl" | "ru" | "tr" | "id" | "zh" | "ja" | "ko" | "hi" | "ar") | null;
             /** Show Uncertainty */
             show_uncertainty?: boolean | null;
             /** Theme */
@@ -3564,7 +3564,7 @@ export interface components {
         /** VisitReportIn */
         VisitReportIn: {
             /** Language */
-            language?: ("en" | "es" | "pt") | null;
+            language?: ("en" | "es" | "ca" | "gl" | "eu" | "pt" | "fr" | "it" | "de" | "nl" | "pl" | "ru" | "tr" | "id" | "zh" | "ja" | "ko" | "hi" | "ar") | null;
             /**
              * Paper
              * @default a4
@@ -6636,7 +6636,7 @@ export interface operations {
         parameters: {
             query?: {
                 page?: "a4" | "letter";
-                lang?: "en" | "es" | "pt";
+                lang?: "en" | "es" | "ca" | "gl" | "eu" | "pt" | "fr" | "it" | "de" | "nl" | "pl" | "ru" | "tr" | "id" | "zh" | "ja" | "ko" | "hi" | "ar";
             };
             header?: never;
             path?: never;
@@ -6667,7 +6667,7 @@ export interface operations {
     reference_card_3d_api_reference_card_3d_get: {
         parameters: {
             query?: {
-                lang?: "en" | "es" | "pt";
+                lang?: "en" | "es" | "ca" | "gl" | "eu" | "pt" | "fr" | "it" | "de" | "nl" | "pl" | "ru" | "tr" | "id" | "zh" | "ja" | "ko" | "hi" | "ar";
             };
             header?: never;
             path?: never;
