@@ -2140,7 +2140,23 @@
             "enum": [
               "en",
               "es",
-              "pt"
+              "ca",
+              "gl",
+              "eu",
+              "pt",
+              "fr",
+              "it",
+              "de",
+              "nl",
+              "pl",
+              "ru",
+              "tr",
+              "id",
+              "zh",
+              "ja",
+              "ko",
+              "hi",
+              "ar"
             ],
             "title": "Default Language",
             "type": "string"
@@ -3936,7 +3952,23 @@
                 "enum": [
                   "en",
                   "es",
-                  "pt"
+                  "ca",
+                  "gl",
+                  "eu",
+                  "pt",
+                  "fr",
+                  "it",
+                  "de",
+                  "nl",
+                  "pl",
+                  "ru",
+                  "tr",
+                  "id",
+                  "zh",
+                  "ja",
+                  "ko",
+                  "hi",
+                  "ar"
                 ],
                 "type": "string"
               },
@@ -4065,7 +4097,23 @@
             "enum": [
               "en",
               "es",
-              "pt"
+              "ca",
+              "gl",
+              "eu",
+              "pt",
+              "fr",
+              "it",
+              "de",
+              "nl",
+              "pl",
+              "ru",
+              "tr",
+              "id",
+              "zh",
+              "ja",
+              "ko",
+              "hi",
+              "ar"
             ],
             "title": "Language",
             "type": "string"
@@ -5019,7 +5067,23 @@
                 "enum": [
                   "en",
                   "es",
-                  "pt"
+                  "ca",
+                  "gl",
+                  "eu",
+                  "pt",
+                  "fr",
+                  "it",
+                  "de",
+                  "nl",
+                  "pl",
+                  "ru",
+                  "tr",
+                  "id",
+                  "zh",
+                  "ja",
+                  "ko",
+                  "hi",
+                  "ar"
                 ],
                 "type": "string"
               },
@@ -5292,7 +5356,23 @@
                 "enum": [
                   "en",
                   "es",
-                  "pt"
+                  "ca",
+                  "gl",
+                  "eu",
+                  "pt",
+                  "fr",
+                  "it",
+                  "de",
+                  "nl",
+                  "pl",
+                  "ru",
+                  "tr",
+                  "id",
+                  "zh",
+                  "ja",
+                  "ko",
+                  "hi",
+                  "ar"
                 ],
                 "type": "string"
               },
@@ -9666,7 +9746,23 @@
               "enum": [
                 "en",
                 "es",
-                "pt"
+                "ca",
+                "gl",
+                "eu",
+                "pt",
+                "fr",
+                "it",
+                "de",
+                "nl",
+                "pl",
+                "ru",
+                "tr",
+                "id",
+                "zh",
+                "ja",
+                "ko",
+                "hi",
+                "ar"
               ],
               "title": "Lang",
               "type": "string"
@@ -9711,7 +9807,23 @@
               "enum": [
                 "en",
                 "es",
-                "pt"
+                "ca",
+                "gl",
+                "eu",
+                "pt",
+                "fr",
+                "it",
+                "de",
+                "nl",
+                "pl",
+                "ru",
+                "tr",
+                "id",
+                "zh",
+                "ja",
+                "ko",
+                "hi",
+                "ar"
               ],
               "title": "Lang",
               "type": "string"

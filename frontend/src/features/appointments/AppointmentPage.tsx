@@ -1,6 +1,7 @@
 import { Camera, Check, Pencil, Trash2 } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
+import { isLanguage, languageNames, supportedLanguages } from "@/lib/i18n";
 import { useNavigate, useParams } from "react-router";
 import { Button } from "@/design-system/components/Button";
 import { IconButton } from "@/design-system/components/IconButton";
@@ -43,7 +44,9 @@ export function AppointmentPage() {
   const makeReport = useVisitReport(appointmentId, personId);
   const [editing, setEditing] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
-  const [language, setLanguage] = useState<ReportLanguage>(i18n.resolvedLanguage === "es" ? "es" : "en");
+  const [language, setLanguage] = useState<ReportLanguage>(
+    isLanguage(i18n.resolvedLanguage) ? i18n.resolvedLanguage : "en",
+  );
   const [paper, setPaper] = useState<Paper>("a4");
   const locale = i18n.resolvedLanguage ?? "en";
 
@@ -213,10 +216,7 @@ export function AppointmentPage() {
             label={t("reports.language")}
             value={language}
             onChange={(e) => setLanguage(e.target.value as ReportLanguage)}
-            options={[
-              { value: "en", label: t("languages.en") },
-              { value: "es", label: t("languages.es") },
-            ]}
+            options={supportedLanguages.map((code) => ({ value: code, label: languageNames[code] }))}
           />
           <Select
             label={t("reports.paper")}

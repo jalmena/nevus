@@ -18,6 +18,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
+from nevus.languages import direction
 from nevus.reports import svg
 from nevus.reports.i18n import Words
 from nevus.reports.tokens import COLOURS
@@ -266,6 +267,7 @@ def context(payload: dict[str, Any]) -> dict[str, Any]:
     return {
         "w": words,
         "lang": words.language,
+        "dir": direction(words.language),
         "scope": scope,
         "paper": "letter" if payload["paper"] == "letter" else "A4",
         "title": words(titles.get(scope, "profile_title")),
@@ -302,6 +304,18 @@ def public(payload: dict[str, Any]) -> dict[str, Any]:
             for photo in visit["photos"]:
                 photo.pop("path", None)
     return data
+
+
+def pdf_from_html(html: str, allowed: set[Path] | None = None) -> bytes:
+    """A PDF from HTML that may load only the package's own assets and fonts, plus the files in `allowed`."""
+    from weasyprint import HTML
+    from weasyprint.text.fonts import FontConfiguration
+
+    document = HTML(
+        string=html, base_url=(HERE / "assets").as_uri() + "/", url_fetcher=_fetcher(allowed or set())
+    ).render(font_config=FontConfiguration())
+    pdf: bytes = document.write_pdf()
+    return pdf
 
 
 def render(payload: dict[str, Any]) -> dict[str, Any]:

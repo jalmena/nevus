@@ -28,7 +28,8 @@ from nevus.storage.blobs import BlobStore
 
 VERSION = "1.0.0"
 GREY_PATCH_SRGB = 0x77 / 255  # how the card's grey patch is printed
-MIN_GAIN, MAX_GAIN = 0.25, 4.0  # beyond two stops either way, the patch is not the printed grey
+MIN_GAIN, MAX_GAIN = 0.5, 4.0  # brighter than a stop over, or darker than two stops under, it is not the printed grey:
+# a bare white plate reads a stop over and a black print four stops under
 MIN_PIXELS = 40
 
 

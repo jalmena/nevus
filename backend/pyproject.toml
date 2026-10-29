@@ -1,6 +1,6 @@
 [project]
 name = "nevus"
-version = "1.5.2"
+version = "1.6.0"
 description = "Self-hosted longitudinal tracking of moles and skin marks. Not a diagnostic tool."
 readme = "README.md"
 license = "AGPL-3.0-only"
@@ -59,6 +59,11 @@ ignore = ["ANN401", "S101"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S", "ANN"]
+# The message catalogues hold natural text in every script: Cyrillic, Turkish dotless i and the like look like Latin.
+"src/nevus/notify/*.py" = ["RUF001"]
+"src/nevus/api/push.py" = ["RUF001"]
+"src/nevus/cv/card_sheet.py" = ["RUF001"]
+"src/nevus/cv/card_mesh.py" = ["RUF001"]
 
 [tool.mypy]
 python_version = "3.13"

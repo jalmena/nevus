@@ -14,7 +14,7 @@ import {
   useSaveInstanceSettings,
   useTestEmail,
 } from "@/lib/admin";
-import { supportedLanguages, type Language } from "@/lib/i18n";
+import { languageNames, supportedLanguages, type Language } from "@/lib/i18n";
 import styles from "@/features/settings/settings.module.css";
 
 /** For administrators: how reminder emails leave the server. */
@@ -170,7 +170,7 @@ export function InstanceSection() {
         title={t("admin.instanceTitle")}
         meta={[
           instance.data
-            ? t("settings.status.language", { language: t(`languages.${instance.data.default_language}`) })
+            ? t("settings.status.language", { language: languageNames[instance.data.default_language] })
             : null,
         ]}
         help={{ title: t("admin.instanceTitle"), content: <p>{t("admin.instanceHint")}</p> }}
@@ -184,7 +184,7 @@ export function InstanceSection() {
               labelHidden
               value={instance.data?.default_language ?? "en"}
               onChange={(e) => saveInstance.mutate({ default_language: e.target.value as Language })}
-              options={supportedLanguages.map((code) => ({ value: code, label: t(`languages.${code}`) }))}
+              options={supportedLanguages.map((code) => ({ value: code, label: languageNames[code] }))}
             />
           }
         />

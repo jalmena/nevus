@@ -1,6 +1,7 @@
 import { Download, Trash2 } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
+import { isLanguage, languageNames, supportedLanguages, type Language } from "@/lib/i18n";
 import { Button } from "@/design-system/components/Button";
 import { EmptyState } from "@/design-system/components/EmptyState";
 import { IconButton } from "@/design-system/components/IconButton";
@@ -46,7 +47,7 @@ export function Reports({
   const reports = useReports(person.id);
   const create = useCreateReport(person.id);
   const remove = useDeleteReport(person.id);
-  const uiLanguage: ReportLanguage = i18n.resolvedLanguage === "es" ? "es" : "en";
+  const uiLanguage: ReportLanguage = isLanguage(i18n.resolvedLanguage) ? i18n.resolvedLanguage : "en";
   const [open, setOpen] = useState(false);
   const [language, setLanguage] = useState<ReportLanguage>(uiLanguage);
   const [paper, setPaper] = useState<Paper>("a4");
@@ -118,7 +119,7 @@ export function Reports({
               title={describe(report)}
               meta={
                 <>
-                  {shortDateTime(locale, report.created_at)} · {t(`languages.${report.language}`)} ·{" "}
+                  {shortDateTime(locale, report.created_at)} · {languageNames[report.language as Language]} ·{" "}
                   {report.paper === "letter" ? t("reports.letter") : "A4"}
                   {report.status === "failed" && (
                     <span className={styles.failed}>{report.error ?? t("reports.failed")}</span>
@@ -212,10 +213,7 @@ export function Reports({
             label={t("reports.language")}
             value={language}
             onChange={(e) => setLanguage(e.target.value as ReportLanguage)}
-            options={[
-              { value: "en", label: t("languages.en") },
-              { value: "es", label: t("languages.es") },
-            ]}
+            options={supportedLanguages.map((code) => ({ value: code, label: languageNames[code] }))}
           />
           <Select
             label={t("reports.paper")}

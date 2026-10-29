@@ -22,6 +22,34 @@ GREETING = {
     "en": ("neVus can reach this device", "Reminders about marks due for a photo will arrive here."),
     "es": ("neVus llega a este dispositivo", "Los recordatorios de marcas pendientes de foto llegarán aquí."),
     "pt": ("O neVus chega a este aparelho", "Os lembretes de marcas com foto pendente chegarão aqui."),
+    "ca": ("El neVus arriba a aquest dispositiu", "Els recordatoris de marques pendents de foto arribaran aquí."),
+    "gl": ("neVus chega a este dispositivo", "Os recordatorios de marcas pendentes de foto chegarán aquí."),
+    "eu": (
+        "neVus-ek gailu honetara iristen da",
+        "Argazkia behar duten markei buruzko gogorarazpenak hemen iritsiko dira.",
+    ),
+    "fr": ("neVus peut joindre cet appareil", "Les rappels des marques à photographier arriveront ici."),
+    "it": ("neVus raggiunge questo dispositivo", "I promemoria dei segni da fotografare arriveranno qui."),
+    "de": ("neVus erreicht dieses Gerät", "Erinnerungen an Stellen, die für ein Foto fällig sind, kommen hier an."),
+    "nl": (
+        "neVus kan dit apparaat bereiken",
+        "Herinneringen voor plekken die aan een foto toe zijn, komen hier binnen.",
+    ),
+    "pl": (
+        "neVus może dotrzeć do tego urządzenia",
+        "Przypomnienia o oznaczeniach do sfotografowania będą tu docierać.",
+    ),
+    "ru": (
+        "neVus может связаться с этим устройством",
+        "Напоминания о метках, которые пора сфотографировать, будут приходить сюда.",
+    ),
+    "tr": ("neVus bu cihaza ulaşabiliyor", "Fotoğraf zamanı gelen işaretlerin hatırlatıcıları buraya gelecek."),
+    "id": ("neVus dapat menjangkau perangkat ini", "Pengingat tentang tanda yang perlu difoto akan masuk ke sini."),
+    "zh": ("neVus 已可通知此设备", "待拍照标记的提醒将发送到这里。"),
+    "ja": ("neVusはこのデバイスに通知できます", "撮影の時期になったマークのリマインダーがここに届きます。"),
+    "ko": ("neVus가 이 기기에 알림을 보낼 수 있어요", "사진 찍을 표시에 대한 알림이 여기로 도착해요."),
+    "hi": ("neVus इस डिवाइस तक पहुँच सकता है", "फ़ोटो के लिए बाकी निशानों के रिमाइंडर यहाँ आएँगे।"),
+    "ar": ("يستطيع neVus الوصول إلى هذا الجهاز", "ستصل هنا تذكيرات العلامات التي حان موعد تصويرها."),
 }
 
 

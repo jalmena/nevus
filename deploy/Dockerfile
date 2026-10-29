@@ -32,10 +32,11 @@ LABEL org.opencontainers.image.title="neVus" \
       org.opencontainers.image.version="${VERSION}"
 
 # setpriv drops privileges in the entrypoint (util-linux); tzdata for local dates; curl for the healthcheck;
-# Pango and HarfBuzz lay out the PDF reports, with DejaVu as the fallback for characters Epilogue lacks.
+# Pango and HarfBuzz lay out the PDF documents; Noto Core (Latin, Greek, Cyrillic, Arabic, Devanagari and more) and
+# Droid Sans Fallback (Chinese, Japanese, Korean) are the fallbacks for the characters Epilogue lacks.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends util-linux tzdata curl ca-certificates \
-       libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 fonts-dejavu-core \
+       libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 fonts-dejavu-core fonts-noto-core fonts-droid-fallback \
     && rm -rf /var/lib/apt/lists/* \
     && groupadd --gid 1000 nevus && useradd --uid 1000 --gid 1000 --create-home --shell /usr/sbin/nologin nevus \
     && mkdir -p /data /app/static && chown -R nevus:nevus /data /app

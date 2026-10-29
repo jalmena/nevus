@@ -1,3 +1,10 @@
+## v1.6.0 (2026-10-29)
+
+### Feat
+
+- **i18n**: nineteen languages, the same as tabernacle
+- **card**: rounded plate with a frame line, larger lockup and spare grey squares
+
 ## v1.5.2 (2026-10-28)
 
 ### Fix

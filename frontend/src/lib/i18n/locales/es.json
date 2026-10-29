@@ -21,11 +21,6 @@
     "persons": "Personas",
     "more": "Más"
   },
-  "languages": {
-    "en": "Inglés",
-    "es": "Español",
-    "pt": "Portugués"
-  },
   "auth": {
     "username": "Usuario",
     "password": "Contraseña",

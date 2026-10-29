@@ -12,7 +12,7 @@ import { useBackupStatus, useEmailSettings, useInstanceSettings, useUsers } from
 import { useInstance, useLogout, useSession, useUpdateMe } from "@/lib/auth/session";
 import { useTotpStatus } from "@/lib/auth/totp";
 import { useExports } from "@/lib/data";
-import { supportedLanguages, type Language } from "@/lib/i18n";
+import { languageNames, supportedLanguages, type Language } from "@/lib/i18n";
 import { useWebhooks } from "@/lib/notifications";
 import { pushSupported, usePushStatus } from "@/lib/push";
 import { SECTIONS, settingsRail, type SettingsSection } from "./SettingsHeader";
@@ -123,7 +123,7 @@ function SettingsRows({ admin }: { admin: boolean }) {
                         onChange={(e) => update.mutate({ language: e.target.value as Language })}
                         options={supportedLanguages.map((code) => ({
                           value: code,
-                          label: t(`languages.${code}`),
+                          label: languageNames[code],
                         }))}
                       />
                     }
@@ -199,7 +199,7 @@ function AdminRows({
           : t("settings.status.backupsNone")
       : undefined,
     instance: instance.data
-      ? t("settings.status.language", { language: t(`languages.${instance.data.default_language}`) })
+      ? t("settings.status.language", { language: languageNames[instance.data.default_language] })
       : undefined,
   };
   return (
