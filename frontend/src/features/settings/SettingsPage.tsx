@@ -121,7 +121,10 @@ function SettingsRows({ admin }: { admin: boolean }) {
                         labelHidden
                         value={user.language}
                         onChange={(e) => update.mutate({ language: e.target.value as Language })}
-                        options={supportedLanguages.map((code) => ({ value: code, label: languageNames[code] }))}
+                        options={supportedLanguages.map((code) => ({
+                          value: code,
+                          label: languageNames[code],
+                        }))}
                       />
                     }
                   />
