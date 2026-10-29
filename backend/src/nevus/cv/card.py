@@ -56,6 +56,7 @@ STRIP = CardGeometry(
 )
 CARDS = (WINDOW, STRIP)
 APERTURE_RADIUS = 12.0
+GREY = 0x77 / 255  # the grey patch, printed to read as sRGB #777777
 
 
 def card_for_ids(ids: set[int]) -> CardGeometry | None:
@@ -117,7 +118,7 @@ def draw_card(p: Painter, card: CardGeometry, ox: float, oy: float, *, cut_apert
                 boxes.append((left + start * cell, top + row * cell, (col - start) * cell, cell))
         p.rects(boxes)
     gx, gy, gw, gh = card.grey
-    p.fill_gray(0x77 / 255)
+    p.fill_gray(GREY)
     p.rect(ox + gx, oy + gy, gw, gh)
     wx, wy, ww, wh = card.white
     p.fill_gray(1.0)

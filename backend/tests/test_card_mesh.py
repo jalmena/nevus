@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import io
+import math
 import struct
 import zipfile
 from collections import Counter
@@ -34,8 +35,9 @@ def test_each_piece_is_one_mesh_of_closed_bodies_with_the_ink_sunk_into_the_plat
         assert ink, f"{card.name}: nothing raised to print"
         assert all(_open_edges(body) == 0 for body in made.bodies), f"{card.name}: a body is not closed"
         points = np.array([v for tri in made.triangles for v in tri])
-        assert points[:, 0].min() >= -1e-6 and points[:, 0].max() <= card.width + 1e-6
-        assert points[:, 1].min() >= -1e-6 and points[:, 1].max() <= card.height + 1e-6
+        width, height = card_mesh.plate_size(card)
+        assert points[:, 0].min() >= -1e-6 and points[:, 0].max() <= width + 1e-6
+        assert points[:, 1].min() >= -1e-6 and points[:, 1].max() <= height + 1e-6
         plate_points = np.array([v for tri in plate for v in tri])
         ink_points = np.array([v for body in ink for tri in body for v in tri])
         assert plate_points[:, 2].min() == 0.0 and abs(plate_points[:, 2].max() - card_mesh.PLATE_MM) < 1e-9
@@ -68,16 +70,52 @@ def test_every_body_is_wound_consistently_with_its_faces_outward() -> None:
 
 def _seen_from_above_the_bed(card: CardGeometry, px_per_mm: int = 12, pad: int = 40) -> np.ndarray:
     """The printed piece photographed from above: x to the right and y away, as a right-handed bed has them."""
-    width, height = round(card.width * px_per_mm), round(card.height * px_per_mm)
+    plate_w, plate_h = card_mesh.plate_size(card)
+    width, height = round(plate_w * px_per_mm), round(plate_h * px_per_mm)
     picture = np.full((height + 2 * pad, width + 2 * pad), 150, np.uint8)
     picture[pad : pad + height, pad : pad + width] = 235
     _plate, *ink = card_mesh.mesh(card).bodies
     for body in ink:
         for tri in body:
             if all(abs(v[2] - card_mesh.INK_Z1) < 1e-9 for v in tri):
-                points = [(pad + v[0] * px_per_mm, pad + (card.height - v[1]) * px_per_mm) for v in tri]
+                points = [(pad + v[0] * px_per_mm, pad + (plate_h - v[1]) * px_per_mm) for v in tri]
                 cv2.fillConvexPoly(picture, np.round(points).astype(np.int32), 20, lineType=cv2.LINE_AA)
     return picture
+
+
+def _pixel(picture: np.ndarray, height: float, x: float, y: float, px_per_mm: int = 12, pad: int = 40) -> int:
+    """The raster's value at a point of the printed piece, given in the printer's frame in millimetres."""
+    return int(picture[round(pad + (height - y) * px_per_mm), round(pad + x * px_per_mm)])
+
+
+def test_the_plate_is_a_rounded_rectangle_with_the_window_cut_out_and_a_frame_along_its_edge() -> None:
+    for card in (WINDOW, STRIP):
+        plate, *ink = card_mesh.mesh(card).bodies
+        width, height = card_mesh.plate_size(card)
+        top_faces = [tri for tri in plate if all(abs(v[2] - card_mesh.PLATE_MM) < 1e-9 for v in tri)]
+        area = sum(abs((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])) / 2 for a, b, c in top_faces)
+        expected = width * height - (4 - math.pi) * card_mesh.CORNER_MM**2
+        if card is WINDOW:
+            expected -= math.pi * APERTURE_RADIUS**2
+        assert abs(area - expected) < 0.005 * expected, (card.name, area, expected)
+        # The frame: a dark line along every edge, plate colour just inside it, nothing raised beyond it.
+        picture = _seen_from_above_the_bed(card)
+        line = card_mesh.FRAME_INSET_MM + card_mesh.FRAME_MM / 2
+        inside = card_mesh.FRAME_INSET_MM + card_mesh.FRAME_MM + 0.4
+
+        def pixel(x: float, y: float, picture: np.ndarray = picture, height: float = height) -> int:
+            return _pixel(picture, height, x, y)
+
+        for x in np.linspace(card_mesh.CORNER_MM, width - card_mesh.CORNER_MM, 7):
+            assert pixel(x, line) < 100 and pixel(x, height - line) < 100, (card.name, "edge", x)
+            assert pixel(x, inside) > 200 and pixel(x, height - inside) > 200, (card.name, "inside", x)
+        for y in np.linspace(card_mesh.CORNER_MM, height - card_mesh.CORNER_MM, 5):
+            assert pixel(line, y) < 100 and pixel(width - line, y) < 100, (card.name, "side", y)
+        tops = np.array([np.mean(tri, axis=0) for body in ink for tri in body])
+        assert (
+            tops[:, 0].min() >= card_mesh.FRAME_INSET_MM - 1e-6
+            and tops[:, 0].max() <= width - card_mesh.FRAME_INSET_MM + 1e-6
+        )
 
 
 def test_the_printed_piece_reads_like_the_paper_card_and_not_its_mirror_image() -> None:
@@ -89,13 +127,15 @@ def test_the_printed_piece_reads_like_the_paper_card_and_not_its_mirror_image() 
 
 def test_the_window_is_a_hole_and_the_markers_are_ink() -> None:
     plate, *ink = card_mesh.mesh(WINDOW).bodies
-    cx, cy = WINDOW.centre[0], WINDOW.height - WINDOW.centre[1]  # the printer's frame has y running upward
+    m = card_mesh.PLATE_MARGIN_MM
+    _plate_w, plate_h = card_mesh.plate_size(WINDOW)
+    cx, cy = WINDOW.centre[0] + m, plate_h - (WINDOW.centre[1] + m)  # the printer's frame has y running upward
     plate_top = [tri for tri in plate if all(abs(v[2] - card_mesh.PLATE_MM) < 1e-9 for v in tri)]
     centres = np.array([np.mean(tri, axis=0)[:2] for tri in plate_top])
     assert np.all(np.hypot(centres[:, 0] - cx, centres[:, 1] - cy) > APERTURE_RADIUS - 0.5)
     ink_top = np.array([np.mean(tri, axis=0)[:2] for body in ink for tri in body])
     for marker_id, (mx, my) in WINDOW.markers.items():
-        near = np.hypot(ink_top[:, 0] - mx, ink_top[:, 1] - (WINDOW.height - my)) < 6.0
+        near = np.hypot(ink_top[:, 0] - (mx + m), ink_top[:, 1] - (plate_h - (my + m))) < 6.0
         assert near.sum() > 20, f"marker {marker_id} has no ink"
     # Nothing raised hangs over the hole: the ring's inner edge is the hole's edge (centroids of the faces along
     # a 96-gon sit a hundredth of a millimetre inside the circle).
@@ -146,11 +186,13 @@ def test_the_lockup_is_raised_on_both_pieces_with_its_openings_kept() -> None:
             x >= -slack and y >= -slack and x + w <= width + slack and y + h <= height + slack for x, y, w, h in boxes
         )
         assert _enclosed_gaps(boxes, width, height) >= 2
-        left = card.centre[0] - width / 2
+        m = card_mesh.PLATE_MARGIN_MM
+        _plate_w, plate_h = card_mesh.plate_size(card)
+        left = card.centre[0] + m - width / 2
         _plate, *ink = card_mesh.mesh(card).bodies
         tops = np.array(
             [np.mean(tri, axis=0) for body in ink for tri in body if abs(tri[0][2] - card_mesh.INK_Z1) < 1e-9]
         )
-        inside = (tops[:, 0] > left) & (tops[:, 0] < left + width) & (tops[:, 1] > card.height - top - height)
-        inside &= tops[:, 1] < card.height - top
+        inside = (tops[:, 0] > left) & (tops[:, 0] < left + width) & (tops[:, 1] > plate_h - top - m - height)
+        inside &= tops[:, 1] < plate_h - top - m
         assert inside.sum() > 100, f"{card.name}: the lockup is not raised where it belongs"
