@@ -19,15 +19,10 @@ TARGET = ROOT / "backend/src/nevus/reports/zone_names.json"
 
 def main() -> None:
     names = {
-        path.stem: json.loads(path.read_text(encoding="utf-8"))["zones"]
-        for path in sorted(LOCALES.glob("*.json"))
+        path.stem: json.loads(path.read_text(encoding="utf-8"))["zones"] for path in sorted(LOCALES.glob("*.json"))
     }
-    TARGET.write_text(
-        json.dumps(names, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
-    print(
-        f"{TARGET.relative_to(ROOT)}: {len(names)} languages, {len(names['en'])} zones each"
-    )
+    TARGET.write_text(json.dumps(names, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(f"{TARGET.relative_to(ROOT)}: {len(names)} languages, {len(names['en'])} zones each")
 
 
 if __name__ == "__main__":
