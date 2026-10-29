@@ -51,7 +51,7 @@ pnpm run build && pnpm run shots      # in frontend/
 
 It starts the real backend on a scratch data directory, walks every screen on a phone and on a desktop (Playwright, `e2e/gallery.spec.ts`), saves each in light and dark under `frontend/.screenshots/<device>/`, and makes contact sheets (`contact-<device>-<scheme>.png`) with `tools/screenshots/contact_sheet.py`. Check spacing, wrapping, contrast and wording in both schemes, and fix what looks wrong before the change is done. The journey test (`pnpm run e2e`) saves screenshots of its own pages too when `NEVUS_E2E_SHOTS=<dir>` is set. `uv run tools/screenshots/take.py` is a different thing: the three store screenshots, from a seeded instance with plausible photos, for `docs/design/screenshots/`.
 
-A review pass reads the gallery with a designer's eye: one primary action per screen, destructive actions apart, occasional tools folded, the content's own order, two panes where there is room. The rules and the before-and-after boards of the last pass are in [`docs/design/DESIGN_REVIEW.md`](docs/design/DESIGN_REVIEW.md); a board is a labelled contact sheet of the first screen of each key page, before and after, rendered at one scale so the two can be compared.
+A review pass reads the gallery with a designer's eye: one primary action per screen, destructive actions apart, occasional tools folded, the content's own order, two panes where there is room.
 
 ## Conventions
 
@@ -71,15 +71,13 @@ The silhouette and the zone geometry are generated, not drawn by hand. `uv run t
 
 ## Adding a language
 
-The languages neVus speaks are listed once, in `backend/src/nevus/languages.py`; the API types, the stored preferences and the reports read that list. To add one:
+The languages neVus speaks are listed once, in `backend/src/nevus/languages.py`, in the chooser's order; the API types, the stored preferences and the documents read that list, and `frontend/src/lib/i18n/index.ts` keeps the same list with each language's own name. To add one:
 
-1. Add its code to `Language` there. The interface, the emails and the reports use the same two-letter code.
-2. Frontend: copy `src/lib/i18n/locales/en.json` to `<code>.json` and translate every string, keeping the `{{placeholders}}`; give the plural forms the language needs (`_one`, `_other`, and `_many` or `_zero` where the language has them, as `es.json` and `pt.json` do); name the new language under `languages` in every catalogue; add it to `supportedLanguages` and `resources` in `src/lib/i18n/index.ts`. `tests/i18n.test.ts` checks that every catalogue has the same keys and placeholders as the English one.
-3. Backend: add the language to `TEXT` and `MONTHS` in `reports/i18n.py` (and to `DECIMAL_COMMA` if it writes 5,1 rather than 5.1; the `day` format has a branch per convention), to `TEXT` in `notify/email.py`, `notify/calendar.py` and `notify/webhooks.py`, and to `GREETING` in `api/push.py`; copy the `zones` block of the new catalogue into `reports/zone_names.json`. `tests/test_languages.py` checks the parity, and `tests/test_reports.py` that the reports' zone names equal the app's.
-4. Lint: give `tests/test_language.py` the language's disease, risk and prompting words in `FORBIDDEN`, and in `ALLOWED` the exact sentences that say what neVus does not do (the intended-use statement among them). Nothing user-facing ships without passing that check.
-5. Regenerate the API types (`nevus openapi`, then `pnpm run openapi`) and mention the language in the README and in `PRODUCT_REQUIREMENTS.md`.
-
-Translations are reviewed by a speaker before a release; machine output is a draft, not a catalogue.
+1. Add its code to `Language` in `languages.py` and to `supportedLanguages`, `languageNames` and the catalogue imports in `index.ts`; add it to `rtlLanguages` if it is written right to left. The PDF documents set Epilogue and fall back to the fonts the image installs (Noto Core and Droid Sans Fallback cover every script neVus speaks); a new script needs no bundled font.
+2. Frontend: copy `src/lib/i18n/locales/en.json` to `<code>.json` and translate every string, keeping the `{{placeholders}}`; give every plural key the forms the language's `Intl.PluralRules` has (`_one` and `_other` for most, `_few` and `_many` as well for Russian and Polish, all six for Arabic, `_other` alone for Chinese, Japanese, Korean and Indonesian). `tests/i18n.test.ts` checks keys, placeholders and plural forms against English.
+3. Backend: write `reports/locales/<code>.json` (wording, month names, date patterns and decimal mark; start from `en.json`), add the language to `TEXT` in `notify/email.py`, `notify/calendar.py`, `notify/webhooks.py` and `cv/card_sheet.py`, to `GREETING` in `api/push.py` and to `README_TEXT` in `cv/card_mesh.py`; then run `uv run --project backend python tools/i18n/zone_names.py` to copy the zone names of every catalogue into `reports/zone_names.json`. `tests/test_languages.py` checks that every catalogue has every language with the same keys and placeholders.
+4. Lint: `tests/test_language.py` checks every catalogue for disease names in every script; give the language its own list of risk and prompting words in `FORBIDDEN` when you can, and put in `ALLOWED` the exact sentences that say what neVus does not do.
+5. Regenerate the API types (`nevus openapi`, then `pnpm run openapi`) and mention the language in the README.
 
 ## Releasing
 

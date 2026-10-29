@@ -1,6 +1,6 @@
 # neVus — Product requirements
 
-- Status: baseline v1, 2026-09-23, derived from the Product Owner's answers in [`docs/PRODUCT_QUESTIONS.md`](docs/PRODUCT_QUESTIONS.md) and the decisions in [`docs/adr/`](docs/adr/README.md).
+- Status: baseline v1, 2026-09-23, derived from the Product Owner's answers to the discovery questions of 2026-09-23 (in the repository's history up to 1.5.2) and the decisions in [`docs/adr/`](docs/adr/README.md).
 - Audience: the engineering side (architecture, implementation, testing, design) and the Product Owner (PO) as the arbiter of scope.
 - Change policy: requirements change through pull requests; a change that alters intended use or the automatic-analysis boundary needs a new or superseding ADR.
 
@@ -30,7 +30,7 @@ Non-goals, permanent:
 - **Person**: the profile whose skin marks are tracked. A user may manage several persons (a household); a person may later receive their own login.
 - **Profile access**: per person, a user is `owner`, `manager` (create and edit observations) or `viewer` (read only). Two adults can manage a child's profile.
 - Registration is closed. The first visitor claims the instance and becomes admin; admins create the other accounts. No open sign-up.
-- Every user has persistent preferences stored with the account: interface language (English, Spanish or Portuguese), theme (light, dark, system), uncertainty display, experimental-analysis setting per profile they own.
+- Every user has persistent preferences stored with the account: interface language (one of nineteen, from English and Spanish to Japanese and Arabic), theme (light, dark, system), uncertainty display, experimental-analysis setting per profile they own.
 
 ## 4. Glossary
 
@@ -48,7 +48,7 @@ Non-goals, permanent:
 | Reminder | A per-lesion or per-person schedule that produces due items and notifications |
 | Appointment | A dermatology visit date that drives the "Prepare my visit" flow |
 | Session | A full-body capture: zone-by-zone photographs taken in one sitting, comparable with earlier sessions |
-| Report | A generated PDF for a clinician: single lesion or profile summary, in English, Spanish or Portuguese |
+| Report | A generated PDF for a clinician: single lesion or profile summary, in any of the interface's languages |
 
 ## 5. Functional requirements
 
@@ -129,7 +129,7 @@ Each requirement has an identifier, a target release and, where useful, acceptan
 | --- | --- | --- |
 | FR-REP-01 | PDF report for a single lesion: identity, location on the body map, observation history with dated images and scale bars, measurement table with ±, chart, the person's notes, methods used, intended-use statement | 0.2.0 |
 | FR-REP-02 | PDF profile summary: body map with markers, lesion list with latest measurements and due state, highlights of measured changes | 0.2.0 |
-| FR-REP-03 | Templates in English and Spanish (Portuguese since 1.1.0), language selectable per report; A4 default, US Letter option | 0.2.0 |
+| FR-REP-03 | Templates in every interface language (English and Spanish first, Portuguese since 1.1.0, nineteen since 1.6.0), language selectable per report; A4 default, US Letter option | 0.2.0 |
 | FR-REP-04 | Reports separate measured values, automated observations (labelled experimental where applicable), the person's observations, and leave interpretation to the clinician | 0.2.0 |
 | FR-REP-05 | Free selection of lesions for a report | 0.3.0 |
 
@@ -167,7 +167,7 @@ Each requirement has an identifier, a target release and, where useful, acceptan
 
 | ID | Requirement | Release |
 | --- | --- | --- |
-| FR-SET-01 | Interface available in English and Spanish (Portuguese since 1.1.0); language persisted per user; instance default configurable | 0.1.0 |
+| FR-SET-01 | Interface available in English and Spanish (Portuguese since 1.1.0, nineteen languages since 1.6.0); language persisted per user; instance default configurable | 0.1.0 |
 | FR-SET-02 | Theme light, dark or system, persisted per user | 0.1.0 |
 | FR-SET-03 | Uncertainty display switch (in-app only) | 0.1.0 |
 | FR-SET-04 | Experimental-analysis switch per profile the user owns | 0.1.0 |

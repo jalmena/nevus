@@ -10,7 +10,7 @@ neVus is a self-hosted application for keeping a longitudinal photographic recor
 
 Your dermatologist has hundreds of patients and approximately seven minutes. Your mole does not care. When the question "has this changed since last time?" comes up, neVus exists so that the answer is a dated series of measured photographs rather than "I think it was a little smaller".
 
-> **Status: stable, 1.x.** neVus installs from the personal app store or from a compose file (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)). It does what the [roadmap](#roadmap) lists up to 1.0.0: accounts with a second factor, persons, the body map, marks and dated visits with scrubbed photographs, measurement with uncertainty, comparison views, reports for the clinician, reminders through several channels, full-body sessions, and encrypted backups that are read back; in English, Spanish and Portuguese. Minor versions keep the data and migrate it when they must; the release notes say when something changes for the operator.
+> **Status: stable, 1.x.** neVus installs from the personal app store or from a compose file (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)). It does what 1.0.0 set out to do: accounts with a second factor, persons, the body map, marks and dated visits with scrubbed photographs, measurement with uncertainty, comparison views, reports for the clinician, reminders through several channels, full-body sessions, and encrypted backups that are read back; in nineteen languages, from Spanish and Catalan to Japanese and Arabic. Minor versions keep the data and migrate it when they must; the release notes say when something changes for the operator.
 
 ## What neVus is
 
@@ -31,29 +31,12 @@ Remembering what a mole looked like eight months ago is not exactly a controlled
 
 ## Relationship to MoleMapper
 
-neVus is inspired by [MoleMapper](https://github.com/ohsu-molemapper/MoleMapper_Final), the iOS research app released by Oregon Health & Science University under a BSD licence. It is a clean reimplementation for a self-hosted web stack, not a fork: the zone taxonomy, the zone geometry, the coin table and the tap-to-fit measurement idea are ported with the OHSU notice preserved in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Everything else is new. neVus is not affiliated with or endorsed by OHSU, Sage Bionetworks or the MoleMapper study; "MoleMapper" is their trademark. The audit that led to this decision is in [docs/audits/MOLEMAPPER_AUDIT.md](docs/audits/MOLEMAPPER_AUDIT.md) and the decision itself in [ADR-0002](docs/adr/0002-reimplement-instead-of-fork.md).
-
-## Roadmap
-
-| Phase | Release | What becomes possible |
-| --- | --- | --- |
-| 0 — Discovery | — | Audits, research, product questions, requirements, architecture, design brief |
-| 1 — Foundation | internal | Accounts and profiles, photo ingestion with metadata scrubbing, the design system, the application shell |
-| 2 — Deployment | first release candidate | Container image, CasaOS app store entry, backup and restore |
-| 3 — Core tracking | 0.1.0 | Body map, marks, photographed observations with a quality check, measurement in millimetres against a printed card or a coin, timelines, reminders, encrypted export |
-| 4 — Comparison and reports | 0.2.0 | Side-by-side, overlay and difference views, measurement charts, PDF reports, "prepare my visit" |
-| 5 — Computer vision | 0.3.0 | Assisted segmentation and measurement, framing checks, reproducible analysis records (opt-in, experimental) |
-| 6 — Full-body sessions | 0.4.0 | Guided zone-by-zone capture, matching between sessions, candidate review (opt-in, experimental) |
-| 7 — Hardening | 1.0.0 | Second factor with recovery codes, accounts administration, weekly read-back of the backups, blurring parts of session photos, zoom-to-zone placement, an accessibility statement and a threat model, pages that load on demand |
-| 8 — Beyond | 1.x | Descriptive shape and colour of a mark over time, push notifications behind a flag, more languages |
+neVus is inspired by [MoleMapper](https://github.com/ohsu-molemapper/MoleMapper_Final), the iOS research app released by Oregon Health & Science University under a BSD licence. It is a clean reimplementation for a self-hosted web stack, not a fork: the zone taxonomy, the zone geometry, the coin table and the tap-to-fit measurement idea are ported with the OHSU notice preserved in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Everything else is new. neVus is not affiliated with or endorsed by OHSU, Sage Bionetworks or the MoleMapper study; "MoleMapper" is their trademark. The decision is recorded in [ADR-0002](docs/adr/0002-reimplement-instead-of-fork.md).
 
 ## Documents
 
-- Audits: [MoleMapper_Final](docs/audits/MOLEMAPPER_AUDIT.md) · [the personal CasaOS app store](docs/audits/APPSTORE_AUDIT.md)
-- Research: [landscape of projects, datasets, algorithms and regulation](docs/research/LANDSCAPE.md) · [name check](docs/research/NAME_CHECK.md) · [CasaOS / ZimaOS store conventions](docs/research/CASAOS_STORE_CONVENTIONS.md)
-- Product: [questions for the Product Owner](docs/PRODUCT_QUESTIONS.md)
 - Decisions: [architecture decision records](docs/adr/README.md)
-- Requirements and plans: [product requirements](PRODUCT_REQUIREMENTS.md) · [architecture](ARCHITECTURE.md) · [roadmap](ROADMAP.md)
+- Requirements: [product requirements](PRODUCT_REQUIREMENTS.md) · [architecture](ARCHITECTURE.md)
 - Running it: [development](DEVELOPMENT.md) · [deployment](docs/DEPLOYMENT.md) · [security](SECURITY.md) · [privacy](PRIVACY.md)
 - Design: [design brief](docs/design/DESIGN_BRIEF.md) · [identity](docs/design/brand/identity/README.md) · [body map](docs/design/BODY_MAP.md) · [reference card](docs/design/REFERENCE_CARD_SPEC.md)
 - Analysis and assurance: [model card of every analyzer](MODEL_CARD.md) · [threat model](docs/THREAT_MODEL.md) · [accessibility](docs/ACCESSIBILITY.md)
