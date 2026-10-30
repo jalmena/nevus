@@ -14,25 +14,22 @@
 }
 @page {
   size: {{ paper }};
-  margin: 15mm 15mm 18mm;
-  @bottom-left { content: {{ footer|safe }}; font-family: Epilogue; font-size: 7pt; color: var(--color-ink-3); }
-  @bottom-right { content: {{ page_counter|safe }}; font-family: Epilogue; font-size: 7pt; color: var(--color-ink-3); }
+  margin: 14mm 15mm 16mm;
+  @bottom-left { content: {{ footer|safe }}; font-family: Epilogue; font-size: 6.5pt; color: var(--color-ink-3); }
+  @bottom-right { content: {{ page_counter|safe }}; font-family: Epilogue; font-size: 6.5pt; color: var(--color-ink-3); }
 }
 </style>
 </head>
 <body>
 <header class="brand">
-  <img src="wordmark.svg" alt="neVus">
+  <img src="wordmark.svg" alt="neVus" translate="no">
   <div class="title">
     <h1>{{ title }}</h1>
+    <p class="who">{{ person }}{% if born %} · {{ born }}{% endif %}</p>
     <p>{{ generated }}</p>
   </div>
 </header>
-<div class="notice">
-  <strong>{{ w("intended_use_title") }}</strong>
-  {{ w("intended_use") }}
-  <span class="secondary">{{ w("data_attached") }}</span>
-</div>
+<p class="intended-use">{{ w("intended_use") }}</p>
 {% block content %}{% endblock %}
 </body>
 </html>

@@ -4,9 +4,9 @@
 {% from "_closing.html" import closing with context %}
 {% block content %}
 <section class="appointment">
-  <p>{{ w("selection_marks") }}</p>
-  <ul>
-    {% for mark in records %}<li>{{ mark.number }}. {{ mark.title }} · {{ mark.zone }}</li>{% endfor %}
+  <p class="secondary">{{ w("selection_marks") }}</p>
+  <ul class="chosen">
+    {% for mark in records %}<li><span class="badge">{{ mark.number }}</span> {{ mark.title }}</li>{% endfor %}
   </ul>
 </section>
 {{ summary() }}

@@ -7,12 +7,12 @@
   <h2>{{ appointment.title }}</h2>
   {% if appointment.notes %}<p class="quote">{{ appointment.notes }}</p>{% endif %}
   {% if records %}
-  <p>{{ w("visit_marks") }}</p>
-  <ul>
-    {% for mark in records %}<li>{{ mark.number }}. {{ mark.title }} · {{ mark.zone }}</li>{% endfor %}
+  <p class="secondary">{{ w("visit_marks") }}</p>
+  <ul class="chosen">
+    {% for mark in records %}<li><span class="badge">{{ mark.number }}</span> {{ mark.title }}</li>{% endfor %}
   </ul>
   {% else %}
-  <p>{{ w("visit_no_marks") }}</p>
+  <p class="secondary">{{ w("visit_no_marks") }}</p>
   {% endif %}
 </section>
 {{ summary() }}

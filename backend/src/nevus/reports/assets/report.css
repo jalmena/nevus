@@ -1,4 +1,6 @@
-/* neVus reports. Colours come from nevus.reports.tokens (the light theme of the app's tokens); type is Epilogue. */
+/* neVus reports. Colours come from nevus.reports.tokens (the light theme of the app's tokens); type is Epilogue.
+   What a reader needs first is set large: who and when, each mark, its latest size and change, the photos and
+   the person's own words. Method notes and the intended-use statement are fine print. */
 
 @font-face {
   font-family: Epilogue;
@@ -22,8 +24,10 @@ html {
   font-family: Epilogue, sans-serif;
   font-weight: 500;
   font-size: 9pt;
-  line-height: 1.45;
+  line-height: 1.4;
   color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
 }
 
 body {
@@ -32,29 +36,26 @@ body {
 
 h1,
 h2,
-h3 {
+h3,
+h4 {
   margin: 0;
   font-weight: 600;
   line-height: 1.2;
+  break-after: avoid;
 }
 
-h2 {
-  margin: 16pt 0 6pt;
-  padding-bottom: 3pt;
+/* Section headings: the summary's (h2) and those inside a mark's record (h3) look the same. */
+h2,
+h3.section {
+  margin: 14pt 0 5pt;
+  padding-bottom: 2.5pt;
   border-bottom: 0.75pt solid var(--color-border);
-  font-size: 12pt;
+  font-size: 10.5pt;
   color: var(--color-accent);
-  break-after: avoid;
-}
-
-h3 {
-  margin: 0 0 4pt;
-  font-size: 10pt;
-  break-after: avoid;
 }
 
 p {
-  margin: 0 0 4pt;
+  margin: 0 0 3pt;
 }
 
 .secondary {
@@ -66,10 +67,25 @@ p {
   font-size: 7.5pt;
 }
 
-.numeric,
-table {
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum";
+.label {
+  margin: 0;
+  font-size: 7pt;
+  font-weight: 400;
+  color: var(--color-ink-2);
+}
+
+.quote {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  padding-left: 5pt;
+  border-left: 1.5pt solid var(--color-border);
+}
+
+[dir="rtl"] .quote {
+  padding-left: 0;
+  padding-right: 5pt;
+  border-left: 0;
+  border-right: 1.5pt solid var(--color-border);
 }
 
 /* The brand block always sits on the dark paper. */
@@ -77,87 +93,147 @@ table {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0 0 12pt;
-  padding: 10pt 14pt;
-  border-radius: 6pt;
+  margin: 0 0 5pt;
+  padding: 9pt 12pt;
+  border-radius: 5pt;
   background: var(--color-brand-paper);
   color: var(--color-brand-ink);
 }
 
 .brand img {
-  height: 26pt;
+  height: 22pt;
 }
 
 .brand .title {
   text-align: right;
 }
 
+[dir="rtl"] .brand .title {
+  text-align: left;
+}
+
 .brand h1 {
   font-size: 13pt;
 }
 
-.brand .title p {
-  margin: 2pt 0 0;
-  font-size: 8pt;
+.brand p {
+  margin: 1pt 0 0;
+  font-size: 7.5pt;
   font-weight: 400;
-  color: var(--color-brand-ink);
 }
 
-.identity {
+.brand .who {
+  margin-top: 2pt;
+  font-size: 9pt;
+  font-weight: 500;
+}
+
+/* The intended-use statement: always there, in fine print. */
+.intended-use {
+  margin: 0 0 8pt;
+  font-size: 7pt;
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--color-ink-2);
+}
+
+/* A mark's number, drawn like its marker on the body map. */
+.badge {
+  display: inline-block;
+  min-width: 11pt;
+  height: 11pt;
+  padding: 0;
+  border-radius: 5.5pt;
+  background: var(--color-marker);
+  color: #ffffff;
+  font-size: 6.5pt;
+  font-weight: 600;
+  line-height: 11pt;
+  text-align: center;
+  vertical-align: 1pt;
+}
+
+/* A mark's record opens with what it is, where, and its latest size and change. */
+.mark {
   display: flex;
   gap: 14pt;
   align-items: flex-start;
-}
-
-.facts {
-  flex: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6pt 14pt;
-  margin: 0;
-}
-
-.facts div {
   break-inside: avoid;
 }
 
-.facts dt {
-  font-size: 7.5pt;
+.mark .about {
+  flex: 1;
+  min-width: 0;
+}
+
+h2.mark-title {
+  margin: 0 0 3pt;
+  padding: 0;
+  border: 0;
+  font-size: 14pt;
+  color: var(--color-ink);
+}
+
+.mark-title .badge {
+  min-width: 15pt;
+  height: 15pt;
+  border-radius: 7.5pt;
+  font-size: 8.5pt;
+  line-height: 15pt;
+  vertical-align: 2pt;
+}
+
+.where {
+  margin: 0;
+  font-size: 10pt;
+}
+
+.figures {
+  display: flex;
+  gap: 28pt;
+  margin: 9pt 0 8pt;
+}
+
+.figures p {
+  margin: 0;
+}
+
+.figures .value {
+  font-size: 14pt;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.change-yes,
+.figures .value.change-yes {
+  font-weight: 600;
+}
+
+.empty {
+  margin: 9pt 0 8pt;
   color: var(--color-ink-2);
   font-weight: 400;
 }
 
-.facts dd {
-  margin: 0;
-}
-
 .map {
   flex: none;
-  text-align: center;
 }
 
-.notice {
-  margin: 0 0 12pt;
-  padding: 7pt 10pt;
-  border: 0.75pt solid var(--color-border);
-  border-left: 3pt solid var(--color-accent);
-  border-radius: 4pt;
-  background: var(--color-surface);
-  font-size: 8pt;
-  break-inside: avoid;
+.chart {
+  margin: 0 0 2pt;
 }
 
-.notice strong {
-  display: block;
-  margin-bottom: 2pt;
+.chart figcaption {
+  font-size: 7pt;
   font-weight: 600;
+  color: var(--color-ink-2);
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  margin: 4pt 0 6pt;
-  font-size: 8pt;
+  margin: 2pt 0 4pt;
+  font-size: 8.5pt;
 }
 
 th,
@@ -166,10 +242,18 @@ td {
   border-bottom: 0.5pt solid var(--color-border);
   text-align: left;
   vertical-align: top;
+  overflow-wrap: break-word;
+}
+
+[dir="rtl"] th,
+[dir="rtl"] td {
+  text-align: right;
 }
 
 th {
-  font-weight: 600;
+  padding-top: 0;
+  font-size: 7pt;
+  font-weight: 400;
   color: var(--color-ink-2);
 }
 
@@ -181,35 +265,82 @@ tr {
   break-inside: avoid;
 }
 
-.change-yes {
-  font-weight: 600;
+.marks .no {
+  width: 14pt;
+  text-align: center;
 }
 
-.chart {
-  margin: 4pt 0 2pt;
+.marks .size {
+  white-space: nowrap;
 }
 
+/* Visits: the photos with their scale bar, and beside them what was measured and said. Three photos and the
+   text still fit across an A4 page. Margins rather than flex gaps keep the widths exact. */
 .visit {
-  margin: 0 0 10pt;
-  padding: 8pt 0 0;
-  border-top: 0.5pt solid var(--color-border);
+  display: flex;
+  align-items: flex-start;
+  padding: 7pt 0;
+  border-bottom: 0.5pt solid var(--color-border);
   break-inside: avoid;
 }
 
-.photos {
-  display: flex;
-  gap: 8pt;
-  margin: 4pt 0;
+.visit .told {
+  flex: 1;
+  min-width: 0;
 }
 
-figure {
-  width: 160pt;
+.visit .photos + .told {
+  margin-left: 12pt;
+}
+
+[dir="rtl"] .visit .photos + .told {
+  margin-left: 0;
+  margin-right: 12pt;
+}
+
+.visit h4 {
+  margin: 0 0 3pt;
+  font-size: 9.5pt;
+}
+
+.visit p {
+  margin: 0 0 3pt;
+}
+
+.fine {
+  margin-top: 5pt;
+  font-size: 7pt;
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--color-ink-2);
+}
+
+.fine p {
+  margin: 0 0 1.5pt;
+}
+
+.photos {
+  flex: none;
+  display: flex;
+}
+
+.photos figure {
+  width: 116pt;
   margin: 0;
+}
+
+.photos figure + figure {
+  margin-left: 6pt;
+}
+
+[dir="rtl"] .photos figure + figure {
+  margin-left: 0;
+  margin-right: 6pt;
 }
 
 .frame {
   position: relative;
-  width: 160pt;
+  width: 116pt;
   overflow: hidden;
   border-radius: 3pt;
   background: var(--color-surface-2);
@@ -226,110 +357,101 @@ figure {
 
 .scalebar {
   position: absolute;
-  left: 6pt;
-  bottom: 6pt;
-  height: 2.2pt;
+  left: 5pt;
+  bottom: 5pt;
+  height: 2pt;
   background: var(--color-ink);
   border: 0.8pt solid #ffffff;
 }
 
 .scalebar span {
   position: absolute;
-  bottom: 4pt;
+  bottom: 3.5pt;
   left: -1pt;
   padding: 0 2pt;
   border-radius: 2pt;
   background: #ffffff;
-  font-size: 6.5pt;
+  font-size: 6pt;
   font-weight: 600;
   white-space: nowrap;
 }
 
-figcaption {
-  margin-top: 2pt;
-  font-size: 7pt;
-  color: var(--color-ink-2);
-}
-
-.parts {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 8pt;
-  margin-top: 4pt;
-}
-
-.part h4 {
-  margin: 0 0 2pt;
-  font-size: 7.5pt;
-  font-weight: 600;
-  color: var(--color-ink-2);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.part p,
-.part ul {
+figure {
   margin: 0;
-  font-size: 8pt;
 }
 
-.part ul {
-  padding-left: 10pt;
-}
-
-.quote {
-  white-space: pre-wrap;
-}
-
-.clinician {
-  height: 100pt;
-  margin-top: 4pt;
-  border: 0.75pt solid var(--color-border);
-  border-radius: 4pt;
-  background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 17pt, var(--color-surface-2) 17pt, var(--color-surface-2) 18pt);
-  break-inside: avoid;
+figcaption {
+  margin-top: 1.5pt;
+  font-size: 7pt;
+  font-weight: 400;
+  color: var(--color-ink-2);
 }
 
 .bodymaps {
   display: flex;
   justify-content: center;
-  gap: 30pt;
-  margin: 6pt 0;
+  align-items: flex-end;
+  gap: 28pt;
+  margin: 4pt 0 0;
 }
 
 .bodymaps figure {
-  width: auto;
   text-align: center;
 }
 
-.highlight {
-  margin: 0 0 3pt;
+.appointment h2 {
+  margin-top: 4pt;
 }
 
-.keep {
-  break-after: avoid;
+.chosen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3pt 16pt;
+  margin: 2pt 0 0;
+  padding: 0;
+  list-style: none;
 }
 
-/* The visit history starts on its own page: photos read better together than split by a page end. */
-h2.visits {
+/* In a report of several marks, the records start on a new page after the summary, then follow one another. */
+.marks + .record {
   break-before: page;
-  margin-top: 0;
 }
 
-.together {
+.record + .record {
+  margin-top: 18pt;
+  padding-top: 12pt;
+  border-top: 1pt solid var(--color-ink-3);
+}
+
+.clinician {
   break-inside: avoid;
 }
 
-/* In an appointment's report, each mark's record starts on a new page after the summary. */
-.record {
-  break-before: page;
+.clinician .lines {
+  height: 90pt;
+  border: 0.75pt solid var(--color-border);
+  border-radius: 4pt;
+  background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 17pt, var(--color-surface-2) 17pt, var(--color-surface-2) 18pt);
 }
 
-.record h2.visits {
-  break-before: auto;
+/* Methods and where the data is: fine print at the very end. */
+.fine-print {
+  margin-top: 12pt;
+  font-size: 7pt;
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--color-ink-2);
+  break-inside: avoid;
 }
 
-.appointment ul {
-  margin: 2pt 0 8pt;
-  padding-left: 14pt;
+.fine-print h2 {
+  margin: 0 0 1.5pt;
+  padding: 0;
+  border: 0;
+  font-size: 7pt;
+  color: var(--color-ink-2);
+}
+
+.fine-print p {
+  margin: 0 0 2pt;
 }
