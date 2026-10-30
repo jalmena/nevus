@@ -8,6 +8,8 @@
 
 html {
   text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent; /* every control draws its own pressed state */
+  touch-action: manipulation; /* no double-tap zoom delay; the body map and the canvases set their own */
 }
 
 body {
@@ -28,10 +30,12 @@ h3 {
   margin: 0;
   font-weight: var(--font-weight-emphasis);
   line-height: var(--leading-heading);
+  text-wrap: balance;
 }
 
 p {
   margin: 0;
+  text-wrap: pretty;
 }
 
 /* Form controls use the app's type, not the browser's. */
@@ -42,17 +46,11 @@ textarea {
   font: inherit;
 }
 
-/* Pages keep a text column inside the shell; a page marked wide lays its panes across the whole shell. */
+/* Pages keep a text column, centred in the shell; a page marked wide lays its panes across the whole shell. */
 .app-main > :not(.page-wide) {
   width: 100%;
   max-width: 44rem;
   margin-inline: auto;
-}
-
-@media (width >= 900px) {
-  .app-main > :not(.page-wide) {
-    margin-inline: 0;
-  }
 }
 
 .text-secondary {

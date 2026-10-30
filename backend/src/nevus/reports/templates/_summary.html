@@ -1,13 +1,6 @@
 {% macro summary() %}
-<section>
-  <dl class="facts">
-    <div><dt>{{ w("person") }}</dt><dd>{{ person }}{% if born %} · {{ born }}{% endif %}</dd></div>
-    <div><dt>{{ w("summary_marks") }}</dt><dd>{{ lesions|length }}</dd></div>
-  </dl>
-</section>
-
-<h2>{{ w("map_title") }}</h2>
 {% if lesions %}
+<h2>{{ w("map_title") }}</h2>
 <div class="bodymaps">
   <figure>{{ front|safe }}<figcaption>{{ w("front") }}</figcaption></figure>
   <figure>{{ back|safe }}<figcaption>{{ w("back") }}</figcaption></figure>
@@ -15,32 +8,28 @@
 </div>
 
 <h2>{{ w("summary_marks") }}</h2>
-<table>
+<table class="marks">
   <thead><tr>
-    <th>{{ w("summary_number") }}</th><th>{{ w("mark") }}</th><th>{{ w("location") }}</th>
-    <th>{{ w("summary_latest") }}</th><th>{{ w("summary_last_visit") }}</th><th>{{ w("summary_next") }}</th>
+    <th class="no">{{ w("summary_number") }}</th><th>{{ w("mark") }}</th><th>{{ w("summary_latest") }}</th>
+    <th>{{ w("change") }}</th><th>{{ w("summary_last_visit") }}</th>
   </tr></thead>
   <tbody>
   {% for mark in lesions %}
     <tr>
-      <td>{{ mark.number }}</td>
-      <td>{{ mark.title }}{% if mark.status != w("status_active") %}<br><span class="secondary small">{{ mark.status }}</span>{% endif %}</td>
-      <td>{{ mark.zone }} · {{ mark.view }}</td>
-      <td>{{ mark.latest }}</td>
+      <td class="no"><span class="badge">{{ mark.number }}</span></td>
+      <td>{{ mark.title }}<br><span class="secondary small">{% if mark.title != mark.zone %}{{ mark.zone }} · {% endif %}{{ mark.view }}{% if mark.status != w("status_active") %} · {{ mark.status }}{% endif %}</span></td>
+      <td class="size">{{ mark.latest }}</td>
+      <td>
+        {% if mark.change %}
+        <span class="{{ 'change-yes' if mark.change.detectable else '' }}">{{ mark.change.value }}</span><br>
+        <span class="secondary small">{{ w("measured_change") if mark.change.detectable else w("no_detectable_change") }} · {{ mark.change.since }}</span>
+        {% else %}—{% endif %}
+      </td>
       <td>{{ mark.last_visit }}</td>
-      <td>{{ mark.next }}</td>
     </tr>
   {% endfor %}
   </tbody>
 </table>
-
-<h2>{{ w("highlights_title") }}</h2>
-<p class="secondary">{{ w("highlights_intro") }}</p>
-{% for mark in highlights %}
-  <p class="highlight">{{ mark.number }}. {{ mark.title }}: <span class="change-yes">{{ mark.change.value }}</span> {{ mark.change.since }} ({{ w("measured_change") }})</p>
-{% else %}
-  <p>{{ w("highlights_none") }}</p>
-{% endfor %}
 {% else %}
 <p>{{ w("no_marks") }}</p>
 {% endif %}

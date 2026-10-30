@@ -44,7 +44,14 @@ def test_each_piece_is_one_mesh_of_closed_bodies_with_the_ink_sunk_into_the_plat
         # The ink starts below the plate's top, so the shells overlap and the slicer unites them into one solid.
         assert abs(ink_points[:, 2].min() - (card_mesh.PLATE_MM - card_mesh.OVERLAP_MM)) < 1e-9
         assert ink_points[:, 2].min() < card_mesh.PLATE_MM
-        assert abs(ink_points[:, 2].max() - card_mesh.PLATE_MM - card_mesh.INK_MM) < 1e-9
+        # The ink tops out at the ink height, but for the grey square, which stands two layers higher.
+        tops = sorted({round(float(max(v[2] for tri in body for v in tri)), 6) for body in ink})
+        assert tops == [card_mesh.INK_Z1, card_mesh.INK_Z1 + card_mesh.GREY_MM]
+        grey = [body for body in ink if max(v[2] for tri in body for v in tri) > card_mesh.INK_Z1 + 1e-9]
+        assert len(grey) == 1, f"{card.name}: only the grey square stands higher"
+        corners = np.array([v for tri in grey[0] for v in tri])
+        _x, _y, side, _ = card.grey
+        assert abs(np.ptp(corners[:, 0]) - side) < 1e-6 and abs(np.ptp(corners[:, 1]) - side) < 1e-6
 
 
 def _signed_volume(body: list[card_mesh.Tri]) -> float:
@@ -196,3 +203,24 @@ def test_the_lockup_is_raised_on_both_pieces_with_its_openings_kept() -> None:
         inside = (tops[:, 0] > left) & (tops[:, 0] < left + width) & (tops[:, 1] > plate_h - top - m - height)
         inside &= tops[:, 1] < plate_h - top - m
         assert inside.sum() > 100, f"{card.name}: the lockup is not raised where it belongs"
+
+
+def _stroke_widths(boxes: list[lockup.Box], width: float, height: float, step: float) -> np.ndarray:
+    """The width of every stroke along its middle line, in mm: twice the distance to the nearest background."""
+    mask = np.zeros((round(height / step) + 20, round(width / step) + 20), np.uint8)
+    for x, y, w, h in boxes:
+        mask[10 + round(y / step) : 10 + round((y + h) / step), 10 + round(x / step) : 10 + round((x + w) / step)] = 1
+    distance = cv2.distanceTransform(mask, cv2.DIST_L2, 5)
+    ridge = (distance >= cv2.dilate(distance, np.ones((3, 3))) - 1e-6) & (distance > 0)
+    return 2 * distance[ridge] * step
+
+
+def test_no_raised_stroke_is_finer_than_a_041_mm_line() -> None:
+    """What a 0.4 mm nozzle at 0.41 mm lines can draw: the bars, the frame and every stroke of both lockups."""
+    assert card_mesh.MIN_BAR_MM >= 0.41 and card_mesh.FRAME_MM >= 0.41
+    step = 0.02
+    for card in (WINDOW, STRIP):
+        _top, cap_mm = card_mesh.LOCKUPS[card.name]
+        boxes, width, height = lockup.boxes(cap_mm, step, hinge_hole=card.name not in card_mesh.SOLID_HINGE)
+        widths = _stroke_widths(boxes, width, height, step)
+        assert np.percentile(widths, 1) >= 0.41, f"{card.name}: {np.percentile(widths, 1):.2f} mm strokes"

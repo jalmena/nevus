@@ -31,7 +31,7 @@ describe("claiming and signing in", () => {
     await user.type(screen.getByLabelText("Password"), "correct horse battery");
     await user.type(screen.getByLabelText("Repeat the password"), "correct horse battery");
     await user.click(screen.getByRole("button", { name: "Create the administrator" }));
-    expect(await screen.findByRole("heading", { name: "Persons" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "People" })).toBeInTheDocument();
     expect(state.calls.some((c) => c.method === "POST" && c.url.endsWith("/api/auth/claim"))).toBe(true);
     expect(state.session?.username).toBe("jose");
   });

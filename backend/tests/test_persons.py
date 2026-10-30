@@ -74,4 +74,20 @@ def test_validation_of_person_fields(client: TestClient) -> None:
     )
 
 
+def test_a_persons_anatomy_is_chosen_part_by_part_and_unset_by_default(client: TestClient) -> None:
+    claim(client)
+    person = client.post("/api/persons", json={"display_name": "Ana"}).json()
+    assert person["chest"] is None and person["genitals"] is None
+    url = f"/api/persons/{person['id']}"
+    changed = client.patch(url, json={"chest": "breasts", "genitals": "penis"}).json()
+    assert (changed["chest"], changed["genitals"]) == ("breasts", "penis")
+    assert client.patch(url, json={"genitals": "vulva"}).json()["genitals"] == "vulva"
+    assert client.patch(url, json={"chest": "flat"}).status_code == 422
+    assert client.patch(url, json={"genitals": "other"}).status_code == 422
+    cleared = client.patch(url, json={"chest": None, "genitals": None}).json()
+    assert cleared["chest"] is None and cleared["genitals"] is None
+    created = client.post("/api/persons", json={"display_name": "Leo", "genitals": "vulva"}).json()
+    assert created["genitals"] == "vulva" and created["chest"] is None
+
+
 __all__ = ["ADMIN"]

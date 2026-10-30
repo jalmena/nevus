@@ -130,9 +130,15 @@ class Marker:
 
 
 def body_view(
-    view: str, markers: Sequence[Marker], zone: str | None = None, height: float = 230, radius: float = 5.5
+    view: str,
+    markers: Sequence[Marker],
+    zone: str | None = None,
+    height: float = 230,
+    radius: float = 5.5,
+    anatomy: Sequence[str] = (),
 ) -> str:
-    """One view of the silhouette with numbered markers; the mark's own zone shaded when given."""
+    """One view of the silhouette with numbered markers; the mark's own zone shaded when given; with the
+    landmarks, and the parts of the person's anatomy on the front, as the app draws them."""
     data = body_map()
     side: View = view if view in ("front", "back", "head", "hands", "feet") else "front"  # type: ignore[assignment]
     vx, vy, vw, vh = data.viewBox
@@ -143,6 +149,17 @@ def body_view(
         f'height="{height:.0f}" role="img">',
         f'<path d="{data.views[side].silhouette}" fill="{c["surface-2"]}" stroke="{c["ink-3"]}" stroke-width="0.8"/>',
     ]
+    # The anatomy lies over what is under it, the gap between the legs included.
+    parts.extend(
+        f'<path d="{shape.path}" fill="{c["surface-2"]}"/>'
+        for shape in data.zones
+        if shape.view == side and shape.part is not None and shape.part in anatomy
+    )
+    details = data.views[side].details + "".join(data.views[side].details_by_part.get(part, "") for part in anatomy)
+    if details:
+        parts.append(
+            f'<path d="{details}" fill="none" stroke="{c["ink-3"]}" stroke-width="0.6" stroke-linecap="round"/>'
+        )
     if zone:
         shape = data.zone(zone)
         if shape is not None and shape.view == view:

@@ -30,7 +30,7 @@ export async function signIn(page: Page) {
   } else {
     await page.getByRole("button", { name: "Sign in", exact: true }).click();
   }
-  await expect(page.getByRole("heading", { name: "Persons", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "People", exact: true })).toBeVisible();
 }
 
 /** A visit with a photo of the card, and the 5 mm disc in its window measured. */

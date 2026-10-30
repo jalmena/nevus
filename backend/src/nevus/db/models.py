@@ -125,6 +125,9 @@ class Person(Base):
     display_name: Mapped[str] = mapped_column(String(120), nullable=False)
     birth_year: Mapped[int | None] = mapped_column(Integer)
     skin_tone: Mapped[str | None] = mapped_column(String(16))
+    # The anatomy the body map draws, each part on its own: "breasts" or unset; "vulva", "penis" or unset.
+    chest: Mapped[str | None] = mapped_column(String(8))
+    genitals: Mapped[str | None] = mapped_column(String(8))
     owner_user_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("users.id", ondelete="RESTRICT"), nullable=False)
     experimental_analysis: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     created_at: Mapped[datetime] = mapped_column(UTCDateTime, nullable=False, default=utcnow)

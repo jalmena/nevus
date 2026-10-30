@@ -118,10 +118,17 @@ class SudoIn(BaseModel):
     password: str | None = Field(default=None, min_length=1, max_length=1024, description="Not used in proxy mode")
 
 
+# Anatomy, not identity, and each part on its own, so every body can be drawn: it only decides what the map shows.
+Chest = Literal["breasts"]
+Genitals = Literal["vulva", "penis"]
+
+
 class PersonIn(BaseModel):
     display_name: str = Field(min_length=1, max_length=120)
     birth_year: int | None = Field(default=None, ge=1900, le=2100)
     skin_tone: str | None = Field(default=None, max_length=16)
+    chest: Chest | None = None
+    genitals: Genitals | None = None
 
     @field_validator("display_name")
     @classmethod
@@ -136,6 +143,8 @@ class PersonUpdate(BaseModel):
     display_name: str | None = Field(default=None, min_length=1, max_length=120)
     birth_year: int | None = Field(default=None, ge=1900, le=2100)
     skin_tone: str | None = Field(default=None, max_length=16)
+    chest: Chest | None = None
+    genitals: Genitals | None = None
     experimental_analysis: bool | None = None
 
 
@@ -146,6 +155,8 @@ class PersonOut(BaseModel):
     display_name: str
     birth_year: int | None
     skin_tone: str | None
+    chest: Chest | None
+    genitals: Genitals | None
     owner_user_id: uuid.UUID
     experimental_analysis: bool
     created_at: datetime

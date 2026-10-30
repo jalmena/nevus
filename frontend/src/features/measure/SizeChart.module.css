@@ -120,16 +120,6 @@
   text-decoration: none;
 }
 
-.linkLabel {
-  display: none;
-}
-
-@media (width >= 900px) {
-  .linkLabel {
-    display: inline;
-  }
-}
-
 .iconLink:hover {
   background: var(--color-surface-2);
 }

@@ -30,6 +30,7 @@
   --color-photo-frame: #e9e3da;
   --color-marker: #2b2a28;
   --color-marker-selected: #1f6f6b;
+  --color-map-shade: rgb(43 42 40 / 14%); /* the backs of the hands and the tops of the feet: always darker */
 
   /* Data series: validated with the dataviz checks (lightness band, chroma floor, 3:1 on surface). */
   --color-chart-1: #0b9488;
@@ -100,6 +101,7 @@
     --color-photo-frame: #2e2d33;
     --color-marker: #ede8e0;
     --color-marker-selected: #5fb3ae;
+    --color-map-shade: rgb(0 0 0 / 24%);
     --color-chart-1: #1da09a;
     --shadow-1: 0 1px 2px rgb(0 0 0 / 40%), 0 2px 8px rgb(0 0 0 / 30%);
     --shadow-2: 0 6px 24px rgb(0 0 0 / 50%);
@@ -124,6 +126,7 @@
   --color-photo-frame: #2e2d33;
   --color-marker: #ede8e0;
   --color-marker-selected: #5fb3ae;
+  --color-map-shade: rgb(0 0 0 / 24%);
   --color-chart-1: #1da09a;
   --shadow-1: 0 1px 2px rgb(0 0 0 / 40%), 0 2px 8px rgb(0 0 0 / 30%);
   --shadow-2: 0 6px 24px rgb(0 0 0 / 50%);

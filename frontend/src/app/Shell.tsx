@@ -174,9 +174,8 @@ function Rail() {
     [styles.railItem, isActive ? styles.railActive : ""].join(" ");
   return (
     <nav className={styles.rail} aria-label={t("shell.navigation")} data-chrome="rail">
-      <Link to="/" className={styles.railBrand} aria-label={t("app.name")}>
-        <Mark size={36} />
-        <span>{t("app.name")}</span>
+      <Link to="/" className={styles.railBrand}>
+        <img src="/brand/wordmark-dark.svg" alt={t("app.name")} width={112} height={52} />
       </Link>
       <NavLink to="/" end className={item}>
         <Users aria-hidden="true" />

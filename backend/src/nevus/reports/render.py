@@ -134,10 +134,8 @@ def _measurement_row(m: dict[str, Any], words: Words, zone: ZoneInfo) -> dict[st
         "longest": words.mm(m["longest_mm"], m["sigma_longest_mm"]),
         "across": words.mm(m["perpendicular_mm"], m["sigma_perpendicular_mm"]),
         "area": words.area(m["area_mm2"], m["sigma_area_mm2"]),
-        "scale": words(f"scale_{m['scale_kind']}") if m.get("scale_kind") in ("card", "coin", "manual") else "",
         "shape": _shape_words(m.get("descriptors"), words),
         "colour": _colour_words(m.get("descriptors"), words),
-        "tilt": "" if m.get("tilt_deg") is None else f"{words.number(m['tilt_deg'], 0)}°",
         "change": None
         if change is None
         else {
@@ -151,17 +149,6 @@ def _measurement_row(m: dict[str, Any], words: Words, zone: ZoneInfo) -> dict[st
 
 def _title(lesion: dict[str, Any], words: Words) -> str:
     return str(lesion["label"] or words.zone(lesion["zone"]))
-
-
-def _due_state(lesion: dict[str, Any], words: Words, zone: ZoneInfo, today: date) -> str:
-    if lesion["status"] != "active" or not lesion["next_due_on"]:
-        return words("not_followed")
-    next_on = date.fromisoformat(lesion["next_due_on"])
-    if lesion.get("snoozed_until") and date.fromisoformat(lesion["snoozed_until"]) >= today:
-        return f"{words.short_day(next_on)} · {words('snoozed')}"
-    if lesion["due"]:
-        return f"{words.short_day(next_on)} · {words('overdue') if next_on < today else words('due_now')}"
-    return words.short_day(next_on)
 
 
 def context(payload: dict[str, Any]) -> dict[str, Any]:
@@ -220,26 +207,26 @@ def context(payload: dict[str, Any]) -> dict[str, Any]:
                 "first_noticed": words.day(date.fromisoformat(lesion["first_noticed_on"]))
                 if lesion["first_noticed_on"]
                 else words("unknown"),
-                "interval": words("days", n=lesion["interval_days"]),
                 "notes": lesion["notes"],
                 "rows": [_measurement_row(m, words, zone) for m in measurements],
-                "chart": svg.size_chart(points, words) if len(points) >= 2 else "",
+                "chart": svg.size_chart(points, words, width=680, height=150) if len(points) >= 2 else "",
                 "map": svg.body_view(
                     lesion["view"],
                     [svg.Marker(lesion["x"], lesion["y"], "", lesion["view"], highlighted=True)],
                     zone=lesion["zone"],
-                    height=200,
+                    height=150,
+                    radius=7,
+                    anatomy=person.get("anatomy", ()),
                 ),
                 "visits": visits,
                 "latest": words.mm(latest["longest_mm"], latest["sigma_longest_mm"]) if latest else "—",
                 "last_visit": _short(words, _local(lesion["last_observed_at"], zone)),
-                "next": _due_state(lesion, words, zone, generated.date()),
                 "change": None
                 if not change
                 else {
                     "value": words.mm(change["delta_mm"], change["sigma_mm"], sign=True),
                     "detectable": change["detectable"],
-                    "since": words("since", date=words.day(_local(measurements[-2]["captured_at"], zone))),
+                    "since": words("since", date=_short(words, _local(measurements[-2]["captured_at"], zone))),
                 },
             }
         )
@@ -277,14 +264,13 @@ def context(payload: dict[str, Any]) -> dict[str, Any]:
         "person": person["name"],
         "born": words("born", year=person["birth_year"]) if person.get("birth_year") else None,
         "lesions": lesions,
-        "front": svg.body_view("front", markers, height=300, radius=8),
-        "back": svg.body_view("back", markers, height=300, radius=8),
+        "front": svg.body_view("front", markers, height=250, radius=10, anatomy=person.get("anatomy", ())),
+        "back": svg.body_view("back", markers, height=250, radius=10),
         "details": [
-            (view, svg.body_view(view, markers, height=300, radius=8))
+            (view, svg.body_view(view, markers, height=250, radius=10))
             for view in ("head", "hands", "feet")
             if any(raw["view"] == view for raw in payload["lesions"])
         ],
-        "highlights": [lesion for lesion in lesions if lesion["change"] and lesion["change"]["detectable"]],
         "methods_scale": words("methods_scale", kinds=", ".join(words(f"scale_{k}") for k in scale_kinds))
         if scale_kinds
         else None,

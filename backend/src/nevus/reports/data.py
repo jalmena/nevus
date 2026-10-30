@@ -243,7 +243,12 @@ def gather(
         "generated_at": utcnow().isoformat(),
         "timezone": settings.effective_timezone,
         "version": nevus.__version__,
-        "person": {"id": str(person.id), "name": person.display_name, "birth_year": person.birth_year},
+        "person": {
+            "id": str(person.id),
+            "name": person.display_name,
+            "birth_year": person.birth_year,
+            "anatomy": [part for part in (person.chest, person.genitals) if part],
+        },
         "lesions": lesions_data,
         "records": [lesion["id"] for lesion in lesions_data if lesion["id"] in with_records],
         "appointment": appointment,

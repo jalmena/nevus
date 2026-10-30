@@ -15,6 +15,7 @@
   position: sticky;
   top: 0;
   z-index: 10;
+  background: var(--color-paper);
 }
 
 .main {
@@ -29,8 +30,10 @@
   min-height: 100vh;
 }
 
+/* Wide pages use a large screen; text pages keep their own column (base.css). */
 .desktop .main {
-  max-width: 72rem;
+  max-width: 100rem;
+  margin-inline: auto; /* on a very wide screen the page sits in the middle, not against the rail */
   padding: 0 var(--space-6) var(--space-8);
 }
 
@@ -44,9 +47,13 @@
   background: var(--color-paper);
 }
 
+/* As wide as the content below it, so the actions end where the page does on a wide screen. */
 .appBarDesktop {
+  width: 100%;
+  max-width: 100rem;
+  margin-inline: auto;
   min-height: 64px;
-  padding: 0 var(--space-4);
+  padding: 0 var(--space-6) 0 var(--space-4);
 }
 
 .lead,
@@ -155,17 +162,25 @@
   background: var(--color-surface);
 }
 
+/* The wordmark on its dark paper, as everywhere the brand appears, centred on the rail and as tall as the app
+   bar beside it. */
 .railBrand {
   display: flex;
+  flex: none;
   align-items: center;
-  gap: var(--space-3);
-  min-height: var(--touch-target);
-  margin-bottom: var(--space-3);
-  padding: 0 var(--space-3);
-  color: var(--color-ink);
-  font-size: var(--text-lg);
-  font-weight: var(--font-weight-emphasis);
-  text-decoration: none;
+  justify-content: center;
+  height: 64px;
+  margin: calc(-1 * var(--space-4)) calc(-1 * var(--space-3)) var(--space-3);
+  background: var(--color-brand-paper);
+}
+
+.railBrand img {
+  display: block;
+}
+
+.railBrand:focus-visible {
+  border-radius: 0;
+  box-shadow: inset 0 0 0 2px var(--color-brand-accent);
 }
 
 .railItem {

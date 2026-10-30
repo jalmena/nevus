@@ -17,6 +17,11 @@
   stroke-linejoin: round;
 }
 
+.partBase {
+  fill: var(--color-surface-2);
+  pointer-events: none;
+}
+
 .zone {
   fill: transparent;
   stroke: var(--color-border);
@@ -136,17 +141,37 @@
   cursor: default;
 }
 
-/* The backs of the hands and the tops of the feet sit under the palms and soles; a deeper tint tells them apart. */
-.reverse {
-  fill: var(--color-ink);
-  fill-opacity: 0.14;
+/* The backs of the hands and the tops of the feet, the upper row of their views: a deeper tint tells them apart. */
+.reverse:not(.selected, :hover, :focus-visible) {
+  fill: var(--color-map-shade);
 }
 
-.caption {
-  fill: var(--color-ink-2);
-  font-family: var(--font-ui);
-  font-size: 11px;
-  font-weight: var(--font-weight-emphasis);
-  letter-spacing: 0.02em;
+/* The head, hands and feet on the front and the back: veiled with the paper, since they have their own views. */
+.sketched {
+  fill: var(--color-paper);
+  fill-opacity: 0.65;
+  stroke: none;
+  cursor: pointer;
+  transition: fill-opacity var(--motion-fast) var(--ease);
+}
+
+.sketched:hover {
+  fill-opacity: 0.4;
+}
+
+.sketched:focus-visible {
+  fill-opacity: 0.4;
+  stroke: var(--color-accent);
+  stroke-width: 1.2;
+  outline: none;
+}
+
+/* Landmarks that help place a mark (nipples, navel, face, nails): drawn, never tapped. */
+.details {
+  fill: none;
+  stroke: var(--color-ink-3);
+  stroke-width: 0.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
   pointer-events: none;
 }

@@ -100,6 +100,8 @@ export function PersonPage() {
             onPlace={(next) => placing && setPoint(next)}
             placing={placing}
             onSelectMarker={(id) => void navigate(`/lesions/${id}`)}
+            onOpenView={changeView}
+            anatomy={[person.data?.chest, person.data?.genitals].filter((part) => part != null)}
           />
           <div className={styles.zoneLine}>
             {zone && !placing && (

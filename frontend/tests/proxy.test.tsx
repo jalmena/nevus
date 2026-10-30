@@ -37,7 +37,7 @@ describe("behind a single sign-on proxy", () => {
     state.session = SESSION;
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "I have signed in" }));
-    expect(await screen.findByRole("heading", { name: "Persons" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "People" })).toBeInTheDocument();
   });
 
   it("confirms a destructive action without asking for a password", async () => {

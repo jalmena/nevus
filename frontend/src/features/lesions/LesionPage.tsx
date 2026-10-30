@@ -1,4 +1,4 @@
-import { Bell, BellOff, Clock, Columns2, FileText, Pencil, Trash2, TriangleAlert } from "lucide-react";
+import { Bell, BellOff, Clock, Columns2, FileText, Pencil, Trash2 } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
@@ -7,7 +7,6 @@ import { Button } from "@/design-system/components/Button";
 import { EmptyState } from "@/design-system/components/EmptyState";
 import { Notice } from "@/design-system/components/Notice";
 import { PageHeader } from "@/design-system/components/PageHeader";
-import { Row, RowList } from "@/design-system/components/Row";
 import { Section } from "@/design-system/components/Section";
 import { Select } from "@/design-system/components/Select";
 import { Sheet } from "@/design-system/components/Sheet";
@@ -20,7 +19,6 @@ import { Sightings } from "@/features/sessions/Sightings";
 import { shortDate } from "@/lib/dates";
 import { useSession } from "@/lib/auth/session";
 import { useConfirm } from "@/lib/confirm/ConfirmProvider";
-import { thumbOf } from "@/lib/images";
 import {
   INTERVALS,
   useCreateObservation,
@@ -34,6 +32,7 @@ import { personRail } from "@/features/persons/personRail";
 import { usePerson } from "@/lib/persons";
 import { useSnooze } from "@/lib/reminders";
 import { lesionTitle, zoneName } from "./lesionName";
+import { VisitTimeline } from "./VisitTimeline";
 import styles from "./lesions.module.css";
 
 /** One mark: what it is and where, its latest size, and its visits newest first. */
@@ -206,39 +205,12 @@ export function LesionPage() {
             <EmptyState>{t("observations.emptyText")}</EmptyState>
           )}
           {observations.data && observations.data.length > 0 && (
-            <Section title={t("observations.title")} className={styles.visits}>
-              <RowList>
-                {observations.data.map((visit) => (
-                  <Row
-                    key={visit.id}
-                    to={`/observations/${visit.id}`}
-                    title={<span className="numeric">{shortDate(locale, visit.captured_local_date)}</span>}
-                    extra={
-                      visit.images.length > 0 ? (
-                        <span className={styles.visitThumbs}>
-                          {visit.images.slice(0, 4).map((image) => (
-                            <img key={image.id} src={thumbOf(image)} alt="" loading="lazy" />
-                          ))}
-                        </span>
-                      ) : undefined
-                    }
-                    meta={
-                      <>
-                        {[
-                          t("observations.photoCount", { count: visit.images.length }),
-                          ...visit.symptoms.map((symptom) => t(`observations.symptoms.${symptom}`)),
-                        ].join(" · ")}
-                        {visit.quality_flags.length > 0 && (
-                          <span className={styles.qualityMeta}>
-                            <TriangleAlert aria-hidden="true" /> {t("quality.short")}
-                          </span>
-                        )}
-                      </>
-                    }
-                    chevron={false}
-                  />
-                ))}
-              </RowList>
+            <Section title={t("observations.title")}>
+              <VisitTimeline
+                lesionId={data.id}
+                visits={observations.data}
+                showUncertainty={showUncertainty}
+              />
             </Section>
           )}
         </div>

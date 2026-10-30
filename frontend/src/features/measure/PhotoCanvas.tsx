@@ -10,6 +10,8 @@ import {
   type ReactNode,
   type WheelEvent,
 } from "react";
+import { Lasso, Move, ZoomIn, ZoomOut } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { Point } from "@/lib/measurements";
 import styles from "./measure.module.css";
 
@@ -47,7 +49,14 @@ const PAN_KEYS: Record<string, [number, number]> = {
   ArrowDown: [0, 1],
 };
 
-/** The photo in its own pixel coordinates, with zoom and pan by wheel, pinch and drag; a tap reports a point. */
+/** The most points an outline may carry (the API's limit); a longer trace keeps every n-th point. */
+const MAX_OUTLINE_POINTS = 400;
+
+/**
+ * The photo in its own pixel coordinates, with zoom and pan by wheel, pinch and drag; a tap reports a point.
+ * With `tools`, buttons over the photo zoom in and out and, given `onDraw`, switch a drag between moving the
+ * photo and tracing an outline by hand.
+ */
 export function PhotoCanvas({
   src,
   width,
@@ -56,6 +65,10 @@ export function PhotoCanvas({
   onTap,
   view,
   onViewChange,
+  tools = false,
+  drawing = false,
+  onDrawingChange,
+  onDraw,
   children,
 }: {
   src: string;
@@ -66,8 +79,15 @@ export function PhotoCanvas({
   /** Controlled zoom and pan, shared with another canvas. */
   view?: SharedView;
   onViewChange?: (view: SharedView) => void;
+  tools?: boolean;
+  /** A drag traces an outline instead of moving the photo. */
+  drawing?: boolean;
+  onDrawingChange?: (drawing: boolean) => void;
+  /** The finished trace, in image pixels. */
+  onDraw?: (points: Point[]) => void;
   children?: ReactNode;
 }) {
+  const { t } = useTranslation();
   const svg = useRef<SVGSVGElement>(null);
   const [ownVb, setOwnVb] = useState<ViewBox>({ x: 0, y: 0, w: width, h: height });
   const vb: ViewBox = view
@@ -91,6 +111,8 @@ export function PhotoCanvas({
   const pointers = useRef(new Map<number, { x: number; y: number }>());
   const gesture = useRef<{ moved: boolean; startDist: number; startVb: ViewBox } | null>(null);
   const [screenWidth, setScreenWidth] = useState(1);
+  const [trace, setTrace] = useState<Point[] | null>(null);
+  const tracing = useRef<Point[] | null>(null);
 
   useEffect(() => setOwnVb({ x: 0, y: 0, w: width, h: height }), [width, height]);
   useEffect(() => {
@@ -153,6 +175,9 @@ export function PhotoCanvas({
       startDist: a && b ? Math.hypot(a.x - b.x, a.y - b.y) : 0,
       startVb: vb,
     };
+    // Drawing: one finger traces; a second one turns the gesture back into a pinch.
+    tracing.current = drawing && pointers.current.size === 1 ? [toImage(event.clientX, event.clientY)] : null;
+    setTrace(tracing.current);
   }
 
   function onPointerMove(event: PointerEvent<SVGSVGElement>) {
@@ -160,6 +185,15 @@ export function PhotoCanvas({
     if (!previous || !gesture.current) return;
     pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
     const scale = vb.w / Math.max(event.currentTarget.clientWidth || width, 1);
+    if (tracing.current && pointers.current.size === 1) {
+      const point = toImage(event.clientX, event.clientY);
+      const last = tracing.current[tracing.current.length - 1];
+      if (last && Math.hypot(point.x - last.x, point.y - last.y) / scale < 2) return; // every 2 screen pixels
+      tracing.current = [...tracing.current, point];
+      if (tracing.current.length > 3) gesture.current.moved = true;
+      setTrace(tracing.current);
+      return;
+    }
     if (pointers.current.size === 1) {
       const dx = event.clientX - previous.x;
       const dy = event.clientY - previous.y;
@@ -187,6 +221,13 @@ export function PhotoCanvas({
 
   function onPointerUp(event: PointerEvent<SVGSVGElement>) {
     const wasTap = pointers.current.size === 1 && gesture.current && !gesture.current.moved;
+    const traced = tracing.current;
+    tracing.current = null;
+    setTrace(null);
+    if (traced && traced.length >= 8 && onDraw) {
+      const every = Math.ceil(traced.length / MAX_OUTLINE_POINTS);
+      onDraw(traced.filter((_, index) => index % every === 0));
+    }
     pointers.current.delete(event.pointerId);
     if (wasTap && onTap) onTap(toImage(event.clientX, event.clientY));
     if (pointers.current.size === 0) gesture.current = null;
@@ -212,11 +253,12 @@ export function PhotoCanvas({
   }
 
   const unit = vb.w / Math.max(screenWidth, 1);
-  return (
+  const centre = { x: vb.x + vb.w / 2, y: vb.y + vb.h / 2 };
+  const canvas = (
     <Context.Provider value={{ toImage, unit, view: vb }}>
       <svg
         ref={svg}
-        className={styles.canvas}
+        className={[styles.canvas, onDrawingChange && !drawing ? styles.canvasPan : ""].join(" ")}
         viewBox={`${vb.x} ${vb.y} ${vb.w} ${vb.h}`}
         role="application"
         aria-label={label}
@@ -230,8 +272,54 @@ export function PhotoCanvas({
       >
         <image href={src} x={0} y={0} width={width} height={height} preserveAspectRatio="none" />
         {children}
+        {trace && trace.length > 1 && (
+          <polyline
+            className={styles.trace}
+            points={trace.map((p) => `${p.x},${p.y}`).join(" ")}
+            strokeWidth={2 * unit}
+            aria-hidden="true"
+          />
+        )}
       </svg>
     </Context.Provider>
+  );
+  if (!tools) return canvas;
+  return (
+    <div className={styles.canvasWrap}>
+      {canvas}
+      <div className={styles.tools}>
+        <button
+          type="button"
+          onClick={() => zoomAt(centre, 1.5)}
+          disabled={vb.w <= width / MAX_ZOOM + 0.5}
+          aria-label={t("bodymap.zoomIn")}
+          title={t("bodymap.zoomIn")}
+        >
+          <ZoomIn aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          onClick={() => zoomAt(centre, 1 / 1.5)}
+          disabled={vb.w >= width - 0.5}
+          aria-label={t("bodymap.zoomOut")}
+          title={t("bodymap.zoomOut")}
+        >
+          <ZoomOut aria-hidden="true" />
+        </button>
+        {onDrawingChange && (
+          // The button shows what a press does: start drawing (a lasso) or go back to moving (the arrows).
+          <button
+            type="button"
+            className={drawing ? styles.toolActive : ""}
+            onClick={() => onDrawingChange(!drawing)}
+            aria-label={drawing ? t("measure.pan") : t("measure.draw")}
+            title={drawing ? t("measure.pan") : t("measure.draw")}
+          >
+            {drawing ? <Move aria-hidden="true" /> : <Lasso aria-hidden="true" />}
+          </button>
+        )}
+      </div>
+    </div>
   );
 }
 

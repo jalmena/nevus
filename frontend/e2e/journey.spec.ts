@@ -11,7 +11,7 @@ test("from a fresh instance to a measured mark, accessibly", async ({ page }) =>
   await page.getByLabel("Repeat the password").fill(PASSWORD);
   await page.getByRole("button", { name: "Create the administrator", exact: true }).click();
 
-  await expect(page.getByRole("heading", { name: "Persons", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "People", exact: true })).toBeVisible();
   await accessible(page, "home");
   await page.getByRole("button", { name: "Add a person", exact: true }).click();
   await page.getByLabel("Name", { exact: true }).fill("Ana");
@@ -65,8 +65,8 @@ test("from a fresh instance to a measured mark, accessibly", async ({ page }) =>
   // The mark's record as a PDF, rendered by the background worker.
   await more(page, "Reports");
   await expect(page.getByRole("heading", { name: "Reports", exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Make a report", exact: true }).click();
-  await page.getByRole("button", { name: "Make the record of this mark", exact: true }).click();
+  await page.getByRole("button", { name: "Generate report", exact: true }).click();
+  await page.getByRole("button", { name: "Prepare", exact: true }).click();
   const pdf = page.getByRole("link", { name: /Download the PDF/ });
   await expect(pdf).toBeVisible({ timeout: 60_000 });
   await accessible(page, "mark reports");
@@ -164,7 +164,7 @@ test("the second factor: set up in the settings, then a sign-in that needs the c
   await expect(page.getByRole("alert")).toHaveText("Wrong code.");
   await page.getByLabel("Code from the authenticator").fill(totpCode(secret, Date.now() + 30_000));
   await page.getByRole("button", { name: "Continue", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Persons", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "People", exact: true })).toBeVisible();
 
   // A recovery code opens the door too, once.
   await page.goto("/settings/account");
@@ -176,7 +176,7 @@ test("the second factor: set up in the settings, then a sign-in that needs the c
   await page.getByRole("button", { name: "Use a recovery code instead", exact: true }).click();
   await page.getByLabel("Recovery code").fill(recovery);
   await page.getByRole("button", { name: "Continue", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Persons", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "People", exact: true })).toBeVisible();
 
   // Leave the account as the other tests expect it.
   await page.goto("/settings/second-factor");

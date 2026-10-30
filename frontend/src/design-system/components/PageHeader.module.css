@@ -14,7 +14,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-1) 0;
+  gap: var(--space-1) 0.3em;
   color: var(--color-ink-2);
   font-size: var(--text-sm);
   font-weight: var(--font-weight-secondary);

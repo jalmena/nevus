@@ -60,17 +60,27 @@
   font-size: var(--text-sm);
 }
 
+/* The whole row is the option: its words as much as its circle or box. */
 .choice label {
   display: flex;
   align-items: center;
   gap: var(--space-2);
   min-height: var(--touch-target);
+  margin-inline: calc(-1 * var(--space-2));
+  padding-inline: var(--space-2);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+}
+
+.choice label:hover {
+  background: var(--color-surface-2);
 }
 
 .choice input {
   width: 20px;
   height: 20px;
   accent-color: var(--color-accent);
+  cursor: pointer;
 }
 
 .marks {

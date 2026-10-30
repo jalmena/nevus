@@ -39,6 +39,7 @@
   gap: var(--space-3);
   padding: var(--space-5);
   overflow: auto;
+  overscroll-behavior: contain; /* scrolling the sheet to its end does not scroll the page behind */
 }
 
 @media (width >= 900px) {

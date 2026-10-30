@@ -45,12 +45,13 @@ export function PageHeader({
       </h1>
       {(items.length > 0 || chip) && (
         <p className={styles.meta}>
+          {/* A no-break space ties each separator to the item before it: no line starts with one. */}
           {items.every((item) => typeof item === "string")
-            ? items.join(" · ")
+            ? items.join("\u00a0· ")
             : items.map((item, index) => (
                 <span key={index} className={styles.metaItem}>
-                  {index > 0 && <span aria-hidden="true">{" · "}</span>}
                   {item}
+                  {index < items.length - 1 && <span aria-hidden="true">{"\u00a0·"}</span>}
                 </span>
               ))}
           {chip && <span className={styles.chip}>{chip}</span>}

@@ -40,20 +40,21 @@ beforeEach(async () => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("reports", () => {
-  it("makes the summary of every mark and offers the PDF once it is ready", async () => {
+  it("makes the report of every mark and offers the PDF once it is ready", async () => {
     const state = install();
     renderApp(`/persons/${PERSON.id}/reports`);
     const user = userEvent.setup();
-    await user.click(await screen.findByRole("button", { name: "Make a report" }));
-    await user.click(await screen.findByRole("button", { name: "Make the summary" }));
+    await user.click(await screen.findByRole("button", { name: "Generate report" }));
+    await user.click(await screen.findByRole("button", { name: "Prepare" }));
     await waitFor(() =>
       expect(state.calls.find((c) => c.method === "POST" && c.url.endsWith("/reports"))?.body).toEqual({
-        scope: "profile",
+        scope: "selection",
+        lesion_ids: ["l1"],
         language: "en",
         paper: "a4",
       }),
     );
-    expect(await screen.findByText("Summary of all marks")).toBeInTheDocument();
+    expect(await screen.findByText("Record of 1 chosen mark")).toBeInTheDocument();
     const download = await screen.findByRole(
       "link",
       { name: /Download the PDF \(2 pages, 32 kB\)/ },
@@ -66,10 +67,10 @@ describe("reports", () => {
     const state = install();
     renderApp("/lesions/l1/reports");
     const user = userEvent.setup();
-    await user.click(await screen.findByRole("button", { name: "Make a report" }));
+    await user.click(await screen.findByRole("button", { name: "Generate report" }));
     await user.selectOptions(await screen.findByRole("combobox", { name: "Language" }), "es");
     await user.selectOptions(screen.getByRole("combobox", { name: "Paper" }), "letter");
-    await user.click(screen.getByRole("button", { name: "Make the record of this mark" }));
+    await user.click(screen.getByRole("button", { name: "Prepare" }));
     await waitFor(() =>
       expect(state.calls.find((c) => c.method === "POST" && c.url.endsWith("/reports"))?.body).toEqual({
         scope: "lesion",
@@ -106,12 +107,12 @@ describe("reports", () => {
     const state = install();
     renderApp(`/persons/${PERSON.id}/reports`);
     const user = userEvent.setup();
-    await user.click(await screen.findByRole("button", { name: "Make a report" }));
+    await user.click(await screen.findByRole("button", { name: "Generate report" }));
     await user.click(await screen.findByRole("radio", { name: "the marks I choose, with their records" }));
-    const make = screen.getByRole("button", { name: "Make the report of 0 marks" });
+    const make = screen.getByRole("button", { name: "Prepare" });
     expect(make).toBeDisabled();
     await user.click(screen.getByRole("checkbox", { name: "Chest mark" }));
-    await user.click(screen.getByRole("button", { name: "Make the report of 1 mark" }));
+    await user.click(make);
     await waitFor(() =>
       expect(state.calls.find((c) => c.method === "POST" && c.url.endsWith("/reports"))?.body).toEqual({
         scope: "selection",

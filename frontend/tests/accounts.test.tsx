@@ -68,7 +68,7 @@ describe("signing in with a second factor", () => {
     await user.click(screen.getByRole("button", { name: "Use a recovery code instead" }));
     await user.type(screen.getByLabelText("Recovery code"), "AAAAA-BBBBB");
     await user.click(screen.getByRole("button", { name: "Continue" }));
-    expect(await screen.findByRole("heading", { name: "Persons" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "People" })).toBeInTheDocument();
     expect(state.totp.codesLeft).toBe(9);
   });
 });

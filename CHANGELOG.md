@@ -1,3 +1,16 @@
+## v1.7.0 (2026-10-31)
+
+### Feat
+
+- **ui**: a design pass over every page
+- **reports**: a shorter report that reads at a glance
+- **bodymap**: map 4, and a person's anatomy drawn part by part
+- **card**: a larger lockup, a grey square for a filament change, no stroke under a line
+
+### Fix
+
+- **api**: refresh the OpenAPI snapshot with a zone's anatomy part
+
 ## v1.6.0 (2026-10-29)
 
 ### Feat

@@ -5,18 +5,45 @@ import { Help } from "@/design-system/components/Help";
 import { Notice } from "@/design-system/components/Notice";
 import { PageHeader } from "@/design-system/components/PageHeader";
 import { Row, RowList } from "@/design-system/components/Row";
+import { Select } from "@/design-system/components/Select";
 import { Switch } from "@/design-system/components/Switch";
 import { ExportSheet } from "@/features/data/ExportForm";
 import { PurgeSheet } from "@/features/data/PurgePerson";
 import { formatBytes, useUsage } from "@/lib/data";
+import { bodyMap, type BodyPart } from "@/features/bodymap/zones";
+import { useConfirm } from "@/lib/confirm/ConfirmProvider";
+import { useLesions } from "@/lib/lesions";
 import { useUpdatePerson, type PersonOut } from "@/lib/persons";
 import { personRail } from "./personRail";
 import styles from "./persons.module.css";
 
-/** The person's profile: the experimental analysis switch, the space used, export, deletion. */
+/** The person's profile: the anatomy the body map draws, the experimental analysis switch, the space used, export, deletion. */
 export function ProfilePage({ person }: { person: PersonOut }) {
   const { t, i18n } = useTranslation();
   const update = useUpdatePerson(person.id);
+  const lesions = useLesions(person.id);
+  const confirm = useConfirm();
+
+  /** Changes the anatomy, asking first when a part with marks on it leaves the map. */
+  async function changeAnatomy(
+    body: { chest?: PersonOut["chest"]; genitals?: PersonOut["genitals"] },
+    removed?: BodyPart,
+  ) {
+    const zones = new Set(bodyMap.zones.filter((zone) => zone.part === removed).map((zone) => zone.code));
+    const count = removed
+      ? (lesions.data ?? []).filter((lesion) => zones.has(lesion.location.zone)).length
+      : 0;
+    if (count > 0) {
+      const yes = await confirm({
+        title: t("persons.anatomyRemoveTitle"),
+        text: t("persons.anatomyRemoveText", { count }),
+        action: t("persons.anatomyRemoveAction"),
+        danger: true,
+      });
+      if (!yes) return;
+    }
+    update.mutate(body);
+  }
   const usage = useUsage(person.id);
   const [exporting, setExporting] = useState(false);
   const [purging, setPurging] = useState(false);
@@ -37,6 +64,40 @@ export function ProfilePage({ person }: { person: PersonOut }) {
         ]}
       />
       <div className={styles.switchRow}>
+        <Select
+          label={t("persons.chest")}
+          value={person.chest ?? ""}
+          disabled={person.my_role === "viewer" || update.isPending}
+          onChange={(event) => {
+            const chest = (event.target.value || null) as PersonOut["chest"];
+            void changeAnatomy(
+              { chest },
+              person.chest === "breasts" && chest !== "breasts" ? "breasts" : undefined,
+            );
+          }}
+          options={[
+            { value: "", label: t("persons.chestOptions.unset") },
+            { value: "breasts", label: t("persons.chestOptions.breasts") },
+          ]}
+        />
+        <Select
+          label={t("persons.genitals")}
+          value={person.genitals ?? ""}
+          disabled={person.my_role === "viewer" || update.isPending}
+          onChange={(event) => {
+            const genitals = (event.target.value || null) as PersonOut["genitals"];
+            void changeAnatomy(
+              { genitals },
+              person.genitals === "penis" && genitals !== "penis" ? "penis" : undefined,
+            );
+          }}
+          options={[
+            { value: "", label: t("persons.genitalsOptions.unset") },
+            { value: "vulva", label: t("persons.genitalsOptions.vulva") },
+            { value: "penis", label: t("persons.genitalsOptions.penis") },
+          ]}
+        />
+        <p className={["text-secondary", styles.fieldHint].join(" ")}>{t("persons.anatomyHint")}</p>
         <Switch
           label={t("persons.experimental")}
           hint={

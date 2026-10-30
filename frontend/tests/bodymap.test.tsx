@@ -9,14 +9,22 @@ import es from "@/lib/i18n/locales/es.json";
 import pt from "@/lib/i18n/locales/pt.json";
 
 describe("body map data", () => {
-  it("carries 28 zones per body view that tile the same silhouette, and the detail views", () => {
-    expect(bodyMap.version).toBe("nevus-body-map/3");
-    expect(zonesForView("front")).toHaveLength(28);
-    expect(zonesForView("back")).toHaveLength(28);
-    expect(bodyMap.views.front.silhouette).toBe(bodyMap.views.back.silhouette);
+  it("carries the zones of each body view, and the detail views", () => {
+    expect(bodyMap.version).toBe("nevus-body-map/4");
+    expect(zonesForView("front")).toHaveLength(35);
+    expect(zonesForView("back")).toHaveLength(30);
+    // One figure, but seen from behind the gaps under the arms climb higher: there is no armpit to unroll there.
+    expect(bodyMap.views.back.silhouette).not.toBe(bodyMap.views.front.silhouette);
     expect(zoneByCode("1250")?.side).toBe("right");
     expect(zoneByCode("2250")?.side).toBe("left");
-    expect(zonesForView("head").map((zone) => zone.code)).toEqual(["3150", "3151", "3170", "3171", "3172"]);
+    expect(zonesForView("head").map((zone) => zone.code)).toEqual([
+      "3150",
+      "3151",
+      "3170",
+      "3171",
+      "3172",
+      "3173",
+    ]);
     expect(zoneByCode("3150")?.side).toBe("left");
     expect(zonesForView("hands")).toHaveLength(4);
     expect(zonesForView("feet").map((zone) => zone.side)).toEqual(["right", "left", "right", "left"]);
@@ -46,7 +54,8 @@ describe("<BodyMap>", () => {
     const onPlace = vi.fn();
     render(<BodyMap view="front" onSelectZone={onSelectZone} onPlace={onPlace} />);
     const map = screen.getByRole("group");
-    expect(within(map).getAllByRole("button")).toHaveLength(28);
+    // The head, the hands and the feet are only sketched here: they have views of their own.
+    expect(within(map).getAllByRole("button")).toHaveLength(26);
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Right pectoral" }));
     expect(onSelectZone).toHaveBeenCalledWith(expect.objectContaining({ code: "1250" }));
@@ -59,6 +68,61 @@ describe("<BodyMap>", () => {
     expect(point.x * 216).toBeLessThanOrEqual(right);
     expect(point.y * 404).toBeGreaterThanOrEqual(top);
     expect(point.y * 404).toBeLessThanOrEqual(bottom);
+  });
+
+  it("draws each part of the person's anatomy on the front, and none when none is set", () => {
+    const layers = (anatomy?: ("breasts" | "vulva" | "penis")[]) => {
+      const { container, unmount } = render(<BodyMap view="front" anatomy={anatomy} />);
+      const paths = Array.from(container.querySelectorAll("path[aria-hidden='true']:not([data-under])")).map(
+        (path) => path.getAttribute("d"),
+      );
+      unmount();
+      return paths;
+    };
+    const none = layers();
+    expect(layers(["breasts"])).toHaveLength(none.length + 1);
+    expect(layers(["breasts", "penis"])).toHaveLength(none.length + 2);
+    expect(layers(["vulva"]).at(-1)).not.toEqual(layers(["penis"]).at(-1));
+  });
+
+  it("lays each zone of the anatomy over what is under it", () => {
+    const { container } = render(<BodyMap view="front" anatomy={["penis"]} />);
+    const under = Array.from(container.querySelectorAll("[data-under]")).map((path) =>
+      path.getAttribute("data-under"),
+    );
+    expect(under).toEqual(["1370", "1371"]);
+  });
+
+  it("offers the breasts, penis and scrotum as zones only for a person who has them", () => {
+    const zoneCodes = (anatomy?: ("breasts" | "vulva" | "penis")[]) => {
+      const { container, unmount } = render(<BodyMap view="front" anatomy={anatomy} />);
+      const codes = Array.from(container.querySelectorAll("[data-zone]")).map((zone) =>
+        zone.getAttribute("data-zone"),
+      );
+      unmount();
+      return codes;
+    };
+    expect(zoneCodes()).not.toContain("1260");
+    expect(zoneCodes(["breasts"])).toEqual(expect.arrayContaining(["1260", "1261"]));
+    expect(zoneCodes(["penis"])).toEqual(expect.arrayContaining(["1370", "1371"]));
+    expect(zoneCodes(["vulva"])).not.toContain("1370");
+    // Over the zones under them: drawn last, so a tap there lands on the part.
+    expect(zoneCodes(["breasts"]).slice(-2)).toEqual(["1260", "1261"]);
+  });
+
+  it("opens the hands view from a hand sketched on the front, and places no mark there", async () => {
+    await i18n.changeLanguage("en");
+    const onOpenView = vi.fn();
+    const onPlace = vi.fn();
+    render(<BodyMap view="front" onPlace={onPlace} onOpenView={onOpenView} />);
+    const hands = screen.getAllByRole("button", { name: "Hands" });
+    expect(hands).toHaveLength(2);
+    expect(screen.getAllByRole("button", { name: "Feet" })).toHaveLength(2);
+    expect(screen.getByRole("button", { name: "Head" })).toBeInTheDocument();
+    const user = userEvent.setup();
+    await user.click(hands[0] as HTMLElement);
+    expect(onOpenView).toHaveBeenCalledWith("hands");
+    expect(onPlace).not.toHaveBeenCalled();
   });
 
   it("reports a tap on the selected zone or on the background as no selection", async () => {
