@@ -5777,6 +5777,17 @@
             "title": "Name",
             "type": "string"
           },
+          "part": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Part"
+          },
           "path": {
             "title": "Path",
             "type": "string"

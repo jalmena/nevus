@@ -3696,6 +3696,8 @@ export interface components {
             molemapper_shape: number;
             /** Name */
             name: string;
+            /** Part */
+            part?: string | null;
             /** Path */
             path: string;
             /**
