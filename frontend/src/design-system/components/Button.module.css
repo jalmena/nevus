@@ -6,7 +6,10 @@
   font: inherit;
   font-weight: var(--font-weight-emphasis);
   cursor: pointer;
-  transition: background var(--motion-fast) var(--ease);
+  transition:
+    background-color var(--motion-fast) var(--ease),
+    border-color var(--motion-fast) var(--ease),
+    transform var(--motion-fast) var(--ease);
 }
 
 .button:disabled {
@@ -14,9 +17,23 @@
   cursor: default;
 }
 
+/* A press answers the finger: the button gives a little. */
+.button:not(:disabled):active {
+  transform: scale(0.98);
+}
+
 .primary {
   background: var(--color-accent);
   color: var(--color-paper);
+}
+
+/* Hover and press move the fill towards the ink: darker on paper, lighter on the dark theme. */
+.primary:not(:disabled):hover {
+  background: color-mix(in srgb, var(--color-accent) 86%, var(--color-ink));
+}
+
+.primary:not(:disabled):active {
+  background: color-mix(in srgb, var(--color-accent) 74%, var(--color-ink));
 }
 
 .secondary {
@@ -25,9 +42,21 @@
   color: var(--color-ink);
 }
 
+.secondary:not(:disabled):hover {
+  background: var(--color-surface-2);
+}
+
+.secondary:not(:disabled):active {
+  border-color: var(--color-ink-3);
+}
+
 .quiet {
   background: transparent;
   color: var(--color-accent);
+}
+
+.quiet:not(:disabled):hover {
+  background: var(--color-surface-2);
 }
 
 .danger {
@@ -36,7 +65,15 @@
   color: var(--color-danger);
 }
 
+.danger:not(:disabled):hover {
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+}
+
 .dangerFilled {
   background: var(--color-danger);
   color: var(--color-paper);
+}
+
+.dangerFilled:not(:disabled):hover {
+  background: color-mix(in srgb, var(--color-danger) 86%, var(--color-ink));
 }

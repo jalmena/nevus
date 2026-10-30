@@ -16,6 +16,10 @@
   border-radius: var(--radius-card);
 }
 
+.summary:hover {
+  background: var(--color-surface-2);
+}
+
 .summary::marker {
   content: "";
 }

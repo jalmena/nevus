@@ -59,3 +59,7 @@
   background: var(--color-surface-2);
   color: var(--color-ink);
 }
+
+.quiet:not(:disabled):active {
+  background: var(--color-border);
+}

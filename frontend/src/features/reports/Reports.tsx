@@ -27,8 +27,11 @@ import styles from "./reports.module.css";
 
 /**
  * The PDFs for a clinician as a page: the ones made, as rows, and making one in a sheet. Under a
- * person it offers the summary of every mark or the records of some; under a mark, that mark's record.
+ * person it offers every mark or the chosen ones, each with its record; under a mark, that mark's record.
  */
+/** The most marks one report may gather (the API's limit). */
+const MAX_SELECTION = 60;
+
 export function Reports({
   person,
   lesion,
@@ -51,7 +54,7 @@ export function Reports({
   const [open, setOpen] = useState(false);
   const [language, setLanguage] = useState<ReportLanguage>(uiLanguage);
   const [paper, setPaper] = useState<Paper>("a4");
-  const [scope, setScope] = useState<"profile" | "selection">("profile");
+  const [scope, setScope] = useState<"all" | "chosen">("all");
   const [chosen, setChosen] = useState<string[]>([]);
   const locale = i18n.resolvedLanguage ?? "en";
   const shown = (reports.data ?? []).filter((report) =>
@@ -61,9 +64,12 @@ export function Reports({
   function submit(event: FormEvent) {
     event.preventDefault();
     const done = { onSuccess: () => setOpen(false) };
+    // Every mark is a selection of all of them, each with its record; past the API's limit, the summary.
+    const every = marks.length > 0 && marks.length <= MAX_SELECTION ? marks.map((mark) => mark.id) : null;
     if (lesionId) create.mutate({ scope: "lesion", lesion_id: lesionId, language, paper }, done);
-    else if (scope === "selection")
+    else if (scope === "chosen")
       create.mutate({ scope: "selection", lesion_ids: chosen, language, paper }, done);
+    else if (every) create.mutate({ scope: "selection", lesion_ids: every, language, paper }, done);
     else create.mutate({ scope: "profile", language, paper }, done);
   }
 
@@ -78,11 +84,6 @@ export function Reports({
   const back = lesion
     ? { to: `/lesions/${lesion.id}`, label: titleOf(lesion.id) }
     : { to: `/persons/${person.id}`, label: person.display_name };
-  const makeLabel = lesionId
-    ? t("reports.makeLesion")
-    : scope === "selection"
-      ? t("reports.makeSelection", { count: chosen.length })
-      : t("reports.makeProfile");
 
   return (
     <div className={styles.page}>
@@ -168,24 +169,19 @@ export function Reports({
             <fieldset className={styles.choice}>
               <legend>{t("reports.what")}</legend>
               <label>
-                <input
-                  type="radio"
-                  name="scope"
-                  checked={scope === "profile"}
-                  onChange={() => setScope("profile")}
-                />
-                {t("reports.whatProfile")}
+                <input type="radio" name="scope" checked={scope === "all"} onChange={() => setScope("all")} />
+                {t("reports.whatAll")}
               </label>
               <label>
                 <input
                   type="radio"
                   name="scope"
-                  checked={scope === "selection"}
-                  onChange={() => setScope("selection")}
+                  checked={scope === "chosen"}
+                  onChange={() => setScope("chosen")}
                 />
                 {t("reports.whatSelection")}
               </label>
-              {scope === "selection" && (
+              {scope === "chosen" && (
                 <ul className={styles.marks}>
                   {marks.map((mark) => (
                     <li key={mark.id}>
@@ -231,9 +227,9 @@ export function Reports({
             </Button>
             <Button
               type="submit"
-              disabled={create.isPending || (scope === "selection" && !lesionId && chosen.length === 0)}
+              disabled={create.isPending || (scope === "chosen" && !lesionId && chosen.length === 0)}
             >
-              {create.isPending ? t("common.working") : makeLabel}
+              {create.isPending ? t("common.working") : t("reports.prepare")}
             </Button>
           </div>
         </form>

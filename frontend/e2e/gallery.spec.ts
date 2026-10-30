@@ -51,7 +51,7 @@ test("every screen, for a look at the design", async ({ page }, info) => {
   await page.getByLabel("Password", { exact: true }).fill(PASSWORD);
   await page.getByLabel("Repeat the password").fill(PASSWORD);
   await page.getByRole("button", { name: "Create the administrator", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Persons", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "People", exact: true })).toBeVisible();
   await snap("02-home-empty");
   await page.getByRole("button", { name: "Add a person", exact: true }).click();
   await page.getByLabel("Name", { exact: true }).fill("Ana");
@@ -81,8 +81,8 @@ test("every screen, for a look at the design", async ({ page }, info) => {
   await expect(page.getByRole("slider", { name: /Longest diameter at 2 visits/ })).toBeVisible();
   await snap("08-mark");
   await more(page, "Reports");
-  await page.getByRole("button", { name: "Make a report", exact: true }).click();
-  await page.getByRole("button", { name: "Make the record of this mark", exact: true }).click();
+  await page.getByRole("button", { name: "Generate report", exact: true }).click();
+  await page.getByRole("button", { name: "Prepare", exact: true }).click();
   await expect(page.getByRole("link", { name: /Download the PDF/ })).toBeVisible({ timeout: 60_000 });
   await snap("08b-mark-reports");
   await page.getByRole("link", { name: "Back to Chest mark", exact: true }).click();
@@ -101,7 +101,7 @@ test("every screen, for a look at the design", async ({ page }, info) => {
   await page.getByRole("link", { name: /Ana/ }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Ana", exact: true })).toBeVisible();
   await snap("12-person");
-  // Hands and feet show both sides at once: the captions tell palms from backs, and the selected zone is named.
+  // Hands and feet show both sides at once, backs above and palms below; the selected zone is named.
   await page.getByRole("radio", { name: "Hands", exact: true }).click();
   await page.getByRole("button", { name: "Right palm", exact: true }).click();
   await expect(page.getByRole("status")).toHaveText("Right palm · Hands");

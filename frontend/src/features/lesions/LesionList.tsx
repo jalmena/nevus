@@ -20,7 +20,7 @@ export function DueBadge({ lesion }: { lesion: LesionOut }) {
   return null;
 }
 
-/** The marks of a person as rows: thumbnail, name, zone and last visit, the Due chip or the next check. */
+/** The marks of a person as rows: thumbnail, name and zone, the Due chip or the next check; short enough for a narrow pane. */
 export function LesionList({ lesions }: { lesions: LesionOut[] }) {
   const { t, i18n } = useTranslation();
   const locale = i18n.resolvedLanguage;
@@ -34,9 +34,7 @@ export function LesionList({ lesions }: { lesions: LesionOut[] }) {
           title={lesionTitle(lesion, t)}
           meta={[
             zoneName(lesion.location.zone, t),
-            lesion.last_observed_at
-              ? t("lesions.lastVisit", { date: shortDate(locale, lesion.last_observed_at) })
-              : t("lesions.noVisits"),
+            lesion.last_observed_at ? null : t("lesions.noVisits"),
             !lesion.due && lesion.status === "active" && lesion.next_due_on
               ? t("lesions.nextCheck", { date: shortDate(locale, lesion.next_due_on) })
               : null,

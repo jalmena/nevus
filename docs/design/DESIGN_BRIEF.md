@@ -19,7 +19,7 @@ Visual metaphors: the dot under watch, rings of time, the letter V as two lines 
 - Tagline: **"Because 'I think it was smaller' is not data."** Used on the login page, the store card and the report footer. Other lines ("Evidence, not memory.", "Your moles, on the record.") may appear in the README.
 - Mark: **the divider**, a measuring compass holding the mark between its points; the legs are the V of the name, the hinge carries a hole of half its diameter in the inverse colour, the mark between the points is the only accent. Sources and usage rules in [`brand/identity/README.md`](brand/identity/README.md).
 - Wordmark: `neVus` in B612 Bold with the mark standing in for the V, optically centred so the mark's axis is the centre of the word.
-- The mark and the wordmark are always presented on the dark paper (`#17161A`), whatever the interface theme: app icon, favicon, login page, report header, store card and README. Light drawings exist only for a small inline mark on light surfaces.
+- The mark and the wordmark are always presented on the dark paper (`#17161A`), whatever the interface theme: app icon, favicon, login page, the top of the desktop rail, report header, store card and README. Light drawings exist only for a small inline mark on light surfaces.
 - Tone: the sarcastic register lives in the README and marketing copy; in-app text is calm, short and descriptive (rules in the requirements, section 7).
 
 ## 3. Colour
@@ -79,6 +79,8 @@ Every component documents its states: default, hover, focus-visible, active, dis
 ## 8. Layout and navigation
 
 > Revision 2026-10-02: the layout rules learned from building the screens: one primary action per screen, destructive actions apart, occasional tools folded, the content's own order, two panes from 900 px. The phone bottom bar sketched below was not built; the person page is the hub and the decision is recorded in the review.
+
+> Revision 2026-10-30: the visits of a mark are drawn on the time rail sketched in section 9 (a point per visit, the newest in the accent, the size measured that day, a tick where the year changes); on a desktop the app bar is as wide as the content, so its actions end where the page does; wide pages use up to 100 rem, and on the person page the body map takes the wider pane and the window's height. The body map's hands and feet views are described in [`BODY_MAP.md`](BODY_MAP.md).
 
 
 - Mobile first: 360 px minimum width; breakpoints at 600 (large phone, small tablet), 900 (tablet, two panes) and 1200 px (desktop).

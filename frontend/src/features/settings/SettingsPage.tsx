@@ -90,9 +90,12 @@ function SettingsRows({ admin }: { admin: boolean }) {
             show(section.id),
         );
         if (sections.length === 0) return null;
+        // A label over a single row that already says the same thing says nothing ("Your data").
+        const label = t(`settings.groups.${group}`);
+        const redundant = sections.length === 1 && sections[0]?.label(t) === label;
         return (
           <div key={group}>
-            {group !== "about" && <GroupLabel>{t(`settings.groups.${group}`)}</GroupLabel>}
+            {group !== "about" && !redundant && <GroupLabel>{label}</GroupLabel>}
             <RowList>
               {group === "administration" ? (
                 <AdminRows sections={sections} dateFormat={dateFormat} />

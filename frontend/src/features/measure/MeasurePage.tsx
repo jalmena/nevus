@@ -59,6 +59,7 @@ export function MeasurePage() {
   const [shape, setShape] = useState<Shape | null>(null);
   const [fitted, setFitted] = useState<CircleShape | null>(null);
   const [method, setMethod] = useState<"assisted" | "manual">("assisted");
+  const [drawing, setDrawing] = useState(false);
   const [preview, setPreview] = useState<MeasurementPreview | null>(null);
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [search] = useSearchParams();
@@ -157,6 +158,16 @@ export function MeasurePage() {
         },
       },
     );
+  }
+
+  /** An outline drawn by hand: measured as drawn, and the circle around it ready for "Adjust as a circle". */
+  function onDraw(points: Point[]) {
+    const cx = points.reduce((sum, p) => sum + p.x, 0) / points.length;
+    const cy = points.reduce((sum, p) => sum + p.y, 0) / points.length;
+    const r = points.reduce((sum, p) => sum + Math.hypot(p.x - cx, p.y - cy), 0) / points.length;
+    setFitted({ cx, cy, r });
+    setMethod("manual");
+    setShape({ type: "outline", points: points.map((p) => [p.x, p.y]) });
   }
 
   function asCircle() {
@@ -260,6 +271,10 @@ export function MeasurePage() {
             height={height}
             label={step === "scale" ? t("measure.canvasScale") : t("measure.canvasMark")}
             onTap={onTap}
+            tools
+            drawing={step === "mark" && drawing}
+            onDrawingChange={step === "mark" ? setDrawing : undefined}
+            onDraw={onDraw}
           >
             {data.card?.found && data.card.centre_px && (
               <CardMarker x={data.card.centre_px[0] ?? 0} y={data.card.centre_px[1] ?? 0} />
