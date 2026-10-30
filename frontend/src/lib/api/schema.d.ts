@@ -2945,8 +2945,12 @@ export interface components {
         PersonIn: {
             /** Birth Year */
             birth_year?: number | null;
+            /** Chest */
+            chest?: "breasts" | null;
             /** Display Name */
             display_name: string;
+            /** Genitals */
+            genitals?: ("vulva" | "penis") | null;
             /** Skin Tone */
             skin_tone?: string | null;
         };
@@ -2954,6 +2958,8 @@ export interface components {
         PersonOut: {
             /** Birth Year */
             birth_year: number | null;
+            /** Chest */
+            chest: "breasts" | null;
             /**
              * Created At
              * Format: date-time
@@ -2963,6 +2969,8 @@ export interface components {
             display_name: string;
             /** Experimental Analysis */
             experimental_analysis: boolean;
+            /** Genitals */
+            genitals: ("vulva" | "penis") | null;
             /**
              * Id
              * Format: uuid
@@ -2990,10 +2998,14 @@ export interface components {
         PersonUpdate: {
             /** Birth Year */
             birth_year?: number | null;
+            /** Chest */
+            chest?: "breasts" | null;
             /** Display Name */
             display_name?: string | null;
             /** Experimental Analysis */
             experimental_analysis?: boolean | null;
+            /** Genitals */
+            genitals?: ("vulva" | "penis") | null;
             /** Skin Tone */
             skin_tone?: string | null;
         };
@@ -3556,6 +3568,18 @@ export interface components {
         };
         /** ViewData */
         ViewData: {
+            /**
+             * Details
+             * @default
+             */
+            details: string;
+            /**
+             * Details By Part
+             * @default {}
+             */
+            details_by_part: {
+                [key: string]: string;
+            };
             /** Silhouette */
             silhouette: string;
             /** Zones */

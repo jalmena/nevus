@@ -3526,11 +3526,38 @@
             ],
             "title": "Birth Year"
           },
+          "chest": {
+            "anyOf": [
+              {
+                "const": "breasts",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chest"
+          },
           "display_name": {
             "maxLength": 120,
             "minLength": 1,
             "title": "Display Name",
             "type": "string"
+          },
+          "genitals": {
+            "anyOf": [
+              {
+                "enum": [
+                  "vulva",
+                  "penis"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Genitals"
           },
           "skin_tone": {
             "anyOf": [
@@ -3564,6 +3591,18 @@
             ],
             "title": "Birth Year"
           },
+          "chest": {
+            "anyOf": [
+              {
+                "const": "breasts",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chest"
+          },
           "created_at": {
             "format": "date-time",
             "title": "Created At",
@@ -3576,6 +3615,21 @@
           "experimental_analysis": {
             "title": "Experimental Analysis",
             "type": "boolean"
+          },
+          "genitals": {
+            "anyOf": [
+              {
+                "enum": [
+                  "vulva",
+                  "penis"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Genitals"
           },
           "id": {
             "format": "uuid",
@@ -3618,6 +3672,8 @@
           "display_name",
           "birth_year",
           "skin_tone",
+          "chest",
+          "genitals",
           "owner_user_id",
           "experimental_analysis",
           "created_at",
@@ -3642,6 +3698,18 @@
             ],
             "title": "Birth Year"
           },
+          "chest": {
+            "anyOf": [
+              {
+                "const": "breasts",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chest"
+          },
           "display_name": {
             "anyOf": [
               {
@@ -3665,6 +3733,21 @@
               }
             ],
             "title": "Experimental Analysis"
+          },
+          "genitals": {
+            "anyOf": [
+              {
+                "enum": [
+                  "vulva",
+                  "penis"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Genitals"
           },
           "skin_tone": {
             "anyOf": [
@@ -5329,6 +5412,19 @@
       },
       "ViewData": {
         "properties": {
+          "details": {
+            "default": "",
+            "title": "Details",
+            "type": "string"
+          },
+          "details_by_part": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "default": {},
+            "title": "Details By Part",
+            "type": "object"
+          },
           "silhouette": {
             "title": "Silhouette",
             "type": "string"

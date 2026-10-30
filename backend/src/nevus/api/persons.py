@@ -29,6 +29,8 @@ def _person_out(person: Person, role: str) -> PersonOut:
         display_name=person.display_name,
         birth_year=person.birth_year,
         skin_tone=person.skin_tone,
+        chest=person.chest,
+        genitals=person.genitals,
         owner_user_id=person.owner_user_id,
         experimental_analysis=person.experimental_analysis,
         created_at=person.created_at,
@@ -64,7 +66,12 @@ def create_person(
     body: PersonIn, request: Request, user: CurrentUser, db: DbSession, settings: AppSettings
 ) -> PersonOut:
     person = Person(
-        display_name=body.display_name, birth_year=body.birth_year, skin_tone=body.skin_tone, owner_user_id=user.id
+        display_name=body.display_name,
+        birth_year=body.birth_year,
+        skin_tone=body.skin_tone,
+        chest=body.chest,
+        genitals=body.genitals,
+        owner_user_id=user.id,
     )
     db.add(person)
     db.flush()

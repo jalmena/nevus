@@ -32,11 +32,14 @@ class Zone(BaseModel):
     path: str
     anchor: tuple[float, float]
     bbox: tuple[float, float, float, float]
+    part: str | None = None  # a part of a person's anatomy: the zone shows only when the person's profile sets it
 
 
 class ViewData(BaseModel):
     silhouette: str
     zones: list[str]
+    details: str = ""  # landmarks drawn over the zones (nipples, navel, face, nails); not zones themselves
+    details_by_part: dict[str, str] = {}  # the front's anatomy, part by part ("breasts", "vulva", "penis")
 
 
 class BodyMap(BaseModel):

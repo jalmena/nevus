@@ -1,4 +1,5 @@
 import {
+  Fragment,
   useEffect,
   useRef,
   useState,
@@ -12,10 +13,12 @@ import { useTranslation } from "react-i18next";
 import {
   MAP_HEIGHT,
   MAP_WIDTH,
+  SKETCHED,
   bodyMap,
   zoneByCode,
   zonesForView,
   type MapPoint,
+  type BodyPart,
   type View,
   type Zone,
 } from "./zones";
@@ -41,6 +44,10 @@ interface Props {
   /** While a mark is being placed, the first tap on a zone zooms in on it and the second places the mark. */
   placing?: boolean;
   onSelectMarker?: (id: string) => void;
+  /** A tap on the head, a hand or a foot sketched on the front or the back: open that part's own view. */
+  onOpenView?: (view: View) => void;
+  /** The parts of the person's anatomy to draw on the front; none draws the body without them. */
+  anatomy?: BodyPart[];
 }
 
 interface ViewBox {
@@ -50,22 +57,21 @@ interface ViewBox {
   h: number;
 }
 
-const FULL: ViewBox = { x: 0, y: 0, w: MAP_WIDTH, h: MAP_HEIGHT };
+/**
+ * The part of the map a view fills: the full width, and the height of its zones with some room. Front and back
+ * fill the whole map; the head, hands and feet are shorter, so framing them makes them larger on screen.
+ */
+function homeOf(view: View): ViewBox {
+  const zones = zonesForView(view);
+  const room = 12;
+  const y = Math.max(0, Math.min(...zones.map((zone) => zone.bbox[1])) - room);
+  const bottom = Math.min(MAP_HEIGHT, Math.max(...zones.map((zone) => zone.bbox[3])) + room);
+  return { x: 0, y, w: MAP_WIDTH, h: bottom - y };
+}
 
-/** The backs of the hands and the tops of the feet, tinted so the two rows of a view read apart. */
+/** The backs of the hands and the tops of the feet, the upper row of their views, tinted apart from the palms and soles. */
 const REVERSE = new Set(["3220", "3221", "3320", "3321"]);
 
-/** A word over each row of the hands and feet views, where the silhouettes alone do not say which is which. */
-const CAPTIONS: Partial<Record<View, { key: string; y: number }[]>> = {
-  hands: [
-    { key: "palms", y: 56 },
-    { key: "backs", y: 236 },
-  ],
-  feet: [
-    { key: "tops", y: 55 },
-    { key: "soles", y: 239 },
-  ],
-};
 const MAX_ZOOM = 6;
 const CLUSTER_PX = 18;
 
@@ -94,14 +100,15 @@ function cluster(markers: Marker[], unit: number): Cluster[] {
   return out;
 }
 
-function clamp(vb: ViewBox): ViewBox {
-  const w = Math.min(MAP_WIDTH, Math.max(MAP_WIDTH / MAX_ZOOM, vb.w));
-  const h = (w * MAP_HEIGHT) / MAP_WIDTH;
+/** A view box kept inside the view's frame and at its proportions, between the whole frame and the deepest zoom. */
+function clamp(vb: ViewBox, home: ViewBox): ViewBox {
+  const w = Math.min(home.w, Math.max(home.w / MAX_ZOOM, vb.w));
+  const h = (w * home.h) / home.w;
   return {
     w,
     h,
-    x: Math.min(Math.max(0, vb.x), MAP_WIDTH - w),
-    y: Math.min(Math.max(0, vb.y), MAP_HEIGHT - h),
+    x: Math.min(Math.max(home.x, vb.x), home.x + home.w - w),
+    y: Math.min(Math.max(home.y, vb.y), home.y + home.h - h),
   };
 }
 
@@ -114,20 +121,26 @@ export function BodyMap({
   onPlace,
   placing = false,
   onSelectMarker,
+  onOpenView,
+  anatomy = [],
 }: Props) {
   const { t } = useTranslation();
   const svg = useRef<SVGSVGElement>(null);
-  const [vb, setVb] = useState<ViewBox>(FULL);
+  const home = homeOf(view);
+  const [vb, setVb] = useState<ViewBox>(home);
   const [focused, setFocused] = useState<string | null>(null);
   const [screenWidth, setScreenWidth] = useState(400);
   const pointers = useRef(new Map<number, { x: number; y: number }>());
   const pinch = useRef<{ dist: number; vb: ViewBox } | null>(null);
   const moved = useRef(false);
-  const zones = zonesForView(view);
+  // The anatomy's zones lie over the zones under them, so they come last and only for the parts the person has.
+  const zones = zonesForView(view)
+    .filter((zone) => !zone.part || anatomy.includes(zone.part))
+    .sort((a, b) => Number(Boolean(a.part)) - Number(Boolean(b.part)));
   const zoneName = (zone: Zone) => t(`zones.${zone.code}`, { defaultValue: zone.name });
 
   useEffect(() => {
-    setVb(FULL);
+    setVb(homeOf(view));
     setFocused(null);
   }, [view]);
   useEffect(() => {
@@ -154,12 +167,15 @@ export function BodyMap({
   function zoom(factor: number, at?: { x: number; y: number }) {
     setVb((current) => {
       const centre = at ?? { x: current.x + current.w / 2, y: current.y + current.h / 2 };
-      return clamp({
-        x: centre.x - (centre.x - current.x) / factor,
-        y: centre.y - (centre.y - current.y) / factor,
-        w: current.w / factor,
-        h: current.h / factor,
-      });
+      return clamp(
+        {
+          x: centre.x - (centre.x - current.x) / factor,
+          y: centre.y - (centre.y - current.y) / factor,
+          w: current.w / factor,
+          h: current.h / factor,
+        },
+        home,
+      );
     });
   }
 
@@ -173,13 +189,9 @@ export function BodyMap({
   function zoomToZone(zone: Zone) {
     const [left, top, right, bottom] = zone.bbox;
     const room = 1.3;
-    const w = Math.max(
-      (right - left) * room,
-      ((bottom - top) * room * MAP_WIDTH) / MAP_HEIGHT,
-      MAP_WIDTH / MAX_ZOOM,
-    );
-    const h = (w * MAP_HEIGHT) / MAP_WIDTH;
-    setVb(clamp({ x: (left + right) / 2 - w / 2, y: (top + bottom) / 2 - h / 2, w, h }));
+    const w = Math.max((right - left) * room, ((bottom - top) * room * home.w) / home.h, home.w / MAX_ZOOM);
+    const h = (w * home.h) / home.w;
+    setVb(clamp({ x: (left + right) / 2 - w / 2, y: (top + bottom) / 2 - h / 2, w, h }, home));
     setFocused(zone.code);
   }
 
@@ -226,7 +238,7 @@ export function BodyMap({
   }
 
   function showAll() {
-    setVb(FULL);
+    setVb(home);
     setFocused(null);
   }
 
@@ -257,20 +269,23 @@ export function BodyMap({
         y: start.y + start.h / 2,
       };
       setVb(
-        clamp({
-          x: mid.x - (mid.x - start.x) / factor,
-          y: mid.y - (mid.y - start.y) / factor,
-          w: start.w / factor,
-          h: start.h / factor,
-        }),
+        clamp(
+          {
+            x: mid.x - (mid.x - start.x) / factor,
+            y: mid.y - (mid.y - start.y) / factor,
+            w: start.w / factor,
+            h: start.h / factor,
+          },
+          home,
+        ),
       );
       return;
     }
     const dx = event.clientX - previous.x;
     const dy = event.clientY - previous.y;
-    if (vb.w < MAP_WIDTH && (moved.current || Math.hypot(dx, dy) > 4)) {
+    if (vb.w < home.w && (moved.current || Math.hypot(dx, dy) > 4)) {
       moved.current = true;
-      setVb((current) => clamp({ ...current, x: current.x - dx * unit, y: current.y - dy * unit }));
+      setVb((current) => clamp({ ...current, x: current.x - dx * unit, y: current.y - dy * unit }, home));
     }
   }
 
@@ -285,15 +300,18 @@ export function BodyMap({
     const xs = group.members.map((m) => m.x * MAP_WIDTH);
     const ys = group.members.map((m) => m.y * MAP_HEIGHT);
     const pad = 12;
-    const w = Math.max(Math.max(...xs) - Math.min(...xs) + 2 * pad, MAP_WIDTH / MAX_ZOOM);
-    const h = (w * MAP_HEIGHT) / MAP_WIDTH;
+    const w = Math.max(Math.max(...xs) - Math.min(...xs) + 2 * pad, home.w / MAX_ZOOM);
+    const h = (w * home.h) / home.w;
     setVb(
-      clamp({
-        x: (Math.min(...xs) + Math.max(...xs)) / 2 - w / 2,
-        y: (Math.min(...ys) + Math.max(...ys)) / 2 - h / 2,
-        w,
-        h,
-      }),
+      clamp(
+        {
+          x: (Math.min(...xs) + Math.max(...xs)) / 2 - w / 2,
+          y: (Math.min(...ys) + Math.max(...ys)) / 2 - h / 2,
+          w,
+          h,
+        },
+        home,
+      ),
     );
   }
 
@@ -314,37 +332,67 @@ export function BodyMap({
         onClick={onBackgroundClick}
       >
         <path className={styles.silhouette} d={bodyMap.views[view].silhouette} />
-        {zones.map((zone) => (
-          <path
-            key={zone.code}
-            d={zone.path}
-            className={[
-              styles.zone,
-              zone.code === selectedZone ? styles.selected : "",
-              REVERSE.has(zone.code) ? styles.reverse : "",
-            ].join(" ")}
-            role="button"
-            tabIndex={0}
-            aria-label={zoneName(zone)}
-            aria-pressed={zone.code === selectedZone}
-            data-zone={zone.code}
-            onClick={(event) => activate(zone, pointFromEvent(event, zone))}
-            onKeyDown={(event) => onKey(event, zone)}
-          >
-            <title>{zoneName(zone)}</title>
-          </path>
-        ))}
-        {CAPTIONS[view]?.map((caption) => (
-          <text
-            key={caption.key}
-            x={MAP_WIDTH / 2}
-            y={caption.y}
-            className={styles.caption}
-            textAnchor="middle"
-          >
-            {t(`bodymap.captions.${caption.key}`)}
-          </text>
-        ))}
+        {zones.map((zone) => {
+          const elsewhere = SKETCHED[zone.code];
+          if (elsewhere) {
+            const name = t(`bodymap.views.${elsewhere}`);
+            const open = () => onOpenView?.(elsewhere);
+            return onOpenView ? (
+              <path
+                key={zone.code}
+                d={zone.path}
+                className={styles.sketched}
+                role="button"
+                tabIndex={0}
+                aria-label={name}
+                data-zone={zone.code}
+                onClick={() => !moved.current && open()}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    open();
+                  }
+                }}
+              >
+                <title>{name}</title>
+              </path>
+            ) : (
+              <path key={zone.code} d={zone.path} className={styles.sketched} aria-hidden="true" />
+            );
+          }
+          return (
+            <Fragment key={zone.code}>
+              {/* The anatomy lies over what is under it, the gap between the legs included. */}
+              {zone.part && (
+                <path className={styles.partBase} d={zone.path} aria-hidden="true" data-under={zone.code} />
+              )}
+              <path
+                d={zone.path}
+                className={[
+                  styles.zone,
+                  zone.code === selectedZone ? styles.selected : "",
+                  REVERSE.has(zone.code) ? styles.reverse : "",
+                ].join(" ")}
+                role="button"
+                tabIndex={0}
+                aria-label={zoneName(zone)}
+                aria-pressed={zone.code === selectedZone}
+                data-zone={zone.code}
+                onClick={(event) => activate(zone, pointFromEvent(event, zone))}
+                onKeyDown={(event) => onKey(event, zone)}
+              >
+                <title>{zoneName(zone)}</title>
+              </path>
+            </Fragment>
+          );
+        })}
+        {bodyMap.views[view].details && (
+          <path className={styles.details} d={bodyMap.views[view].details} aria-hidden="true" />
+        )}
+        {anatomy.map((part) => {
+          const d = bodyMap.views[view].details_by_part?.[part];
+          return d ? <path key={part} className={styles.details} d={d} aria-hidden="true" /> : null;
+        })}
         {groups.map((group) =>
           group.members.length > 1 ? (
             <g
@@ -424,7 +472,7 @@ export function BodyMap({
         >
           <ZoomIn aria-hidden="true" />
         </button>
-        {vb.w < MAP_WIDTH && (
+        {vb.w < home.w && (
           <button
             type="button"
             onClick={() => zoom(1 / 1.5)}
@@ -434,7 +482,7 @@ export function BodyMap({
             <ZoomOut aria-hidden="true" />
           </button>
         )}
-        {vb.w < MAP_WIDTH && (
+        {vb.w < home.w && (
           <button
             type="button"
             onClick={showAll}
