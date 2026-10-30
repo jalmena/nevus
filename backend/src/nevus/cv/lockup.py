@@ -153,8 +153,9 @@ def shapes() -> Shapes:
     return result
 
 
-def boxes(cap_mm: float, step_mm: float = 0.1) -> tuple[list[Box], float, float]:
-    """Raised boxes for the lockup at `cap_mm` of cap height, with the lockup's width and height in mm."""
+def boxes(cap_mm: float, step_mm: float = 0.1, hinge_hole: bool = True) -> tuple[list[Box], float, float]:
+    """Raised boxes for the lockup at `cap_mm` of cap height, with the lockup's width and height in mm. Without
+    `hinge_hole` the hinge is solid, for a size at which a printer could not keep the hole open."""
     drawing = shapes()
     left, top, right, bottom = drawing.extent()
     cells_per_px = cap_mm / 100.0 / step_mm
@@ -172,6 +173,8 @@ def boxes(cap_mm: float, step_mm: float = 0.1) -> tuple[list[Box], float, float]
     for quad in drawing.quads:
         cv2.fillConvexPoly(mask, grid(quad), 255, cv2.LINE_AA, SHIFT)
     for cx, cy, r, ink in drawing.discs:
+        if not ink and not hinge_hole:
+            continue
         centre = grid(np.array([[cx, cy]]))[0]
         cv2.circle(
             mask,

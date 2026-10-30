@@ -26,7 +26,7 @@ from typing import Any
 import numpy as np
 
 from nevus.cv import lockup, outline
-from nevus.cv.card import APERTURE_RADIUS, STRIP, WINDOW, CardGeometry, draw_card
+from nevus.cv.card import APERTURE_RADIUS, GREY, STRIP, WINDOW, CardGeometry, draw_card
 from nevus.languages import normalise
 from nevus.reports.i18n import catalogue
 
@@ -34,12 +34,17 @@ PLATE_MM = 1.2
 INK_MM = 0.4
 OVERLAP_MM = 0.2  # the ink sinks one layer into the plate: overlapping shells unite in the slicer, touching may not
 INK_Z0, INK_Z1 = PLATE_MM - OVERLAP_MM, PLATE_MM + INK_MM
+GREY_MM = 0.4  # the grey square stands two 0.2 mm layers higher, for a change to grey filament at INK_Z1
 MIN_BAR_MM = 0.5
 PLATE_MARGIN_MM = 1.0  # the plate reaches this far beyond the drawing, so a frame line keeps clear of the markers
 CORNER_MM = 3.0  # the plate's corners, rounded like a bank card's
 FRAME_MM, FRAME_INSET_MM = 0.5, 0.3  # a thin raised line following the plate's edge
 LOCKUP_STEP_MM = 0.1
-LOCKUPS = {WINDOW.name: (1.5, 7.5), STRIP.name: (8.3, 5.0)}  # top edge and cap height in mm, centred on the card
+# Top edge and cap height in mm, centred on the card; on the window card, as large as the room above the ring allows.
+LOCKUPS = {WINDOW.name: (0.7, 9.0), STRIP.name: (8.3, 5.0)}
+# At the strip's size the hole in the mark's hinge (0.66 mm) and the ring round it (0.30 mm) are finer than a
+# 0.41 mm line, so its hinge is printed solid; every other stroke of the lockups is 0.54 mm or more.
+SOLID_HINGE = {STRIP.name}
 SEGMENTS = 96
 Tri = tuple[tuple[float, float, float], tuple[float, float, float], tuple[float, float, float]]
 
@@ -149,7 +154,8 @@ class MeshPainter:
         if not fill:
             return
         if self.fill < 0.95:  # black, and the grey patch with it: raised ink
-            self.ink.box(x, y, w, h, INK_Z0, INK_Z1)
+            grey = abs(self.fill - GREY) < 0.01
+            self.ink.box(x, y, w, h, INK_Z0, INK_Z1 + (GREY_MM if grey else 0.0))
 
     def rects(self, boxes: list[tuple[float, float, float, float]]) -> None:
         for x, y, w, h in boxes:
@@ -178,9 +184,9 @@ class MeshPainter:
     def text(self, x: float, y: float, text: str, size_mm: float, *, bold: bool = False, align: str = "left") -> None:
         return  # lettering is left to the paper version; the lockup stands in for it
 
-    def lockup(self, centre_x: float, top: float, cap_mm: float) -> None:
+    def lockup(self, centre_x: float, top: float, cap_mm: float, hinge_hole: bool = True) -> None:
         """The neVus mark and wordmark, raised like the rest of the ink, centred on `centre_x`."""
-        boxes, width, _ = lockup.boxes(cap_mm, LOCKUP_STEP_MM)
+        boxes, width, _ = lockup.boxes(cap_mm, LOCKUP_STEP_MM, hinge_hole)
         left = centre_x - width / 2
         for x, y, w, h in boxes:
             self.ink.box(left + x, top + y, w, h, INK_Z0, INK_Z1)
@@ -263,7 +269,7 @@ def mesh(card: CardGeometry = WINDOW) -> Mesh:
     m = PLATE_MARGIN_MM
     draw_card(painter, card, m, m, cut_aperture=False)
     top, cap_mm = LOCKUPS[card.name]
-    painter.lockup(card.centre[0] + m, top + m, cap_mm)
+    painter.lockup(card.centre[0] + m, top + m, cap_mm, hinge_hole=card.name not in SOLID_HINGE)
     width, height = plate_size(card)
     painter.frame(width, height)
     return Mesh(bodies=[*plate(card).bodies, *painter.ink.bodies]).in_printer_frame(height)
@@ -282,10 +288,11 @@ README_TEXT: dict[str, tuple[str, list[str]]] = {
             "With a multi-material printer or a filament change, print white up to {plate_mm} mm and black from "
             "there: in the slicer, set the colour change at the layer that starts at {plate_mm} mm. With one colour, "
             "print the whole piece in white and paint the raised parts with a black permanent marker.",
-            "The grey patch comes out black: a print cannot make its grey, and the app then takes its colour "
-            "reference from the camera. For colours that compare across visits, cut a grey square from the paper "
-            "sheet (Settings > Reference card; the sheet carries spare squares at the bottom) and glue it over the "
-            "black square.",
+            "The grey square stands {grey_mm} mm above the rest of the ink: change to grey filament at the layer "
+            "that starts at {grey_from} mm and only the square goes on, two layers of grey over the black. Left "
+            "black, the app takes its colour reference from the camera; for colours that compare across visits, "
+            "cut a grey square from the paper sheet (Settings > Reference card; the sheet carries spare squares "
+            "at the bottom) and glue it on.",
             "Light matte filament: glossy surfaces reflect and hide the markers. Check the piece with a ruler before "
             "using it.",
         ],
@@ -303,10 +310,11 @@ README_TEXT: dict[str, tuple[str, list[str]]] = {
             "hasta {plate_mm} mm y en negro desde ahí: en el laminador, pon el cambio de color en la capa que "
             "empieza a {plate_mm} mm. Con un solo color, imprime toda la pieza en blanco y pinta las partes en "
             "relieve con un rotulador permanente negro.",
-            "El parche gris sale negro: una impresión no puede hacer su gris, y la aplicación toma entonces la "
-            "referencia de color de la cámara. Para colores comparables entre vistazos, recorta un cuadrado gris de "
-            "la hoja de papel (Ajustes > Tarjeta de referencia; la hoja lleva cuadrados de repuesto abajo) y pégalo "
-            "sobre el cuadrado negro.",
+            "El cuadrado gris sobresale {grey_mm} mm por encima del resto de la tinta: cambia a filamento gris "
+            "en la capa que empieza en {grey_from} mm y solo seguirá el cuadrado, con dos capas de gris sobre el "
+            "negro. Si queda negro, la aplicación toma la referencia de color de la cámara; para colores "
+            "comparables entre vistazos, recorta un cuadrado gris de la hoja de papel (Ajustes > Tarjeta de "
+            "referencia; la hoja lleva cuadrados de repuesto abajo) y pégalo encima.",
             "Filamento mate y claro: las superficies brillantes reflejan y ocultan los marcadores. Comprueba la "
             "pieza con una regla antes de usarla.",
         ],
@@ -323,10 +331,11 @@ README_TEXT: dict[str, tuple[str, list[str]]] = {
             "{plate_mm} mm e a preto a partir daí: no fatiador, ponha a mudança de cor na camada que começa a "
             "{plate_mm} mm. Com uma só cor, imprima a peça toda a branco e pinte as partes em relevo com um marcador "
             "permanente preto.",
-            "O quadrado cinzento sai preto: uma impressão não consegue fazer o seu cinzento, e a aplicação passa "
-            "então a tirar a referência de cor da câmara. Para cores comparáveis entre visitas, recorte um quadrado "
-            "cinzento da folha de papel (Definições > Cartão de referência; a folha leva quadrados sobresselentes em "
-            "baixo) e cole-o sobre o quadrado preto.",
+            "O quadrado cinzento sobressai {grey_mm} mm acima do resto da tinta: mude para filamento cinzento na "
+            "camada que começa em {grey_from} mm e só o quadrado continua, com duas camadas de cinzento sobre o "
+            "preto. Se ficar preto, a aplicação tira a referência de cor da câmara; para cores comparáveis entre "
+            "visitas, recorte um quadrado cinzento da folha de papel (Definições > Cartão de referência; a folha "
+            "leva quadrados sobresselentes em baixo) e cole-o por cima.",
             "Filamento mate e claro: as superfícies brilhantes refletem e escondem os marcadores. Verifique a peça "
             "com uma régua antes de a usar.",
         ],
@@ -344,10 +353,11 @@ README_TEXT: dict[str, tuple[str, list[str]]] = {
             "{plate_mm} mm i en negre des d'aquí: al laminador, posa el canvi de color a la capa que comença a "
             "{plate_mm} mm. Amb un sol color, imprimeix tota la peça en blanc i pinta les parts en relleu amb un "
             "retolador permanent negre.",
-            "El quadrat gris surt negre: una impressió no pot fer el seu gris, i l'aplicació agafa llavors la "
-            "referència de color de la càmera. Per a colors comparables entre visites, retalla un quadrat gris del "
-            "full de paper (Ajustos > Targeta de referència; el full porta quadrats de recanvi a baix) i enganxa'l "
-            "sobre el quadrat negre.",
+            "El quadrat gris sobresurt {grey_mm} mm per sobre de la resta de la tinta: canvia a filament gris a "
+            "la capa que comença a {grey_from} mm i només continuarà el quadrat, amb dues capes de gris sobre el "
+            "negre. Si queda negre, l'aplicació agafa la referència de color de la càmera; per a colors "
+            "comparables entre visites, retalla un quadrat gris del full de paper (Ajustos > Targeta de "
+            "referència; el full porta quadrats de recanvi a baix) i enganxa'l a sobre.",
             "Filament mat i clar: les superfícies brillants reflecteixen i amaguen els marcadors. Comprova la peça "
             "amb una regla abans d'utilitzar-la.",
         ],
@@ -364,10 +374,11 @@ README_TEXT: dict[str, tuple[str, list[str]]] = {
             "{ink_mm} mm de alto. Cunha impresora multimaterial ou un cambio de filamento, imprime en branco ata "
             "{plate_mm} mm e en negro desde aí: no laminador, pon o cambio de cor na capa que comeza a {plate_mm} mm. "
             "Cunha soa cor, imprime toda a peza en branco e pinta as partes en relevo cun rotulador permanente negro.",
-            "O cadrado gris sae negro: unha impresión non pode facer o seu gris, e a aplicación toma entón a "
-            "referencia de cor da cámara. Para cores comparables entre visitas, recorta un cadrado gris da folla de "
-            "papel (Axustes > Tarxeta de referencia; a folla leva cadrados de reposto abaixo) e pégao sobre o cadrado "
-            "negro.",
+            "O cadrado gris sobresae {grey_mm} mm por riba do resto da tinta: cambia a filamento gris na capa "
+            "que comeza en {grey_from} mm e só seguirá o cadrado, con dúas capas de gris sobre o negro. Se queda "
+            "negro, a aplicación toma a referencia de cor da cámara; para cores comparables entre visitas, "
+            "recorta un cadrado gris da folla de papel (Axustes > Tarxeta de referencia; a folla leva cadrados "
+            "de reposto abaixo) e pégao enriba.",
             "Filamento mate e claro: as superficies brillantes reflicten e agochan os marcadores. Comproba a peza "
             "cunha regra antes de usala.",
         ],
@@ -385,10 +396,11 @@ README_TEXT: dict[str, tuple[str, list[str]]] = {
             "{plate_mm} mm arte eta beltzez handik aurrera: laminatzailean, jarri kolore-aldaketa {plate_mm} mm-tan "
             "hasten den geruzan. Kolore bakarrarekin, inprimatu pieza osoa zuriz eta margotu erliebeko zatiak "
             "errotulagailu iraunkor beltz batekin.",
-            "Koadro grisa beltz ateratzen da: inprimaketak ezin du bere grisa egin, eta orduan aplikazioak kamerako "
-            "kolore-erreferentzia hartzen du. Bisiten artean alderagarriak diren koloreetarako, moztu koadro gris bat "
-            "paperezko orritik (Ezarpenak > Erreferentzia-txartela; orriak ordezko koadroak ditu behean) eta itsatsi "
-            "koadro beltzaren gainean.",
+            "Koadro grisa tintaren gainerakoa baino {grey_mm} mm altuago dago: aldatu harizpi grisera "
+            "{grey_from} mm-tan hasten den geruzan, eta koadroak bakarrik jarraituko du, bi geruza gris "
+            "beltzaren gainean. Beltz geratzen bada, aplikazioak kamerako kolore-erreferentzia hartzen du; "
+            "bisiten artean alderagarriak diren koloreetarako, moztu koadro gris bat paperezko orritik "
+            "(Ezarpenak > Erreferentzia-txartela; orriak ordezko koadroak ditu behean) eta itsatsi gainean.",
             "Harizpi mate eta argia: gainazal distiratsuek islatu egiten dute eta markatzaileak ezkutatzen dituzte. "
             "Egiaztatu pieza erregela batekin erabili aurretik.",
         ],
@@ -406,10 +418,11 @@ README_TEXT: dict[str, tuple[str, list[str]]] = {
             "jusqu'à {plate_mm} mm puis en noir à partir de là : dans le trancheur, placez le changement de couleur à "
             "la couche qui commence à {plate_mm} mm. Avec une seule couleur, imprimez toute la pièce en blanc et "
             "peignez les parties en relief avec un marqueur permanent noir.",
-            "Le carré gris sort noir : une impression ne peut pas produire son gris, et l'application prend alors sa "
-            "référence de couleur à partir de la caméra. Pour des couleurs comparables d'une visite à l'autre, "
-            "découpez un carré gris dans la feuille de papier (Réglages > Carte de référence ; la feuille comporte "
-            "des carrés de rechange en bas) et collez-le sur le carré noir.",
+            "Le carré gris dépasse de {grey_mm} mm le reste de l'encre : passez au filament gris à la couche qui "
+            "commence à {grey_from} mm et seul le carré continue, avec deux couches de gris sur le noir. S'il "
+            "reste noir, l'application prend sa référence de couleur à partir de la caméra ; pour des couleurs "
+            "comparables d'une visite à l'autre, découpez un carré gris dans la feuille de papier (Réglages > "
+            "Carte de référence ; la feuille comporte des carrés de rechange en bas) et collez-le dessus.",
             "Filament mat et clair : les surfaces brillantes reflètent la lumière et masquent les repères. Vérifiez "
             "la pièce avec une règle avant de l'utiliser.",
         ],
@@ -427,10 +440,12 @@ README_TEXT: dict[str, tuple[str, list[str]]] = {
             "{plate_mm} mm e in nero da lì in poi: nello slicer, imposta il cambio colore sullo strato che inizia a "
             "{plate_mm} mm. Con un solo colore, stampa tutto il pezzo in bianco e dipingi le parti in rilievo con un "
             "pennarello indelebile nero.",
-            "Il riquadro grigio esce nero: una stampa non può produrre il proprio grigio, e l'app prende allora il "
-            "riferimento colore dalla fotocamera. Per colori confrontabili tra una visita e l'altra, ritaglia un "
-            "quadrato grigio dal foglio di carta (Impostazioni > Tessera di riferimento; il foglio ha quadrati di "
-            "scorta in basso) e incollalo sul quadrato nero.",
+            "Il riquadro grigio sporge di {grey_mm} mm sopra il resto dell'inchiostro: passa al filamento grigio "
+            "allo strato che inizia a {grey_from} mm e prosegue solo il riquadro, con due strati di grigio sopra "
+            "il nero. Se resta nero, l'app prende il riferimento colore dalla fotocamera; per colori "
+            "confrontabili tra una visita e l'altra, ritaglia un quadrato grigio dal foglio di carta "
+            "(Impostazioni > Tessera di riferimento; il foglio ha quadrati di scorta in basso) e incollalo "
+            "sopra.",
             "Filamento opaco e chiaro: le superfici lucide riflettono e nascondono i marcatori. Controlla il pezzo "
             "con un righello prima di usarlo.",
         ],
@@ -448,10 +463,11 @@ README_TEXT: dict[str, tuple[str, list[str]]] = {
             "und ab da in Schwarz: Setze im Slicer den Farbwechsel auf die Schicht, die bei {plate_mm} mm beginnt. "
             "Mit nur einer Farbe druckst du das ganze Teil in Weiß und bemalst die erhabenen Teile mit einem "
             "schwarzen Permanentmarker.",
-            "Das graue Feld wird schwarz: Ein Druck kann sein Grau nicht erzeugen, und die App nimmt ihre "
-            "Farbreferenz dann von der Kamera. Für Farben, die sich über mehrere Besuche vergleichen lassen, schneide "
-            "ein graues Quadrat aus dem Papierbogen aus (Einstellungen > Referenzkarte; der Bogen enthält unten "
-            "Ersatzquadrate) und klebe es auf das schwarze Quadrat.",
+            "Das graue Feld steht {grey_mm} mm über der übrigen Farbe: Wechsle bei der Schicht, die bei "
+            "{grey_from} mm beginnt, auf graues Filament; dann geht nur das Feld weiter, mit zwei Schichten Grau "
+            "über dem Schwarz. Bleibt es schwarz, nimmt die App ihre Farbreferenz von der Kamera; für Farben, "
+            "die sich über mehrere Besuche vergleichen lassen, schneide ein graues Quadrat aus dem Papierbogen "
+            "aus (Einstellungen > Referenzkarte; der Bogen enthält unten Ersatzquadrate) und klebe es darauf.",
             "Helles, mattes Filament: Glänzende Oberflächen spiegeln und verdecken die Markierungen. Prüfe das Teil "
             "vor dem Gebrauch mit einem Lineal.",
         ],
@@ -468,10 +484,11 @@ README_TEXT: dict[str, tuple[str, list[str]]] = {
             "multimaterial-printer of een filamentwissel print je wit tot {plate_mm} mm en zwart vanaf daar: stel in "
             "de slicer de kleurwissel in op de laag die begint bij {plate_mm} mm. Met één kleur print je het hele "
             "onderdeel wit en schilder je de verhoogde delen met een zwarte permanente marker.",
-            "Het grijze vlak komt zwart uit: een print kan zijn grijs niet maken, en de app haalt dan de "
-            "kleurreferentie uit de camera. Voor kleuren die je tussen bezoeken kunt vergelijken, knip je een grijs "
-            "vierkantje uit het papieren vel (Instellingen > Referentiekaart; het vel heeft onderaan "
-            "reservevierkantjes) en plak je het over het zwarte vierkant.",
+            "Het grijze vlak steekt {grey_mm} mm boven de rest van de inkt uit: wissel naar grijs filament bij "
+            "de laag die op {grey_from} mm begint, en alleen het vlak gaat door, met twee lagen grijs over het "
+            "zwart. Blijft het zwart, dan haalt de app de kleurreferentie uit de camera; voor kleuren die je "
+            "tussen bezoeken kunt vergelijken, knip je een grijs vierkantje uit het papieren vel (Instellingen > "
+            "Referentiekaart; het vel heeft onderaan reservevierkantjes) en plak je het erop.",
             "Licht, mat filament: glanzende oppervlakken reflecteren en verbergen de markeringen. Controleer het "
             "onderdeel met een liniaal voordat je het gebruikt.",
         ],
@@ -487,10 +504,11 @@ README_TEXT: dict[str, tuple[str, list[str]]] = {
             "mm. Na drukarce wielomateriałowej lub ze zmianą filamentu drukuj na biało do {plate_mm} mm, a od tej "
             "wysokości na czarno: w slicerze ustaw zmianę koloru na warstwie zaczynającej się na {plate_mm} mm. Przy "
             "jednym kolorze wydrukuj całość na biało, a wypukłe części pomaluj czarnym markerem permanentnym.",
-            "Szare pole wychodzi czarne: wydruk nie potrafi uzyskać własnej szarości, a wtedy aplikacja bierze "
-            "odniesienie kolorystyczne z aparatu. Aby kolory dały się porównywać między wizytami, wytnij szary "
-            "kwadrat z papierowego arkusza (Ustawienia > Karta referencyjna; na dole arkusza są zapasowe kwadraty) i "
-            "przyklej go na czarny kwadrat.",
+            "Szare pole wystaje {grey_mm} mm ponad resztę tuszu: zmień filament na szary na warstwie "
+            "zaczynającej się na {grey_from} mm, a dalej drukuje się tylko pole, dwie warstwy szarości na "
+            "czerni. Jeśli zostanie czarne, aplikacja bierze odniesienie kolorystyczne z aparatu; aby kolory "
+            "dały się porównywać między wizytami, wytnij szary kwadrat z papierowego arkusza (Ustawienia > Karta "
+            "referencyjna; na dole arkusza są zapasowe kwadraty) i przyklej go na wierzch.",
             "Jasny, matowy filament: błyszczące powierzchnie odbijają światło i zasłaniają znaczniki. Przed użyciem "
             "sprawdź element linijką.",
         ],
@@ -507,10 +525,11 @@ README_TEXT: dict[str, tuple[str, list[str]]] = {
             "многоматериальном принтере или со сменой филамента печатайте белым до {plate_mm} мм и чёрным выше: в "
             "слайсере поставьте смену цвета на слой, который начинается на {plate_mm} мм. Если цвет один, напечатайте "
             "всю деталь белым, а рельефные части закрасьте чёрным перманентным маркером.",
-            "Серое поле получается чёрным: печать не может создать свой серый, и тогда приложение берёт цветовой "
-            "эталон с камеры. Чтобы цвета можно было сравнивать между визитами, вырежьте серый квадрат из бумажного "
-            "листа (Настройки > Эталонная карточка; внизу листа есть запасные квадраты) и наклейте его на чёрный "
-            "квадрат.",
+            "Серое поле выступает на {grey_mm} мм над остальной краской: смените филамент на серый на слое, "
+            "который начинается на {grey_from} мм, и дальше печатается только поле, два слоя серого поверх "
+            "чёрного. Если оно останется чёрным, приложение берёт цветовой эталон с камеры; чтобы цвета можно "
+            "было сравнивать между визитами, вырежьте серый квадрат из бумажного листа (Настройки > Эталонная "
+            "карточка; внизу листа есть запасные квадраты) и наклейте его сверху.",
             "Светлый матовый филамент: глянцевые поверхности отражают свет и скрывают маркеры. Перед использованием "
             "проверьте деталь линейкой.",
         ],
@@ -527,9 +546,11 @@ README_TEXT: dict[str, tuple[str, list[str]]] = {
             "mürekkeptir. Çok malzemeli bir yazıcıyla veya filament değişimiyle {plate_mm} mm'ye kadar beyaz, oradan "
             "sonra siyah basın: dilimleyicide renk değişimini {plate_mm} mm'de başlayan katmana ayarlayın. Tek renkle "
             "parçanın tamamını beyaz basın ve kabartmalı kısımları siyah kalıcı bir kalemle boyayın.",
-            "Gri alan siyah çıkar: bir baskı kendi grisini üretemez ve uygulama bu durumda renk referansını kameradan "
-            "alır. Ziyaretler arasında karşılaştırılabilir renkler için kâğıt sayfadan gri bir kare kesin (Ayarlar > "
-            "Referans kartı; sayfanın altında yedek kareler vardır) ve siyah karenin üzerine yapıştırın.",
+            "Gri alan mürekkebin geri kalanından {grey_mm} mm yüksektir: {grey_from} mm'de başlayan katmanda gri "
+            "filamente geçin; yalnızca alan devam eder, siyahın üzerine iki kat gri. Siyah kalırsa uygulama renk "
+            "referansını kameradan alır; ziyaretler arasında karşılaştırılabilir renkler için kâğıt sayfadan gri "
+            "bir kare kesin (Ayarlar > Referans kartı; sayfanın altında yedek kareler vardır) ve üstüne "
+            "yapıştırın.",
             "Açık renkli mat filament: parlak yüzeyler yansır ve işaretleyicileri gizler. Parçayı kullanmadan önce "
             "cetvelle kontrol edin.",
         ],
@@ -547,10 +568,11 @@ README_TEXT: dict[str, tuple[str, list[str]]] = {
             "hitam dari situ: di slicer, atur pergantian warna pada lapisan yang dimulai di {plate_mm} mm. Dengan "
             "satu warna, cetak seluruh bagian dengan warna putih dan cat bagian timbulnya dengan spidol permanen "
             "hitam.",
-            "Bidang abu-abu keluar berwarna hitam: hasil cetak tidak bisa membuat warna abu-abunya, dan aplikasi lalu "
-            "mengambil acuan warna dari kamera. Agar warna dapat dibandingkan antarkunjungan, gunting satu kotak "
-            "abu-abu dari lembar kertas (Pengaturan > Kartu referensi; lembar itu memuat kotak cadangan di bagian "
-            "bawah) dan tempelkan di atas kotak hitam.",
+            "Bidang abu-abu menonjol {grey_mm} mm di atas tinta lainnya: ganti ke filamen abu-abu pada lapisan "
+            "yang dimulai di {grey_from} mm, dan hanya bidang itu yang berlanjut, dua lapis abu-abu di atas "
+            "hitam. Jika tetap hitam, aplikasi mengambil acuan warna dari kamera; agar warna dapat dibandingkan "
+            "antarkunjungan, gunting satu kotak abu-abu dari lembar kertas (Pengaturan > Kartu referensi; lembar "
+            "itu memuat kotak cadangan di bagian bawah) dan tempelkan di atasnya.",
             "Filamen matte berwarna terang: permukaan mengilap memantulkan cahaya dan menyembunyikan penanda. Periksa "
             "bagian itu dengan penggaris sebelum dipakai.",
         ],
@@ -566,9 +588,10 @@ README_TEXT: dict[str, tuple[str, list[str]]] = {
             "毫米。使用多材料打印机或中途换料时，到 {plate_mm} "
             "毫米为止打印白色，之后打印黑色：在切片软件中，把换色设在从 {plate_mm} "
             "毫米开始的那一层。只有一种颜色时，整件用白色打印，再用黑色油性记号笔涂满凸起部分。",
-            "灰色块打印出来会是黑色：打印件无法做出灰色，于是应用会改用相机来获取颜色参考。若"
-            "想让不同次拍摄的颜色可以比较，请从纸质页（设置 > 参考卡；纸页底部带有备用方块）上剪下一个"
-            "灰色方块，贴在黑色方块上。",
+            "灰色块比其余墨层高出 {grey_mm} 毫米：在从 {grey_from} 毫"
+            "米开始的那一层换成灰色耗材，之后只有灰色块继续打印，黑色上面盖两层灰色。若保持黑"
+            "色，应用会改用相机获取颜色参考；若想让不同次拍摄的颜色可以比较，请从纸质页（设置"
+            " > 参考卡；纸页底部带有备用方块）上剪下一个灰色方块，贴在上面。",
             "浅色哑光耗材：光面表面会反光，遮住定位标记。使用前请用尺子检查部件。",
         ],
     ),
@@ -584,10 +607,12 @@ README_TEXT: dict[str, tuple[str, list[str]]] = {
             "のインクです。マルチマテリアルプリンターやフィラメント交換が使える場合は、{plate_mm} mm "
             "まで白、そこから上を黒で造形します。スライサーで、{plate_mm} mm から始まる層に色替えを設定してください。"
             "1色の場合は全体を白で造形し、盛り上がった部分を黒の油性マーカーで塗ります。",
-            "グレーの部分は黒で出力されます。造形物ではグレーを作れないため、アプリはその場合"
-            "カメラから色の基準を取ります。訪問をまたいで色を比べたいときは、紙のシート（設定 > "
-            "リファレンスカード。シートの下部に予備の四角があります）からグレーの四角を切り取"
-            "り、黒い四角の上に貼ってください。",
+            "グレーの四角はほかのインクより {grey_mm} mm 高くなっています。{g"
+            "rey_from} mm から始まる層でグレーのフィラメントに替えると、四角だけ"
+            "が続き、黒の上にグレーが2層重なります。黒のままの場合、アプリはカメラから色の基"
+            "準を取ります。訪問をまたいで色を比べたいときは、紙のシート（設定 > リファレン"
+            "スカード。シートの下部に予備の四角があります）からグレーの四角を切り取り、上に貼"
+            "ってください。",
             "明るい色のマットなフィラメントを使ってください。光沢のある表面は反射してマーカー"
             "を隠します。使う前に、定規で寸法を確認してください。",
         ],
@@ -604,9 +629,12 @@ README_TEXT: dict[str, tuple[str, list[str]]] = {
             "프린터나 필라멘트 교체를 쓸 수 있다면 {plate_mm} mm까지는 흰색, 그 위는 검은색으로 출력하세요. "
             "슬라이서에서 {plate_mm} mm에서 시작하는 레이어에 색 변경을 지정하면 됩니다. 한 가지 색만 쓴다면 전체를 "
             "흰색으로 출력하고, 돌출된 부분은 검은색 유성 마커로 칠하세요.",
-            "회색 부분은 검은색으로 출력됩니다. 출력물로는 회색을 만들 수 없어서, 앱이 카메라에서 색 기준을 "
-            "가져옵니다. 방문 간에 색을 비교하려면 종이 시트(설정 > 참조 카드, 시트 아래쪽에 여분의 사각형이 "
-            "있습니다)에서 회색 사각형을 오려 검은 사각형 위에 붙이세요.",
+            "회색 사각형은 나머지 잉크보다 {grey_mm} mm 높습니다. {gre"
+            "y_from} mm에서 시작하는 레이어에서 회색 필라멘트로 바꾸면 사각형"
+            "만 계속 출력되어 검은색 위에 회색이 두 겹 쌓입니다. 검은색으로 두면 "
+            "앱이 카메라에서 색 기준을 가져옵니다. 방문 간에 색을 비교하려면 종이 "
+            "시트(설정 > 참조 카드, 시트 아래쪽에 여분의 사각형이 있습니다)에서 "
+            "회색 사각형을 오려 위에 붙이세요.",
             "밝은 무광 필라멘트를 쓰세요. 광택 있는 표면은 빛을 반사해 마커를 가립니다. 사용하기 전에 자로 크기를 "
             "확인하세요.",
         ],
@@ -623,9 +651,10 @@ README_TEXT: dict[str, tuple[str, list[str]]] = {
             "है। मल्टी-मटेरियल प्रिंटर या फ़िलामेंट बदलने की सुविधा हो तो {plate_mm} mm तक सफ़ेद और वहाँ से काला "
             "प्रिंट करें: स्लाइसर में रंग बदलने की जगह उस परत पर रखें जो {plate_mm} mm से शुरू होती है। एक ही रंग हो "
             "तो पूरा हिस्सा सफ़ेद प्रिंट करें और उभरे हिस्सों को काले परमानेंट मार्कर से रँग दें।",
-            "स्लेटी हिस्सा काला छपता है: प्रिंट अपना स्लेटी रंग नहीं बना सकता, इसलिए ऐप तब रंग का संदर्भ कैमरे से "
-            "लेता है। अलग-अलग बार के रंगों की तुलना हो सके, इसके लिए काग़ज़ की शीट (सेटिंग > संदर्भ कार्ड; शीट के "
-            "नीचे अतिरिक्त वर्ग होते हैं) से एक स्लेटी वर्ग काटें और उसे काले वर्ग पर चिपका दें।",
+            "स्लेटी वर्ग बाकी स्याही से {grey_mm} mm ऊँचा है: {grey_from} mm से शुरू होने वाली परत पर स्लेटी "
+            "फ़िलामेंट लगाएँ, तब सिर्फ़ वर्ग आगे छपेगा, काले के ऊपर स्लेटी की दो परतें। काला रहने पर ऐप रंग का "
+            "संदर्भ कैमरे से लेता है; अलग-अलग बार के रंगों की तुलना हो सके, इसके लिए काग़ज़ की शीट (सेटिंग > "
+            "संदर्भ कार्ड; शीट के नीचे अतिरिक्त वर्ग होते हैं) से एक स्लेटी वर्ग काटें और उसे ऊपर चिपका दें।",
             "हल्का मैट फ़िलामेंट: चमकदार सतहें चमक लौटाती हैं और मार्कर छिपा देती हैं। इस्तेमाल से पहले हिस्से को स्केल से जाँच लें।",
         ],
     ),
@@ -640,9 +669,10 @@ README_TEXT: dict[str, tuple[str, list[str]]] = {
             "المواد أو تغيير الخيط، اطبع باللون الأبيض حتى {plate_mm} mm وبالأسود من هناك: في برنامج التقطيع، اضبط "
             "تغيير اللون عند الطبقة التي تبدأ عند {plate_mm} mm. مع لون واحد، اطبع القطعة كلها بالأبيض وارسم الأجزاء "
             "البارزة بقلم تحديد دائم أسود.",
-            "تخرج البقعة الرمادية سوداء: لا تستطيع الطباعة إنتاج لونها الرمادي، فيأخذ التطبيق مرجع اللون من الكاميرا. "
-            "وللحصول على ألوان قابلة للمقارنة بين الزيارات، قصّ مربعًا رماديًا من الورقة المطبوعة (الإعدادات > "
-            "البطاقة المرجعية؛ تحمل الورقة مربعات احتياطية في أسفلها) والصقه فوق المربع الأسود.",
+            "يرتفع المربع الرمادي {grey_mm} mm فوق بقية الحبر: بدّل إلى خيط رمادي عند الطبقة التي تبدأ عند "
+            "{grey_from} mm، فلا يكمل إلا المربع، بطبقتين من الرمادي فوق الأسود. وإن بقي أسود، يأخذ التطبيق مرجع "
+            "اللون من الكاميرا؛ وللحصول على ألوان قابلة للمقارنة بين الزيارات، قصّ مربعًا رماديًا من الورقة "
+            "المطبوعة (الإعدادات > البطاقة المرجعية؛ تحمل الورقة مربعات احتياطية في أسفلها) والصقه فوقه.",
             "خيط طباعة فاتح ومطفي: الأسطح اللامعة تعكس الضوء وتخفي المؤشرات. افحص القطعة بمسطرة قبل استخدامها.",
         ],
     ),
@@ -661,6 +691,8 @@ def readme(lang: str = "en") -> str:
         "plate_mm": PLATE_MM,
         "ink_mm": INK_MM,
         "overlap_mm": OVERLAP_MM,
+        "grey_mm": GREY_MM,
+        "grey_from": INK_Z1,
         "card_w": WINDOW.width + 2 * PLATE_MARGIN_MM,
         "card_h": WINDOW.height + 2 * PLATE_MARGIN_MM,
         "strip_w": STRIP.width + 2 * PLATE_MARGIN_MM,
