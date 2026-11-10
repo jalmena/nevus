@@ -613,7 +613,8 @@
     "pickPhoto": "Pilih foto",
     "needsAligned": "Memerlukan foto yang sudah disejajarkan",
     "differenceShort": "Menunjukkan di mana harus melihat; tidak mengukur apa pun.",
-    "alignedMark": "Disejajarkan pada tanda, di dalam jendela kartu."
+    "alignedMark": "Disejajarkan pada tanda, di dalam jendela kartu.",
+    "alignedSkin": "Disejajarkan dengan kartu referensi, lalu pada kulit di sekitar tanda."
   },
   "chart": {
     "title": "Ukuran dari waktu ke waktu",

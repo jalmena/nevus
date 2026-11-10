@@ -627,7 +627,8 @@
     "pickPhoto": "Choose a photo",
     "needsAligned": "Needs lined-up photos",
     "differenceShort": "Shows where to look; it measures nothing.",
-    "alignedMark": "Lined up on the mark, inside the card's window."
+    "alignedMark": "Lined up on the mark, inside the card's window.",
+    "alignedSkin": "Lined up with the reference card, then on the skin around the mark."
   },
   "chart": {
     "title": "Size over time",

@@ -627,7 +627,8 @@
     "pickPhoto": "Escoller unha foto",
     "needsAligned": "Fan falta fotos aliñadas",
     "differenceShort": "Indica onde mirar; non mide nada.",
-    "alignedMark": "Aliñadas sobre a marca, dentro da fiestra da tarxeta."
+    "alignedMark": "Aliñadas sobre a marca, dentro da fiestra da tarxeta.",
+    "alignedSkin": "Aliñadas coa tarxeta de referencia e despois pola pel arredor da marca."
   },
   "chart": {
     "title": "Tamaño co paso do tempo",

@@ -627,7 +627,8 @@
     "pickPhoto": "Choisir une photo",
     "needsAligned": "Nécessite des photos alignées",
     "differenceShort": "Montre où regarder ; ne mesure rien.",
-    "alignedMark": "Alignées sur la marque, à l’intérieur de la fenêtre de la carte."
+    "alignedMark": "Alignées sur la marque, à l’intérieur de la fenêtre de la carte.",
+    "alignedSkin": "Alignées grâce à la carte de référence, puis grâce à la peau autour de la marque."
   },
   "chart": {
     "title": "Taille au fil du temps",

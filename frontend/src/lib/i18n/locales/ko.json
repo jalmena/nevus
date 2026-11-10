@@ -611,7 +611,8 @@
     "pickPhoto": "사진 선택",
     "needsAligned": "맞춘 사진이 필요해요",
     "differenceShort": "어디를 볼지 알려 줄 뿐, 측정은 아니에요.",
-    "alignedMark": "카드 창 안에서 점에 맞췄어요."
+    "alignedMark": "카드 창 안에서 점에 맞췄어요.",
+    "alignedSkin": "기준 카드로 맞춘 다음, 점 주변의 피부로 맞췄어요."
   },
   "chart": {
     "title": "시간에 따른 크기",

@@ -627,7 +627,8 @@
     "pickPhoto": "Tria una foto",
     "needsAligned": "Calen fotos alineades",
     "differenceShort": "Indica on mirar; no mesura res.",
-    "alignedMark": "Alineades sobre la marca, dins de la finestra de la targeta."
+    "alignedMark": "Alineades sobre la marca, dins de la finestra de la targeta.",
+    "alignedSkin": "Alineades amb la targeta de referència i després per la pell al voltant de la marca."
   },
   "chart": {
     "title": "Mida al llarg del temps",

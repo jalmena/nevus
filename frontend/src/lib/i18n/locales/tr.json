@@ -627,7 +627,8 @@
     "pickPhoto": "Fotoğraf seç",
     "needsAligned": "Hizalanmış fotoğraflar gerekir",
     "differenceShort": "Nereye bakacağınızı gösterir; hiçbir şeyi ölçmez.",
-    "alignedMark": "İşarete göre, kartın penceresinin içinde hizalandı."
+    "alignedMark": "İşarete göre, kartın penceresinin içinde hizalandı.",
+    "alignedSkin": "Referans kartıyla, ardından işaretin çevresindeki cilde göre hizalandı."
   },
   "chart": {
     "title": "Zaman içinde boyut",

@@ -655,7 +655,8 @@
     "pickPhoto": "Wybierz zdjęcie",
     "needsAligned": "Wymaga dopasowanych zdjęć",
     "differenceShort": "Pokazuje, gdzie patrzeć; niczego nie mierzy.",
-    "alignedMark": "Dopasowane na znaku, wewnątrz okienka karty."
+    "alignedMark": "Dopasowane na znaku, wewnątrz okienka karty.",
+    "alignedSkin": "Dopasowane na podstawie karty referencyjnej, a potem skóry wokół znaku."
   },
   "chart": {
     "title": "Rozmiar w czasie",

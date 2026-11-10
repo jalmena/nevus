@@ -627,7 +627,8 @@
     "pickPhoto": "Scegli una foto",
     "needsAligned": "Servono foto allineate",
     "differenceShort": "Indica dove guardare; non misura nulla.",
-    "alignedMark": "Allineate sul segno, dentro la finestra della scheda."
+    "alignedMark": "Allineate sul segno, dentro la finestra della scheda.",
+    "alignedSkin": "Allineate con la scheda di riferimento e poi sulla pelle attorno al segno."
   },
   "chart": {
     "title": "Dimensione nel tempo",

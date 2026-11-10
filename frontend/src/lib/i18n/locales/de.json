@@ -627,7 +627,8 @@
     "pickPhoto": "Foto auswählen",
     "needsAligned": "Braucht ausgerichtete Fotos",
     "differenceShort": "Zeigt, wo du hinschauen kannst; misst nichts.",
-    "alignedMark": "Auf die Marke ausgerichtet, innerhalb des Kartenfensters."
+    "alignedMark": "Auf die Marke ausgerichtet, innerhalb des Kartenfensters.",
+    "alignedSkin": "Mit der Referenzkarte ausgerichtet, dann an der Haut um die Marke."
   },
   "chart": {
     "title": "Größe im Zeitverlauf",

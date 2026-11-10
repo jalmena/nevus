@@ -159,11 +159,13 @@ function AlignmentNote({ comparison }: { comparison: Comparison }) {
   if (comparison.status === "aligned") {
     return (
       <p className="text-secondary">
-        {comparison.method === "card+mark"
-          ? t("compare.alignedMark")
-          : comparison.method === "card"
-            ? t("compare.alignedCard")
-            : t("compare.alignedPoints", { count: comparison.inliers ?? 0 })}
+        {comparison.method === "card+skin"
+          ? t("compare.alignedSkin")
+          : comparison.method === "card+mark"
+            ? t("compare.alignedMark")
+            : comparison.method === "card"
+              ? t("compare.alignedCard")
+              : t("compare.alignedPoints", { count: comparison.inliers ?? 0 })}
       </p>
     );
   }

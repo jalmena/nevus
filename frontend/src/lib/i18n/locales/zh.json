@@ -613,7 +613,8 @@
     "pickPhoto": "选择照片",
     "needsAligned": "需要已对齐的照片",
     "differenceShort": "提示该看哪里；不做任何测量。",
-    "alignedMark": "已按标记对齐，位于卡片窗口内。"
+    "alignedMark": "已按标记对齐，位于卡片窗口内。",
+    "alignedSkin": "已先根据参照卡对齐，再根据标记周围的皮肤对齐。"
   },
   "chart": {
     "title": "尺寸随时间的变化",

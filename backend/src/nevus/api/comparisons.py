@@ -64,7 +64,7 @@ class ComparisonOut(BaseModel):
     id: uuid.UUID
     status: Literal["aligned", "abstained"]
     reason: Reason | None
-    method: Literal["card", "card+mark", "features"]
+    method: Literal["card", "card+mark", "card+skin", "features"]
     inliers: int | None
     inlier_ratio: float | None
     matrix: list[list[float]] | None
@@ -104,9 +104,7 @@ def _window(card: dict[str, Any]) -> WindowOut | None:
     return WindowOut(cx=float(cx), cy=float(cy), r=APERTURE_RADIUS / float(card["mm_per_px"]))
 
 
-def _anchor(
-    db: DbSession, store: BlobStore, image: Image, picture: Img, card: dict[str, Any]
-) -> tuple[float, float] | None:
+def _anchor(db: DbSession, image: Image, picture: Img, card: dict[str, Any] | None) -> tuple[float, float] | None:
     """Where the mark is in this photo: the saved measurement's centre, else a fit at the window's centre."""
     measured = db.scalar(
         select(Measurement)
@@ -120,7 +118,7 @@ def _anchor(
         points = np.asarray(shape.get("points", []), np.float64)
         if len(points) >= 3:
             return float(points[:, 0].mean()), float(points[:, 1].mean())
-    window = _window(card)
+    window = _window(card) if card else None
     if window is None:
         return None
     found = fit.propose(picture, window.cx, window.cy, "lesion")
@@ -189,14 +187,8 @@ def compare(body: ComparisonIn, request: Request, user: CurrentUser, db: DbSessi
     store: BlobStore = request.app.state.blob_store
     card_a, card_b = _card(db, a), _card(db, b)
     image_a, image_b = load_upright(store, a), load_upright(store, b)
-    if card_a and card_b:
-        result = align.from_cards(card_a["homography"], card_b["homography"])
-        anchor_a = _anchor(db, store, a, image_a, card_a)
-        anchor_b = _anchor(db, store, b, image_b, card_b)
-        if anchor_a is not None and anchor_b is not None:
-            result = align.anchored(result["matrix"], anchor_a, anchor_b)
-    else:
-        result = align.from_features(image_a, image_b)
+    anchor_a, anchor_b = _anchor(db, a, image_a, card_a), _anchor(db, b, image_b, card_b)
+    result = align.align_photos(image_a, image_b, card_a, card_b, anchor_a, anchor_b)
     if result["status"] == "aligned":
         pictures = align.difference(image_a, image_b, result["matrix"])
         result["overlay_sha256"] = store.put(pictures.pop("overlay"), derived=True)

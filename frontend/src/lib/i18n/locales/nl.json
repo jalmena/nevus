@@ -627,7 +627,8 @@
     "pickPhoto": "Kies een foto",
     "needsAligned": "Vraagt om op elkaar gelegde foto's",
     "differenceShort": "Laat zien waar je kunt kijken; meet niets.",
-    "alignedMark": "Op elkaar gelegd op de plek, binnen het venster van de kaart."
+    "alignedMark": "Op elkaar gelegd op de plek, binnen het venster van de kaart.",
+    "alignedSkin": "Op elkaar gelegd met de referentiekaart, daarna op de huid rond de plek."
   },
   "chart": {
     "title": "Grootte in de tijd",
