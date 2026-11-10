@@ -163,7 +163,9 @@
       "backupsLast": "last {{date}}",
       "backupsOff": "off",
       "backupsNone": "none yet",
-      "language": "new accounts in {{language}}"
+      "language": "new accounts in {{language}}",
+      "pushServerOff": "off on this server",
+      "pushUnsupported": "not in this browser"
     },
     "version": "neVus {{version}}"
   },
@@ -1120,6 +1122,9 @@
     "test": "Send a test notification",
     "tested": "Sent to {{sent}}, failed for {{failed}}.",
     "note": "On iPhone and iPad, notifications work only once neVus is installed on the Home Screen and opened from there.",
-    "introMore": "When marks are due for a photo, this device gets one notification a day, after the reminder hour. The message travels encrypted through your browser's push service, which sees only that something was sent."
+    "introMore": "When marks are due for a photo, this device gets one notification a day, after the reminder hour. The message travels encrypted through your browser's push service, which sees only that something was sent.",
+    "serverOff": "Notifications to devices are off on this server. Whoever runs it can turn them on.",
+    "serverOffAdmin": "Notifications to devices are off on this server. To turn them on, set NEVUS_WEB_PUSH to true in the server's configuration and restart neVus. They travel through the browsers' push services: the deployment guide explains what that means.",
+    "unsupported": "This browser cannot receive notifications from neVus."
   }
 }

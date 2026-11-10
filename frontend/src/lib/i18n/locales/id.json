@@ -158,7 +158,9 @@
       "backupsLast": "terakhir {{date}}",
       "backupsOff": "mati",
       "backupsNone": "belum ada",
-      "language": "akun baru dalam {{language}}"
+      "language": "akun baru dalam {{language}}",
+      "pushServerOff": "mati di server ini",
+      "pushUnsupported": "tidak di peramban ini"
     },
     "version": "neVus {{version}}"
   },
@@ -1088,6 +1090,9 @@
     "test": "Kirim notifikasi uji",
     "tested": "Terkirim ke {{sent}}, gagal untuk {{failed}}.",
     "note": "Di iPhone dan iPad, notifikasi hanya berfungsi setelah neVus dipasang di Layar Utama dan dibuka dari sana.",
-    "introMore": "Saat tanda waktunya difoto, perangkat ini mendapat satu notifikasi per hari, setelah jam pengingat. Pesan dikirim terenkripsi lewat layanan push peramban Anda, yang hanya melihat bahwa sesuatu telah dikirim."
+    "introMore": "Saat tanda waktunya difoto, perangkat ini mendapat satu notifikasi per hari, setelah jam pengingat. Pesan dikirim terenkripsi lewat layanan push peramban Anda, yang hanya melihat bahwa sesuatu telah dikirim.",
+    "serverOff": "Notifikasi ke perangkat mati di server ini. Pengelolanya dapat menyalakannya.",
+    "serverOffAdmin": "Notifikasi ke perangkat mati di server ini. Untuk menyalakannya, atur NEVUS_WEB_PUSH ke true di konfigurasi server lalu mulai ulang neVus. Notifikasi dikirim lewat layanan push peramban: panduan penerapan menjelaskan artinya.",
+    "unsupported": "Peramban ini tidak dapat menerima notifikasi dari neVus."
   }
 }

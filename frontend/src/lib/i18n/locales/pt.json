@@ -163,7 +163,9 @@
       "backupsLast": "última {{date}}",
       "backupsOff": "desligadas",
       "backupsNone": "nenhuma ainda",
-      "language": "contas novas em {{language}}"
+      "language": "contas novas em {{language}}",
+      "pushServerOff": "desligadas neste servidor",
+      "pushUnsupported": "não neste navegador"
     },
     "version": "neVus {{version}}"
   },
@@ -1139,6 +1141,9 @@
     "test": "Enviar uma notificação de teste",
     "tested": "Enviada a {{sent}}, falhou em {{failed}}.",
     "note": "No iPhone e no iPad, as notificações só funcionam depois de o neVus estar instalado no ecrã principal e ser aberto a partir daí.",
-    "introMore": "Quando houver marcas com foto pendente, este aparelho recebe uma notificação por dia, depois da hora dos lembretes. A mensagem viaja cifrada pelo serviço de push do seu navegador, que só vê que algo foi enviado."
+    "introMore": "Quando houver marcas com foto pendente, este aparelho recebe uma notificação por dia, depois da hora dos lembretes. A mensagem viaja cifrada pelo serviço de push do seu navegador, que só vê que algo foi enviado.",
+    "serverOff": "As notificações para aparelhos estão desligadas neste servidor. Quem o administra pode ligá-las.",
+    "serverOffAdmin": "As notificações para aparelhos estão desligadas neste servidor. Para as ligar, defina NEVUS_WEB_PUSH como true na configuração do servidor e reinicie o neVus. Viajam pelos serviços de push dos navegadores: o guia de implementação explica o que isso implica.",
+    "unsupported": "Este navegador não pode receber notificações do neVus."
   }
 }

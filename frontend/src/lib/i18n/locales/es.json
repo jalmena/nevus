@@ -163,7 +163,9 @@
       "backupsLast": "última {{date}}",
       "backupsOff": "desactivadas",
       "backupsNone": "ninguna aún",
-      "language": "cuentas nuevas en {{language}}"
+      "language": "cuentas nuevas en {{language}}",
+      "pushServerOff": "desactivadas en el servidor",
+      "pushUnsupported": "no en este navegador"
     },
     "version": "neVus {{version}}"
   },
@@ -1131,6 +1133,9 @@
     "test": "Enviar una notificación de prueba",
     "tested": "Enviada a {{sent}}, falló en {{failed}}.",
     "note": "En iPhone y iPad las notificaciones funcionan solo cuando neVus está instalada en la pantalla de inicio y se abre desde ahí.",
-    "introMore": "Cuando haya marcas pendientes de foto, este dispositivo recibirá una notificación al día, pasada la hora de los recordatorios. El mensaje viaja cifrado por el servicio de push de tu navegador, que solo ve que se envió algo."
+    "introMore": "Cuando haya marcas pendientes de foto, este dispositivo recibirá una notificación al día, pasada la hora de los recordatorios. El mensaje viaja cifrado por el servicio de push de tu navegador, que solo ve que se envió algo.",
+    "serverOff": "Las notificaciones a dispositivos están desactivadas en este servidor. Quien lo administra puede activarlas.",
+    "serverOffAdmin": "Las notificaciones a dispositivos están desactivadas en este servidor. Para activarlas, pon NEVUS_WEB_PUSH a true en la configuración del servidor y reinicia neVus. Viajan por los servicios de push de los navegadores: la guía de despliegue explica qué supone.",
+    "unsupported": "Este navegador no puede recibir notificaciones de neVus."
   }
 }

@@ -163,7 +163,9 @@
       "backupsLast": "zuletzt {{date}}",
       "backupsOff": "aus",
       "backupsNone": "noch keine",
-      "language": "neue Konten auf {{language}}"
+      "language": "neue Konten auf {{language}}",
+      "pushServerOff": "auf diesem Server aus",
+      "pushUnsupported": "nicht in diesem Browser"
     },
     "version": "neVus {{version}}"
   },
@@ -1120,6 +1122,9 @@
     "test": "Testbenachrichtigung senden",
     "tested": "Gesendet an {{sent}}, fehlgeschlagen bei {{failed}}.",
     "note": "Auf iPhone und iPad funktionieren Benachrichtigungen erst, wenn neVus auf dem Home-Bildschirm installiert und von dort geöffnet wurde.",
-    "introMore": "Wenn Marken fotografiert werden sollen, erhält dieses Gerät nach der Erinnerungsstunde eine Benachrichtigung pro Tag. Die Nachricht reist verschlüsselt über den Push-Dienst deines Browsers, der nur sieht, dass etwas gesendet wurde."
+    "introMore": "Wenn Marken fotografiert werden sollen, erhält dieses Gerät nach der Erinnerungsstunde eine Benachrichtigung pro Tag. Die Nachricht reist verschlüsselt über den Push-Dienst deines Browsers, der nur sieht, dass etwas gesendet wurde.",
+    "serverOff": "Benachrichtigungen an Geräte sind auf diesem Server ausgeschaltet. Wer ihn betreibt, kann sie einschalten.",
+    "serverOffAdmin": "Benachrichtigungen an Geräte sind auf diesem Server ausgeschaltet. Zum Einschalten setze NEVUS_WEB_PUSH in der Konfiguration des Servers auf true und starte neVus neu. Sie laufen über die Push-Dienste der Browser: Die Bereitstellungsanleitung erklärt, was das bedeutet.",
+    "unsupported": "Dieser Browser kann keine Benachrichtigungen von neVus empfangen."
   }
 }

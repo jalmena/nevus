@@ -158,7 +158,9 @@
       "backupsLast": "最近一次：{{date}}",
       "backupsOff": "已关闭",
       "backupsNone": "暂无",
-      "language": "新账户使用{{language}}"
+      "language": "新账户使用{{language}}",
+      "pushServerOff": "此服务器已关闭",
+      "pushUnsupported": "此浏览器不支持"
     },
     "version": "neVus {{version}}"
   },
@@ -1088,6 +1090,9 @@
     "test": "发送测试通知",
     "tested": "已发送给{{sent}}台，{{failed}}台失败。",
     "note": "在iPhone和iPad上，只有将neVus安装到主屏幕并从那里打开后，通知才会生效。",
-    "introMore": "标记到了该拍照的时候，此设备每天会收到一条通知，时间在提醒时刻之后。消息经由您浏览器的推送服务加密传送，该服务只能看到有内容被发送。"
+    "introMore": "标记到了该拍照的时候，此设备每天会收到一条通知，时间在提醒时刻之后。消息经由您浏览器的推送服务加密传送，该服务只能看到有内容被发送。",
+    "serverOff": "此服务器已关闭向设备发送通知。运行它的人可以将其开启。",
+    "serverOffAdmin": "此服务器已关闭向设备发送通知。要开启，请在服务器配置中将NEVUS_WEB_PUSH设为true，然后重启neVus。通知会经由浏览器的推送服务传送：部署指南说明了这意味着什么。",
+    "unsupported": "此浏览器无法接收neVus的通知。"
   }
 }

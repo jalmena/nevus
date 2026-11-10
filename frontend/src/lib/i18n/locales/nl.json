@@ -163,7 +163,9 @@
       "backupsLast": "laatste {{date}}",
       "backupsOff": "uit",
       "backupsNone": "nog geen",
-      "language": "nieuwe accounts in: {{language}}"
+      "language": "nieuwe accounts in: {{language}}",
+      "pushServerOff": "uit op deze server",
+      "pushUnsupported": "niet in deze browser"
     },
     "version": "neVus {{version}}"
   },
@@ -1120,6 +1122,9 @@
     "test": "Stuur een testmelding",
     "tested": "Verstuurd naar {{sent}}, mislukt voor {{failed}}.",
     "note": "Op iPhone en iPad werken meldingen pas als neVus op het beginscherm is geïnstalleerd en vandaar wordt geopend.",
-    "introMore": "Als er plekken aan de beurt zijn voor een foto, krijgt dit apparaat één melding per dag, na het herinneringsuur. Het bericht reist versleuteld via de pushdienst van je browser, die alleen ziet dat er iets is verstuurd."
+    "introMore": "Als er plekken aan de beurt zijn voor een foto, krijgt dit apparaat één melding per dag, na het herinneringsuur. Het bericht reist versleuteld via de pushdienst van je browser, die alleen ziet dat er iets is verstuurd.",
+    "serverOff": "Meldingen naar apparaten staan uit op deze server. Wie hem beheert, kan ze aanzetten.",
+    "serverOffAdmin": "Meldingen naar apparaten staan uit op deze server. Zet NEVUS_WEB_PUSH op true in de serverconfiguratie en herstart neVus om ze aan te zetten. Ze reizen via de pushdiensten van browsers: de implementatiegids legt uit wat dat betekent.",
+    "unsupported": "Deze browser kan geen meldingen van neVus ontvangen."
   }
 }
