@@ -163,7 +163,9 @@
       "backupsLast": "l'últim {{date}}",
       "backupsOff": "desactivades",
       "backupsNone": "encara cap",
-      "language": "comptes nous en {{language}}"
+      "language": "comptes nous en {{language}}",
+      "pushServerOff": "desactivades al servidor",
+      "pushUnsupported": "no en aquest navegador"
     },
     "version": "neVus {{version}}"
   },
@@ -627,7 +629,8 @@
     "pickPhoto": "Tria una foto",
     "needsAligned": "Calen fotos alineades",
     "differenceShort": "Indica on mirar; no mesura res.",
-    "alignedMark": "Alineades sobre la marca, dins de la finestra de la targeta."
+    "alignedMark": "Alineades sobre la marca, dins de la finestra de la targeta.",
+    "alignedSkin": "Alineades amb la targeta de referència i després per la pell al voltant de la marca."
   },
   "chart": {
     "title": "Mida al llarg del temps",
@@ -1119,6 +1122,9 @@
     "test": "Envia una notificació de prova",
     "tested": "Enviada a {{sent}}, ha fallat per a {{failed}}.",
     "note": "A iPhone i iPad, les notificacions només funcionen quan neVus està instal·lat a la pantalla d'inici i s'obre des d'allà.",
-    "introMore": "Quan toca fotografiar marques, aquest dispositiu rep una notificació al dia, després de l'hora del recordatori. El missatge viatja xifrat pel servei push del teu navegador, que només veu que s'ha enviat alguna cosa."
+    "introMore": "Quan toca fotografiar marques, aquest dispositiu rep una notificació al dia, després de l'hora del recordatori. El missatge viatja xifrat pel servei push del teu navegador, que només veu que s'ha enviat alguna cosa.",
+    "serverOff": "Les notificacions als dispositius estan desactivades en aquest servidor. Qui l'administra pot activar-les.",
+    "serverOffAdmin": "Les notificacions als dispositius estan desactivades en aquest servidor. Per activar-les, posa NEVUS_WEB_PUSH a true a la configuració del servidor i reinicia neVus. Viatgen pels serveis push dels navegadors: la guia de desplegament explica què implica.",
+    "unsupported": "Aquest navegador no pot rebre notificacions de neVus."
   }
 }

@@ -1170,6 +1170,7 @@
             "enum": [
               "card",
               "card+mark",
+              "card+skin",
               "features"
             ],
             "title": "Method",

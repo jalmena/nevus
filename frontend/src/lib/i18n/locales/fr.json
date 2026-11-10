@@ -163,7 +163,9 @@
       "backupsLast": "dernière le {{date}}",
       "backupsOff": "désactivées",
       "backupsNone": "aucune pour l’instant",
-      "language": "nouveaux comptes en {{language}}"
+      "language": "nouveaux comptes en {{language}}",
+      "pushServerOff": "désactivées sur ce serveur",
+      "pushUnsupported": "pas dans ce navigateur"
     },
     "version": "neVus {{version}}"
   },
@@ -627,7 +629,8 @@
     "pickPhoto": "Choisir une photo",
     "needsAligned": "Nécessite des photos alignées",
     "differenceShort": "Montre où regarder ; ne mesure rien.",
-    "alignedMark": "Alignées sur la marque, à l’intérieur de la fenêtre de la carte."
+    "alignedMark": "Alignées sur la marque, à l’intérieur de la fenêtre de la carte.",
+    "alignedSkin": "Alignées grâce à la carte de référence, puis grâce à la peau autour de la marque."
   },
   "chart": {
     "title": "Taille au fil du temps",
@@ -1119,6 +1122,9 @@
     "test": "Envoyer une notification de test",
     "tested": "Envoyée à {{sent}}, échec pour {{failed}}.",
     "note": "Sur iPhone et iPad, les notifications ne fonctionnent qu’une fois neVus installé sur l’écran d’accueil et ouvert depuis celui-ci.",
-    "introMore": "Quand des marques sont à photographier, cet appareil reçoit une notification par jour, après l’heure du rappel. Le message transite chiffré par le service de notifications push de votre navigateur, qui voit seulement que quelque chose a été envoyé."
+    "introMore": "Quand des marques sont à photographier, cet appareil reçoit une notification par jour, après l’heure du rappel. Le message transite chiffré par le service de notifications push de votre navigateur, qui voit seulement que quelque chose a été envoyé.",
+    "serverOff": "Les notifications vers les appareils sont désactivées sur ce serveur. La personne qui l’administre peut les activer.",
+    "serverOffAdmin": "Les notifications vers les appareils sont désactivées sur ce serveur. Pour les activer, mettez NEVUS_WEB_PUSH à true dans la configuration du serveur et redémarrez neVus. Elles transitent par les services push des navigateurs : le guide de déploiement explique ce que cela implique.",
+    "unsupported": "Ce navigateur ne peut pas recevoir les notifications de neVus."
   }
 }

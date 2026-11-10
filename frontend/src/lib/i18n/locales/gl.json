@@ -163,7 +163,9 @@
       "backupsLast": "a última {{date}}",
       "backupsOff": "desactivadas",
       "backupsNone": "aínda ningunha",
-      "language": "contas novas en {{language}}"
+      "language": "contas novas en {{language}}",
+      "pushServerOff": "desactivadas no servidor",
+      "pushUnsupported": "non neste navegador"
     },
     "version": "neVus {{version}}"
   },
@@ -627,7 +629,8 @@
     "pickPhoto": "Escoller unha foto",
     "needsAligned": "Fan falta fotos aliñadas",
     "differenceShort": "Indica onde mirar; non mide nada.",
-    "alignedMark": "Aliñadas sobre a marca, dentro da fiestra da tarxeta."
+    "alignedMark": "Aliñadas sobre a marca, dentro da fiestra da tarxeta.",
+    "alignedSkin": "Aliñadas coa tarxeta de referencia e despois pola pel arredor da marca."
   },
   "chart": {
     "title": "Tamaño co paso do tempo",
@@ -1119,6 +1122,9 @@
     "test": "Enviar unha notificación de proba",
     "tested": "Enviada a {{sent}}, fallou para {{failed}}.",
     "note": "En iPhone e iPad, as notificacións só funcionan cando neVus está instalado na pantalla de inicio e se abre desde alí.",
-    "introMore": "Cando toca fotografar marcas, este dispositivo recibe unha notificación ao día, despois da hora do lembrete. A mensaxe viaxa cifrada polo servizo push do teu navegador, que só ve que se enviou algo."
+    "introMore": "Cando toca fotografar marcas, este dispositivo recibe unha notificación ao día, despois da hora do lembrete. A mensaxe viaxa cifrada polo servizo push do teu navegador, que só ve que se enviou algo.",
+    "serverOff": "As notificacións aos dispositivos están desactivadas neste servidor. Quen o administra pode activalas.",
+    "serverOffAdmin": "As notificacións aos dispositivos están desactivadas neste servidor. Para activalas, pon NEVUS_WEB_PUSH a true na configuración do servidor e reinicia neVus. Viaxan polos servizos push dos navegadores: a guía de despregamento explica o que implica.",
+    "unsupported": "Este navegador non pode recibir notificacións de neVus."
   }
 }

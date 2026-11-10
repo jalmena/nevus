@@ -19,6 +19,7 @@ import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useMediaQuery, type Chrome } from "@/app/chrome";
 import { PageHeader } from "@/design-system/components/PageHeader";
+import { usePushOffered } from "@/lib/push";
 
 export interface SettingsSection {
   id: string;
@@ -51,15 +52,22 @@ export const SECTIONS: SettingsSection[] = [
   { id: "about", label: (t) => t("settings.about"), icon: Info, group: "about" },
 ];
 
-/** The rail's context block inside Settings: the sections the user may open. */
-export function settingsRail(t: TFunction, admin: boolean): Chrome["rail"] {
+/** The rail's context block inside Settings: the sections the user may open, less any `hidden`. */
+export function settingsRail(t: TFunction, admin: boolean, hidden: readonly string[] = []): Chrome["rail"] {
   return {
     heading: t("settings.title"),
-    items: SECTIONS.filter((section) => admin || !section.admin).map((section) => {
-      const Icon = section.icon;
-      return { to: `/settings/${section.id}`, label: section.label(t), icon: <Icon /> };
-    }),
+    items: SECTIONS.filter((section) => (admin || !section.admin) && !hidden.includes(section.id)).map(
+      (section) => {
+        const Icon = section.icon;
+        return { to: `/settings/${section.id}`, label: section.label(t), icon: <Icon /> };
+      },
+    ),
   };
+}
+
+/** The sections this user is not offered here: the same in the rail and in the list on a phone. */
+export function useHiddenSections(admin: boolean): string[] {
+  return usePushOffered(admin) ? [] : ["notifications"];
 }
 
 /** The header of a settings sub-page: back to the list on a phone, the sections in the rail on a desktop. */
@@ -79,6 +87,7 @@ export function SettingsHeader({
 }) {
   const { t } = useTranslation();
   const desktop = useMediaQuery("(min-width: 900px)");
+  const hidden = useHiddenSections(admin);
   return (
     <PageHeader
       {...chrome}
@@ -86,7 +95,7 @@ export function SettingsHeader({
       title={title}
       meta={meta}
       chip={chip}
-      rail={settingsRail(t, admin)}
+      rail={settingsRail(t, admin, hidden)}
     >
       {children}
     </PageHeader>

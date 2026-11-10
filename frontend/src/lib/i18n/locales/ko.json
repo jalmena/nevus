@@ -156,7 +156,9 @@
       "backupsLast": "마지막 {{date}}",
       "backupsOff": "꺼짐",
       "backupsNone": "아직 없음",
-      "language": "새 계정은 {{language}}"
+      "language": "새 계정은 {{language}}",
+      "pushServerOff": "이 서버에서 꺼짐",
+      "pushUnsupported": "이 브라우저에서는 안 됨"
     },
     "version": "neVus {{version}}"
   },
@@ -611,7 +613,8 @@
     "pickPhoto": "사진 선택",
     "needsAligned": "맞춘 사진이 필요해요",
     "differenceShort": "어디를 볼지 알려 줄 뿐, 측정은 아니에요.",
-    "alignedMark": "카드 창 안에서 점에 맞췄어요."
+    "alignedMark": "카드 창 안에서 점에 맞췄어요.",
+    "alignedSkin": "기준 카드로 맞춘 다음, 점 주변의 피부로 맞췄어요."
   },
   "chart": {
     "title": "시간에 따른 크기",
@@ -1084,6 +1087,9 @@
     "test": "테스트 알림 보내기",
     "tested": "{{sent}}대에 보냈고, {{failed}}대는 실패했어요.",
     "note": "iPhone과 iPad에서는 neVus를 홈 화면에 설치하고 거기서 열어야만 알림이 작동해요.",
-    "introMore": "촬영할 차례인 점이 있으면, 알림 시각 이후에 이 기기로 하루에 알림 한 번이 와요. 메시지는 암호화되어 브라우저의 푸시 서비스를 거치고, 푸시 서비스는 무언가 전송되었다는 사실만 알아요."
+    "introMore": "촬영할 차례인 점이 있으면, 알림 시각 이후에 이 기기로 하루에 알림 한 번이 와요. 메시지는 암호화되어 브라우저의 푸시 서비스를 거치고, 푸시 서비스는 무언가 전송되었다는 사실만 알아요.",
+    "serverOff": "이 서버에서는 기기 알림이 꺼져 있어요. 서버를 운영하는 사람이 켤 수 있어요.",
+    "serverOffAdmin": "이 서버에서는 기기 알림이 꺼져 있어요. 켜려면 서버 설정에서 NEVUS_WEB_PUSH를 true로 두고 neVus를 다시 시작하세요. 알림은 브라우저의 푸시 서비스를 거쳐요. 배포 가이드에서 그것이 무엇을 뜻하는지 설명해요.",
+    "unsupported": "이 브라우저는 neVus 알림을 받을 수 없어요."
   }
 }

@@ -163,7 +163,9 @@
       "backupsLast": "azkena: {{date}}",
       "backupsOff": "desaktibatuta",
       "backupsNone": "oraindik batere ez",
-      "language": "kontu berriak hizkuntza honetan: {{language}}"
+      "language": "kontu berriak hizkuntza honetan: {{language}}",
+      "pushServerOff": "zerbitzari honetan desaktibatuta",
+      "pushUnsupported": "ez nabigatzaile honetan"
     },
     "version": "neVus {{version}}"
   },
@@ -627,7 +629,8 @@
     "pickPhoto": "Aukeratu argazki bat",
     "needsAligned": "Lerrokatutako argazkiak behar ditu",
     "differenceShort": "Non begiratu erakusten du; ez du ezer neurtzen.",
-    "alignedMark": "Markaren gainean lerrokatuta, txartelaren leihoaren barruan."
+    "alignedMark": "Markaren gainean lerrokatuta, txartelaren leihoaren barruan.",
+    "alignedSkin": "Erreferentzia-txartelarekin lerrokatuta, eta gero markaren inguruko azalarekin."
   },
   "chart": {
     "title": "Tamaina denboran zehar",
@@ -1119,6 +1122,9 @@
     "test": "Bidali proba-jakinarazpen bat",
     "tested": "{{sent}}(e)ra bidalita, {{failed}}(e)tan huts eginda.",
     "note": "iPhone eta iPad gailuetan, jakinarazpenek neVus hasierako pantailan instalatuta dagoenean eta handik irekitzen denean soilik funtzionatzen dute.",
-    "introMore": "Marka batzuei argazkia ateratzeko garaia datorrenean, gailu honek jakinarazpen bat jasotzen du egunean, gogorarazpen-orduaren ondoren. Mezua zifratuta doa zure nabigatzailearen push zerbitzutik, eta horrek zerbait bidali dela bakarrik ikusten du."
+    "introMore": "Marka batzuei argazkia ateratzeko garaia datorrenean, gailu honek jakinarazpen bat jasotzen du egunean, gogorarazpen-orduaren ondoren. Mezua zifratuta doa zure nabigatzailearen push zerbitzutik, eta horrek zerbait bidali dela bakarrik ikusten du.",
+    "serverOff": "Gailuetarako jakinarazpenak desaktibatuta daude zerbitzari honetan. Kudeatzen duenak aktiba ditzake.",
+    "serverOffAdmin": "Gailuetarako jakinarazpenak desaktibatuta daude zerbitzari honetan. Aktibatzeko, ezarri NEVUS_WEB_PUSH true balioan zerbitzariaren konfigurazioan eta berrabiarazi neVus. Nabigatzaileen push zerbitzuetatik doaz: hedapen-gidak azaltzen du zer esan nahi duen.",
+    "unsupported": "Nabigatzaile honek ezin ditu neVus-en jakinarazpenak jaso."
   }
 }

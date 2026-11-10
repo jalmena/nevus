@@ -29,7 +29,7 @@ async function readyWorker(): Promise<ServiceWorkerRegistration> {
   }
 }
 
-export function usePushStatus(enabled = true) {
+export function usePushStatus() {
   return useQuery({
     queryKey: pushKey,
     queryFn: async () => {
@@ -37,8 +37,16 @@ export function usePushStatus(enabled = true) {
       if (!data) throw new Error(errorMessage(error, "Notifications could not be checked."));
       return data;
     },
-    enabled,
   });
+}
+
+/**
+ * Whether Settings offers the section: when the server sends notifications, or to an administrator,
+ * who is told there how to turn them on. Everyone else is not shown what this server does not do.
+ */
+export function usePushOffered(admin: boolean): boolean {
+  const status = usePushStatus();
+  return admin || Boolean(status.data?.enabled);
 }
 
 function keyBytes(base64url: string): Uint8Array<ArrayBuffer> {
