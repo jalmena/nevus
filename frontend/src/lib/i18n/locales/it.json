@@ -163,7 +163,9 @@
       "backupsLast": "ultimo {{date}}",
       "backupsOff": "disattivati",
       "backupsNone": "ancora nessuno",
-      "language": "nuovi account in {{language}}"
+      "language": "nuovi account in {{language}}",
+      "pushServerOff": "disattivate su questo server",
+      "pushUnsupported": "non in questo browser"
     },
     "version": "neVus {{version}}"
   },
@@ -627,7 +629,8 @@
     "pickPhoto": "Scegli una foto",
     "needsAligned": "Servono foto allineate",
     "differenceShort": "Indica dove guardare; non misura nulla.",
-    "alignedMark": "Allineate sul segno, dentro la finestra della scheda."
+    "alignedMark": "Allineate sul segno, dentro la finestra della scheda.",
+    "alignedSkin": "Allineate con la scheda di riferimento e poi sulla pelle attorno al segno."
   },
   "chart": {
     "title": "Dimensione nel tempo",
@@ -1119,6 +1122,9 @@
     "test": "Invia una notifica di prova",
     "tested": "Inviata a {{sent}}, non riuscita per {{failed}}.",
     "note": "Su iPhone e iPad le notifiche funzionano solo dopo aver installato neVus nella schermata Home e averlo aperto da lì.",
-    "introMore": "Quando ci sono segni da fotografare, questo dispositivo riceve una notifica al giorno, dopo l'ora del promemoria. Il messaggio viaggia cifrato attraverso il servizio push del tuo browser, che vede solo che è stato inviato qualcosa."
+    "introMore": "Quando ci sono segni da fotografare, questo dispositivo riceve una notifica al giorno, dopo l'ora del promemoria. Il messaggio viaggia cifrato attraverso il servizio push del tuo browser, che vede solo che è stato inviato qualcosa.",
+    "serverOff": "Le notifiche ai dispositivi sono disattivate su questo server. Chi lo amministra può attivarle.",
+    "serverOffAdmin": "Le notifiche ai dispositivi sono disattivate su questo server. Per attivarle, imposta NEVUS_WEB_PUSH su true nella configurazione del server e riavvia neVus. Viaggiano attraverso i servizi push dei browser: la guida al deployment spiega cosa comporta.",
+    "unsupported": "Questo browser non può ricevere notifiche da neVus."
   }
 }

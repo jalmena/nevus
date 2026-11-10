@@ -62,12 +62,41 @@ afterEach(() => {
 });
 
 describe("notifications on this device", () => {
-  it("stays out of the way when the server has them off", async () => {
+  it("stays out of the way of a member when the server has them off", async () => {
     fakeBrowser();
-    installMockApi({ claimed: true, session: SESSION });
+    installMockApi({ claimed: true, session: { ...SESSION, role: "member" } });
     renderApp("/settings");
     expect(await screen.findByRole("link", { name: /Reminders/ })).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /Notifications on this device/ })).not.toBeInTheDocument();
+  });
+
+  it("tells an administrator how to turn them on when the server has them off", async () => {
+    fakeBrowser();
+    installMockApi({ claimed: true, session: SESSION });
+    const list = renderApp("/settings");
+    const row = await screen.findByRole("link", { name: /Notifications on this device/ });
+    expect(row).toHaveTextContent("off on this server");
+    list.unmount();
+    renderApp("/settings/notifications");
+    // The page opens, title and all, instead of staying blank.
+    expect(await screen.findByText(/set NEVUS_WEB_PUSH to true/)).toBeInTheDocument();
+    expect(screen.getAllByRole("heading", { name: "Notifications on this device" }).length).toBeGreaterThan(
+      0,
+    );
+    expect(screen.queryByRole("button", { name: "Turn on for this device" })).not.toBeInTheDocument();
+  });
+
+  it("opens, and says so, in a browser that cannot take them", async () => {
+    installMockApi({
+      claimed: true,
+      session: SESSION,
+      push: { enabled: true, public_key: PUBLIC_KEY, subscriptions: 0 },
+    });
+    renderApp("/settings/notifications");
+    expect(
+      await screen.findByText(/This browser cannot receive notifications from neVus/),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Turn on for this device" })).not.toBeInTheDocument();
   });
 
   it("subscribes this device with the server's key, sends a test, and unsubscribes", async () => {

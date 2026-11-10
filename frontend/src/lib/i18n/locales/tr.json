@@ -163,7 +163,9 @@
       "backupsLast": "son: {{date}}",
       "backupsOff": "kapalı",
       "backupsNone": "henüz yok",
-      "language": "yeni hesaplar için dil: {{language}}"
+      "language": "yeni hesaplar için dil: {{language}}",
+      "pushServerOff": "bu sunucuda kapalı",
+      "pushUnsupported": "bu tarayıcıda yok"
     },
     "version": "neVus {{version}}"
   },
@@ -627,7 +629,8 @@
     "pickPhoto": "Fotoğraf seç",
     "needsAligned": "Hizalanmış fotoğraflar gerekir",
     "differenceShort": "Nereye bakacağınızı gösterir; hiçbir şeyi ölçmez.",
-    "alignedMark": "İşarete göre, kartın penceresinin içinde hizalandı."
+    "alignedMark": "İşarete göre, kartın penceresinin içinde hizalandı.",
+    "alignedSkin": "Referans kartıyla, ardından işaretin çevresindeki cilde göre hizalandı."
   },
   "chart": {
     "title": "Zaman içinde boyut",
@@ -1119,6 +1122,9 @@
     "test": "Deneme bildirimi gönder",
     "tested": "{{sent}} cihaza gönderildi, {{failed}} cihazda başarısız oldu.",
     "note": "iPhone ve iPad'de bildirimler yalnızca neVus Ana Ekran'a yüklenip oradan açıldığında çalışır.",
-    "introMore": "İşaretlerin fotoğraf zamanı geldiğinde bu cihaz, hatırlatma saatinden sonra günde bir bildirim alır. İleti, tarayıcınızın anlık bildirim hizmeti üzerinden şifreli olarak ilerler; bu hizmet yalnızca bir şey gönderildiğini görür."
+    "introMore": "İşaretlerin fotoğraf zamanı geldiğinde bu cihaz, hatırlatma saatinden sonra günde bir bildirim alır. İleti, tarayıcınızın anlık bildirim hizmeti üzerinden şifreli olarak ilerler; bu hizmet yalnızca bir şey gönderildiğini görür.",
+    "serverOff": "Cihazlara bildirimler bu sunucuda kapalı. Sunucuyu yöneten kişi bunları açabilir.",
+    "serverOffAdmin": "Cihazlara bildirimler bu sunucuda kapalı. Açmak için sunucunun yapılandırmasında NEVUS_WEB_PUSH değerini true yapın ve neVus'u yeniden başlatın. Bildirimler tarayıcıların anlık bildirim hizmetleri üzerinden ilerler: dağıtım kılavuzu bunun ne anlama geldiğini açıklar.",
+    "unsupported": "Bu tarayıcı neVus bildirimlerini alamaz."
   }
 }

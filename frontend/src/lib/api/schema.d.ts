@@ -2186,7 +2186,7 @@ export interface components {
              * Method
              * @enum {string}
              */
-            method: "card" | "card+mark" | "features";
+            method: "card" | "card+mark" | "card+skin" | "features";
             /** Overlay Url */
             overlay_url: string | null;
             /** Reason */

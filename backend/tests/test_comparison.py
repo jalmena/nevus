@@ -17,6 +17,8 @@ from nevus.cv.card import WINDOW
 from nevus.db.models import Analysis
 from nevus.domain import purge
 from tests.scene import photograph
+from tests.skin_scene import Shot, Skin, Visit, error_mm, skin_plane
+from tests.skin_scene import photograph as visit_photo
 from tests.synthetic import jpeg, skin
 from tests.test_accounts import MEMBER, claim
 from tests.test_scale import SAME_ORIGIN, _measure_disc
@@ -90,6 +92,73 @@ def test_two_photos_with_the_card_align_through_it() -> None:
     assert np.linalg.norm(mapped - np.array(card_a["centre_px"])) < 2.0
 
 
+def _visits(skin_: Skin, first: Visit, second: Visit) -> tuple[Shot, Shot]:
+    plane = skin_plane(skin_)
+    later = plane if second.growth == first.growth else skin_plane(skin_, second.growth)
+    return visit_photo(skin_, first, plane), visit_photo(skin_, second, later)
+
+
+def _turned(angle: float, **changes: object) -> Visit:
+    """The card laid on the skin at another angle, and the phone held square to the card."""
+    return Visit(card_angle=angle, roll=angle, **changes)  # type: ignore[arg-type]
+
+
+def _aligned(a: Shot, b: Shot) -> dict[str, object]:
+    card_a, card_b = card_detect.detect(a["photo"]), card_detect.detect(b["photo"])  # type: ignore[arg-type]
+    return align.align_photos(
+        a["photo"],  # type: ignore[arg-type]
+        b["photo"],  # type: ignore[arg-type]
+        card_a if card_a["found"] else None,
+        card_b if card_b["found"] else None,
+        a["mark_px"],  # type: ignore[arg-type]
+        b["mark_px"],  # type: ignore[arg-type]
+    )
+
+
+@pytest.mark.parametrize(
+    ("skin_", "first", "second"),
+    [
+        pytest.param(Skin(seed=3), Visit(), _turned(10, hair_seed=3), id="card a little turned"),
+        pytest.param(
+            Skin(seed=5),
+            Visit(size=(2400, 3200), roll=90),
+            _turned(86, card_offset=(1.0, 0.8), hair_seed=5),
+            id="a quarter turn, one photo upright",
+        ),
+        pytest.param(Skin(seed=6), Visit(), _turned(180, card_offset=(-1.2, 0.5), hair_seed=6), id="card upside down"),
+        pytest.param(
+            Skin(seed=7),
+            Visit(),
+            _turned(25, card_offset=(1.5, 1.0), tilt=(12, -5), distance_mm=150, gain=1.25, white=(0.9, 1.0, 1.1)),
+            id="turned, tilted, other light",
+        ),
+        pytest.param(Skin(seed=8), Visit(), _turned(15, growth=1.2, hair_seed=8), id="the mark grew"),
+        pytest.param(Skin(seed=9), Visit(hairs=200, hair_seed=10), _turned(-20, hairs=200), id="dense hair"),
+        pytest.param(Skin(seed=12, tone=(52, 65, 96)), Visit(), _turned(40, hair_seed=14), id="dark skin"),
+    ],
+)
+def test_the_skin_lines_up_however_the_card_lay_on_it(skin_: Skin, first: Visit, second: Visit) -> None:
+    """The card may lie on the skin at any angle and a little off at each visit: the card alone would
+    turn the skin with it, by as much as the card turned, and the mark would land millimetres away."""
+    a, b = _visits(skin_, first, second)
+    result = _aligned(a, b)
+    assert result["status"] == "aligned" and result["method"] == "card+skin", result
+    _, worst = error_mm(result["matrix"], a, b)  # type: ignore[arg-type]
+    assert worst < 0.05, f"the skin lands {worst:.3f} mm off"
+
+
+def test_a_close_up_lines_up_with_the_window_of_a_photo_with_the_card() -> None:
+    a, b = _visits(Skin(seed=13), Visit(), Visit(card=False, distance_mm=75, roll=40, aim_mm=(1.5, -1.0), hair_seed=15))
+    result = _aligned(a, b)
+    assert result["status"] == "aligned" and result["refined"], result
+    assert error_mm(result["matrix"], a, b)[1] < 0.05  # type: ignore[arg-type]
+
+
+def test_skin_with_nothing_on_it_leaves_the_rough_map_alone() -> None:
+    flat = np.full((1200, 1600, 3), (150, 175, 215), np.uint8)
+    assert align.refine(flat, flat.copy(), np.eye(3).tolist(), (800.0, 600.0), 300.0) is None
+
+
 def test_the_difference_map_is_quiet_where_nothing_changed() -> None:
     a = skin(1600, 1200, seed=8)
     changed = a.copy()
@@ -145,8 +214,8 @@ def test_comparing_two_visits_through_the_api(client: TestClient) -> None:
     response = client.post("/api/comparisons", json={"image_a": image_a, "image_b": image_b}, headers=SAME_ORIGIN)
     assert response.status_code == 200, response.text
     body = response.json()
-    # Both photos hold the card and the disc: lined up by the card, then shifted so the marks coincide.
-    assert body["status"] == "aligned" and body["method"] == "card+mark"
+    # Both photos hold the card and the disc: lined up by the card, then laid on the skin in the window.
+    assert body["status"] == "aligned" and body["method"] == "card+skin"
     assert body["a"]["scale_kind"] == "card" and body["a"]["mm_per_px"] > 0
     assert body["a"]["window"]["r"] > 0 and body["b"]["window"]["cx"] > 0
     overlay = client.get(body["overlay_url"])

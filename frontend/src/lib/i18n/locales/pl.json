@@ -173,7 +173,9 @@
       "backupsLast": "ostatnia {{date}}",
       "backupsOff": "wyłączone",
       "backupsNone": "jeszcze brak",
-      "language": "nowe konta w języku: {{language}}"
+      "language": "nowe konta w języku: {{language}}",
+      "pushServerOff": "wyłączone na tym serwerze",
+      "pushUnsupported": "nie w tej przeglądarce"
     },
     "version": "neVus {{version}}"
   },
@@ -655,7 +657,8 @@
     "pickPhoto": "Wybierz zdjęcie",
     "needsAligned": "Wymaga dopasowanych zdjęć",
     "differenceShort": "Pokazuje, gdzie patrzeć; niczego nie mierzy.",
-    "alignedMark": "Dopasowane na znaku, wewnątrz okienka karty."
+    "alignedMark": "Dopasowane na znaku, wewnątrz okienka karty.",
+    "alignedSkin": "Dopasowane na podstawie karty referencyjnej, a potem skóry wokół znaku."
   },
   "chart": {
     "title": "Rozmiar w czasie",
@@ -1183,6 +1186,9 @@
     "test": "Wyślij powiadomienie testowe",
     "tested": "Wysłano do {{sent}}, niepowodzenia: {{failed}}.",
     "note": "Na iPhonie i iPadzie powiadomienia działają dopiero po zainstalowaniu neVus na ekranie głównym i otwarciu go stamtąd.",
-    "introMore": "Gdy znaki czekają na zdjęcie, to urządzenie dostaje jedno powiadomienie dziennie, po godzinie przypomnienia. Wiadomość podróżuje zaszyfrowana przez usługę push twojej przeglądarki, która widzi tylko, że coś zostało wysłane."
+    "introMore": "Gdy znaki czekają na zdjęcie, to urządzenie dostaje jedno powiadomienie dziennie, po godzinie przypomnienia. Wiadomość podróżuje zaszyfrowana przez usługę push twojej przeglądarki, która widzi tylko, że coś zostało wysłane.",
+    "serverOff": "Powiadomienia na urządzenia są wyłączone na tym serwerze. Osoba, która nim zarządza, może je włączyć.",
+    "serverOffAdmin": "Powiadomienia na urządzenia są wyłączone na tym serwerze. Aby je włączyć, ustaw NEVUS_WEB_PUSH na true w konfiguracji serwera i uruchom neVus ponownie. Podróżują przez usługi push przeglądarek: przewodnik wdrożenia wyjaśnia, co to oznacza.",
+    "unsupported": "Ta przeglądarka nie może odbierać powiadomień z neVus."
   }
 }

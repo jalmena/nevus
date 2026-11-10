@@ -15,7 +15,7 @@ import { useExports } from "@/lib/data";
 import { languageNames, supportedLanguages, type Language } from "@/lib/i18n";
 import { useWebhooks } from "@/lib/notifications";
 import { pushSupported, usePushStatus } from "@/lib/push";
-import { SECTIONS, settingsRail, type SettingsSection } from "./SettingsHeader";
+import { SECTIONS, settingsRail, useHiddenSections, type SettingsSection } from "./SettingsHeader";
 import { THEMES } from "./AppearanceSection";
 import { useThisDevice } from "./PushSettings";
 import styles from "./settings.module.css";
@@ -39,8 +39,9 @@ function SettingsRows({ admin }: { admin: boolean }) {
   const local = instance.data?.auth_mode !== "proxy";
   const totp = useTotpStatus(local);
   const supported = pushSupported();
-  const push = usePushStatus(supported);
+  const push = usePushStatus();
   const thisDevice = useThisDevice(push.data?.subscriptions);
+  const hidden = useHiddenSections(admin);
   const exports = useExports();
   const user = session.data?.user;
   if (!user) return null;
@@ -49,7 +50,13 @@ function SettingsRows({ admin }: { admin: boolean }) {
   const status: Record<string, string | undefined> = {
     account: t(`settings.roles.${user.role}`),
     reminders: user.email_reminders ? t("settings.status.emailOn") : t("settings.status.emailOff"),
-    notifications: thisDevice ? t("settings.status.deviceOn") : t("settings.status.deviceOff"),
+    notifications: !push.data?.enabled
+      ? t("settings.status.pushServerOff")
+      : !supported
+        ? t("settings.status.pushUnsupported")
+        : thisDevice
+          ? t("settings.status.deviceOn")
+          : t("settings.status.deviceOff"),
     "second-factor": totp.data?.enabled
       ? t("settings.status.secondFactorOn", { count: totp.data.recovery_codes_left })
       : t("settings.status.secondFactorOff"),
@@ -69,7 +76,7 @@ function SettingsRows({ admin }: { admin: boolean }) {
     "about",
   ] as const;
   const show = (id: string) => {
-    if (id === "notifications") return supported && Boolean(push.data?.enabled);
+    if (hidden.includes(id)) return false;
     if (id === "second-factor") return local && Boolean(totp.data);
     return true;
   };
@@ -79,7 +86,7 @@ function SettingsRows({ admin }: { admin: boolean }) {
       <PageHeader
         back={{ to: "/", label: t("shell.persons") }}
         title={t("settings.title")}
-        rail={settingsRail(t, admin)}
+        rail={settingsRail(t, admin, hidden)}
       />
       {groups.map((group) => {
         const sections = SECTIONS.filter(
