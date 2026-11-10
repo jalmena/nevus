@@ -1,3 +1,10 @@
+## v1.7.1 (2026-11-10)
+
+### Fix
+
+- **settings**: open the notifications page whatever the server does
+- **compare**: line two visits up on the skin, not only on the card
+
 ## v1.7.0 (2026-10-31)
 
 ### Feat
