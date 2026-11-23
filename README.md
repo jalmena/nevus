@@ -4,6 +4,8 @@
 
 # neVus
 
+[![CI](https://github.com/jalmena/nevus/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/jalmena/nevus/actions/workflows/ci.yml?query=branch%3Adevelop) [![Release](https://img.shields.io/github/v/release/jalmena/nevus)](https://github.com/jalmena/nevus/releases) [![Licence](https://img.shields.io/github/license/jalmena/nevus)](LICENSE) [![Python](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fjalmena%2Fnevus%2Fmain%2Fbackend%2Fpyproject.toml)](backend/pyproject.toml) [![React](https://img.shields.io/github/package-json/dependency-version/jalmena/nevus/react?filename=frontend%2Fpackage.json)](frontend/package.json) [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff) [![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/) [![Image](https://img.shields.io/badge/ghcr.io-nevus-2496ed?logo=docker&logoColor=white)](https://github.com/jalmena/nevus/pkgs/container/nevus) [![CasaOS](https://img.shields.io/badge/CasaOS-jalmena%20store-0b6ef0)](https://github.com/jalmena/jalmena-appstore#adding-the-store)
+
 **Because "I think it was smaller" is not data.**
 
 neVus is a self-hosted application for keeping a longitudinal photographic record of your moles and other skin marks: where each one sits on your body, what it looked like on each date, how large it measured against a physical reference, and how those numbers moved between dermatology visits.
